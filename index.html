@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cactus Coffee, Snack & Dessert — Bursa'nın en özel kafe deneyimi. FSM ve Podyumpark şubelerimizde sizi bekliyoruz.">
+<title>Cactus Coffee — Anasayfa</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--ink);}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,#1e1a14 0%,#0a0a0a 100%);}
+.hero-bg{position:absolute;inset:0;z-index:0;}
+.hero-deco{position:absolute;right:-60px;bottom:-40px;width:420px;height:560px;opacity:.06;z-index:1;}
+.hero-content{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:120px 24px 60px;flex:1;
+}
+.hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;opacity:0;animation:fadeUp .8s ease .3s forwards;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(64px,10vw,120px);font-weight:300;line-height:.9;color:#f8f6f2;letter-spacing:-2px;margin-bottom:12px;opacity:0;animation:fadeUp .9s ease .5s forwards;}
+.hero-title em{font-style:italic;color:var(--gold);display:block;}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;font-style:italic;color:rgba(248,246,242,.4);margin-bottom:52px;opacity:0;animation:fadeUp .9s ease .7s forwards;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .9s ease .9s forwards;}
+.hero-btns .btn-pri{background:var(--gold);color:var(--ink);}
+.hero-btns .btn-sec{color:#f8f6f2;border-color:rgba(248,246,242,.3);}
+.hero-btns .btn-sec:hover{background:rgba(248,246,242,.1);color:#f8f6f2;}
+.hero-scroll{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeUp .9s ease 1.2s forwards;z-index:2;}
+.hero-scroll span{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(248,246,242,.3);}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(248,246,242,.3),transparent);animation:scrollPulse 2s ease infinite;}
+
+/* ── ŞUBELER ── */
+.subeler{background:var(--ink);padding:100px 32px;}
+.sube-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:60px;background:rgba(255,255,255,.06);}
+.sube-krt{background:var(--ink);padding:48px 40px;position:relative;overflow:hidden;transition:background .3s;}
+.sube-krt::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;}
+.sube-krt:hover{background:#111;}
+.sube-krt:hover::before{transform:scaleX(1);}
+.sube-no{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:300;color:rgba(255,255,255,.05);line-height:1;margin-bottom:24px;letter-spacing:-3px;}
+.sube-ad{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--paper);margin-bottom:8px;line-height:1.1;}
+.sube-tur{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+.sube-desc{font-size:13px;font-weight:300;color:rgba(248,246,242,.4);line-height:1.8;margin-bottom:28px;}
+.sube-link{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(248,246,242,.5);text-decoration:none;border-bottom:1px solid rgba(248,246,242,.15);padding-bottom:3px;transition:all .2s;}
+.sube-link:hover{color:var(--gold);border-color:var(--gold);}
+
+/* ── MENÜ ÖN İZLEME ── */
+.menu-sec{padding:100px 32px;background:var(--paper);}
+.menu-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:60px;}
+.menu-intro-desc{font-size:15px;font-weight:300;color:#888;line-height:1.9;}
+.menu-intro-link{display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:4px;transition:all .2s;}
+.menu-intro-link:hover{color:var(--gold);border-color:var(--gold);}
+.menu-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--stone);}
+.mcat{background:var(--paper);padding:32px 24px;cursor:default;transition:background .25s;position:relative;overflow:hidden;}
+.mcat:hover{background:var(--ink);}
+.mcat-emoji{font-size:28px;margin-bottom:14px;display:block;transition:transform .3s;}
+.mcat:hover .mcat-emoji{transform:scale(1.12);}
+.mcat-ad{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:4px;transition:color .25s;}
+.mcat:hover .mcat-ad{color:var(--paper);}
+.mcat-adet{font-size:11px;color:var(--mist);transition:color .25s;}
+.mcat:hover .mcat-adet{color:rgba(248,246,242,.35);}
+
+/* ── INSTAGRAM ── */
+.insta-sec{background:var(--ink);padding:100px 32px;}
+.insta-intro{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:20px;}
+.insta-accounts{display:flex;gap:12px;flex-wrap:wrap;}
+.insta-acc{display:flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid rgba(248,246,242,.1);text-decoration:none;transition:all .2s;}
+.insta-acc:hover{border-color:var(--gold);}
+.insta-acc-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+.insta-acc-name{font-size:11px;font-weight:500;color:rgba(248,246,242,.6);letter-spacing:.5px;}
+.insta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.insta-cell{aspect-ratio:1;background:var(--accent);position:relative;overflow:hidden;cursor:pointer;}
+.insta-cell::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#1a1712,#0d0d0d);}
+.insta-cell:nth-child(2n)::before{background:linear-gradient(135deg,#141210,#1a1612);}
+.insta-cell:nth-child(3n)::before{background:linear-gradient(225deg,#111,#1c1a16);}
+.insta-cell-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.1;transition:opacity .3s;}
+.insta-cell:hover .insta-cell-ico{opacity:.25;}
+.insta-cell-overlay{position:absolute;inset:0;background:rgba(184,150,90,.15);opacity:0;transition:opacity .3s;display:flex;align-items:center;justify-content:center;}
+.insta-cell:hover .insta-cell-overlay{opacity:1;}
+.insta-cell-overlay span{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#f8f6f2;}
+.insta-more{margin-top:28px;text-align:center;}
+.insta-more a{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(248,246,242,.3);text-decoration:none;transition:color .2s;}
+.insta-more a:hover{color:var(--gold);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sube-grid{grid-template-columns:1fr;}
+  .menu-cats{grid-template-columns:repeat(2,1fr);}
+  .insta-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:768px){
+  .subeler,.menu-sec,.insta-sec{padding:70px 20px;}
+  .hero-content{padding:100px 20px 60px;}
+  .menu-intro{grid-template-columns:1fr;gap:20px;}
+  .sube-krt{padding:32px 24px;}
+  .sube-no{font-size:50px;}
+  .insta-intro{flex-direction:column;align-items:flex-start;}
+  .insta-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:480px){
+  .hero-btns{flex-direction:column;align-items:center;width:100%;}
+  .hero-btns a{width:100%;max-width:280px;justify-content:center;}
+  .hero-deco{display:none;}
+  .menu-cats{grid-template-columns:repeat(2,1fr);}
+  .mcat{padding:22px 16px;}
+  .mcat-emoji{font-size:22px;}
+  .mcat-ad{font-size:16px;}
+  .insta-accounts{flex-direction:column;width:100%;}
+  .insta-acc{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">CACTUS</a>
+  <div class="nav-links">
+    <a href="index.html" class="aktif">Ana Sayfa</a>
+    <a href="menu.html">Menü</a>
+    <a href="galeri.html">Galeri</a>
+    <a href="iletisim.html">İletişim</a>
+  </div>
+  <button class="nav-burger" onclick="toggleMenu()" id="burger">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBİL MENÜ -->
+<div class="nav-mob" id="navMob">
+  <a href="index.html" onclick="toggleMenu()">Ana Sayfa</a>
+  <a href="menu.html" onclick="toggleMenu()">Menü</a>
+  <a href="galeri.html" onclick="toggleMenu()">Galeri</a>
+  <a href="iletisim.html" onclick="toggleMenu()">İletişim</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <svg class="hero-deco" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="88" y="20" width="24" height="200" fill="white"/>
+      <rect x="40" y="80" width="50" height="20" rx="10" fill="white"/>
+      <rect x="40" y="60" width="20" height="60" fill="white"/>
+      <rect x="110" y="100" width="50" height="20" rx="10" fill="white"/>
+      <rect x="140" y="80" width="20" height="70" fill="white"/>
+      <rect x="76" y="220" width="48" height="50" rx="4" fill="white"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Bursa'nın Kalbinde · İki Şube</div>
+    <h1 class="hero-title">Cactus<em>Coffee</em></h1>
+    <p class="hero-sub">Snack & Dessert · Her yudumda bir hikaye</p>
+    <div class="hero-btns">
+      <a href="menu.html" class="btn-pri">Menüyü Gör</a>
+      <a href="iletisim.html" class="btn-sec">Bize Ulaşın</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Keşfet</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Espresso <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Bubble Waffle <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Ice Latte <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Çikolatalı Mocha <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Taze Limonata <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Cactus Kokteyl <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Dubai Waffle <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Flat White <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Espresso <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Bubble Waffle <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Ice Latte <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Çikolatalı Mocha <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Taze Limonata <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Cactus Kokteyl <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Dubai Waffle <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Flat White <span class="ticker-sep">·</span></span>
+  </div>
+</div>
+
+<!-- ŞUBELER -->
+<section class="subeler reveal">
+  <div class="container">
+    <div class="sec-label" style="color:var(--gold);">Şubelerimiz</div>
+    <h2 class="sec-title" style="color:var(--paper)">İki farklı <em>deneyim</em></h2>
+    <div class="sube-grid">
+      <div class="sube-krt">
+        <div class="sube-no">01</div>
+        <div class="sube-ad">FSM Şubesi</div>
+        <div class="sube-tur">Kapalı Mekan · Bohem</div>
+        <div class="sube-desc">Şehrin tam ortasında, kendi dünyasında bir yer. Sıcak renkleri ve özgün dokusuyla sohbetin ve kahvenin buluştuğu nokta.</div>
+        <a href="menu.html" class="sube-link">Menüyü Gör →</a>
+      </div>
+      <div class="sube-krt">
+        <div class="sube-no">02</div>
+        <div class="sube-ad">Podyumpark Şubesi</div>
+        <div class="sube-tur">Açık Hava · Doğa</div>
+        <div class="sube-desc">Yeşilliklerin üzerinde şezlonga yayılıp günün tadını çıkarın. Güneşin, kahvenin ve huzurun buluştuğu açık hava kafesi.</div>
+        <a href="menu.html" class="sube-link">Menüyü Gör →</a>
+      </div>
+      <div class="sube-krt">
+        <div class="sube-no">03</div>
+        <div class="sube-ad">Waffle Corner</div>
+        <div class="sube-tur">Açık Hava · Tatlı</div>
+        <div class="sube-desc">Enfes bubble waffle'lar eşliğinde gününüzü tatlandırın. Renkli, enerjik ve eğlenceli tatlı köşemiz sizi bekliyor.</div>
+        <a href="menu.html" class="sube-link">Menüyü Gör →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENÜ ÖN İZLEME -->
+<section class="menu-sec reveal">
+  <div class="container">
+    <div class="menu-intro">
+      <div>
+        <div class="sec-label">Menümüz</div>
+        <h2 class="sec-title">Her damak <em>tadına</em><br>bir şeyler</h2>
+      </div>
+      <div>
+        <p class="menu-intro-desc">Özenle seçilmiş kahvelerden taze hazırlanan waffle'lara, bitkisel çaylardan el yapımı kokteyillere kadar geniş menümüz sizin için burada.</p>
+        <a href="menu.html" class="menu-intro-link">Tam Menüyü Gör →</a>
+      </div>
+    </div>
+    <div class="menu-cats">
+      <div class="mcat"><span class="mcat-emoji">☕</span><div class="mcat-ad">Sıcak Kahveler</div><div class="mcat-adet">20 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🧊</span><div class="mcat-ad">Soğuk Kahveler</div><div class="mcat-adet">10 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🌿</span><div class="mcat-ad">Bitkisel Çaylar</div><div class="mcat-adet">8 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🍋</span><div class="mcat-ad">Vitamin İçecekler</div><div class="mcat-adet">6 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🍹</span><div class="mcat-ad">Kokteyller</div><div class="mcat-adet">3 özel tarif</div></div>
+      <div class="mcat"><span class="mcat-emoji">🧇</span><div class="mcat-ad">Bubble Waffle</div><div class="mcat-adet">5 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🥪</span><div class="mcat-ad">Tostlar</div><div class="mcat-adet">6 çeşit</div></div>
+      <div class="mcat"><span class="mcat-emoji">🥤</span><div class="mcat-ad">Meşrubatlar</div><div class="mcat-adet">3 çeşit</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section class="insta-sec reveal">
+  <div class="container">
+    <div class="insta-intro">
+      <div>
+        <div class="sec-label">Instagram</div>
+        <h2 class="sec-title" style="color:var(--paper)">Bizi <em>takip edin</em></h2>
+      </div>
+      <div class="insta-accounts">
+        <a href="https://instagram.com/cactuscafe.fsm" target="_blank" class="insta-acc"><div class="insta-acc-dot"></div><span class="insta-acc-name">@cactuscafe.fsm</span></a>
+        <a href="https://instagram.com/cactuscafe.tr" target="_blank" class="insta-acc"><div class="insta-acc-dot"></div><span class="insta-acc-name">@cactuscafe.tr</span></a>
+        <a href="https://instagram.com/cactuscafe.waffle" target="_blank" class="insta-acc"><div class="insta-acc-dot"></div><span class="insta-acc-name">@cactuscafe.waffle</span></a>
+      </div>
+    </div>
+    <div class="insta-grid">
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.fsm','_blank')"><div class="insta-cell-ico">☕</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.tr','_blank')"><div class="insta-cell-ico">🧇</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.waffle','_blank')"><div class="insta-cell-ico">🌵</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.fsm','_blank')"><div class="insta-cell-ico">🍹</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.tr','_blank')"><div class="insta-cell-ico">🧊</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.waffle','_blank')"><div class="insta-cell-ico">🌿</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.fsm','_blank')"><div class="insta-cell-ico">☕</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+      <div class="insta-cell" onclick="window.open('https://instagram.com/cactuscafe.tr','_blank')"><div class="insta-cell-ico">🍋</div><div class="insta-cell-overlay"><span>Instagram'da Gör</span></div></div>
+    </div>
+    <div class="insta-more"><a href="https://instagram.com/cactuscafe.fsm" target="_blank">Tüm Gönderileri Gör →</a></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">CACTUS</div>
+      <p class="footer-desc">Coffee, Snack & Dessert. Bursa'nın kalbinde, iki farklı deneyim. Her yudumda bir hikaye.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Sayfalar</div>
+      <a href="index.html">Ana Sayfa</a>
+      <a href="menu.html">Menü</a>
+      <a href="galeri.html">Galeri</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Şubeler</div>
+      <a href="iletisim.html">FSM Şubesi</a>
+      <a href="iletisim.html">Podyumpark Şubesi</a>
+      <a href="iletisim.html">Waffle Corner</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Cactus Coffee, Snack & Dessert · Bursa</div>
+    <div class="footer-ig">
+      <a href="https://instagram.com/cactuscafe.fsm" target="_blank">@cactuscafe.fsm</a>
+      <a href="https://instagram.com/cactuscafe.tr" target="_blank">@cactuscafe.tr</a>
+      <a href="https://instagram.com/cactuscafe.waffle" target="_blank">@cactuscafe.waffle</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav scroll efekti
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);
+});
+// Mobil menü
+function toggleMenu(){
+  const mob=document.getElementById('navMob');
+  const b=document.getElementById('burger');
+  const open=mob.classList.toggle('on');
+  b.children[0].style.transform=open?'rotate(45deg) translateY(6.5px)':'';
+  b.children[1].style.opacity=open?'0':'1';
+  b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';
+  document.body.style.overflow=open?'hidden':'';
+}
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

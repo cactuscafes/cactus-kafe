@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cactus Coffee galeri — Kafemizden kareler ve atmosfer.">
+<title>Galeri — Cactus Coffee</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-hero{background:var(--ink);padding:160px 32px 80px;text-align:center;position:relative;overflow:hidden;}
+.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,#0a0a0a);}
+.page-hero-content{position:relative;z-index:1;}
+.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:#f8f6f2;line-height:.95;letter-spacing:-2px;}
+.page-title em{font-style:italic;color:var(--gold);}
+
+/* Galeri filtre */
+.galeri-wrap{max-width:1200px;margin:0 auto;padding:60px 32px;}
+.galeri-filter{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px;
+  border-bottom:1px solid var(--stone);padding-bottom:24px;
+}
+.gfilt{
+  padding:8px 20px;border:1.5px solid var(--stone);background:none;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:2px;text-transform:uppercase;color:var(--mist);
+  cursor:pointer;transition:all .2s;
+}
+.gfilt.on,.gfilt:hover{border-color:var(--ink);color:var(--ink);}
+.gfilt.on{background:var(--ink);color:var(--paper);}
+
+/* Masonry-style grid */
+.galeri-grid{
+  columns:4;column-gap:4px;
+}
+.galeri-item{
+  break-inside:avoid;margin-bottom:4px;
+  position:relative;overflow:hidden;cursor:pointer;
+  background:var(--stone);
+}
+.galeri-item::before{
+  content:'';display:block;
+}
+/* Farklı boy oranları için çeşitlilik */
+.galeri-item:nth-child(3n+1)::before{padding-top:120%;}
+.galeri-item:nth-child(3n+2)::before{padding-top:80%;}
+.galeri-item:nth-child(3n+3)::before{padding-top:100%;}
+
+.galeri-inner{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;
+}
+/* Renk varyasyonları */
+.galeri-item:nth-child(6n+1) .galeri-inner{background:linear-gradient(135deg,#1a1712,#0f0d0a);}
+.galeri-item:nth-child(6n+2) .galeri-inner{background:linear-gradient(225deg,#161412,#1c1a15);}
+.galeri-item:nth-child(6n+3) .galeri-inner{background:linear-gradient(135deg,#131110,#1a1814);}
+.galeri-item:nth-child(6n+4) .galeri-inner{background:linear-gradient(315deg,#181614,#111);}
+.galeri-item:nth-child(6n+5) .galeri-inner{background:linear-gradient(45deg,#1c1a16,#0e0d0b);}
+.galeri-item:nth-child(6n+6) .galeri-inner{background:linear-gradient(180deg,#141210,#1a1814);}
+
+.galeri-ico{font-size:32px;opacity:.15;transition:opacity .3s,transform .3s;}
+.galeri-tag{font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(184,150,90,.4);transition:opacity .3s;}
+.galeri-overlay{
+  position:absolute;inset:0;
+  background:rgba(184,150,90,.12);
+  opacity:0;transition:opacity .3s;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;
+}
+.galeri-item:hover .galeri-overlay{opacity:1;}
+.galeri-item:hover .galeri-ico{opacity:.3;transform:scale(1.1);}
+.galeri-overlay-ico{font-size:18px;}
+.galeri-overlay-txt{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(248,246,242,.7);}
+
+/* Instagram CTA */
+.galeri-cta{
+  text-align:center;padding:80px 32px;
+  background:var(--ink);margin-top:0;
+}
+.galeri-cta .sec-label{justify-content:center;}
+.galeri-cta .sec-label::after{display:none;}
+.galeri-cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,52px);font-weight:300;color:var(--paper);margin-bottom:12px;letter-spacing:-1px;}
+.galeri-cta-title em{font-style:italic;color:var(--gold);}
+.galeri-cta-sub{font-size:14px;font-weight:300;color:rgba(248,246,242,.35);margin-bottom:40px;line-height:1.7;}
+.galeri-ig-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+.galeri-ig-link{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 24px;border:1px solid rgba(248,246,242,.1);
+  text-decoration:none;transition:all .2s;
+}
+.galeri-ig-link:hover{border-color:var(--gold);background:rgba(184,150,90,.08);}
+.galeri-ig-link span{font-size:12px;font-weight:500;color:rgba(248,246,242,.6);letter-spacing:.5px;}
+.galeri-ig-link:hover span{color:var(--gold);}
+
+/* Lightbox */
+.lightbox{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,10,10,.95);z-index:600;
+  align-items:center;justify-content:center;
+}
+.lightbox.on{display:flex;}
+.lightbox-content{
+  background:var(--accent);
+  width:min(500px,90vw);aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;position:relative;
+}
+.lightbox-ico{font-size:60px;opacity:.2;}
+.lightbox-tag{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(184,150,90,.5);}
+.lightbox-close{
+  position:absolute;top:-48px;right:0;
+  background:none;border:none;color:rgba(248,246,242,.5);
+  font-size:28px;cursor:pointer;transition:color .2s;
+}
+.lightbox-close:hover{color:var(--gold);}
+
+/* Fotoğraf yükleme notu */
+.foto-notu{
+  background:rgba(184,150,90,.06);border:1px solid rgba(184,150,90,.2);
+  border-radius:0;padding:16px 24px;margin-bottom:32px;
+  font-size:13px;color:#8a7040;line-height:1.6;
+}
+.foto-notu strong{display:block;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+
+/* Responsive */
+@media(max-width:900px){.galeri-grid{columns:3;}}
+@media(max-width:640px){
+  .galeri-grid{columns:2;}
+  .galeri-wrap{padding:40px 16px;}
+  .page-hero{padding:130px 20px 60px;}
+  .galeri-ig-links{flex-direction:column;align-items:center;}
+  .galeri-ig-link{width:100%;max-width:280px;justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">CACTUS</a>
+  <div class="nav-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="menu.html">Menü</a>
+    <a href="galeri.html" class="aktif">Galeri</a>
+    <a href="iletisim.html">İletişim</a>
+  </div>
+  <button class="nav-burger" onclick="toggleMenu()" id="burger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-mob" id="navMob">
+  <a href="index.html" onclick="toggleMenu()">Ana Sayfa</a>
+  <a href="menu.html" onclick="toggleMenu()">Menü</a>
+  <a href="galeri.html" onclick="toggleMenu()">Galeri</a>
+  <a href="iletisim.html" onclick="toggleMenu()">İletişim</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-hero-content">
+    <span class="page-eyebrow">Cactus Coffee</span>
+    <h1 class="page-title">Bizden<br><em>Kareler</em></h1>
+  </div>
+</div>
+
+<div class="galeri-wrap">
+
+  <div class="foto-notu">
+    <strong>📸 Fotoğraf Eklemek İçin</strong>
+    Bu sayfa şu an demo görsel ile çalışıyor. Gerçek fotoğraflarınızı eklemek için HTML'deki her <code>.galeri-item</code> içine <code>&lt;img&gt;</code> etiketi ekleyin veya arka plan görseli olarak CSS'e tanımlayın.
+  </div>
+
+  <div class="galeri-filter">
+    <button class="gfilt on" onclick="galeriFiltre('tumu',this)">Tümü</button>
+    <button class="gfilt" onclick="galeriFiltre('mekan',this)">Mekan</button>
+    <button class="gfilt" onclick="galeriFiltre('kahve',this)">Kahve</button>
+    <button class="gfilt" onclick="galeriFiltre('waffle',this)">Waffle</button>
+    <button class="gfilt" onclick="galeriFiltre('atmosfer',this)">Atmosfer</button>
+  </div>
+
+  <div class="galeri-grid" id="galeriGrid">
+    <div class="galeri-item" data-kat="mekan" onclick="lightboxAc('🏙','Mekan')"><div class="galeri-inner"><span class="galeri-ico">🏙</span><span class="galeri-tag">Mekan</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="kahve" onclick="lightboxAc('☕','Kahve')"><div class="galeri-inner"><span class="galeri-ico">☕</span><span class="galeri-tag">Kahve</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="waffle" onclick="lightboxAc('🧇','Waffle')"><div class="galeri-inner"><span class="galeri-ico">🧇</span><span class="galeri-tag">Waffle</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="atmosfer" onclick="lightboxAc('🌿','Atmosfer')"><div class="galeri-inner"><span class="galeri-ico">🌿</span><span class="galeri-tag">Atmosfer</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="kahve" onclick="lightboxAc('🧊','Soğuk Kahve')"><div class="galeri-inner"><span class="galeri-ico">🧊</span><span class="galeri-tag">Soğuk Kahve</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="mekan" onclick="lightboxAc('🌵','Cactus Vibes')"><div class="galeri-inner"><span class="galeri-ico">🌵</span><span class="galeri-tag">Cactus Vibes</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="waffle" onclick="lightboxAc('🍓','Meyveli Waffle')"><div class="galeri-inner"><span class="galeri-ico">🍓</span><span class="galeri-tag">Meyveli Waffle</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="atmosfer" onclick="lightboxAc('✨','Atmosfer')"><div class="galeri-inner"><span class="galeri-ico">✨</span><span class="galeri-tag">Atmosfer</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="kahve" onclick="lightboxAc('🍫','Mocha')"><div class="galeri-inner"><span class="galeri-ico">🍫</span><span class="galeri-tag">Mocha</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="mekan" onclick="lightboxAc('☀️','Podyumpark')"><div class="galeri-inner"><span class="galeri-ico">☀️</span><span class="galeri-tag">Podyumpark</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="waffle" onclick="lightboxAc('🍯','Caramel Waffle')"><div class="galeri-inner"><span class="galeri-ico">🍯</span><span class="galeri-tag">Caramel</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+    <div class="galeri-item" data-kat="atmosfer" onclick="lightboxAc('🌙','Gece')"><div class="galeri-inner"><span class="galeri-ico">🌙</span><span class="galeri-tag">Gece Atmosferi</span></div><div class="galeri-overlay"><span class="galeri-overlay-ico">🔍</span><span class="galeri-overlay-txt">Büyüt</span></div></div>
+  </div>
+</div>
+
+<!-- Instagram CTA -->
+<div class="galeri-cta">
+  <div class="sec-label" style="justify-content:center;">Daha Fazlası</div>
+  <h2 class="galeri-cta-title">Instagram'da <em>takip edin</em></h2>
+  <p class="galeri-cta-sub">Güncel fotoğraflar, yeni ürünler ve kampanyalar için<br>Instagram hesaplarımızı takip edin.</p>
+  <div class="galeri-ig-links">
+    <a href="https://instagram.com/cactuscafe.fsm" target="_blank" class="galeri-ig-link"><span>@cactuscafe.fsm</span></a>
+    <a href="https://instagram.com/cactuscafe.tr" target="_blank" class="galeri-ig-link"><span>@cactuscafe.tr</span></a>
+    <a href="https://instagram.com/cactuscafe.waffle" target="_blank" class="galeri-ig-link"><span>@cactuscafe.waffle</span></a>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="lightboxKapat()">
+  <div class="lightbox-content" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="lightboxKapat()">×</button>
+    <span class="lightbox-ico" id="lbIco">☕</span>
+    <span class="lightbox-tag" id="lbTag">Kahve</span>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">CACTUS</div>
+      <p class="footer-desc">Coffee, Snack & Dessert. Bursa'nın kalbinde, iki farklı deneyim.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Sayfalar</div>
+      <a href="index.html">Ana Sayfa</a>
+      <a href="menu.html">Menü</a>
+      <a href="galeri.html">Galeri</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Instagram</div>
+      <a href="https://instagram.com/cactuscafe.fsm" target="_blank">@cactuscafe.fsm</a>
+      <a href="https://instagram.com/cactuscafe.tr" target="_blank">@cactuscafe.tr</a>
+      <a href="https://instagram.com/cactuscafe.waffle" target="_blank">@cactuscafe.waffle</a>
+    </div>
+  </div>
+  <div class="footer-bottom"><div class="footer-copy">© 2025 Cactus Coffee · Bursa</div></div>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);});
+function toggleMenu(){
+  const mob=document.getElementById('navMob'),b=document.getElementById('burger');
+  const open=mob.classList.toggle('on');
+  b.children[0].style.transform=open?'rotate(45deg) translateY(6.5px)':'';
+  b.children[1].style.opacity=open?'0':'1';
+  b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';
+  document.body.style.overflow=open?'hidden':'';
+}
+function galeriFiltre(kat,el){
+  document.querySelectorAll('.gfilt').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.galeri-item').forEach(item=>{
+    if(kat==='tumu'||item.dataset.kat===kat){
+      item.style.display='block';
+    } else {
+      item.style.display='none';
+    }
+  });
+}
+function lightboxAc(ico,tag){
+  document.getElementById('lbIco').textContent=ico;
+  document.getElementById('lbTag').textContent=tag;
+  document.getElementById('lightbox').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function lightboxKapat(){
+  document.getElementById('lightbox').classList.remove('on');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lightboxKapat();});
+</script>
+</body>
+</html>

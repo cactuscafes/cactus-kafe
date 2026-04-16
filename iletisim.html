@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cactus Coffee iletişim bilgileri — Bursa FSM ve Podyumpark şubelerimize ulaşın.">
+<title>İletişim — Cactus Coffee</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-hero{background:var(--ink);padding:160px 32px 80px;text-align:center;position:relative;overflow:hidden;}
+.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,#0a0a0a);}
+.page-hero-content{position:relative;z-index:1;}
+.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:#f8f6f2;line-height:.95;letter-spacing:-2px;}
+.page-title em{font-style:italic;color:var(--gold);}
+
+/* İletişim içerik */
+.iletisim-wrap{max-width:1100px;margin:0 auto;padding:80px 32px;}
+.iletisim-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-bottom:80px;background:var(--stone);}
+.sube-kart{
+  background:var(--paper);padding:48px 40px;
+  transition:background .25s;position:relative;
+}
+.sube-kart::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.sube-kart:hover{background:#fff;}
+.sube-kart:hover::before{transform:scaleX(1);}
+.sk-no{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:rgba(10,10,10,.06);line-height:1;margin-bottom:20px;}
+.sk-ad{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--ink);margin-bottom:6px;}
+.sk-tur{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.sk-info{display:flex;flex-direction:column;gap:14px;}
+.sk-info-row{display:flex;align-items:flex-start;gap:12px;}
+.sk-info-ico{font-size:16px;flex-shrink:0;margin-top:1px;}
+.sk-info-txt{font-size:13px;font-weight:300;color:#666;line-height:1.6;}
+.sk-info-txt strong{display:block;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);margin-bottom:3px;}
+.sk-ig{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:24px;padding:9px 16px;
+  border:1px solid var(--stone);font-size:11px;font-weight:500;
+  letter-spacing:1px;color:var(--ink);text-decoration:none;transition:all .2s;
+}
+.sk-ig:hover{border-color:var(--gold);color:var(--gold);}
+
+/* İletişim formu */
+.form-sec{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  padding:80px 0;border-top:1px solid var(--stone);
+}
+.form-intro .sec-title{margin-bottom:16px;}
+.form-intro p{font-size:14px;font-weight:300;color:#888;line-height:1.8;}
+.form{display:flex;flex-direction:column;gap:16px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mist);}
+.form-group input,.form-group textarea,.form-group select{
+  padding:12px 14px;border:1.5px solid var(--stone);background:#fff;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);
+  transition:border-color .2s;resize:none;
+}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--gold);}
+.form-group textarea{min-height:120px;}
+.form-submit{
+  padding:14px 32px;background:var(--ink);color:var(--paper);
+  border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;
+  align-self:flex-start;
+}
+.form-submit:hover{background:var(--gold);color:var(--ink);}
+.form-success{display:none;padding:16px;background:rgba(31,92,56,.08);border:1px solid rgba(31,92,56,.2);font-size:14px;color:#1F5C38;}
+
+/* Responsive */
+@media(max-width:900px){
+  .iletisim-grid{grid-template-columns:1fr;}
+  .form-sec{grid-template-columns:1fr;gap:48px;}
+}
+@media(max-width:768px){
+  .page-hero{padding:130px 20px 60px;}
+  .iletisim-wrap{padding:50px 20px;}
+  .sube-kart{padding:32px 24px;}
+  .sk-no{font-size:40px;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">CACTUS</a>
+  <div class="nav-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="menu.html">Menü</a>
+    <a href="galeri.html">Galeri</a>
+    <a href="iletisim.html" class="aktif">İletişim</a>
+  </div>
+  <button class="nav-burger" onclick="toggleMenu()" id="burger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-mob" id="navMob">
+  <a href="index.html" onclick="toggleMenu()">Ana Sayfa</a>
+  <a href="menu.html" onclick="toggleMenu()">Menü</a>
+  <a href="galeri.html" onclick="toggleMenu()">Galeri</a>
+  <a href="iletisim.html" onclick="toggleMenu()">İletişim</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-hero-content">
+    <span class="page-eyebrow">Cactus Coffee</span>
+    <h1 class="page-title">Bize<br><em>Ulaşın</em></h1>
+  </div>
+</div>
+
+<div class="iletisim-wrap">
+
+  <!-- Şube Kartları -->
+  <div class="iletisim-grid reveal">
+    <div class="sube-kart">
+      <div class="sk-no">01</div>
+      <div class="sk-ad">FSM Şubesi</div>
+      <div class="sk-tur">Kapalı Mekan · Bursa</div>
+      <div class="sk-info">
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📍</span>
+          <div class="sk-info-txt"><strong>Adres</strong>Fatih Sultan Mehmet Bulvarı, Bursa</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">🕐</span>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Her gün 09:00 – 22:00</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📞</span>
+          <div class="sk-info-txt"><strong>Telefon</strong>Bilgi için Instagram'dan yazın</div>
+        </div>
+      </div>
+      <a href="https://instagram.com/cactuscafe.fsm" target="_blank" class="sk-ig">📷 @cactuscafe.fsm</a>
+    </div>
+
+    <div class="sube-kart">
+      <div class="sk-no">02</div>
+      <div class="sk-ad">Podyumpark</div>
+      <div class="sk-tur">Açık Hava · Bursa</div>
+      <div class="sk-info">
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📍</span>
+          <div class="sk-info-txt"><strong>Adres</strong>Podyumpark AVM, Bursa</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">🕐</span>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Her gün 10:00 – 22:00</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📞</span>
+          <div class="sk-info-txt"><strong>Telefon</strong>Bilgi için Instagram'dan yazın</div>
+        </div>
+      </div>
+      <a href="https://instagram.com/cactuscafe.tr" target="_blank" class="sk-ig">📷 @cactuscafe.tr</a>
+    </div>
+
+    <div class="sube-kart">
+      <div class="sk-no">03</div>
+      <div class="sk-ad">Waffle Corner</div>
+      <div class="sk-tur">Açık Hava · Podyumpark</div>
+      <div class="sk-info">
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📍</span>
+          <div class="sk-info-txt"><strong>Adres</strong>Podyumpark AVM, Bursa</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">🕐</span>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Her gün 10:00 – 22:00</div>
+        </div>
+        <div class="sk-info-row">
+          <span class="sk-info-ico">📞</span>
+          <div class="sk-info-txt"><strong>Telefon</strong>Bilgi için Instagram'dan yazın</div>
+        </div>
+      </div>
+      <a href="https://instagram.com/cactuscafe.waffle" target="_blank" class="sk-ig">📷 @cactuscafe.waffle</a>
+    </div>
+  </div>
+
+  <!-- İletişim Formu -->
+  <div class="form-sec reveal">
+    <div class="form-intro">
+      <div class="sec-label">Mesaj Gönderin</div>
+      <h2 class="sec-title">Sizinle<br><em>konuşalım</em></h2>
+      <p>Rezervasyon, iş başvurusu veya herhangi bir konu için bize mesaj gönderebilirsiniz. En kısa sürede geri döneceğiz.</p>
+    </div>
+    <div>
+      <form class="form" onsubmit="formGonder(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Adınız</label>
+            <input type="text" placeholder="Ad Soyad" required>
+          </div>
+          <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" placeholder="mail@örnek.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Konu</label>
+          <select>
+            <option>Genel Bilgi</option>
+            <option>Rezervasyon</option>
+            <option>İş Başvurusu</option>
+            <option>Öneri / Şikayet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mesajınız</label>
+          <textarea placeholder="Mesajınızı buraya yazın..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Gönder →</button>
+        <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">CACTUS</div>
+      <p class="footer-desc">Coffee, Snack & Dessert. Bursa'nın kalbinde, iki farklı deneyim.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Sayfalar</div>
+      <a href="index.html">Ana Sayfa</a>
+      <a href="menu.html">Menü</a>
+      <a href="galeri.html">Galeri</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-ttl">Instagram</div>
+      <a href="https://instagram.com/cactuscafe.fsm" target="_blank">@cactuscafe.fsm</a>
+      <a href="https://instagram.com/cactuscafe.tr" target="_blank">@cactuscafe.tr</a>
+      <a href="https://instagram.com/cactuscafe.waffle" target="_blank">@cactuscafe.waffle</a>
+    </div>
+  </div>
+  <div class="footer-bottom"><div class="footer-copy">© 2025 Cactus Coffee · Bursa</div></div>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);});
+function toggleMenu(){
+  const mob=document.getElementById('navMob'),b=document.getElementById('burger');
+  const open=mob.classList.toggle('on');
+  b.children[0].style.transform=open?'rotate(45deg) translateY(6.5px)':'';
+  b.children[1].style.opacity=open?'0':'1';
+  b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';
+  document.body.style.overflow=open?'hidden':'';
+}
+function formGonder(e){
+  e.preventDefault();
+  document.getElementById('formSuccess').style.display='block';
+  e.target.reset();
+  setTimeout(()=>document.getElementById('formSuccess').style.display='none',5000);
+}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');obs.unobserve(x.target);}});},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

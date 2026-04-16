@@ -1,0 +1,136 @@
+/* ═══════════════════════════════
+   CACTUS KAFE — Ortak Stiller
+═══════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0a0a0a;
+  --paper:#f8f6f2;
+  --stone:#e8e4dd;
+  --mist:#c8c2b8;
+  --accent:#1a1a1a;
+  --gold:#b8965a;
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:.4;
+}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+  transition:background .3s,box-shadow .3s;
+}
+.nav.scrolled{background:rgba(10,10,10,.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(255,255,255,.06);}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:300;
+  color:#f8f6f2;letter-spacing:3px;text-decoration:none;
+}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{
+  font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(248,246,242,.6);text-decoration:none;transition:color .2s;
+}
+.nav-links a:hover,.nav-links a.aktif{color:var(--gold);}
+.nav-burger{
+  display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;
+}
+.nav-burger span{display:block;width:22px;height:1.5px;background:#f8f6f2;transition:all .3s;}
+.nav-mob{
+  display:none;position:fixed;inset:0;background:var(--ink);z-index:490;
+  flex-direction:column;align-items:center;justify-content:center;gap:32px;
+}
+.nav-mob.on{display:flex;}
+.nav-mob a{
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px;font-weight:300;font-style:italic;
+  color:rgba(248,246,242,.7);text-decoration:none;transition:color .2s;
+}
+.nav-mob a:hover{color:var(--gold);}
+
+/* ── ORTAK ELEMENTLER ── */
+.container{max-width:1100px;margin:0 auto;}
+.sec-label{
+  font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.sec-label::after{content:'';flex:0 0 40px;height:1px;background:var(--gold);}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,5vw,64px);font-weight:300;line-height:1;
+  letter-spacing:-1px;margin-bottom:20px;
+}
+.sec-title em{font-style:italic;color:var(--gold);}
+.btn-pri{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 34px;background:var(--gold);color:var(--ink);
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;
+  border:none;cursor:pointer;transition:all .25s;
+}
+.btn-pri:hover{background:#c9a96a;transform:translateY(-1px);}
+.btn-sec{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 34px;background:transparent;color:var(--ink);
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;
+  border:1.5px solid var(--ink);cursor:pointer;transition:all .25s;
+}
+.btn-sec:hover{background:var(--ink);color:var(--paper);}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* ── FOOTER ── */
+.footer{background:var(--ink);padding:60px 32px 32px;}
+.footer-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr;gap:60px;
+  max-width:1100px;margin:0 auto;padding-bottom:48px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--paper);letter-spacing:3px;margin-bottom:16px;}
+.footer-desc{font-size:13px;font-weight:300;color:rgba(248,246,242,.35);line-height:1.8;max-width:280px;}
+.footer-col-ttl{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.footer-col a{display:block;font-size:13px;color:rgba(248,246,242,.4);text-decoration:none;margin-bottom:10px;transition:color .2s;}
+.footer-col a:hover{color:var(--paper);}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.footer-copy{font-size:11px;color:rgba(248,246,242,.2);letter-spacing:1px;}
+.footer-ig{display:flex;gap:16px;}
+.footer-ig a{font-size:11px;color:rgba(248,246,242,.3);text-decoration:none;letter-spacing:1px;transition:color .2s;}
+.footer-ig a:hover{color:var(--gold);}
+
+/* ── TICKER ── */
+.ticker{background:var(--gold);padding:12px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;animation:ticker 22s linear infinite;}
+.ticker-item{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--ink);padding:0 36px;}
+.ticker-sep{color:rgba(10,10,10,.35);}
+
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes scrollPulse{0%,100%{opacity:.3;}50%{opacity:.8;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-burger{display:flex;}
+  .footer-grid{grid-template-columns:1fr;gap:36px;}
+  .footer{padding:48px 20px 28px;}
+  .footer-bottom{justify-content:center;text-align:center;}
+}
+@media(max-width:480px){
+  .footer-ig{flex-wrap:wrap;justify-content:center;}
+}

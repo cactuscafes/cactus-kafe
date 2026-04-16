@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cactus Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0a0a0a;--paper:#f8f6f2;--stone:#e8e4dd;--mist:#c8c2b8;
+  --gold:#b8965a;--gr:#1F5C38;--gr2:#2E8A52;--rd:#8B1A1A;--rd2:#B52B2B;
+  --bl:#1A3F6F;--bl2:#2A60A8;
+}
+body{font-family:'DM Sans',sans-serif;background:#f0ede8;color:var(--ink);min-height:100vh;}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;}
+input,select,textarea{font-family:'DM Sans',sans-serif;}
+
+/* ── GİRİŞ EKRANI ── */
+.giris{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--ink);
+}
+.giris-kart{
+  background:#fff;padding:48px 40px;width:min(400px,95vw);
+  box-shadow:0 40px 80px rgba(0,0,0,.3);
+}
+.giris-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--ink);letter-spacing:3px;text-align:center;margin-bottom:4px;}
+.giris-sub{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--mist);text-align:center;margin-bottom:32px;}
+.giris-label{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px;}
+.giris-input{
+  width:100%;padding:12px 14px;border:1.5px solid var(--stone);
+  font-size:15px;color:var(--ink);margin-bottom:16px;
+  transition:border-color .2s;
+}
+.giris-input:focus{outline:none;border-color:var(--gold);}
+.giris-btn{
+  width:100%;padding:14px;background:var(--ink);color:#fff;
+  border:none;font-size:12px;font-weight:500;letter-spacing:2px;
+  text-transform:uppercase;transition:background .2s;
+}
+.giris-btn:hover{background:#222;}
+.giris-hata{font-size:13px;color:var(--rd);text-align:center;margin-top:10px;display:none;}
+
+/* ── ADMIN LAYOUT ── */
+.admin{display:none;min-height:100vh;}
+.admin-nav{
+  background:var(--ink);padding:0 24px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.admin-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:#fff;letter-spacing:2px;}
+.admin-nav-right{display:flex;align-items:center;gap:16px;}
+.admin-save-all{
+  padding:8px 20px;background:var(--gold);color:var(--ink);
+  border:none;font-size:11px;font-weight:600;letter-spacing:1.5px;
+  text-transform:uppercase;transition:all .2s;
+}
+.admin-save-all:hover{background:#c9a96a;}
+.admin-cikis{
+  padding:8px 16px;background:transparent;color:rgba(255,255,255,.5);
+  border:1px solid rgba(255,255,255,.15);font-size:11px;letter-spacing:1px;
+  transition:all .2s;
+}
+.admin-cikis:hover{color:#fff;border-color:rgba(255,255,255,.4);}
+
+.admin-body{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px);}
+
+/* ── SIDEBAR ── */
+.sidebar{background:#fff;border-right:1px solid var(--stone);padding:20px 0;}
+.sidebar-ttl{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--mist);padding:0 20px;margin-bottom:8px;}
+.sidebar-btn{
+  width:100%;padding:10px 20px;text-align:left;background:none;border:none;
+  font-size:13px;color:#666;display:flex;align-items:center;gap:10px;
+  border-left:3px solid transparent;transition:all .15s;
+}
+.sidebar-btn:hover{background:var(--paper);color:var(--ink);}
+.sidebar-btn.on{background:var(--paper);color:var(--ink);border-left-color:var(--gold);font-weight:500;}
+.sidebar-sep{height:1px;background:var(--stone);margin:12px 20px;}
+
+/* ── MAIN CONTENT ── */
+.main{padding:28px 32px;overflow-y:auto;}
+.panel{display:none;}
+.panel.on{display:block;}
+.panel-ttl{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--ink);margin-bottom:4px;}
+.panel-sub{font-size:13px;color:var(--mist);margin-bottom:28px;}
+
+/* ── KATEGORİ TAB ── */
+.kat-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;}
+.kat-tab{
+  padding:7px 14px;border:1.5px solid var(--stone);background:#fff;
+  font-size:11px;font-weight:500;letter-spacing:1px;color:var(--mist);
+  border-radius:20px;transition:all .15s;
+}
+.kat-tab.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.kat-tab:hover{border-color:var(--ink);color:var(--ink);}
+
+/* ── ÜRÜN KARTLARI ── */
+.urun-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+.urun-kart{
+  background:#fff;border:1.5px solid var(--stone);
+  padding:16px;position:relative;transition:border-color .2s;
+}
+.urun-kart:hover{border-color:var(--gold);}
+.urun-kart.gizli{opacity:.45;}
+.uk-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.uk-foto{
+  width:60px;height:60px;background:var(--paper);border:1.5px solid var(--stone);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:24px;overflow:hidden;position:relative;cursor:pointer;
+}
+.uk-foto img{width:100%;height:100%;object-fit:cover;}
+.uk-foto-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.5);
+  display:none;align-items:center;justify-content:center;
+  font-size:10px;color:#fff;font-weight:600;letter-spacing:1px;
+}
+.uk-foto:hover .uk-foto-overlay{display:flex;}
+.uk-info{flex:1;min-width:0;}
+.uk-ad{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.uk-tip{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;}
+.uk-tip.ic{color:var(--gold);}
+.uk-tip.yi{color:#8B6114;}
+
+.uk-fields{display:flex;flex-direction:column;gap:8px;}
+.uk-field{display:flex;flex-direction:column;gap:4px;}
+.uk-field label{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);}
+.uk-field input,.uk-field textarea{
+  padding:8px 10px;border:1.5px solid var(--stone);font-size:13px;color:var(--ink);
+  transition:border-color .2s;resize:none;
+}
+.uk-field input:focus,.uk-field textarea:focus{outline:none;border-color:var(--gold);}
+.uk-field textarea{min-height:60px;line-height:1.5;}
+
+.uk-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--stone);}
+.uk-gizle{
+  flex:1;padding:7px;border:1.5px solid var(--stone);background:#fff;
+  font-size:11px;font-weight:500;letter-spacing:1px;color:#666;transition:all .2s;
+}
+.uk-gizle:hover{border-color:var(--rd);color:var(--rd);}
+.urun-kart.gizli .uk-gizle{border-color:var(--gr2);color:var(--gr2);}
+.urun-kart.gizli .uk-gizle:hover{background:rgba(46,138,82,.08);}
+
+/* ── YENI ÜRÜN ── */
+.yeni-urun-sec{
+  background:#fff;border:2px dashed var(--stone);padding:24px;
+  margin-bottom:20px;
+}
+.yeni-urun-ttl{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.yeni-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.yeni-form .span2{grid-column:1/-1;}
+.yeni-input{
+  padding:9px 12px;border:1.5px solid var(--stone);font-size:13px;
+  color:var(--ink);width:100%;transition:border-color .2s;
+}
+.yeni-input:focus{outline:none;border-color:var(--gold);}
+.yeni-ekle{
+  padding:10px 20px;background:var(--ink);color:#fff;border:none;
+  font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
+  transition:background .2s;width:100%;margin-top:4px;
+}
+.yeni-ekle:hover{background:#333;}
+
+/* ── POPUP EDITOR ── */
+.popup-editor{background:#fff;border:1.5px solid var(--stone);padding:24px;margin-bottom:20px;}
+.pe-ttl{font-size:13px;font-weight:500;margin-bottom:16px;}
+.pe-field{margin-bottom:14px;}
+.pe-field label{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px;}
+.pe-field input,.pe-field textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--stone);
+  font-size:14px;color:var(--ink);transition:border-color .2s;resize:none;
+}
+.pe-field input:focus,.pe-field textarea:focus{outline:none;border-color:var(--gold);}
+.pe-gorsel-pnl{
+  border:2px dashed var(--stone);padding:20px;text-align:center;
+  margin-bottom:14px;cursor:pointer;transition:border-color .2s;
+}
+.pe-gorsel-pnl:hover{border-color:var(--gold);}
+.pe-gorsel-pnl p{font-size:13px;color:var(--mist);margin-top:8px;}
+.pe-kaydet{
+  padding:11px 28px;background:var(--gr);color:#fff;border:none;
+  font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
+  transition:background .2s;
+}
+.pe-kaydet:hover{background:var(--gr2);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:var(--ink);color:#fff;padding:12px 24px;
+  font-size:13px;font-weight:500;border-radius:4px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  transition:transform .28s ease;z-index:999;white-space:nowrap;
+}
+.toast.on{transform:translateX(-50%) translateY(0);}
+
+/* ── ONLİNE GÖSTERGE ── */
+.sync-badge{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:rgba(255,255,255,.4);
+}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--gr2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .admin-body{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main{padding:20px 16px;}
+  .urun-grid{grid-template-columns:1fr;}
+  .yeni-form{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- GİRİŞ EKRANI -->
+<div class="giris" id="girisEkrani">
+  <div class="giris-kart">
+    <div class="giris-logo">CACTUS</div>
+    <div class="giris-sub">Admin Paneli</div>
+    <label class="giris-label">Kullanıcı Adı</label>
+    <input class="giris-input" type="text" id="girisAd" placeholder="admin" autocomplete="username">
+    <label class="giris-label">Şifre</label>
+    <input class="giris-input" type="password" id="girisSifre" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')girisYap()">
+    <button class="giris-btn" onclick="girisYap()">Giriş Yap</button>
+    <div class="giris-hata" id="girisHata">Kullanıcı adı veya şifre hatalı.</div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin" id="adminPanel">
+  <nav class="admin-nav">
+    <div class="admin-logo">🌵 CACTUS Admin</div>
+    <div class="admin-nav-right">
+      <div class="sync-badge"><div class="sync-dot"></div>Değişiklikler kaydedildi</div>
+      <button class="admin-save-all" onclick="tumunuKaydet()">💾 Kaydet & Yayınla</button>
+      <button class="admin-cikis" onclick="cikisYap()">Çıkış</button>
+    </div>
+  </nav>
+
+  <div class="admin-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-ttl">Menü</div>
+      <button class="sidebar-btn on" onclick="panelAc('menu',this)">📋 Menü Yönetimi</button>
+      <button class="sidebar-btn" onclick="panelAc('popup',this)">🎉 Karşılama Popup</button>
+      <button class="sidebar-btn" onclick="panelAc('anasayfa',this)">🏠 Ana Sayfa Yazıları</button>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-ttl">Hızlı Erişim</div>
+      <button class="sidebar-btn" onclick="window.open('index.html','_blank')">🔗 Siteyi Gör</button>
+      <button class="sidebar-btn" onclick="window.open('menu.html','_blank')">🔗 Menüyü Gör</button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- MENÜ PANELİ -->
+      <div class="panel on" id="panel-menu">
+        <div class="panel-ttl">Menü Yönetimi</div>
+        <div class="panel-sub">Ürünleri düzenleyin, fiyat ve fotoğraf ekleyin, geçici olarak gizleyin.</div>
+
+        <!-- Kategori tabs -->
+        <div class="kat-tabs" id="adminKatTabs"></div>
+
+        <!-- Yeni ürün ekle -->
+        <div class="yeni-urun-sec">
+          <div class="yeni-urun-ttl">➕ Yeni Ürün Ekle</div>
+          <div class="yeni-form">
+            <div><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Emoji</label><input class="yeni-input" id="yeniEmoji" placeholder="☕" maxlength="4"></div>
+            <div><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Ürün Adı</label><input class="yeni-input" id="yeniAd" placeholder="Yeni Ürün"></div>
+            <div><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Fiyat (₺)</label><input class="yeni-input" id="yeniFiyat" type="number" placeholder="150"></div>
+            <div><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Tür</label><select class="yeni-input" id="yeniTip"><option value="ic">İçecek</option><option value="yi">Yiyecek</option></select></div>
+            <div class="span2"><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Açıklama</label><input class="yeni-input" id="yeniAciklama" placeholder="Ürün açıklaması..."></div>
+            <div class="span2"><label style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:5px;">Fotoğraf URL (Cloudinary)</label><input class="yeni-input" id="yeniFoto" placeholder="https://res.cloudinary.com/..."></div>
+          </div>
+          <button class="yeni-ekle" onclick="yeniUrunEkle()" style="margin-top:12px;">+ Ürünü Ekle</button>
+        </div>
+
+        <!-- Ürün listesi -->
+        <div class="urun-grid" id="adminUrunGrid"></div>
+      </div>
+
+      <!-- POPUP PANELİ -->
+      <div class="panel" id="panel-popup">
+        <div class="panel-ttl">Karşılama Popup</div>
+        <div class="panel-sub">Ziyaretçilere gösterilen karşılama mesajını düzenleyin.</div>
+
+        <div class="popup-editor">
+          <div class="pe-ttl">📸 Popup Fotoğrafı</div>
+          <div class="pe-gorsel-pnl" onclick="document.getElementById('popupFotoInput').click()">
+            <div style="font-size:32px;">🖼️</div>
+            <p>Cloudinary'den kopyaladığınız URL'yi aşağıya yapıştırın</p>
+          </div>
+          <div class="pe-field">
+            <label>Fotoğraf URL (Cloudinary)</label>
+            <input type="url" id="popupFotoUrl" placeholder="https://res.cloudinary.com/..." oninput="popupOnizle()">
+          </div>
+          <div id="popupFotoOnizle" style="margin-bottom:14px;display:none;">
+            <img id="popupFotoImg" src="" style="width:100%;max-height:200px;object-fit:cover;" alt="Önizleme">
+          </div>
+          <div class="pe-field">
+            <label>Ana Mesaj</label>
+            <input type="text" id="popupMesaj" value="Seni görmek çok güzel!">
+          </div>
+          <div class="pe-field">
+            <label>Alt Yazı</label>
+            <input type="text" id="popupAlt" value="Cactus Coffee'ye hoş geldiniz ✦">
+          </div>
+          <div class="pe-field">
+            <label>Buton Yazısı</label>
+            <input type="text" id="popupBtn" value="Keşfetmeye Başla">
+          </div>
+          <button class="pe-kaydet" onclick="popupKaydet()">💾 Popup'ı Kaydet</button>
+        </div>
+      </div>
+
+      <!-- ANA SAYFA PANELİ -->
+      <div class="panel" id="panel-anasayfa">
+        <div class="panel-ttl">Ana Sayfa Yazıları</div>
+        <div class="panel-sub">Hero bölümü ve diğer yazıları düzenleyin.</div>
+
+        <div class="popup-editor">
+          <div class="pe-ttl">🦸 Hero Bölümü</div>
+          <div class="pe-field">
+            <label>Üst Yazı (küçük)</label>
+            <input type="text" id="heroEyebrow" value="Bursa'nın Kalbinde · İki Şube">
+          </div>
+          <div class="pe-field">
+            <label>Ana Başlık</label>
+            <input type="text" id="heroTitle" value="Cactus">
+          </div>
+          <div class="pe-field">
+            <label>Alt Başlık (italik, altın)</label>
+            <input type="text" id="heroTitleEm" value="Coffee">
+          </div>
+          <div class="pe-field">
+            <label>Alt Yazı</label>
+            <input type="text" id="heroSub" value="Snack & Dessert · Her yudumda bir hikaye">
+          </div>
+          <button class="pe-kaydet" onclick="anasayfaKaydet()">💾 Ana Sayfayı Kaydet</button>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /admin-body -->
+</div><!-- /admin -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════
+   GİRİŞ
+══════════════════════════════════ */
+// Şifreyi değiştirmek için aşağıdaki değerleri düzenleyin
+const ADMIN_AD    = 'cactus';
+const ADMIN_SIFRE = 'cactus2025';
+
+function girisYap(){
+  const ad=document.getElementById('girisAd').value.trim();
+  const sifre=document.getElementById('girisSifre').value;
+  if(ad===ADMIN_AD&&sifre===ADMIN_SIFRE){
+    sessionStorage.setItem('cactus_admin','1');
+    document.getElementById('girisEkrani').style.display='none';
+    document.getElementById('adminPanel').style.display='block';
+    adminBaslat();
+  } else {
+    document.getElementById('girisHata').style.display='block';
+    document.getElementById('girisSifre').value='';
+  }
+}
+function cikisYap(){
+  sessionStorage.removeItem('cactus_admin');
+  location.reload();
+}
+// Oturum kontrolü
+if(sessionStorage.getItem('cactus_admin')==='1'){
+  document.getElementById('girisEkrani').style.display='none';
+  document.getElementById('adminPanel').style.display='block';
+}
+
+/* ══════════════════════════════════
+   PANEL NAVİGASYON
+══════════════════════════════════ */
+function panelAc(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');
+  el.classList.add('on');
+}
+
+/* ══════════════════════════════════
+   VERİ
+══════════════════════════════════ */
+const KATEGORILER = [
+  {id:'sicak',  label:'☕ Sıcak',   tip:'ic'},
+  {id:'soguk',  label:'🧊 Soğuk',   tip:'ic'},
+  {id:'cay',    label:'🌿 Çaylar',  tip:'ic'},
+  {id:'vitamin',label:'🍋 Vitamin', tip:'ic'},
+  {id:'kokteyl',label:'🍹 Kokteyl', tip:'ic'},
+  {id:'mesrubat',label:'🥤 Meşrubat',tip:'ic'},
+  {id:'waffle', label:'🧇 Waffle',  tip:'yi'},
+  {id:'tost',   label:'🥪 Tostlar', tip:'yi'},
+];
+
+const VARSAYILAN_MENU = {
+  sicak:[
+    {id:'si1',ad:'Espresso',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Yoğun ve aromatik. Güçlü bir başlangıç için ideal.',foto:'',gizli:false},
+    {id:'si2',ad:'Macchiato',fiyat:140,emoji:'☕',tip:'ic',aciklama:'Espresso üzerine hafif süt köpüğü.',foto:'',gizli:false},
+    {id:'si3',ad:'Americano',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso üzerine sıcak su. Uzun ve dengeli.',foto:'',gizli:false},
+    {id:'si4',ad:'Cortado',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso ve buharda ısıtılmış süt.',foto:'',gizli:false},
+    {id:'si5',ad:'Latte',fiyat:190,emoji:'🥛',tip:'ic',aciklama:'Espresso ve bol buharda ısıtılmış süt.',foto:'',gizli:false},
+    {id:'si6',ad:'Caramel Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Klasik latte üzerine karamel sos.',foto:'',gizli:false},
+    {id:'si7',ad:'Vanilla Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Vanilya özü ile zenginleştirilmiş latte.',foto:'',gizli:false},
+    {id:'si8',ad:'Hazelnut Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Fındık aroması ile kremsi latte.',foto:'',gizli:false},
+    {id:'si9',ad:'Flat White',fiyat:200,emoji:'☕',tip:'ic',aciklama:'Double espresso ve mikroköpük süt.',foto:'',gizli:false},
+    {id:'si10',ad:'Cappuccino',fiyat:190,emoji:'☕',tip:'ic',aciklama:'Eşit oranda espresso, süt ve köpük.',foto:'',gizli:false},
+    {id:'si11',ad:'Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Espresso, çikolata ve buharda süt.',foto:'',gizli:false},
+    {id:'si12',ad:'White Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Beyaz çikolata sosu ile kremsi mocha.',foto:'',gizli:false},
+    {id:'si13',ad:'Filtre Kahve',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Tek köken çekirdekten damlatma yöntemi.',foto:'',gizli:false},
+    {id:'si14',ad:'Türk Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Geleneksel cezve Türk kahvesi.',foto:'',gizli:false},
+    {id:'si15',ad:'Double Türk Kahvesi',fiyat:170,emoji:'☕',tip:'ic',aciklama:'Çift porsiyon Türk kahvesi.',foto:'',gizli:false},
+    {id:'si16',ad:'Dibek Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Baharatlı geleneksel Türk kahvesi.',foto:'',gizli:false},
+    {id:'si17',ad:'Salep',fiyat:190,emoji:'🌾',tip:'ic',aciklama:'Sıcak süt ve tarçın ile servis edilir.',foto:'',gizli:false},
+    {id:'si18',ad:'Sıcak Çikolata',fiyat:190,emoji:'🍫',tip:'ic',aciklama:'Gerçek çikolata ile zengin sıcak çikolata.',foto:'',gizli:false},
+    {id:'si19',ad:'Bardak Süt',fiyat:90,emoji:'🥛',tip:'ic',aciklama:'Taze buharda ısıtılmış süt.',foto:'',gizli:false},
+    {id:'si20',ad:'Ballı Süt',fiyat:150,emoji:'🍯',tip:'ic',aciklama:'Sıcak süt ve çiçek balı.',foto:'',gizli:false},
+  ],
+  soguk:[
+    {id:'so1',ad:'Ice Americano',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'Soğuk su ve buz üzerine espresso.',foto:'',gizli:false},
+    {id:'so2',ad:'Ice Latte',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'Buz ve soğuk süt üzerine espresso.',foto:'',gizli:false},
+    {id:'so3',ad:'Ice Flat White',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Soğuk servis edilen flat white.',foto:'',gizli:false},
+    {id:'so4',ad:'Ice Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'Soğuk çikolatalı kahve.',foto:'',gizli:false},
+    {id:'so5',ad:'Ice White Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'Beyaz çikolata ve soğuk süt.',foto:'',gizli:false},
+    {id:'so6',ad:'Ice Caramel Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Karamel ve buz.',foto:'',gizli:false},
+    {id:'so7',ad:'Ice Caramel Macchiato',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Katmanlı sunum, karamel ve buz.',foto:'',gizli:false},
+    {id:'so8',ad:'Ice Hazelnut Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Fındık ve soğuk latte.',foto:'',gizli:false},
+    {id:'so9',ad:'Ice Vanilla Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Vanilya ve buz.',foto:'',gizli:false},
+    {id:'so10',ad:'Ice Filtre',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'Soğuk demleme filtre kahve.',foto:'',gizli:false},
+  ],
+  cay:[
+    {id:'c1',ad:'Ihlamur',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'Doğal ihlamur çiçeğinden demlenmiş.',foto:'',gizli:false},
+    {id:'c2',ad:'Adaçayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'Taze adaçayı yapraklarından.',foto:'',gizli:false},
+    {id:'c3',ad:'Melisa Çayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'Rahatlatıcı melisa bitkisinden.',foto:'',gizli:false},
+    {id:'c4',ad:'Hibiskus',fiyat:190,emoji:'🌺',tip:'ic',aciklama:'Kırmızı rengi ve ekşimsi tadıyla.',foto:'',gizli:false},
+    {id:'c5',ad:'Papatya',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'Nazik ve sakinleştirici.',foto:'',gizli:false},
+    {id:'c6',ad:'Yeşil Çay',fiyat:190,emoji:'🍵',tip:'ic',aciklama:'Antioksidan açısından zengin.',foto:'',gizli:false},
+    {id:'c7',ad:'Kış Çayı',fiyat:190,emoji:'❄️',tip:'ic',aciklama:'Tarçın ve baharatlarla özel karışım.',foto:'',gizli:false},
+    {id:'c8',ad:'Mavi Kelebek',fiyat:190,emoji:'🦋',tip:'ic',aciklama:'Renk değiştiren büyülü çay.',foto:'',gizli:false},
+  ],
+  vitamin:[
+    {id:'v1',ad:'Churchill',fiyat:170,emoji:'🍊',tip:'ic',aciklama:'Portakal, limon ve greyfurt karışımı.',foto:'',gizli:false},
+    {id:'v2',ad:'Cool Lime',fiyat:190,emoji:'🍋',tip:'ic',aciklama:'Misket limonu ve nane.',foto:'',gizli:false},
+    {id:'v3',ad:'Frozen',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'Buz ve meyve karışımı.',foto:'',gizli:false},
+    {id:'v4',ad:'Milkshake',fiyat:210,emoji:'🥤',tip:'ic',aciklama:'Kremalı ve sütlü milkshake.',foto:'',gizli:false},
+    {id:'v5',ad:'Limonata',fiyat:170,emoji:'🍋',tip:'ic',aciklama:'Taze sıkılmış limon ve soda.',foto:'',gizli:false},
+    {id:'v6',ad:'Çilekli Limonata',fiyat:180,emoji:'🍓',tip:'ic',aciklama:'Taze çilek püresi ve limonata.',foto:'',gizli:false},
+  ],
+  kokteyl:[
+    {id:'ko1',ad:'Blue Sky',fiyat:210,emoji:'🫐',tip:'ic',aciklama:'Yaban mersini ve mavi spirulina.',foto:'',gizli:false},
+    {id:'ko2',ad:'Cactus',fiyat:210,emoji:'🌵',tip:'ic',aciklama:'Kaktüs meyvesi ve tropikal karışım.',foto:'',gizli:false},
+    {id:'ko3',ad:'Pink Wind',fiyat:210,emoji:'🍉',tip:'ic',aciklama:'Karpuz ve gül suyu.',foto:'',gizli:false},
+  ],
+  mesrubat:[
+    {id:'m1',ad:'Su',fiyat:30,emoji:'💧',tip:'ic',aciklama:'Soğuk kaynak suyu.',foto:'',gizli:false},
+    {id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧',tip:'ic',aciklama:'Ferahlatıcı maden sodası.',foto:'',gizli:false},
+    {id:'m3',ad:'Enerji İçeceği',fiyat:140,emoji:'⚡',tip:'ic',aciklama:'Seçenekler için garsonumuza danışın.',foto:'',gizli:false},
+  ],
+  waffle:[
+    {id:'w1',ad:'Classic Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Vanilyalı dondurma ve çikolata sosuyla.',foto:'',gizli:false},
+    {id:'w2',ad:'Dubai Bubble Waffle',fiyat:330,emoji:'🧇',tip:'yi',aciklama:'Kadayıf, fıstık ezmesi ve çikolata.',foto:'',gizli:false},
+    {id:'w3',ad:'Bitter Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Bitter çikolata sosu ve dondurma.',foto:'',gizli:false},
+    {id:'w4',ad:'Caramel Bubble Waffle',fiyat:300,emoji:'🍯',tip:'yi',aciklama:'Ev yapımı karamel sos ile.',foto:'',gizli:false},
+    {id:'w5',ad:'Meyveli Bubble Waffle',fiyat:300,emoji:'🍓',tip:'yi',aciklama:'Mevsim meyveler ve taze krema.',foto:'',gizli:false},
+  ],
+  tost:[
+    {id:'t1',ad:'Kaşarlı Sosyete',fiyat:150,emoji:'🧀',tip:'yi',aciklama:'İnce dilim ekmek ve kaşar peyniri.',foto:'',gizli:false},
+    {id:'t2',ad:'Sucuklu Sosyete',fiyat:150,emoji:'🥩',tip:'yi',aciklama:'Sucuk ve ince dilim ekmek.',foto:'',gizli:false},
+    {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪',tip:'yi',aciklama:'Kaşar ve sucuk birlikte.',foto:'',gizli:false},
+    {id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀',tip:'yi',aciklama:'Kalın ekmek ve bol kaşar.',foto:'',gizli:false},
+    {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩',tip:'yi',aciklama:'Kalın ekmek ve bol sucuk.',foto:'',gizli:false},
+    {id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪',tip:'yi',aciklama:'Kaşar, sucuk ve kalın ekmek.',foto:'',gizli:false},
+  ],
+};
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let MENU = JSON.parse(localStorage.getItem('cactus_admin_menu')||'null') || JSON.parse(JSON.stringify(VARSAYILAN_MENU));
+let aktifKat = 'sicak';
+
+/* ══════════════════════════════════
+   ADMIN BAŞLAT
+══════════════════════════════════ */
+function adminBaslat(){
+  renderKatTabs();
+  renderUrunler();
+  // Popup değerlerini yükle
+  const p=JSON.parse(localStorage.getItem('cactus_popup')||'{}');
+  if(p.mesaj) document.getElementById('popupMesaj').value=p.mesaj;
+  if(p.alt) document.getElementById('popupAlt').value=p.alt;
+  if(p.btn) document.getElementById('popupBtn').value=p.btn;
+  if(p.foto) document.getElementById('popupFotoUrl').value=p.foto;
+  // Anasayfa değerlerini yükle
+  const a=JSON.parse(localStorage.getItem('cactus_anasayfa')||'{}');
+  if(a.eyebrow) document.getElementById('heroEyebrow').value=a.eyebrow;
+  if(a.title) document.getElementById('heroTitle').value=a.title;
+  if(a.titleEm) document.getElementById('heroTitleEm').value=a.titleEm;
+  if(a.sub) document.getElementById('heroSub').value=a.sub;
+}
+
+function renderKatTabs(){
+  const tabs=document.getElementById('adminKatTabs');
+  tabs.innerHTML='';
+  KATEGORILER.forEach(k=>{
+    const b=document.createElement('button');
+    b.className='kat-tab'+(aktifKat===k.id?' on':'');
+    b.textContent=k.label;
+    b.onclick=()=>{aktifKat=k.id;renderKatTabs();renderUrunler();};
+    tabs.appendChild(b);
+  });
+}
+
+function renderUrunler(){
+  const grid=document.getElementById('adminUrunGrid');
+  grid.innerHTML='';
+  const urunler=MENU[aktifKat]||[];
+  urunler.forEach((u,i)=>{
+    const kart=document.createElement('div');
+    kart.className='urun-kart'+(u.gizli?' gizli':'');
+    kart.innerHTML=`
+      <div class="uk-top">
+        <div class="uk-foto" onclick="fotoGuncelle('${aktifKat}',${i})" title="Fotoğraf ekle">
+          ${u.foto?`<img src="${u.foto}" alt="${u.ad}">`:`<span>${u.emoji}</span>`}
+          <div class="uk-foto-overlay">📷 Değiştir</div>
+        </div>
+        <div class="uk-info">
+          <div class="uk-ad">${u.ad}</div>
+          <div class="uk-tip ${u.tip}">${u.tip==='ic'?'İçecek':'Yiyecek'}</div>
+        </div>
+      </div>
+      <div class="uk-fields">
+        <div class="uk-field">
+          <label>Ürün Adı</label>
+          <input value="${u.ad}" onchange="urunGuncelle('${aktifKat}',${i},'ad',this.value)">
+        </div>
+        <div class="uk-field">
+          <label>Fiyat (₺)</label>
+          <input type="number" value="${u.fiyat}" onchange="urunGuncelle('${aktifKat}',${i},'fiyat',parseInt(this.value))">
+        </div>
+        <div class="uk-field">
+          <label>Açıklama</label>
+          <textarea onchange="urunGuncelle('${aktifKat}',${i},'aciklama',this.value)">${u.aciklama||''}</textarea>
+        </div>
+        <div class="uk-field">
+          <label>Fotoğraf URL (Cloudinary)</label>
+          <input value="${u.foto||''}" placeholder="https://res.cloudinary.com/..." onchange="urunGuncelle('${aktifKat}',${i},'foto',this.value)">
+        </div>
+      </div>
+      <div class="uk-actions">
+        <button class="uk-gizle" onclick="urunGizle('${aktifKat}',${i})">
+          ${u.gizli?'👁 Göster':'🙈 Gizle'}
+        </button>
+        <button onclick="urunSil('${aktifKat}',${i})" style="padding:7px 12px;border:1.5px solid var(--stone);background:#fff;font-size:11px;color:var(--rd);transition:all .2s;" onmouseover="this.style.borderColor='var(--rd)'" onmouseout="this.style.borderColor='var(--stone)'">🗑 Sil</button>
+      </div>`;
+    grid.appendChild(kart);
+  });
+}
+
+function urunGuncelle(kat,i,alan,deger){
+  MENU[kat][i][alan]=deger;
+  menuKaydet();
+}
+
+function urunGizle(kat,i){
+  MENU[kat][i].gizli=!MENU[kat][i].gizli;
+  menuKaydet();
+  renderUrunler();
+  toast(MENU[kat][i].gizli?'🙈 Ürün gizlendi':'👁 Ürün gösterildi');
+}
+
+function urunSil(kat,i){
+  if(!confirm('"'+MENU[kat][i].ad+'" silinsin mi?')) return;
+  MENU[kat].splice(i,1);
+  menuKaydet();
+  renderUrunler();
+  toast('🗑 Ürün silindi');
+}
+
+function fotoGuncelle(kat,i){
+  const url=prompt('Cloudinary fotoğraf URL\'sini yapıştırın:',MENU[kat][i].foto||'');
+  if(url===null) return;
+  MENU[kat][i].foto=url.trim();
+  menuKaydet();
+  renderUrunler();
+  toast('📷 Fotoğraf güncellendi');
+}
+
+function yeniUrunEkle(){
+  const emoji=document.getElementById('yeniEmoji').value.trim()||'☕';
+  const ad=document.getElementById('yeniAd').value.trim();
+  const fiyat=parseInt(document.getElementById('yeniFiyat').value)||0;
+  const tip=document.getElementById('yeniTip').value;
+  const aciklama=document.getElementById('yeniAciklama').value.trim();
+  const foto=document.getElementById('yeniFoto').value.trim();
+  if(!ad||!fiyat){toast('⚠️ Ad ve fiyat zorunlu');return;}
+  MENU[aktifKat].push({id:aktifKat+'_'+Date.now(),ad,fiyat,emoji,tip,aciklama,foto,gizli:false});
+  menuKaydet();
+  renderUrunler();
+  ['yeniEmoji','yeniAd','yeniFiyat','yeniAciklama','yeniFoto'].forEach(id=>document.getElementById(id).value='');
+  toast('✅ Ürün eklendi');
+}
+
+function menuKaydet(){
+  localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+}
+
+function popupOnizle(){
+  const url=document.getElementById('popupFotoUrl').value.trim();
+  const onizle=document.getElementById('popupFotoOnizle');
+  const img=document.getElementById('popupFotoImg');
+  if(url){onizle.style.display='block';img.src=url;}
+  else{onizle.style.display='none';}
+}
+
+function popupKaydet(){
+  const p={
+    mesaj:document.getElementById('popupMesaj').value,
+    alt:document.getElementById('popupAlt').value,
+    btn:document.getElementById('popupBtn').value,
+    foto:document.getElementById('popupFotoUrl').value.trim(),
+  };
+  localStorage.setItem('cactus_popup',JSON.stringify(p));
+  toast('✅ Popup kaydedildi');
+}
+
+function anasayfaKaydet(){
+  const a={
+    eyebrow:document.getElementById('heroEyebrow').value,
+    title:document.getElementById('heroTitle').value,
+    titleEm:document.getElementById('heroTitleEm').value,
+    sub:document.getElementById('heroSub').value,
+  };
+  localStorage.setItem('cactus_anasayfa',JSON.stringify(a));
+  toast('✅ Ana sayfa kaydedildi');
+}
+
+function tumunuKaydet(){
+  menuKaydet();
+  toast('💾 Tüm değişiklikler kaydedildi! Menu.html\'i de güncellemeyi unutmayın.');
+}
+
+/* ══════════════════════════════════
+   DIŞA AKTAR (JSON)
+══════════════════════════════════ */
+function menuDisaAktar(){
+  const json=JSON.stringify(MENU,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='cactus-menu.json';
+  a.click();
+}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+let _tt;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('on');
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),3000);
+}
+
+// Başlat
+if(sessionStorage.getItem('cactus_admin')==='1') adminBaslat();
+</script>
+</body>
+</html>

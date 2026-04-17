@@ -1,0 +1,674 @@
+{
+  "kategoriler": [
+    {
+      "id": "sicak",
+      "label": "☕ Sıcak İçecekler",
+      "tip": "ic"
+    },
+    {
+      "id": "soguk",
+      "label": "🧊 Soğuk İçecekler",
+      "tip": "ic"
+    },
+    {
+      "id": "cay",
+      "label": "🌿 Bitkisel Çaylar",
+      "tip": "ic"
+    },
+    {
+      "id": "vitamin",
+      "label": "🍋 Vitamin İçecekler",
+      "tip": "ic"
+    },
+    {
+      "id": "kokteyl",
+      "label": "🍹 Kokteyller",
+      "tip": "ic"
+    },
+    {
+      "id": "mesrubat",
+      "label": "🥤 Meşrubatlar",
+      "tip": "ic"
+    },
+    {
+      "id": "waffle",
+      "label": "🧇 Bubble Waffle",
+      "tip": "yi"
+    },
+    {
+      "id": "tost",
+      "label": "🥪 Tostlar",
+      "tip": "yi"
+    }
+  ],
+  "menu": {
+    "sicak": [
+      {
+        "id": "s1",
+        "ad": "Espresso",
+        "fiyat": 130,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Tek shot, saf ve yoğun.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s2",
+        "ad": "Macchiato",
+        "fiyat": 140,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Espresso + hafif süt köpüğü.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s3",
+        "ad": "Americano",
+        "fiyat": 180,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Espresso + sıcak su.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s4",
+        "ad": "Cortado",
+        "fiyat": 180,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Espresso + eşit oranda süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s5",
+        "ad": "Latte",
+        "fiyat": 190,
+        "emoji": "🥛",
+        "tip": "ic",
+        "aciklama": "Espresso + bol buharda süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s6",
+        "ad": "Caramel Latte",
+        "fiyat": 200,
+        "emoji": "🥛",
+        "tip": "ic",
+        "aciklama": "Latte + karamel sos.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s7",
+        "ad": "Vanilla Latte",
+        "fiyat": 200,
+        "emoji": "🥛",
+        "tip": "ic",
+        "aciklama": "Latte + vanilya özü.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s8",
+        "ad": "Hazelnut Latte",
+        "fiyat": 200,
+        "emoji": "🥛",
+        "tip": "ic",
+        "aciklama": "Latte + fındık aroması.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s9",
+        "ad": "Flat White",
+        "fiyat": 200,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Double espresso + mikroköpük süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s10",
+        "ad": "Cappuccino",
+        "fiyat": 190,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Espresso + süt + köpük.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s11",
+        "ad": "Mocha",
+        "fiyat": 200,
+        "emoji": "🍫",
+        "tip": "ic",
+        "aciklama": "Espresso + çikolata + süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s12",
+        "ad": "White Mocha",
+        "fiyat": 200,
+        "emoji": "🍫",
+        "tip": "ic",
+        "aciklama": "Espresso + beyaz çikolata + süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s13",
+        "ad": "Filtre Kahve",
+        "fiyat": 180,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Tek köken, damlatma yöntemi.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s14",
+        "ad": "Türk Kahvesi",
+        "fiyat": 130,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Cezve, tercihe göre şekerli.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s15",
+        "ad": "Double Türk Kahvesi",
+        "fiyat": 170,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Çift porsiyon Türk kahvesi.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s16",
+        "ad": "Dibek Kahvesi",
+        "fiyat": 130,
+        "emoji": "☕",
+        "tip": "ic",
+        "aciklama": "Taş dibekte dövülmüş, baharatlı.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s17",
+        "ad": "Salep",
+        "fiyat": 190,
+        "emoji": "🌾",
+        "tip": "ic",
+        "aciklama": "Salep unu + sıcak süt + tarçın.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s18",
+        "ad": "Sıcak Çikolata",
+        "fiyat": 190,
+        "emoji": "🍫",
+        "tip": "ic",
+        "aciklama": "Gerçek çikolata + sıcak süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s19",
+        "ad": "Bardak Süt",
+        "fiyat": 90,
+        "emoji": "🥛",
+        "tip": "ic",
+        "aciklama": "Sade buharda ısıtılmış süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s20",
+        "ad": "Ballı Süt",
+        "fiyat": 150,
+        "emoji": "🍯",
+        "tip": "ic",
+        "aciklama": "Sıcak süt + çiçek balı.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "soguk": [
+      {
+        "id": "sg1",
+        "ad": "Ice Americano",
+        "fiyat": 190,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + soğuk su + buz.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg2",
+        "ad": "Ice Latte",
+        "fiyat": 200,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + soğuk süt + buz.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg3",
+        "ad": "Ice Flat White",
+        "fiyat": 210,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Double espresso + soğuk süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg4",
+        "ad": "Ice Mocha",
+        "fiyat": 210,
+        "emoji": "🍫",
+        "tip": "ic",
+        "aciklama": "Espresso + çikolata + soğuk süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg5",
+        "ad": "Ice White Mocha",
+        "fiyat": 210,
+        "emoji": "🍫",
+        "tip": "ic",
+        "aciklama": "Espresso + beyaz çikolata + buz.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg6",
+        "ad": "Ice Caramel Latte",
+        "fiyat": 210,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + karamel + soğuk süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg7",
+        "ad": "Ice Caramel Macchiato",
+        "fiyat": 210,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + vanilya + karamel + buz.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg8",
+        "ad": "Ice Hazelnut Latte",
+        "fiyat": 210,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + fındık + soğuk süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg9",
+        "ad": "Ice Vanilla Latte",
+        "fiyat": 210,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Espresso + vanilya + soğuk süt.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sg10",
+        "ad": "Ice Filtre",
+        "fiyat": 190,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Soğuk demleme filtre kahve.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "cay": [
+      {
+        "id": "c1",
+        "ad": "Ihlamur",
+        "fiyat": 190,
+        "emoji": "🌼",
+        "tip": "ic",
+        "aciklama": "Taze ihlamur çiçeği demlemesi.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c2",
+        "ad": "Adaçayı",
+        "fiyat": 190,
+        "emoji": "🌿",
+        "tip": "ic",
+        "aciklama": "Taze adaçayı yapraklarından.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c3",
+        "ad": "Melisa Çayı",
+        "fiyat": 190,
+        "emoji": "🌿",
+        "tip": "ic",
+        "aciklama": "Melisa + hafif limon aroması.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c4",
+        "ad": "Hibiskus",
+        "fiyat": 190,
+        "emoji": "🌺",
+        "tip": "ic",
+        "aciklama": "Hibiskus çiçeği, ekşimsi.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c5",
+        "ad": "Papatya",
+        "fiyat": 190,
+        "emoji": "🌼",
+        "tip": "ic",
+        "aciklama": "Papatya çiçeği demlemesi.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c6",
+        "ad": "Yeşil Çay",
+        "fiyat": 190,
+        "emoji": "🍵",
+        "tip": "ic",
+        "aciklama": "Hafif demlenmiş, antioksidan.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c7",
+        "ad": "Kış Çayı",
+        "fiyat": 190,
+        "emoji": "❄️",
+        "tip": "ic",
+        "aciklama": "Tarçın + karanfil + zencefil.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "c8",
+        "ad": "Mavi Kelebek",
+        "fiyat": 190,
+        "emoji": "🦋",
+        "tip": "ic",
+        "aciklama": "Butterfly pea flower, renk değiştirir.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "vitamin": [
+      {
+        "id": "v1",
+        "ad": "Churchill",
+        "fiyat": 170,
+        "emoji": "🍊",
+        "tip": "ic",
+        "aciklama": "Soda + Tuz + Limon Suyu",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "v2",
+        "ad": "Cool Lime",
+        "fiyat": 190,
+        "emoji": "🍋",
+        "tip": "ic",
+        "aciklama": "Misket limonu + nane + soda.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "v3",
+        "ad": "Frozen",
+        "fiyat": 200,
+        "emoji": "🧊",
+        "tip": "ic",
+        "aciklama": "Dondurulmuş meyve + buz.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "v4",
+        "ad": "Milkshake",
+        "fiyat": 210,
+        "emoji": "🥤",
+        "tip": "ic",
+        "aciklama": "Dondurma + süt, mevsimlik.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "v5",
+        "ad": "Limonata",
+        "fiyat": 170,
+        "emoji": "🍋",
+        "tip": "ic",
+        "aciklama": "Taze limon + şerbet + soda.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "v6",
+        "ad": "Çilekli Limonata",
+        "fiyat": 180,
+        "emoji": "🍓",
+        "tip": "ic",
+        "aciklama": "Taze çilek + limon + soda.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "kokteyl": [
+      {
+        "id": "k1",
+        "ad": "Blue Sky",
+        "fiyat": 210,
+        "emoji": "🫐",
+        "tip": "ic",
+        "aciklama": "Yaban mersini + spirulina + limon.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "k2",
+        "ad": "Cactus",
+        "fiyat": 210,
+        "emoji": "🌵",
+        "tip": "ic",
+        "aciklama": "Kaktüs meyvesi + tropikal meyve.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "k3",
+        "ad": "Pink Wind",
+        "fiyat": 210,
+        "emoji": "🍉",
+        "tip": "ic",
+        "aciklama": "Karpuz + gül suyu + limon.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "mesrubat": [
+      {
+        "id": "m1",
+        "ad": "Su",
+        "fiyat": 30,
+        "emoji": "💧",
+        "tip": "ic",
+        "aciklama": "Soğuk kaynak suyu.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "m2",
+        "ad": "Sade Soda",
+        "fiyat": 80,
+        "emoji": "🫧",
+        "tip": "ic",
+        "aciklama": "Karbonatlı maden suyu.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "m3",
+        "ad": "Enerji İçeceği",
+        "fiyat": 140,
+        "emoji": "⚡",
+        "tip": "ic",
+        "aciklama": "Kafeinli enerji içeceği.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "waffle": [
+      {
+        "id": "w1",
+        "ad": "Classic Bubble Waffle",
+        "fiyat": 300,
+        "emoji": "🧇",
+        "tip": "yi",
+        "aciklama": "Dondurma + çilek + muz + sütlü çikolata.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "w2",
+        "ad": "Dubai Bubble Waffle",
+        "fiyat": 330,
+        "emoji": "🧇",
+        "tip": "yi",
+        "aciklama": "Kadayıf + fıstık ezmesi + çikolata.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "w3",
+        "ad": "Bitter Bubble Waffle",
+        "fiyat": 300,
+        "emoji": "🧇",
+        "tip": "yi",
+        "aciklama": "Dondurma + bitter çikolata.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "w4",
+        "ad": "Caramel Bubble Waffle",
+        "fiyat": 300,
+        "emoji": "🍯",
+        "tip": "yi",
+        "aciklama": "Dondurma + karamel.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "w5",
+        "ad": "Meyveli Bubble Waffle",
+        "fiyat": 300,
+        "emoji": "🍓",
+        "tip": "yi",
+        "aciklama": "Dondurma + mevsim meyveleri.",
+        "foto": "",
+        "gizli": false
+      }
+    ],
+    "tost": [
+      {
+        "id": "t1",
+        "ad": "Kaşarlı Sosyete",
+        "fiyat": 150,
+        "emoji": "🧀",
+        "tip": "yi",
+        "aciklama": "İnce ekmek + kaşar peyniri.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t2",
+        "ad": "Sucuklu Sosyete",
+        "fiyat": 150,
+        "emoji": "🥩",
+        "tip": "yi",
+        "aciklama": "İnce ekmek + sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t3",
+        "ad": "Karışık Sosyete",
+        "fiyat": 170,
+        "emoji": "🥪",
+        "tip": "yi",
+        "aciklama": "İnce ekmek + kaşar + sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t4",
+        "ad": "Kaşarlı Sanayi",
+        "fiyat": 220,
+        "emoji": "🧀",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol kaşar.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t5",
+        "ad": "Sucuklu Sanayi",
+        "fiyat": 220,
+        "emoji": "🥩",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t6",
+        "ad": "Karışık Sanayi",
+        "fiyat": 250,
+        "emoji": "🥪",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + kaşar + sucuk.",
+        "foto": "",
+        "gizli": false
+      }
+    ]
+  },
+  "oncu": [],
+  "guncelleme": "2026-04-17T11:10:58.263Z"
+}

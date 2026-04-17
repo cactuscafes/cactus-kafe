@@ -630,7 +630,7 @@
       {
         "id": "t3",
         "ad": "Karışık Sosyete Tostu",
-        "fiyat": 250,
+        "fiyat": 280,
         "emoji": "🥪",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar + sucuk.",
@@ -640,5 +640,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-17T11:28:05.259Z"
+  "guncelleme": "2026-04-17T11:29:02.536Z"
 }

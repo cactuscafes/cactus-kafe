@@ -8,15 +8,49 @@
 <link rel="stylesheet" href="style.css">
 <style>
 /* ── HERO ── */
-.page-hero{
-  background:var(--ink);padding:160px 32px 80px;
-  text-align:center;position:relative;overflow:hidden;
+.oncu-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  padding:80px 32px 40px;
+  background:#f8f6f2;
 }
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,#0a0a0a);}
-.page-hero-content{position:relative;z-index:1;}
-.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block;}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:#f8f6f2;line-height:.95;letter-spacing:-2px;}
-.page-title em{font-style:italic;color:var(--gold);}
+@media(max-width:768px){.oncu-grid{grid-template-columns:1fr;padding:80px 16px 24px;}}
+.oncu-kart{
+  background:#fff;
+  overflow:hidden;
+  border:1px solid #e8e4de;
+}
+.oncu-kart img{
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  display:block;
+  transition:transform .5s ease;
+}
+.oncu-kart:hover img{transform:scale(1.03);}
+.oncu-kart-info{
+  padding:16px;
+}
+.oncu-kart-ad{
+  font-size:16px;font-weight:500;color:#0a0a0a;
+  margin-bottom:4px;line-height:1.3;
+}
+.oncu-kart-aciklama{
+  font-size:12px;color:#888;
+  line-height:1.5;margin-bottom:10px;
+}
+.oncu-kart-fiyat{
+  font-size:14px;font-weight:600;color:#0a0a0a;
+}
+.oncu-baslik{
+  text-align:left;
+  padding:80px 32px 0;
+  font-size:20px;font-weight:500;color:#0a0a0a;
+  background:#f8f6f2;
+}
+@media(max-width:768px){.oncu-baslik{padding:80px 16px 0;}}
+.oncu-bos{padding:80px 24px;text-align:center;color:#aaa;font-size:13px;background:#f8f6f2;}
 
 /* ── ŞUBE SEÇİCİ ── */
 .sube-sec{
@@ -142,8 +176,8 @@
 }
 .urun-aciklama{
   font-size:10px;font-weight:300;color:var(--mist);
-  padding:2px 24px 6px 45px;
-  line-height:1.6;
+  padding:2px 24px 8px 45px;
+  line-height:1.5;
   border-bottom:1px solid var(--stone);
 }
 .urun-row:last-child + .urun-aciklama{border-bottom:none;}
@@ -268,13 +302,8 @@
   <a href="iletisim.html" onclick="toggleMenu()">İletişim</a>
 </div>
 
-<!-- HERO -->
-<div class="page-hero">
-  <div class="page-hero-content">
-    <span class="page-eyebrow">Cactus Coffee</span>
-    <h1 class="page-title">Bizim<br><em>Menümüz</em></h1>
-  </div>
-</div>
+<!-- ÖNE ÇIKAN ÜRÜNLER -->
+<div id="oncuUrunler" style="padding:80px 0 0;background:#0a0a0a;"></div>
 
 <!-- ŞUBE SEÇİCİ -->
 <div class="sube-sec">
@@ -316,45 +345,45 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Espresso</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Yoğun ve aromatik. Güçlü bir başlangıç için ideal.</div>
+          <div class="urun-aciklama">Tek shot, saf ve yoğun.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Macchiato</span><span class="urun-fiyat">₺140</span></div>
-          <div class="urun-aciklama">Espresso üzerine hafif süt köpüğü.</div>
+          <div class="urun-aciklama">Espresso + hafif süt köpüğü.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Americano</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Espresso üzerine sıcak su. Uzun ve dengeli.</div>
+          <div class="urun-aciklama">Espresso + sıcak su.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Cortado</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Espresso ve buharda ısıtılmış süt.</div>
+          <div class="urun-aciklama">Espresso + eşit oranda süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Latte</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Kremsi ve bol sütlü kahve.</div>
+          <div class="urun-aciklama">Espresso + bol buharda süt + ince köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Caramel Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Karamel soslu latte.</div>
+          <div class="urun-aciklama">Latte + ev yapımı karamel sos.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Vanilla Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Vanilya aromalı latte.</div>
+          <div class="urun-aciklama">Latte + vanilya özü.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Hazelnut Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Fındık aromalı latte.</div>
+          <div class="urun-aciklama">Latte + fındık aroması.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Flat White</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Double espresso ve mikroköpük süt.</div>
+          <div class="urun-aciklama">Double espresso + az mikroköpük süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Cappuccino</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Espresso, süt ve köpük.</div>
+          <div class="urun-aciklama">Espresso + süt + bol köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Mocha</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Espresso ve çikolata.</div>
+          <div class="urun-aciklama">Espresso + çikolata sosu + buharda süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">White Mocha</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Beyaz çikolatalı mocha.</div>
+          <div class="urun-aciklama">Espresso + beyaz çikolata sosu + süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Filtre Kahve</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Özel çekirdeklerden damlatma yöntemiyle.</div>
+          <div class="urun-aciklama">Tek köken çekirdek, damlatma yöntemi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Türk Kahvesi</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Geleneksel cezve Türk kahvesi.</div>
+          <div class="urun-aciklama">Cezve, tercihe göre şekerli.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Double Türk Kahvesi</span><span class="urun-fiyat">₺170</span></div>
           <div class="urun-aciklama">Çift porsiyon Türk kahvesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Dibek Kahvesi</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Dibekte dövülmüş, baharatlı.</div>
+          <div class="urun-aciklama">Taş dibekte dövülmüş, baharatlı.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌾</span><span class="urun-ad">Salep</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Sıcak süt ve tarçınla.</div>
+          <div class="urun-aciklama">Salep unu + sıcak süt + tarçın.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Sıcak Çikolata</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Gerçek çikolata parçalarıyla.</div>
+          <div class="urun-aciklama">Gerçek çikolata + sıcak süt + köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Bardak Süt</span><span class="urun-fiyat">₺90</span></div>
-          <div class="urun-aciklama">Taze buharda ısıtılmış süt.</div>
+          <div class="urun-aciklama">Sade buharda ısıtılmış süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍯</span><span class="urun-ad">Ballı Süt</span><span class="urun-fiyat">₺150</span></div>
-          <div class="urun-aciklama">Sıcak süt ve çiçek balı.</div>
+          <div class="urun-aciklama">Sıcak süt + çiçek balı.</div>
         </div>
       </div>
     </div>
@@ -372,25 +401,25 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Americano</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Soğuk espresso ve buz.</div>
+          <div class="urun-aciklama">Espresso + soğuk su + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Buz ve soğuk sütlü latte.</div>
+          <div class="urun-aciklama">Espresso + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Flat White</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Soğuk flat white.</div>
+          <div class="urun-aciklama">Double espresso + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Ice Mocha</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Soğuk çikolatalı kahve.</div>
+          <div class="urun-aciklama">Espresso + çikolata + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Ice White Mocha</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Beyaz çikolata ve soğuk süt.</div>
+          <div class="urun-aciklama">Espresso + beyaz çikolata + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Caramel Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Karamel ve buz.</div>
+          <div class="urun-aciklama">Espresso + karamel + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Caramel Macchiato</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Katmanlı soğuk macchiato.</div>
+          <div class="urun-aciklama">Espresso + vanilya + süt + karamel + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Hazelnut Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Fındık aromalı soğuk latte.</div>
+          <div class="urun-aciklama">Espresso + fındık + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Vanilla Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Vanilya aromalı soğuk latte.</div>
+          <div class="urun-aciklama">Espresso + vanilya + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Filtre</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Soğuk demleme filtre.</div>
+          <div class="urun-aciklama">Soğuk demleme filtre kahve + buz.</div>
         </div>
       </div>
     </div>
@@ -408,21 +437,21 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌼</span><span class="urun-ad">Ihlamur</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Doğal ihlamur çiçeğinden.</div>
+          <div class="urun-aciklama">Taze ihlamur çiçeği demlemesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌿</span><span class="urun-ad">Adaçayı</span><span class="urun-fiyat">₺190</span></div>
           <div class="urun-aciklama">Taze adaçayı yapraklarından.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌿</span><span class="urun-ad">Melisa Çayı</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Rahatlatıcı limon aromalı melisa.</div>
+          <div class="urun-aciklama">Melisa + hafif limon aroması.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌺</span><span class="urun-ad">Hibiskus</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Ekşimsi, tropikal bir çay.</div>
+          <div class="urun-aciklama">Hibiskus çiçeği, ekşimsi ve kırmızı.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌼</span><span class="urun-ad">Papatya</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Nazik ve sakinleştirici.</div>
+          <div class="urun-aciklama">Papatya çiçeği demlemesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍵</span><span class="urun-ad">Yeşil Çay</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Antioksidan açısından zengin.</div>
+          <div class="urun-aciklama">Hafif demlenmiş, antioksidan zengini.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">❄️</span><span class="urun-ad">Kış Çayı</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Tarçın ve baharatlarla özel karışım.</div>
+          <div class="urun-aciklama">Tarçın + karanfil + zencefil + baharatlar.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🦋</span><span class="urun-ad">Mavi Kelebek</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Renk değiştiren büyülü çay.</div>
+          <div class="urun-aciklama">Butterfly pea flower, renk değiştirir.</div>
         </div>
       </div>
     </div>
@@ -440,17 +469,17 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍊</span><span class="urun-ad">Churchill</span><span class="urun-fiyat">₺170</span></div>
-          <div class="urun-aciklama">Portakal, limon ve greyfurt karışımı.</div>
+          <div class="urun-aciklama">Portakal + limon + greyfurt suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍋</span><span class="urun-ad">Cool Lime</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Misket limonu ve nane.</div>
+          <div class="urun-aciklama">Misket limonu + nane + soda.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Frozen</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Buz ve meyve karışımı.</div>
+          <div class="urun-aciklama">Dondurulmuş meyve + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥤</span><span class="urun-ad">Milkshake</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Kremali ve sütlü milkshake.</div>
+          <div class="urun-aciklama">Dondurma + süt, mevsimlik tatlar.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍋</span><span class="urun-ad">Limonata</span><span class="urun-fiyat">₺170</span></div>
-          <div class="urun-aciklama">Taze sıkılmış limon ve soda.</div>
+          <div class="urun-aciklama">Taze sıkılmış limon + şerbet + soda.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍓</span><span class="urun-ad">Çilekli Limonata</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Taze çilek ve limonata.</div>
+          <div class="urun-aciklama">Taze çilek + limon + soda.</div>
         </div>
       </div>
     </div>
@@ -468,11 +497,11 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🫐</span><span class="urun-ad">Blue Sky</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Yaban mersini ve mavi spirulina.</div>
+          <div class="urun-aciklama">Yaban mersini + spirulina + limon.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌵</span><span class="urun-ad">Cactus</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">İmza kokteylimiz.</div>
+          <div class="urun-aciklama">Kaktüs meyvesi + tropikal meyve + limon.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍉</span><span class="urun-ad">Pink Wind</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Karpuz ve gül suyu.</div>
+          <div class="urun-aciklama">Karpuz + gül suyu + limon + soda.</div>
         </div>
       </div>
     </div>
@@ -492,9 +521,9 @@
           <div class="urun-row has-aciklama"><span class="urun-emoji">💧</span><span class="urun-ad">Su</span><span class="urun-fiyat">₺30</span></div>
           <div class="urun-aciklama">Soğuk kaynak suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🫧</span><span class="urun-ad">Sade Soda</span><span class="urun-fiyat">₺80</span></div>
-          <div class="urun-aciklama">Ferahlatıcı maden sodası.</div>
+          <div class="urun-aciklama">Karbonatlı maden suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">⚡</span><span class="urun-ad">Enerji İçeceği</span><span class="urun-fiyat">₺140</span></div>
-          <div class="urun-aciklama">Seçenekler için garsonumuza danışın.</div>
+          <div class="urun-aciklama">Kafeinli enerji içeceği.</div>
         </div>
       </div>
     </div>
@@ -512,15 +541,15 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧇</span><span class="urun-ad">Classic Bubble Waffle</span><span class="urun-fiyat">₺300</span></div>
-          <div class="urun-aciklama">Çilek, muz, sütlü çikolata.</div>
+          <div class="urun-aciklama">Waffle + dondurma + çilek + muz + sütlü çikolata.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧇</span><span class="urun-ad">Dubai Bubble Waffle</span><span class="urun-fiyat">₺330</span></div>
-          <div class="urun-aciklama">Kadayıf, fıstık ezmesi, çikolata.</div>
+          <div class="urun-aciklama">Waffle + kadayıf + fıstık ezmesi + antep fıstıklı çikolata.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧇</span><span class="urun-ad">Bitter Bubble Waffle</span><span class="urun-fiyat">₺300</span></div>
-          <div class="urun-aciklama">Bitter çikolata ve dondurma.</div>
+          <div class="urun-aciklama">Waffle + dondurma + çilek + muz + bitter çikolata.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍯</span><span class="urun-ad">Caramel Bubble Waffle</span><span class="urun-fiyat">₺300</span></div>
-          <div class="urun-aciklama">Karamel sos ve tuzlu dondurma.</div>
+          <div class="urun-aciklama">Waffle + dondurma + karamel + lotus parçacıkları.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍓</span><span class="urun-ad">Meyveli Bubble Waffle</span><span class="urun-fiyat">₺300</span></div>
-          <div class="urun-aciklama">Mevsim meyveleri ve krema.</div>
+          <div class="urun-aciklama">Waffle + dondurma + çilek + frambuaz çikolata.</div>
         </div>
       </div>
     </div>
@@ -538,17 +567,17 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧀</span><span class="urun-ad">Kaşarlı Sosyete</span><span class="urun-fiyat">₺150</span></div>
-          <div class="urun-aciklama">İnce ekmek ve kaşar peyniri.</div>
+          <div class="urun-aciklama">İnce ekmek + kaşar peyniri.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥩</span><span class="urun-ad">Sucuklu Sosyete</span><span class="urun-fiyat">₺150</span></div>
-          <div class="urun-aciklama">Sucuk ve ince dilim ekmek.</div>
+          <div class="urun-aciklama">İnce ekmek + sucuk.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥪</span><span class="urun-ad">Karışık Sosyete</span><span class="urun-fiyat">₺170</span></div>
-          <div class="urun-aciklama">Kaşar ve sucuk birlikte.</div>
+          <div class="urun-aciklama">İnce ekmek + kaşar + sucuk.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧀</span><span class="urun-ad">Kaşarlı Sanayi</span><span class="urun-fiyat">₺220</span></div>
-          <div class="urun-aciklama">Kalın ekmek ve bol kaşar.</div>
+          <div class="urun-aciklama">Kalın ekmek + bol kaşar.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥩</span><span class="urun-ad">Sucuklu Sanayi</span><span class="urun-fiyat">₺220</span></div>
-          <div class="urun-aciklama">Kalın ekmek ve bol sucuk.</div>
+          <div class="urun-aciklama">Kalın ekmek + bol sucuk.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥪</span><span class="urun-ad">Karışık Sanayi</span><span class="urun-fiyat">₺250</span></div>
-          <div class="urun-aciklama">Kaşar, sucuk ve kalın ekmek.</div>
+          <div class="urun-aciklama">Kalın ekmek + kaşar + sucuk.</div>
         </div>
       </div>
     </div>
@@ -584,45 +613,45 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Espresso</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Yoğun ve aromatik. Güçlü bir başlangıç için ideal.</div>
+          <div class="urun-aciklama">Tek shot, saf ve yoğun.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Macchiato</span><span class="urun-fiyat">₺140</span></div>
-          <div class="urun-aciklama">Espresso üzerine hafif süt köpüğü.</div>
+          <div class="urun-aciklama">Espresso + hafif süt köpüğü.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Americano</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Espresso üzerine sıcak su. Uzun ve dengeli.</div>
+          <div class="urun-aciklama">Espresso + sıcak su.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Cortado</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Espresso ve buharda ısıtılmış süt.</div>
+          <div class="urun-aciklama">Espresso + eşit oranda süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Latte</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Kremsi ve bol sütlü kahve.</div>
+          <div class="urun-aciklama">Espresso + bol buharda süt + ince köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Caramel Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Karamel soslu latte.</div>
+          <div class="urun-aciklama">Latte + ev yapımı karamel sos.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Vanilla Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Vanilya aromalı latte.</div>
+          <div class="urun-aciklama">Latte + vanilya özü.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Hazelnut Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Fındık aromalı latte.</div>
+          <div class="urun-aciklama">Latte + fındık aroması.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Flat White</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Double espresso ve mikroköpük süt.</div>
+          <div class="urun-aciklama">Double espresso + az mikroköpük süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Cappuccino</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Espresso, süt ve köpük.</div>
+          <div class="urun-aciklama">Espresso + süt + bol köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Mocha</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Espresso ve çikolata.</div>
+          <div class="urun-aciklama">Espresso + çikolata sosu + buharda süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">White Mocha</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Beyaz çikolatalı mocha.</div>
+          <div class="urun-aciklama">Espresso + beyaz çikolata sosu + süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Filtre Kahve</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Özel çekirdeklerden damlatma yöntemiyle.</div>
+          <div class="urun-aciklama">Tek köken çekirdek, damlatma yöntemi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Türk Kahvesi</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Geleneksel cezve Türk kahvesi.</div>
+          <div class="urun-aciklama">Cezve, tercihe göre şekerli.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Double Türk Kahvesi</span><span class="urun-fiyat">₺170</span></div>
           <div class="urun-aciklama">Çift porsiyon Türk kahvesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">☕</span><span class="urun-ad">Dibek Kahvesi</span><span class="urun-fiyat">₺130</span></div>
-          <div class="urun-aciklama">Dibekte dövülmüş, baharatlı.</div>
+          <div class="urun-aciklama">Taş dibekte dövülmüş, baharatlı.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌾</span><span class="urun-ad">Salep</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Sıcak süt ve tarçınla.</div>
+          <div class="urun-aciklama">Salep unu + sıcak süt + tarçın.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Sıcak Çikolata</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Gerçek çikolata parçalarıyla.</div>
+          <div class="urun-aciklama">Gerçek çikolata + sıcak süt + köpük.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥛</span><span class="urun-ad">Bardak Süt</span><span class="urun-fiyat">₺90</span></div>
-          <div class="urun-aciklama">Taze buharda ısıtılmış süt.</div>
+          <div class="urun-aciklama">Sade buharda ısıtılmış süt.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍯</span><span class="urun-ad">Ballı Süt</span><span class="urun-fiyat">₺150</span></div>
-          <div class="urun-aciklama">Sıcak süt ve çiçek balı.</div>
+          <div class="urun-aciklama">Sıcak süt + çiçek balı.</div>
         </div>
       </div>
     </div>
@@ -640,25 +669,25 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Americano</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Soğuk espresso ve buz.</div>
+          <div class="urun-aciklama">Espresso + soğuk su + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Latte</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Buz ve soğuk sütlü latte.</div>
+          <div class="urun-aciklama">Espresso + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Flat White</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Soğuk flat white.</div>
+          <div class="urun-aciklama">Double espresso + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Ice Mocha</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Soğuk çikolatalı kahve.</div>
+          <div class="urun-aciklama">Espresso + çikolata + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍫</span><span class="urun-ad">Ice White Mocha</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Beyaz çikolata ve soğuk süt.</div>
+          <div class="urun-aciklama">Espresso + beyaz çikolata + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Caramel Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Karamel ve buz.</div>
+          <div class="urun-aciklama">Espresso + karamel + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Caramel Macchiato</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Katmanlı soğuk macchiato.</div>
+          <div class="urun-aciklama">Espresso + vanilya + süt + karamel + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Hazelnut Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Fındık aromalı soğuk latte.</div>
+          <div class="urun-aciklama">Espresso + fındık + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Vanilla Latte</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Vanilya aromalı soğuk latte.</div>
+          <div class="urun-aciklama">Espresso + vanilya + soğuk süt + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Ice Filtre</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Soğuk demleme filtre.</div>
+          <div class="urun-aciklama">Soğuk demleme filtre kahve + buz.</div>
         </div>
       </div>
     </div>
@@ -676,19 +705,19 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌼</span><span class="urun-ad">Ihlamur</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Doğal ihlamur çiçeğinden.</div>
+          <div class="urun-aciklama">Taze ihlamur çiçeği demlemesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌿</span><span class="urun-ad">Adaçayı</span><span class="urun-fiyat">₺190</span></div>
           <div class="urun-aciklama">Taze adaçayı yapraklarından.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌿</span><span class="urun-ad">Melisa Çayı</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Rahatlatıcı limon aromalı melisa.</div>
+          <div class="urun-aciklama">Melisa + hafif limon aroması.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌺</span><span class="urun-ad">Hibiskus</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Ekşimsi, tropikal bir çay.</div>
+          <div class="urun-aciklama">Hibiskus çiçeği, ekşimsi ve kırmızı.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🌼</span><span class="urun-ad">Papatya</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Nazik ve sakinleştirici.</div>
+          <div class="urun-aciklama">Papatya çiçeği demlemesi.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍵</span><span class="urun-ad">Yeşil Çay</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Antioksidan açısından zengin.</div>
+          <div class="urun-aciklama">Hafif demlenmiş, antioksidan zengini.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">❄️</span><span class="urun-ad">Kış Çayı</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Tarçın ve baharatlarla özel karışım.</div>
+          <div class="urun-aciklama">Tarçın + karanfil + zencefil + baharatlar.</div>
           <div class="urun-row"><span class="urun-emoji">🦋</span><span class="urun-ad">Mavi Kelebek Çayı</span><span class="urun-fiyat">₺190</span></div>
         </div>
       </div>
@@ -707,17 +736,17 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍊</span><span class="urun-ad">Churchill</span><span class="urun-fiyat">₺170</span></div>
-          <div class="urun-aciklama">Portakal, limon ve greyfurt karışımı.</div>
+          <div class="urun-aciklama">Portakal + limon + greyfurt suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍋</span><span class="urun-ad">Cool Lime</span><span class="urun-fiyat">₺190</span></div>
-          <div class="urun-aciklama">Misket limonu ve nane.</div>
+          <div class="urun-aciklama">Misket limonu + nane + soda.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🧊</span><span class="urun-ad">Frozen</span><span class="urun-fiyat">₺200</span></div>
-          <div class="urun-aciklama">Buz ve meyve karışımı.</div>
+          <div class="urun-aciklama">Dondurulmuş meyve + buz.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🥤</span><span class="urun-ad">Milkshake</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Kremali ve sütlü milkshake.</div>
+          <div class="urun-aciklama">Dondurma + süt, mevsimlik tatlar.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍋</span><span class="urun-ad">Limonata</span><span class="urun-fiyat">₺170</span></div>
-          <div class="urun-aciklama">Taze sıkılmış limon ve soda.</div>
+          <div class="urun-aciklama">Taze sıkılmış limon + şerbet + soda.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🍓</span><span class="urun-ad">Çilekli Limonata</span><span class="urun-fiyat">₺180</span></div>
-          <div class="urun-aciklama">Taze çilek ve limonata.</div>
+          <div class="urun-aciklama">Taze çilek + limon + soda.</div>
         </div>
       </div>
     </div>
@@ -737,9 +766,9 @@
           <div class="urun-row has-aciklama"><span class="urun-emoji">💧</span><span class="urun-ad">Su</span><span class="urun-fiyat">₺30</span></div>
           <div class="urun-aciklama">Soğuk kaynak suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">🫧</span><span class="urun-ad">Sade Soda</span><span class="urun-fiyat">₺80</span></div>
-          <div class="urun-aciklama">Ferahlatıcı maden sodası.</div>
+          <div class="urun-aciklama">Karbonatlı maden suyu.</div>
           <div class="urun-row has-aciklama"><span class="urun-emoji">⚡</span><span class="urun-ad">Enerji İçeceği</span><span class="urun-fiyat">₺140</span></div>
-          <div class="urun-aciklama">Seçenekler için garsonumuza danışın.</div>
+          <div class="urun-aciklama">Kafeinli enerji içeceği.</div>
         </div>
       </div>
     </div>
@@ -757,7 +786,7 @@
       <div class="acc-body">
         <div class="urun-list">
           <div class="urun-row has-aciklama"><span class="urun-emoji">🫐</span><span class="urun-ad">Blue Sky</span><span class="urun-fiyat">₺210</span></div>
-          <div class="urun-aciklama">Yaban mersini ve mavi spirulina.</div>
+          <div class="urun-aciklama">Yaban mersini + spirulina + limon.</div>
           <div class="urun-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
             <div style="display:flex;align-items:center;width:100%;"><span class="urun-emoji">🌵</span><span class="urun-ad">Cactus</span><span class="urun-fiyat">₺210</span></div>
             <div style="font-size:11px;color:var(--mist);padding-left:31px;">Vanilya, elma, süt, buz</div>
@@ -873,6 +902,56 @@
 
 <script>
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);});
+
+/* ── ÖNE ÇIKAN ÜRÜNLER ── */
+async function oncuUrunleriYukle(){
+  const container = document.getElementById('oncuUrunler');
+  if(!container) return;
+
+  // Önce menu-data.json'dan dene
+  let data = [];
+  try{
+    const r = await fetch('menu-data.json?t='+Date.now());
+    if(r.ok){
+      const d = await r.json();
+      if(d.oncu && d.oncu.length) data = d.oncu;
+    }
+  }catch(e){}
+
+  // Yoksa localStorage'dan oku
+  if(!data.length) data = JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+
+  if(!data.length){
+    container.innerHTML = '<div class="oncu-bos"></div>';
+    return;
+  }
+  container.innerHTML =
+    '<div class="oncu-baslik">Öne Çıkan Ürünlerimiz</div>' +
+    '<div class="oncu-grid">' + data.map(u=>`
+    <div class="oncu-kart">
+      <img src="${u.foto}" alt="${u.ad}" onerror="this.parentElement.style.display='none'">
+      <div class="oncu-kart-info">
+        <div class="oncu-kart-ad">${u.ad}</div>
+        ${u.aciklama?`<div class="oncu-kart-aciklama">${u.aciklama}</div>`:''}
+        ${u.fiyat?`<div class="oncu-kart-fiyat">${u.fiyat} ₺</div>`:''}
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+// Menü verilerini yükle
+async function menuVerisiYukle(){
+  try{
+    const r = await fetch('menu-data.json?t='+Date.now());
+    if(r.ok){
+      const d = await r.json();
+      if(d.menu) localStorage.setItem('cactus_admin_menu', JSON.stringify(d.menu));
+      if(d.kategoriler) localStorage.setItem('cactus_kat', JSON.stringify(d.kategoriler));
+    }
+  }catch(e){}
+}
+
+oncuUrunleriYukle();
+menuVerisiYukle();
 
 function toggleMenu(){
   const mob=document.getElementById('navMob'),b=document.getElementById('burger');

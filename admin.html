@@ -7,335 +7,218 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--ink:#0a0a0a;--paper:#f8f6f2;--stone:#e8e4dd;--mist:#c8c2b8;--gold:#b8965a;--gr:#1F5C38;--gr2:#2E8A52;--rd:#8B1A1A;}
-body{font-family:'DM Sans',sans-serif;background:#f0ede8;color:var(--ink);min-height:100vh;}
-button,input,select,textarea{font-family:'DM Sans',sans-serif;}
-
+:root{--ink:#0a0a0a;--gold:#b8965a;--paper:#f8f6f2;--stone:#e8e4de;--mist:#aaa;--rd:#e74c3c;}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .giris{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);}
-.giris-kart{background:#fff;padding:48px 40px;width:min(400px,95vw);box-shadow:0 40px 80px rgba(0,0,0,.3);}
-.giris-logo{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);letter-spacing:3px;text-align:center;margin-bottom:4px;}
-.giris-sub{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--mist);text-align:center;margin-bottom:32px;}
-.lbl{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px;}
-.inp{width:100%;padding:12px 14px;border:1.5px solid var(--stone);font-size:15px;color:var(--ink);margin-bottom:16px;transition:border-color .2s;}
-.inp:focus{outline:none;border-color:var(--gold);}
-.giris-btn{width:100%;padding:14px;background:var(--ink);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
-.giris-btn:hover{background:#333;}
-.giris-hata{font-size:13px;color:var(--rd);text-align:center;margin-top:10px;display:none;}
-
-.setup{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--ink);}
-.setup-kart{background:#fff;padding:40px;width:min(460px,95vw);box-shadow:0 40px 80px rgba(0,0,0,.3);}
-.setup-logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:2px;margin-bottom:8px;}
-.setup-info{background:var(--paper);border-left:3px solid var(--gold);padding:12px 14px;margin:16px 0;font-size:12px;line-height:1.8;color:#666;}
-.setup-btn{width:100%;padding:14px;background:var(--gr);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;}
-
-.admin{display:none;min-height:100vh;}
-.nav{background:var(--ink);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.giris-kart{background:#fff;padding:48px;width:min(420px,95vw);}
+.giris-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:3px;margin-bottom:4px;}
+.giris-sub{font-size:11px;color:var(--mist);letter-spacing:2px;margin-bottom:32px;}
+.lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px;}
+.inp{width:100%;border:1.5px solid var(--stone);padding:11px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:16px;}
+.inp:focus{border-color:var(--ink);}
+.giris-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:2px;cursor:pointer;font-family:inherit;}
+.giris-hata{font-size:12px;color:var(--rd);text-align:center;margin-top:10px;display:none;}
+.nav{position:fixed;top:0;left:0;right:0;height:52px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:#fff;letter-spacing:2px;}
-.nav-right{display:flex;align-items:center;gap:10px;}
-.nav-btn{padding:7px 16px;border:none;font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.nav-btn{padding:7px 16px;font-size:11px;font-weight:500;letter-spacing:1px;border:none;cursor:pointer;font-family:inherit;}
 .btn-yayinla{background:var(--gold);color:var(--ink);}
-.btn-yayinla:hover{background:#c9a96a;}
-.btn-cikis{background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);}
-.btn-cikis:hover{color:#fff;}
-
-.body{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 56px);}
-.sidebar{background:#fff;border-right:1px solid var(--stone);padding:16px 0;}
-.sb-ttl{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--mist);padding:0 16px;margin-bottom:8px;margin-top:8px;}
-.sb-btn{width:100%;padding:10px 16px;text-align:left;background:none;border:none;border-left:3px solid transparent;font-size:13px;color:#666;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;}
-.sb-btn:hover,.sb-btn.on{background:var(--paper);color:var(--ink);}
-.sb-btn.on{border-left-color:var(--gold);font-weight:500;}
-.sb-sep{height:1px;background:var(--stone);margin:8px 16px;}
-
-.main{padding:24px;overflow-y:auto;}
+.btn-cikis{background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);}
+.wrap{display:grid;grid-template-columns:200px 1fr;min-height:100vh;padding-top:52px;}
+.sb{background:#fff;border-right:1px solid var(--stone);padding:20px 0;}
+.sb-ttl{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--mist);padding:0 16px;margin:16px 0 8px;}
+.sb-btn{width:100%;text-align:left;padding:10px 16px;background:none;border:none;border-left:3px solid transparent;font-size:13px;font-family:inherit;cursor:pointer;color:var(--ink);}
+.sb-btn:hover{background:var(--paper);}
+.sb-btn.on{background:var(--paper);border-left-color:var(--gold);font-weight:500;}
+.main{padding:32px;}
 .panel{display:none;}
 .panel.on{display:block;}
-.pttl{font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:4px;}
+.pttl{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:4px;}
 .psub{font-size:12px;color:var(--mist);margin-bottom:24px;}
-
-.kat-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
-.kat-tab{padding:6px 14px;border:1.5px solid var(--stone);background:#fff;font-size:11px;font-weight:500;color:var(--mist);border-radius:20px;cursor:pointer;transition:all .15s;}
-.kat-tab.on{background:var(--ink);border-color:var(--ink);color:#fff;}
-
-.urun-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:16px;}
-.uk{background:#fff;border:1.5px solid var(--stone);padding:14px;transition:border-color .2s;}
-.uk:hover{border-color:var(--gold);}
-.uk.gizli{opacity:.4;}
-.uk-top{display:flex;gap:12px;align-items:center;margin-bottom:12px;}
-.uk-foto{width:64px;height:64px;flex-shrink:0;border:1.5px solid var(--stone);background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;position:relative;cursor:pointer;}
-.uk-foto img{width:100%;height:100%;object-fit:cover;}
-.uk-foto-ovr{position:absolute;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;flex-direction:column;gap:2px;}
-.uk-foto:hover .uk-foto-ovr{display:flex;}
-.uk-foto-ovr span{font-size:18px;}
-.uk-foto-ovr small{font-size:9px;color:#fff;font-weight:600;letter-spacing:1px;}
-.uk-info{flex:1;}
-.uk-ad{font-size:14px;font-weight:500;margin-bottom:2px;}
-.uk-tip{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;}
-.uk-tip.ic{color:var(--gold);}.uk-tip.yi{color:#8B6114;}
-.uk-f{display:flex;flex-direction:column;gap:7px;}
-.uk-f label{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:2px;}
-.uk-f input,.uk-f textarea{width:100%;padding:7px 9px;border:1.5px solid var(--stone);font-size:13px;color:var(--ink);transition:border-color .2s;resize:none;}
-.uk-f input:focus,.uk-f textarea:focus{outline:none;border-color:var(--gold);}
-.uk-f textarea{min-height:54px;}
-.uk-acts{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--stone);}
-.uk-gizle{flex:1;padding:6px;border:1.5px solid var(--stone);background:#fff;font-size:11px;color:#666;cursor:pointer;transition:all .2s;}
-.uk-gizle:hover{border-color:var(--rd);color:var(--rd);}
-.uk-sil{padding:6px 12px;border:1.5px solid var(--stone);background:#fff;font-size:11px;color:var(--rd);cursor:pointer;}
-.uk-sil:hover{border-color:var(--rd);}
-
-.yeni-sec{background:#fff;border:2px dashed var(--stone);padding:20px;margin-bottom:16px;}
-.yeni-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.yeni-form .s2{grid-column:1/-1;}
-.yi{width:100%;padding:8px 10px;border:1.5px solid var(--stone);font-size:13px;color:var(--ink);transition:border-color .2s;}
-.yi:focus{outline:none;border-color:var(--gold);}
-.yeni-ekle{width:100%;padding:10px;background:var(--ink);color:#fff;border:none;font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;margin-top:6px;}
-
-.foto-zone{display:block;width:100%;padding:36px 20px;border:2px dashed var(--stone);text-align:center;cursor:pointer;background:var(--paper);transition:border-color .2s;}
-.foto-zone:hover{border-color:var(--gold);}
-.foto-onizle{margin-top:14px;display:none;}
-.foto-onizle img{width:100%;max-height:240px;object-fit:cover;border:1.5px solid var(--stone);}
-
-.yuklu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:12px;}
-.yuklu-item{position:relative;border:1.5px solid var(--stone);overflow:hidden;background:var(--paper);}
-.yuklu-item img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
-.yuklu-item small{display:block;padding:3px 5px;font-size:9px;color:var(--mist);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.yuklu-kopyala{position:absolute;top:3px;right:3px;width:22px;height:22px;background:rgba(0,0,0,.65);color:#fff;border:none;font-size:10px;cursor:pointer;border-radius:50%;}
-
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.yi{width:100%;border:1.5px solid var(--stone);padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;}
+.yi:focus{border-color:var(--ink);}
+.kart{background:#fff;border:1.5px solid var(--stone);padding:20px;margin-bottom:16px;}
+.kat-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.kat-tab{padding:7px 14px;border:1.5px solid var(--stone);background:#fff;font-size:12px;cursor:pointer;font-family:inherit;}
+.kat-tab.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+.urun-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.urun-kart{background:#fff;border:1.5px solid var(--stone);padding:16px;}
+.urun-kart.gizli{opacity:.5;}
+.uk-ust{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.uk-emoji{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--paper);flex-shrink:0;cursor:pointer;position:relative;overflow:hidden;}
+.uk-emoji img{width:100%;height:100%;object-fit:cover;}
+.uk-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;color:#fff;font-size:14px;}
+.uk-emoji:hover .uk-overlay{display:flex;}
+.uk-ad{font-size:14px;font-weight:500;}
+.uk-tip{font-size:10px;color:var(--mist);letter-spacing:1px;text-transform:uppercase;}
+.uk-btns{display:flex;gap:8px;margin-top:12px;}
+.uk-btn{flex:1;padding:7px;border:1.5px solid var(--stone);background:#fff;font-size:11px;cursor:pointer;font-family:inherit;}
+.uk-btn.red{color:var(--rd);}
+.uk-btn.red:hover{border-color:var(--rd);}
+.foto-btn{padding:8px 14px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;}
+.foto-onizle{width:100%;max-height:140px;object-fit:cover;margin-top:8px;display:none;}
+.oncu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+.oncu-kart{background:#fff;border:1.5px solid var(--stone);overflow:hidden;}
+.oncu-kart-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.oncu-info{padding:12px;}
+.oncu-ad{font-size:13px;font-weight:500;margin-bottom:2px;}
+.oncu-fiyat{font-size:12px;color:var(--gold);}
+.oncu-sil{width:100%;padding:6px;background:#fff;border:1.5px solid #fcc;color:var(--rd);font-size:11px;cursor:pointer;margin-top:8px;font-family:inherit;}
+.rap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.rap-krt{background:#fff;border:1.5px solid var(--stone);padding:16px;text-align:center;}
+.rap-lbl{font-size:10px;color:var(--mist);letter-spacing:1px;margin-bottom:4px;}
+.rap-val{font-size:22px;font-weight:600;}
+.rap-sub{font-size:11px;color:var(--mist);margin-top:2px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:8px;border-bottom:2px solid var(--stone);font-weight:500;}
+td{padding:8px;border-bottom:1px solid var(--paper);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;font-size:13px;transform:translateY(80px);transition:transform .3s;z-index:999;pointer-events:none;}
+.toast.on{transform:translateY(0);}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;}
 .modal-bg.on{display:flex;}
-.modal{background:#fff;padding:32px;width:min(420px,95vw);}
-.modal-ttl{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px;}
-.modal-sub{font-size:12px;color:var(--mist);margin-bottom:20px;line-height:1.6;}
-.modal-btns{display:flex;gap:10px;margin-top:16px;}
-.modal-ok{flex:1;padding:12px;background:var(--gr);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
-.modal-ok:disabled{opacity:.5;cursor:not-allowed;}
-.modal-iptal{padding:12px 18px;background:#fff;border:1.5px solid var(--stone);font-size:12px;cursor:pointer;}
-.modal-durum{margin-top:12px;padding:10px 12px;background:var(--paper);font-size:12px;line-height:1.7;display:none;}
+.modal{background:#fff;padding:32px;width:min(440px,95vw);}
+.modal-ttl{font-size:18px;font-weight:500;margin-bottom:8px;}
+.modal-sub{font-size:13px;color:var(--mist);margin-bottom:20px;}
+.modal-btns{display:flex;gap:10px;margin-top:20px;}
+.modal-ok{flex:1;padding:12px;background:var(--ink);color:#fff;border:none;font-size:13px;cursor:pointer;font-family:inherit;}
+.modal-iptal{flex:1;padding:12px;background:#fff;border:1.5px solid var(--stone);font-size:13px;cursor:pointer;font-family:inherit;}
+.modal-durum{font-size:13px;padding:10px;background:var(--paper);margin-top:12px;display:none;}
 .modal-durum.on{display:block;}
-
-.progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transform-origin:left;z-index:999;}
-.progress.on{animation:prog 1.5s ease infinite;}
-@keyframes prog{0%{transform:scaleX(0);}50%{transform:scaleX(.7);}100%{transform:scaleX(1);}}
-
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 24px;font-size:13px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .28s;z-index:999;white-space:nowrap;border-radius:3px;}
-.toast.on{transform:translateX(-50%) translateY(0);}
-
-@media(max-width:768px){
-  .body{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .main{padding:16px;}
-  .urun-grid{grid-template-columns:1fr;}
-  .yeni-form{grid-template-columns:1fr;}
-}
 </style>
 </head>
 <body>
 
-<div class="progress" id="progress"></div>
-
-<!-- GİRİŞ -->
-<div class="giris" id="giris">
+<div id="giris" class="giris">
   <div class="giris-kart">
     <div class="giris-logo">🌵 CACTUS</div>
     <div class="giris-sub">Admin Paneli</div>
     <label class="lbl">Kullanıcı Adı</label>
-    <input class="inp" type="text" id="gAd" placeholder="admin" autocomplete="username">
+    <input class="inp" id="gAd" placeholder="admin" onkeydown="if(event.key==='Enter')giris()">
     <label class="lbl">Şifre</label>
-    <input class="inp" type="password" id="gSifre" placeholder="••••••••" onkeydown="if(event.key==='Enter')girisYap()">
-    <button class="giris-btn" onclick="girisYap()">Giriş Yap</button>
-    <div class="giris-hata" id="gHata">Hatalı kullanıcı adı veya şifre.</div>
+    <input class="inp" type="password" id="gSifre" placeholder="••••" onkeydown="if(event.key==='Enter')giris()">
+    <button class="giris-btn" onclick="giris()">Giriş Yap</button>
+    <div class="giris-hata" id="gHata">Kullanıcı adı veya şifre hatalı.</div>
   </div>
 </div>
 
-<!-- TOKEN SETUP -->
-
-
-<!-- ADMIN -->
-<div class="admin" id="admin">
+<div id="admin" style="display:none">
   <nav class="nav">
     <div class="nav-logo">🌵 CACTUS Admin</div>
-    <div class="nav-right">
+    <div style="display:flex;gap:10px;">
       <button class="nav-btn btn-yayinla" onclick="modalAc()">🚀 Yayınla</button>
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
   </nav>
-  <div class="body">
-    <div class="sidebar">
+  <div class="wrap">
+    <div class="sb">
       <div class="sb-ttl">Yönetim</div>
       <button class="sb-btn on" onclick="panelAc('menu',this)">📋 Menü</button>
       <button class="sb-btn" onclick="panelAc('kategori',this)">🗂 Kategoriler</button>
       <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
-      <button class="sb-btn" onclick="panelAc('foto',this)">📷 Fotoğraflar</button>
-      <div class="sb-sep"></div>
-      <div class="sb-ttl">Hızlı Erişim</div>
+      <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
+      <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
-      <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü Sayfası</button>
+      <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
     </div>
     <div class="main">
 
-      <!-- MENÜ PANELİ -->
+      <!-- MENÜ -->
       <div class="panel on" id="panel-menu">
-        <div class="pttl">Menü Yönetimi</div>
-        <div class="psub">Ürün ekle, fiyat güncelle, fotoğraf yükle. "Yayınla" ile siteye uygula.</div>
-        <div class="kat-tabs" id="katTabs"></div>
-        <div class="yeni-sec">
-          <div style="font-size:13px;font-weight:500;margin-bottom:14px;">➕ Yeni Ürün Ekle</div>
-          <div class="yeni-form">
-            <div>
-              <label class="lbl" style="font-size:9px;">Emoji</label>
-              <input class="yi" id="yEmoji" placeholder="☕" maxlength="4">
-            </div>
-            <div>
-              <label class="lbl" style="font-size:9px;">Ürün Adı *</label>
-              <input class="yi" id="yAd" placeholder="Ürün adı">
-            </div>
-            <div>
-              <label class="lbl" style="font-size:9px;">Fiyat ₺ *</label>
-              <input class="yi" id="yFiyat" type="number" placeholder="150">
-            </div>
-            <div>
-              <label class="lbl" style="font-size:9px;">Tür</label>
-              <select class="yi" id="yTip">
-                <option value="ic">İçecek</option>
-                <option value="yi">Yiyecek</option>
-              </select>
-            </div>
-            <div class="s2">
-              <label class="lbl" style="font-size:9px;">Açıklama</label>
-              <input class="yi" id="yAciklama" placeholder="Kısa açıklama...">
-            </div>
+        <div class="pttl">📋 Menü Yönetimi</div>
+        <div class="psub">Ürün ekle, güncelle, fotoğraf ekle. Yayınla ile siteye uygula.</div>
+        <div class="kart">
+          <div style="font-size:12px;font-weight:600;margin-bottom:14px;">➕ Yeni Ürün Ekle</div>
+          <div style="display:grid;grid-template-columns:70px 1fr 110px;gap:10px;margin-bottom:10px;">
+            <div><label class="lbl">Emoji</label><input class="yi" id="yE" placeholder="☕" maxlength="4"></div>
+            <div><label class="lbl">Ad *</label><input class="yi" id="yA" placeholder="Ürün adı"></div>
+            <div><label class="lbl">Fiyat *</label><input class="yi" id="yF" type="number" placeholder="0"></div>
           </div>
-          <button class="yeni-ekle" onclick="yeniEkle()">+ Ürünü Ekle</button>
+          <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;margin-bottom:12px;">
+            <div><label class="lbl">Açıklama</label><input class="yi" id="yAc" placeholder="Kısa açıklama"></div>
+            <div><label class="lbl">Tür</label><select class="yi" id="yT"><option value="ic">İçecek</option><option value="yi">Yiyecek</option></select></div>
+          </div>
+          <button onclick="urunEkle()" style="padding:10px 24px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">+ Ekle</button>
         </div>
+        <div class="kat-tabs" id="katTabs"></div>
         <div class="urun-grid" id="urunGrid"></div>
       </div>
 
-      <!-- KATEGORİ PANELİ -->
+      <!-- KATEGORİ -->
       <div class="panel" id="panel-kategori">
-        <div class="pttl">🗂 Kategori Yönetimi</div>
-        <div class="psub">Kategorileri düzenle, yeniden sırala veya yeni kategori ekle.</div>
-
-        <div style="background:#f8f6f2;border:1.5px solid #e8e4de;padding:20px;margin-bottom:20px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:14px;">➕ Yeni Kategori Ekle</div>
-          <div style="display:grid;grid-template-columns:80px 1fr auto auto;gap:10px;align-items:end;">
-            <div>
-              <label class="lbl">Emoji</label>
-              <input class="yi" id="katEmoji" placeholder="🍵" maxlength="4">
-            </div>
-            <div>
-              <label class="lbl">Kategori Adı</label>
-              <input class="yi" id="katAd" placeholder="Örn: Smoothieler">
-            </div>
-            <div>
-              <label class="lbl">Tür</label>
-              <select class="yi" id="katTip">
-                <option value="ic">İçecek</option>
-                <option value="yi">Yiyecek</option>
-              </select>
-            </div>
-            <button onclick="katEkle()" style="padding:9px 16px;background:#0a0a0a;color:#fff;border:none;font-size:12px;cursor:pointer;white-space:nowrap;">+ Ekle</button>
+        <div class="pttl">🗂 Kategoriler</div>
+        <div class="psub">Kategori ekle, düzenle veya sil.</div>
+        <div class="kart">
+          <div style="font-size:12px;font-weight:600;margin-bottom:14px;">➕ Yeni Kategori</div>
+          <div style="display:grid;grid-template-columns:70px 1fr 110px auto;gap:10px;align-items:end;">
+            <div><label class="lbl">Emoji</label><input class="yi" id="kE" placeholder="🍵" maxlength="4"></div>
+            <div><label class="lbl">Ad *</label><input class="yi" id="kA" placeholder="Kategori adı"></div>
+            <div><label class="lbl">Tür</label><select class="yi" id="kT"><option value="ic">İçecek</option><option value="yi">Yiyecek</option></select></div>
+            <button onclick="katEkle()" style="padding:10px 16px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Ekle</button>
           </div>
         </div>
-
         <div id="katListe"></div>
       </div>
 
-      <!-- ÖNE ÇIKAN ÜRÜNLER PANELİ -->
+      <!-- ÖNE ÇIKAN -->
       <div class="panel" id="panel-oncu">
-        <div class="pttl">⭐ Öne Çıkan Ürünler</div>
-        <div class="psub">Menüden ürün seç, fotoğraf ekle. Menü sayfasının üstünde büyük görseller olarak görünür.</div>
-
-        <div style="background:#f8f6f2;border:1.5px solid #e8e4de;padding:20px;margin-bottom:20px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:14px;">➕ Ürün Seç ve Ekle</div>
+        <div class="pttl">⭐ Öne Çıkan</div>
+        <div class="psub">Menüden ürün seç veya manuel gir, fotoğraf ekle.</div>
+        <div class="kart">
           <div style="margin-bottom:12px;">
-            <label class="lbl">Menüden Ürün Seç</label>
-            <select class="yi" id="oncuSecim" onchange="oncuSecimDegisti(this)">
+            <label class="lbl">Menüden Seç</label>
+            <select class="yi" id="oncuSec" onchange="oncuSecDegisti()">
               <option value="">-- Ürün seçin --</option>
             </select>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div>
-              <label class="lbl">Ürün Adı</label>
-              <input class="yi" id="oncuAd" placeholder="Caramel Latte">
-            </div>
-            <div>
-              <label class="lbl">Fiyat (₺)</label>
-              <input class="yi" id="oncuFiyat" type="number" placeholder="200">
-            </div>
+          <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;margin-bottom:10px;">
+            <div><label class="lbl">Ürün Adı *</label><input class="yi" id="oAd" placeholder="Caramel Latte"></div>
+            <div><label class="lbl">Fiyat (₺)</label><input class="yi" id="oFiyat" type="number" placeholder="200"></div>
           </div>
+          <div style="margin-bottom:10px;"><label class="lbl">Açıklama</label><input class="yi" id="oAc" placeholder="Kısa açıklama"></div>
           <div style="margin-bottom:12px;">
-            <label class="lbl">Açıklama</label>
-            <input class="yi" id="oncuAciklama" placeholder="Kısa açıklama">
-          </div>
-          <div style="margin-bottom:12px;">
-            <label class="lbl">Fotoğraf</label>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <input type="file" id="oncuFotoFile" accept="image/*" style="display:none" onchange="oncuFotoYukle(this)">
-              <button onclick="document.getElementById('oncuFotoFile').click()" style="padding:8px 14px;background:#f8f6f2;border:1.5px solid #e8e4de;font-size:11px;cursor:pointer;white-space:nowrap;">📷 Fotoğraf Seç</button>
-              <span id="oncuFotoAd" style="font-size:11px;color:#aaa;">Seçilmedi</span>
+            <label class="lbl">Fotoğraf *</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+              <input type="file" id="oDosya" accept="image/*" style="display:none" onchange="fotoIsle(this,'oUrl','oOnizle','oDosyaAd')">
+              <button class="foto-btn" onclick="document.getElementById('oDosya').click()">📷 Fotoğraf Seç</button>
+              <span id="oDosyaAd" style="font-size:11px;color:var(--mist);">Seçilmedi</span>
             </div>
-            <input class="yi" id="oncuFoto" placeholder="veya URL yapıştır" style="margin-top:8px;">
-            <div id="oncuFotoOnizle" style="display:none;margin-top:8px;"><img id="oncuFotoImg" style="width:100%;max-height:150px;object-fit:cover;"></div>
+            <input class="yi" id="oUrl" placeholder="veya URL yapıştır" oninput="urlOnizle(this.value,'oOnizle')">
+            <img id="oOnizle" class="foto-onizle">
           </div>
-          <button onclick="oncuEkle()" style="width:100%;padding:10px;background:#0a0a0a;color:#f8f6f2;border:none;font-size:12px;font-weight:500;letter-spacing:1px;cursor:pointer;">+ ÖNE ÇIKANLARA EKLE</button>
+          <button onclick="oncuEkle()" style="width:100%;padding:11px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;">+ ÖNE ÇIKANLARA EKLE</button>
         </div>
-
-        <div id="oncuListe" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
+        <div class="oncu-grid" id="oncuGrid"></div>
       </div>
 
-      <!-- FOTOĞRAF PANELİ -->
-      <div class="panel" id="panel-foto">
-        <div class="pttl">Fotoğraf Yükle</div>
-        <div class="psub">Telefonunuzun galerisinden fotoğraf seçin. Otomatik olarak GitHub'a yüklenip siteye eklenir.</div>
-
-        <div style="background:#fff;border:1.5px solid var(--stone);padding:20px;margin-bottom:16px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-            <div>
-              <label class="lbl" style="font-size:9px;">Ürüne Ata</label>
-              <select class="yi" id="fotoUrun" style="width:100%;">
-                <option value="">-- İsteğe bağlı --</option>
-              </select>
-            </div>
-            <div>
-              <label class="lbl" style="font-size:9px;">Dosya Adı</label>
-              <input class="yi" id="fotoIsim" placeholder="foto_adi" style="width:100%;">
-            </div>
-          </div>
-
-          <label class="foto-zone" for="fotoInput">
-            <div style="font-size:36px;margin-bottom:8px;">📷</div>
-            <div style="font-size:14px;font-weight:500;margin-bottom:4px;">Galeriden Fotoğraf Seç</div>
-            <div style="font-size:12px;color:var(--mist);">veya kamera ile çek</div>
-            <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none;" onchange="fotoYukle(this)">
-          </label>
-
-          <div class="foto-onizle" id="fotoOnizle">
-            <img id="fotoOnizleImg" src="" alt="Önizleme">
-            <div style="margin-top:8px;padding:8px 10px;background:var(--paper);font-size:11px;color:var(--mist);" id="fotoBilgi"></div>
-          </div>
+      <!-- RAPOR -->
+      <div class="panel" id="panel-rapor">
+        <div class="pttl">📊 Raporlar</div>
+        <div class="psub">Adisyon sisteminden satış verileri.</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end;">
+          <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:150px;"></div>
+          <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:150px;"></div>
+          <div><label class="lbl">Ödeme</label><select id="rOd" class="yi" style="width:130px;"><option value="">Tümü</option><option value="Nakit">Nakit</option><option value="Kredi Kartı">Kredi Kartı</option></select></div>
+          <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">Filtrele</button>
+          <button onclick="rapTemizle()" style="padding:9px 16px;background:#fff;border:1.5px solid var(--stone);font-size:12px;cursor:pointer;color:var(--rd);font-family:inherit;">🗑 Temizle</button>
         </div>
-
-        <div style="background:#fff;border:1.5px solid var(--stone);padding:20px;">
-          <div style="font-size:13px;font-weight:500;margin-bottom:4px;">📂 Yüklenen Fotoğraflar</div>
-          <div style="font-size:11px;color:var(--mist);margin-bottom:12px;">Kopyala butonuyla URL'yi alabilirsiniz</div>
-          <div class="yuklu-grid" id="yukluGrid">
-            <div style="font-size:12px;color:var(--mist);grid-column:1/-1;padding:16px;text-align:center;">Henüz fotoğraf yüklenmedi</div>
-          </div>
-        </div>
+        <div class="rap-grid" id="rOzet"></div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px;">En Çok Satanlar</div>
+        <div id="rUrun" style="margin-bottom:24px;overflow-x:auto;"></div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px;">İşlem Detayları</div>
+        <div id="rTablo" style="overflow-x:auto;"></div>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- YAYINLA MODAL -->
-<div class="modal-bg" id="modalBg">
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)modalKapat()">
   <div class="modal">
     <div class="modal-ttl">🚀 Siteyi Yayınla</div>
-    <div class="modal-sub">Menüdeki tüm değişiklikler GitHub'a kaydedilecek ve site 1-2 dakika içinde güncellenecek.</div>
+    <div class="modal-sub">Menü değişikliklerini canlı siteye uygula. GitHub token gereklidir (tek seferlik).</div>
     <div class="modal-durum" id="modalDurum"></div>
     <div class="modal-btns">
       <button class="modal-ok" id="modalOkBtn" onclick="yayinla()">✅ Yayınla</button>
-      <button class="modal-iptal" onclick="document.getElementById('modalBg').classList.remove('on')">İptal</button>
+      <button class="modal-iptal" onclick="modalKapat()">İptal</button>
     </div>
   </div>
 </div>
@@ -344,9 +227,9 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;}
 
 <script>
 const REPO='cactuscafes/cactus-kafe', BRANCH='main';
-const ADMIN_USER='admin', ADMIN_PASS='1234';
+const U='admin', P='1234';
 
-const KATEGORILER_VARSAYILAN=[
+const KAT_V=[
   {id:'sicak',label:'☕ Sıcak İçecekler',tip:'ic'},
   {id:'soguk',label:'🧊 Soğuk İçecekler',tip:'ic'},
   {id:'cay',label:'🌿 Bitkisel Çaylar',tip:'ic'},
@@ -356,580 +239,392 @@ const KATEGORILER_VARSAYILAN=[
   {id:'waffle',label:'🧇 Bubble Waffle',tip:'yi'},
   {id:'tost',label:'🥪 Tostlar',tip:'yi'},
 ];
-let KATEGORILER=JSON.parse(localStorage.getItem('cactus_kategoriler')||'null')||JSON.parse(JSON.stringify(KATEGORILER_VARSAYILAN));
 
-const VARSAYILAN={
+const MENU_V={
   sicak:[
-    {id:'s1',ad:'Espresso',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Yoğun ve aromatik espresso.',foto:'',gizli:false},
-    {id:'s2',ad:'Macchiato',fiyat:140,emoji:'☕',tip:'ic',aciklama:'Espresso üzerine süt köpüğü.',foto:'',gizli:false},
-    {id:'s3',ad:'Americano',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso ve sıcak su.',foto:'',gizli:false},
-    {id:'s4',ad:'Cortado',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso ve buharda süt.',foto:'',gizli:false},
-    {id:'s5',ad:'Latte',fiyat:190,emoji:'🥛',tip:'ic',aciklama:'Kremsi ve bol sütlü.',foto:'',gizli:false},
-    {id:'s6',ad:'Caramel Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Karamel soslu latte.',foto:'',gizli:false},
-    {id:'s7',ad:'Vanilla Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Vanilya aromalı.',foto:'',gizli:false},
-    {id:'s8',ad:'Hazelnut Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Fındık aromalı.',foto:'',gizli:false},
-    {id:'s9',ad:'Flat White',fiyat:200,emoji:'☕',tip:'ic',aciklama:'Double espresso ve mikroköpük.',foto:'',gizli:false},
-    {id:'s10',ad:'Cappuccino',fiyat:190,emoji:'☕',tip:'ic',aciklama:'Espresso, süt ve köpük.',foto:'',gizli:false},
-    {id:'s11',ad:'Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Espresso ve çikolata.',foto:'',gizli:false},
-    {id:'s12',ad:'White Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Beyaz çikolatalı mocha.',foto:'',gizli:false},
-    {id:'s13',ad:'Filtre Kahve',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Damlatma yöntemiyle.',foto:'',gizli:false},
-    {id:'s14',ad:'Türk Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Geleneksel Türk kahvesi.',foto:'',gizli:false},
-    {id:'s15',ad:'Double Türk Kahvesi',fiyat:170,emoji:'☕',tip:'ic',aciklama:'Çift porsiyon.',foto:'',gizli:false},
-    {id:'s16',ad:'Dibek Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Dibekte dövülmüş.',foto:'',gizli:false},
-    {id:'s17',ad:'Salep',fiyat:190,emoji:'🌾',tip:'ic',aciklama:'Sıcak süt ve tarçınla.',foto:'',gizli:false},
-    {id:'s18',ad:'Sıcak Çikolata',fiyat:190,emoji:'🍫',tip:'ic',aciklama:'Gerçek çikolata parçalarıyla.',foto:'',gizli:false},
-    {id:'s19',ad:'Bardak Süt',fiyat:90,emoji:'🥛',tip:'ic',aciklama:'Taze buharda ısıtılmış.',foto:'',gizli:false},
-    {id:'s20',ad:'Ballı Süt',fiyat:150,emoji:'🍯',tip:'ic',aciklama:'Sıcak süt ve çiçek balı.',foto:'',gizli:false},
+    {id:'s1',ad:'Espresso',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Tek shot, saf ve yoğun.',foto:'',gizli:false},
+    {id:'s2',ad:'Macchiato',fiyat:140,emoji:'☕',tip:'ic',aciklama:'Espresso + hafif süt köpüğü.',foto:'',gizli:false},
+    {id:'s3',ad:'Americano',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso + sıcak su.',foto:'',gizli:false},
+    {id:'s4',ad:'Cortado',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Espresso + eşit oranda süt.',foto:'',gizli:false},
+    {id:'s5',ad:'Latte',fiyat:190,emoji:'🥛',tip:'ic',aciklama:'Espresso + bol buharda süt.',foto:'',gizli:false},
+    {id:'s6',ad:'Caramel Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Latte + karamel sos.',foto:'',gizli:false},
+    {id:'s7',ad:'Vanilla Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Latte + vanilya özü.',foto:'',gizli:false},
+    {id:'s8',ad:'Hazelnut Latte',fiyat:200,emoji:'🥛',tip:'ic',aciklama:'Latte + fındık aroması.',foto:'',gizli:false},
+    {id:'s9',ad:'Flat White',fiyat:200,emoji:'☕',tip:'ic',aciklama:'Double espresso + mikroköpük süt.',foto:'',gizli:false},
+    {id:'s10',ad:'Cappuccino',fiyat:190,emoji:'☕',tip:'ic',aciklama:'Espresso + süt + köpük.',foto:'',gizli:false},
+    {id:'s11',ad:'Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Espresso + çikolata + süt.',foto:'',gizli:false},
+    {id:'s12',ad:'White Mocha',fiyat:200,emoji:'🍫',tip:'ic',aciklama:'Espresso + beyaz çikolata + süt.',foto:'',gizli:false},
+    {id:'s13',ad:'Filtre Kahve',fiyat:180,emoji:'☕',tip:'ic',aciklama:'Tek köken, damlatma yöntemi.',foto:'',gizli:false},
+    {id:'s14',ad:'Türk Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Cezve, tercihe göre şekerli.',foto:'',gizli:false},
+    {id:'s15',ad:'Double Türk Kahvesi',fiyat:170,emoji:'☕',tip:'ic',aciklama:'Çift porsiyon Türk kahvesi.',foto:'',gizli:false},
+    {id:'s16',ad:'Dibek Kahvesi',fiyat:130,emoji:'☕',tip:'ic',aciklama:'Taş dibekte dövülmüş, baharatlı.',foto:'',gizli:false},
+    {id:'s17',ad:'Salep',fiyat:190,emoji:'🌾',tip:'ic',aciklama:'Salep unu + sıcak süt + tarçın.',foto:'',gizli:false},
+    {id:'s18',ad:'Sıcak Çikolata',fiyat:190,emoji:'🍫',tip:'ic',aciklama:'Gerçek çikolata + sıcak süt.',foto:'',gizli:false},
+    {id:'s19',ad:'Bardak Süt',fiyat:90,emoji:'🥛',tip:'ic',aciklama:'Sade buharda ısıtılmış süt.',foto:'',gizli:false},
+    {id:'s20',ad:'Ballı Süt',fiyat:150,emoji:'🍯',tip:'ic',aciklama:'Sıcak süt + çiçek balı.',foto:'',gizli:false},
   ],
   soguk:[
-    {id:'sg1',ad:'Ice Americano',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg2',ad:'Ice Latte',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg3',ad:'Ice Flat White',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg4',ad:'Ice Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg5',ad:'Ice White Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg6',ad:'Ice Caramel Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg7',ad:'Ice Caramel Macchiato',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg8',ad:'Ice Hazelnut Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg9',ad:'Ice Vanilla Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'sg10',ad:'Ice Filtre',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
+    {id:'sg1',ad:'Ice Americano',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'Espresso + soğuk su + buz.',foto:'',gizli:false},
+    {id:'sg2',ad:'Ice Latte',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'Espresso + soğuk süt + buz.',foto:'',gizli:false},
+    {id:'sg3',ad:'Ice Flat White',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Double espresso + soğuk süt.',foto:'',gizli:false},
+    {id:'sg4',ad:'Ice Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'Espresso + çikolata + soğuk süt.',foto:'',gizli:false},
+    {id:'sg5',ad:'Ice White Mocha',fiyat:210,emoji:'🍫',tip:'ic',aciklama:'Espresso + beyaz çikolata + buz.',foto:'',gizli:false},
+    {id:'sg6',ad:'Ice Caramel Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Espresso + karamel + soğuk süt.',foto:'',gizli:false},
+    {id:'sg7',ad:'Ice Caramel Macchiato',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Espresso + vanilya + karamel + buz.',foto:'',gizli:false},
+    {id:'sg8',ad:'Ice Hazelnut Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Espresso + fındık + soğuk süt.',foto:'',gizli:false},
+    {id:'sg9',ad:'Ice Vanilla Latte',fiyat:210,emoji:'🧊',tip:'ic',aciklama:'Espresso + vanilya + soğuk süt.',foto:'',gizli:false},
+    {id:'sg10',ad:'Ice Filtre',fiyat:190,emoji:'🧊',tip:'ic',aciklama:'Soğuk demleme filtre kahve.',foto:'',gizli:false},
   ],
   cay:[
-    {id:'c1',ad:'Ihlamur',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c2',ad:'Adaçayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c3',ad:'Melisa Çayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c4',ad:'Hibiskus',fiyat:190,emoji:'🌺',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c5',ad:'Papatya',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c6',ad:'Yeşil Çay',fiyat:190,emoji:'🍵',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c7',ad:'Kış Çayı',fiyat:190,emoji:'❄️',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'c8',ad:'Mavi Kelebek',fiyat:190,emoji:'🦋',tip:'ic',aciklama:'',foto:'',gizli:false},
+    {id:'c1',ad:'Ihlamur',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'Taze ihlamur çiçeği demlemesi.',foto:'',gizli:false},
+    {id:'c2',ad:'Adaçayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'Taze adaçayı yapraklarından.',foto:'',gizli:false},
+    {id:'c3',ad:'Melisa Çayı',fiyat:190,emoji:'🌿',tip:'ic',aciklama:'Melisa + hafif limon aroması.',foto:'',gizli:false},
+    {id:'c4',ad:'Hibiskus',fiyat:190,emoji:'🌺',tip:'ic',aciklama:'Hibiskus çiçeği, ekşimsi.',foto:'',gizli:false},
+    {id:'c5',ad:'Papatya',fiyat:190,emoji:'🌼',tip:'ic',aciklama:'Papatya çiçeği demlemesi.',foto:'',gizli:false},
+    {id:'c6',ad:'Yeşil Çay',fiyat:190,emoji:'🍵',tip:'ic',aciklama:'Hafif demlenmiş, antioksidan.',foto:'',gizli:false},
+    {id:'c7',ad:'Kış Çayı',fiyat:190,emoji:'❄️',tip:'ic',aciklama:'Tarçın + karanfil + zencefil.',foto:'',gizli:false},
+    {id:'c8',ad:'Mavi Kelebek',fiyat:190,emoji:'🦋',tip:'ic',aciklama:'Butterfly pea flower, renk değiştirir.',foto:'',gizli:false},
   ],
   vitamin:[
-    {id:'v1',ad:'Churchill',fiyat:170,emoji:'🍊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'v2',ad:'Cool Lime',fiyat:190,emoji:'🍋',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'v3',ad:'Frozen',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'v4',ad:'Milkshake',fiyat:210,emoji:'🥤',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'v5',ad:'Limonata',fiyat:170,emoji:'🍋',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'v6',ad:'Çilekli Limonata',fiyat:180,emoji:'🍓',tip:'ic',aciklama:'',foto:'',gizli:false},
+    {id:'v1',ad:'Churchill',fiyat:170,emoji:'🍊',tip:'ic',aciklama:'Portakal + limon + greyfurt.',foto:'',gizli:false},
+    {id:'v2',ad:'Cool Lime',fiyat:190,emoji:'🍋',tip:'ic',aciklama:'Misket limonu + nane + soda.',foto:'',gizli:false},
+    {id:'v3',ad:'Frozen',fiyat:200,emoji:'🧊',tip:'ic',aciklama:'Dondurulmuş meyve + buz.',foto:'',gizli:false},
+    {id:'v4',ad:'Milkshake',fiyat:210,emoji:'🥤',tip:'ic',aciklama:'Dondurma + süt, mevsimlik.',foto:'',gizli:false},
+    {id:'v5',ad:'Limonata',fiyat:170,emoji:'🍋',tip:'ic',aciklama:'Taze limon + şerbet + soda.',foto:'',gizli:false},
+    {id:'v6',ad:'Çilekli Limonata',fiyat:180,emoji:'🍓',tip:'ic',aciklama:'Taze çilek + limon + soda.',foto:'',gizli:false},
   ],
   kokteyl:[
-    {id:'k1',ad:'Blue Sky',fiyat:210,emoji:'🫐',tip:'ic',aciklama:'Yaban mersini ve spirulina.',foto:'',gizli:false},
-    {id:'k2',ad:'Cactus',fiyat:210,emoji:'🌵',tip:'ic',aciklama:'İmza kokteylimiz.',foto:'',gizli:false},
-    {id:'k3',ad:'Pink Wind',fiyat:210,emoji:'🍉',tip:'ic',aciklama:'Karpuz ve gül suyu.',foto:'',gizli:false},
+    {id:'k1',ad:'Blue Sky',fiyat:210,emoji:'🫐',tip:'ic',aciklama:'Yaban mersini + spirulina + limon.',foto:'',gizli:false},
+    {id:'k2',ad:'Cactus',fiyat:210,emoji:'🌵',tip:'ic',aciklama:'Kaktüs meyvesi + tropikal meyve.',foto:'',gizli:false},
+    {id:'k3',ad:'Pink Wind',fiyat:210,emoji:'🍉',tip:'ic',aciklama:'Karpuz + gül suyu + limon.',foto:'',gizli:false},
   ],
   mesrubat:[
-    {id:'m1',ad:'Su',fiyat:30,emoji:'💧',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧',tip:'ic',aciklama:'',foto:'',gizli:false},
-    {id:'m3',ad:'Enerji İçeceği',fiyat:140,emoji:'⚡',tip:'ic',aciklama:'',foto:'',gizli:false},
+    {id:'m1',ad:'Su',fiyat:30,emoji:'💧',tip:'ic',aciklama:'Soğuk kaynak suyu.',foto:'',gizli:false},
+    {id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧',tip:'ic',aciklama:'Karbonatlı maden suyu.',foto:'',gizli:false},
+    {id:'m3',ad:'Enerji İçeceği',fiyat:140,emoji:'⚡',tip:'ic',aciklama:'Kafeinli enerji içeceği.',foto:'',gizli:false},
   ],
   waffle:[
-    {id:'w1',ad:'Classic Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Çilek, muz, sütlü çikolata.',foto:'',gizli:false},
-    {id:'w2',ad:'Dubai Bubble Waffle',fiyat:330,emoji:'🧇',tip:'yi',aciklama:'Kadayıf, fıstık, çikolata.',foto:'',gizli:false},
-    {id:'w3',ad:'Bitter Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Bitter çikolata, dondurma.',foto:'',gizli:false},
-    {id:'w4',ad:'Caramel Bubble Waffle',fiyat:300,emoji:'🍯',tip:'yi',aciklama:'Karamel sos, tuzlu dondurma.',foto:'',gizli:false},
-    {id:'w5',ad:'Meyveli Bubble Waffle',fiyat:300,emoji:'🍓',tip:'yi',aciklama:'Mevsim meyveleri, krema.',foto:'',gizli:false},
+    {id:'w1',ad:'Classic Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Dondurma + çilek + muz + sütlü çikolata.',foto:'',gizli:false},
+    {id:'w2',ad:'Dubai Bubble Waffle',fiyat:330,emoji:'🧇',tip:'yi',aciklama:'Kadayıf + fıstık ezmesi + çikolata.',foto:'',gizli:false},
+    {id:'w3',ad:'Bitter Bubble Waffle',fiyat:300,emoji:'🧇',tip:'yi',aciklama:'Dondurma + bitter çikolata.',foto:'',gizli:false},
+    {id:'w4',ad:'Caramel Bubble Waffle',fiyat:300,emoji:'🍯',tip:'yi',aciklama:'Dondurma + karamel.',foto:'',gizli:false},
+    {id:'w5',ad:'Meyveli Bubble Waffle',fiyat:300,emoji:'🍓',tip:'yi',aciklama:'Dondurma + mevsim meyveleri.',foto:'',gizli:false},
   ],
   tost:[
-    {id:'t1',ad:'Kaşarlı Sosyete',fiyat:150,emoji:'🧀',tip:'yi',aciklama:'',foto:'',gizli:false},
-    {id:'t2',ad:'Sucuklu Sosyete',fiyat:150,emoji:'🥩',tip:'yi',aciklama:'',foto:'',gizli:false},
-    {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪',tip:'yi',aciklama:'',foto:'',gizli:false},
-    {id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀',tip:'yi',aciklama:'',foto:'',gizli:false},
-    {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩',tip:'yi',aciklama:'',foto:'',gizli:false},
-    {id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪',tip:'yi',aciklama:'',foto:'',gizli:false},
+    {id:'t1',ad:'Kaşarlı Sosyete',fiyat:150,emoji:'🧀',tip:'yi',aciklama:'İnce ekmek + kaşar peyniri.',foto:'',gizli:false},
+    {id:'t2',ad:'Sucuklu Sosyete',fiyat:150,emoji:'🥩',tip:'yi',aciklama:'İnce ekmek + sucuk.',foto:'',gizli:false},
+    {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪',tip:'yi',aciklama:'İnce ekmek + kaşar + sucuk.',foto:'',gizli:false},
+    {id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀',tip:'yi',aciklama:'Kalın ekmek + bol kaşar.',foto:'',gizli:false},
+    {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩',tip:'yi',aciklama:'Kalın ekmek + bol sucuk.',foto:'',gizli:false},
+    {id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪',tip:'yi',aciklama:'Kalın ekmek + kaşar + sucuk.',foto:'',gizli:false},
   ],
 };
 
-let MENU=JSON.parse(localStorage.getItem('cactus_menu')||'null')||JSON.parse(JSON.stringify(VARSAYILAN));
-let aktifKat='sicak';
-let FOTOLAR=JSON.parse(localStorage.getItem('cactus_fotolar')||'[]');
-const getToken=()=>localStorage.getItem('cactus_gh_token')||'';
+let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
+let MENU=JSON.parse(localStorage.getItem('cactus_admin_menu')||'null')||JSON.parse(JSON.stringify(MENU_V));
+let aktifKat=KAT[0]?.id||'sicak';
 
-function girisYap(){
-  const ad=document.getElementById('gAd').value;
-  const sifre=document.getElementById('gSifre').value;
-  if(ad===ADMIN_USER&&sifre===ADMIN_PASS){
-    sessionStorage.setItem('ca','1');
+function giris(){
+  if(document.getElementById('gAd').value===U&&document.getElementById('gSifre').value===P){
+    localStorage.setItem('ca','1');
     document.getElementById('giris').style.display='none';
-    adminBaslat();
-  }else{document.getElementById('gHata').style.display='block';}
+    basla();
+  } else { document.getElementById('gHata').style.display='block'; }
 }
-
-function tokenKaydet(){ adminBaslat(); }
-
-function cikis(){sessionStorage.removeItem('ca');location.reload();}
-
-function adminBaslat(){
-  document.getElementById('admin').style.display='block';
-  renderKatTabs();renderUrunler();urunDropdown();
-  if(document.getElementById('fotolar-grid')) renderFotolar();
-}
-
+function cikis(){ localStorage.removeItem('ca'); location.reload(); }
+function basla(){ document.getElementById('admin').style.display='block'; renderKatTabs(); renderUrunler(); }
 function panelAc(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('panel-'+id).classList.add('on');
   el.classList.add('on');
-  if(id==='oncu') { renderOncuListe(); urunDropdown(); }
   if(id==='kategori') renderKatListe();
+  if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
+  if(id==='rapor') rapGoster();
 }
+let _tt;
+function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
+function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
+function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); }
 
-/* ── KATEGORİ YÖNETİMİ ── */
-function katKaydet(){
-  localStorage.setItem('cactus_kategoriler',JSON.stringify(KATEGORILER));
+function fotoIsle(input,urlId,onizleId,adId){
+  const file=input.files[0]; if(!file) return;
+  if(adId) document.getElementById(adId).textContent=file.name;
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=function(){
+    const canvas=document.createElement('canvas');
+    const r=Math.min(1200/img.width,1200/img.height,1);
+    canvas.width=img.width*r; canvas.height=img.height*r;
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    const b64=canvas.toDataURL('image/jpeg',0.82);
+    URL.revokeObjectURL(url);
+    document.getElementById(urlId).value=b64;
+    const oel=document.getElementById(onizleId);
+    oel.src=b64; oel.style.display='block';
+    toast('✅ Fotoğraf hazır');
+  };
+  img.src=url;
 }
+function urlOnizle(v,id){ const e=document.getElementById(id); if(v){e.src=v;e.style.display='block';}else{e.style.display='none';} }
 
-function katEkle(){
-  const emoji=document.getElementById('katEmoji').value.trim()||'📌';
-  const ad=document.getElementById('katAd').value.trim();
-  const tip=document.getElementById('katTip').value;
-  if(!ad){toast('⚠️ Kategori adı boş');return;}
-  const id='kat_'+Date.now();
-  KATEGORILER.push({id,label:emoji+' '+ad,tip});
-  if(!MENU[id]) MENU[id]=[];
-  katKaydet();
-  menuKaydet();
-  renderKatListe();
-  renderKatTabs();
-  document.getElementById('katEmoji').value='';
-  document.getElementById('katAd').value='';
-  toast('✅ Kategori eklendi');
+/* MENÜ */
+function renderKatTabs(){
+  document.getElementById('katTabs').innerHTML=KAT.map(k=>
+    `<button class="kat-tab${k.id===aktifKat?' on':''}" onclick="aktifKat='${k.id}';renderKatTabs();renderUrunler();">${k.label}</button>`
+  ).join('');
 }
-
-function katSil(id){
-  if(!confirm('Bu kategoriyi silmek istiyor musunuz? İçindeki ürünler de silinir.')) return;
-  KATEGORILER=KATEGORILER.filter(k=>k.id!==id);
-  delete MENU[id];
-  katKaydet();
-  menuKaydet();
-  renderKatListe();
-  renderKatTabs();
-  toast('🗑 Kategori silindi');
-}
-
-function katDuzenle(id){
-  const kat=KATEGORILER.find(k=>k.id===id);
-  if(!kat) return;
-  const yeniLabel=prompt('Kategori adı:',kat.label);
-  if(!yeniLabel) return;
-  kat.label=yeniLabel;
-  katKaydet();
-  renderKatListe();
-  renderKatTabs();
-  toast('✅ Kategori güncellendi');
-}
-
-function renderKatListe(){
-  const liste=document.getElementById('katListe');
-  if(!liste) return;
-  liste.innerHTML=KATEGORILER.map((k,i)=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f8f6f2;border:1.5px solid #e8e4de;margin-bottom:6px;">
-      <span style="font-size:18px;width:28px;text-align:center;">${k.label.split(' ')[0]}</span>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:500;">${k.label}</div>
-        <div style="font-size:10px;color:#aaa;">${k.tip==='ic'?'İçecek':'Yiyecek'} · ${(MENU[k.id]||[]).length} ürün</div>
+function renderUrunler(){
+  const ul=MENU[aktifKat]||[];
+  document.getElementById('urunGrid').innerHTML=!ul.length?'<div style="color:var(--mist);font-size:13px;padding:20px 0;">Bu kategoride ürün yok.</div>':
+  ul.map((u,i)=>`
+    <div class="urun-kart${u.gizli?' gizli':''}">
+      <div class="uk-ust">
+        <div class="uk-emoji" onclick="urunFoto('${aktifKat}',${i})">
+          ${u.foto?`<img src="${u.foto}" alt="${u.ad}">`:`<span>${u.emoji||'•'}</span>`}
+          <div class="uk-overlay">📷</div>
+        </div>
+        <div><div class="uk-ad">${u.ad}</div><div class="uk-tip">${u.tip==='ic'?'İçecek':'Yiyecek'}</div></div>
       </div>
-      <button onclick="katDuzenle('${k.id}')" style="padding:6px 12px;background:#fff;border:1.5px solid #e8e4de;font-size:11px;cursor:pointer;">✏️ Düzenle</button>
-      ${i>=8?`<button onclick="katSil('${k.id}')" style="padding:6px 12px;background:#fff;border:1.5px solid #fcc;font-size:11px;color:#e74c3c;cursor:pointer;">🗑 Sil</button>`:'<span style="width:70px;"></span>'}
+      <div style="display:grid;gap:8px;">
+        <div><label class="lbl">Ad</label><input class="yi" value="${u.ad}" onchange="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
+        <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" onchange="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value))"></div>
+        <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" onchange="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
+      </div>
+      <div class="uk-btns">
+        <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
+        <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
+      </div>
     </div>`).join('');
 }
-
-/* ── ÖNE ÇIKAN ÜRÜNLER ── */
-function oncuSecimDegisti(sel){
-  if(!sel.value) return;
-  // Tüm ürünleri tara
-  for(const kat of KATEGORILER){
-    const urunler = MENU[kat.id]||[];
-    const urun = urunler.find(u=>u.id===sel.value);
-    if(urun){
-      document.getElementById('oncuAd').value = urun.ad;
-      document.getElementById('oncuFiyat').value = urun.fiyat;
-      document.getElementById('oncuAciklama').value = urun.aciklama||'';
-      if(urun.foto){
-        document.getElementById('oncuFoto').value = urun.foto;
-        document.getElementById('oncuFotoOnizle').style.display='block';
-        document.getElementById('oncuFotoImg').src = urun.foto;
-      }
-      break;
-    }
-  }
-}
-
-function urunDropdown(){
-  const sel = document.getElementById('oncuSecim');
-  if(!sel) return;
-  sel.innerHTML = '<option value="">-- Ürün seçin --</option>';
-  for(const kat of KATEGORILER){
-    const urunler = (MENU[kat.id]||[]).filter(u=>!u.gizli);
-    if(!urunler.length) continue;
-    const grp = document.createElement('optgroup');
-    grp.label = kat.label;
-    urunler.forEach(u=>{
-      const opt = document.createElement('option');
-      opt.value = u.id;
-      opt.textContent = u.ad + ' — ₺' + u.fiyat;
-      grp.appendChild(opt);
-    });
-    sel.appendChild(grp);
-  }
-}
-
-function oncuFotoYukle(input){
-  const file = input.files[0];
-  if(!file) return;
-  document.getElementById('oncuFotoAd').textContent = file.name;
-  toast('⏳ Fotoğraf işleniyor...');
-  // Fotoğrafı küçült ve base64'e çevir
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  img.onload = function(){
-    const canvas = document.createElement('canvas');
-    // Max 800px genişlik
-    const maxW = 800;
-    const ratio = Math.min(maxW / img.width, maxW / img.height, 1);
-    canvas.width = img.width * ratio;
-    canvas.height = img.height * ratio;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const b64 = canvas.toDataURL('image/jpeg', 0.75);
-    document.getElementById('oncuFoto').value = b64;
-    document.getElementById('oncuFotoOnizle').style.display='block';
-    document.getElementById('oncuFotoImg').src = b64;
-    URL.revokeObjectURL(url);
-    toast('✅ Fotoğraf hazır!');
-  };
-  img.src = url;
-}
-
-function oncuEkle(){
-  const ad=document.getElementById('oncuAd').value.trim();
-  const fiyat=document.getElementById('oncuFiyat').value.trim();
-  const aciklama=document.getElementById('oncuAciklama').value.trim();
-  const foto=document.getElementById('oncuFoto').value.trim();
-  if(!ad||!foto){toast('⚠️ Ad ve fotoğraf URL zorunlu');return;}
-  const data=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-  data.push({id:Date.now(),ad,fiyat,aciklama,foto});
-  localStorage.setItem('cactus_oncu',JSON.stringify(data));
-  document.getElementById('oncuAd').value='';
-  document.getElementById('oncuFiyat').value='';
-  document.getElementById('oncuAciklama').value='';
-  document.getElementById('oncuFoto').value='';
-  renderOncuListe();
+function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
+function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }
+function urunSil(k,i){ if(!confirm('"'+MENU[k][i].ad+'" silinsin mi?')) return; MENU[k].splice(i,1); menuKaydet(); renderUrunler(); toast('🗑 Silindi'); }
+function urunEkle(){
+  const e=document.getElementById('yE').value.trim()||'•';
+  const a=document.getElementById('yA').value.trim();
+  const f=parseInt(document.getElementById('yF').value)||0;
+  const t=document.getElementById('yT').value;
+  const ac=document.getElementById('yAc').value.trim();
+  if(!a||!f){ toast('⚠️ Ad ve fiyat zorunlu'); return; }
+  if(!MENU[aktifKat]) MENU[aktifKat]=[];
+  MENU[aktifKat].push({id:aktifKat+'_'+Date.now(),ad:a,fiyat:f,emoji:e,tip:t,aciklama:ac,foto:'',gizli:false});
+  menuKaydet(); renderUrunler();
+  ['yE','yA','yF','yAc'].forEach(id=>document.getElementById(id).value='');
   toast('✅ Ürün eklendi');
 }
-
-function oncuSil(id){
-  let data=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-  data=data.filter(u=>u.id!==id);
-  localStorage.setItem('cactus_oncu',JSON.stringify(data));
-  renderOncuListe();
-  toast('🗑 Silindi');
+function urunFoto(k,i){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){
+    const file=this.files[0]; if(!file) return;
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const r=Math.min(800/img.width,800/img.height,1);
+      canvas.width=img.width*r; canvas.height=img.height*r;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      MENU[k][i].foto=canvas.toDataURL('image/jpeg',0.8);
+      URL.revokeObjectURL(url); menuKaydet(); renderUrunler(); toast('✅ Fotoğraf güncellendi');
+    }; img.src=url;
+  }; inp.click();
 }
 
-function renderOncuListe(){
-  const liste=document.getElementById('oncuListe');
-  if(!liste) return;
+/* KATEGORİ */
+function katEkle(){
+  const e=document.getElementById('kE').value.trim()||'📌';
+  const a=document.getElementById('kA').value.trim();
+  const t=document.getElementById('kT').value;
+  if(!a){ toast('⚠️ Ad zorunlu'); return; }
+  const id='kat_'+Date.now();
+  KAT.push({id,label:e+' '+a,tip:t});
+  if(!MENU[id]) MENU[id]=[];
+  katKaydet(); menuKaydet(); renderKatListe(); renderKatTabs();
+  document.getElementById('kE').value=''; document.getElementById('kA').value='';
+  toast('✅ Kategori eklendi');
+}
+function katSil(id){
+  if(!confirm('Bu kategori silinsin mi?')) return;
+  KAT=KAT.filter(k=>k.id!==id); delete MENU[id];
+  if(aktifKat===id) aktifKat=KAT[0]?.id;
+  katKaydet(); menuKaydet(); renderKatListe(); renderKatTabs(); renderUrunler();
+  toast('🗑 Silindi');
+}
+function katDuzenle(id){
+  const k=KAT.find(x=>x.id===id); if(!k) return;
+  const y=prompt('Kategori adı:',k.label); if(!y) return;
+  k.label=y; katKaydet(); renderKatListe(); renderKatTabs(); toast('✅ Güncellendi');
+}
+function renderKatListe(){
+  document.getElementById('katListe').innerHTML=KAT.map((k,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1.5px solid var(--stone);margin-bottom:6px;">
+      <span style="font-size:20px;width:30px;">${k.label.split(' ')[0]}</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">${k.label}</div><div style="font-size:11px;color:var(--mist);">${k.tip==='ic'?'İçecek':'Yiyecek'} · ${(MENU[k.id]||[]).length} ürün</div></div>
+      <button onclick="katDuzenle('${k.id}')" style="padding:6px 12px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">✏️</button>
+      ${i>=8?`<button onclick="katSil('${k.id}')" style="padding:6px 12px;background:#fff;border:1.5px solid #fcc;font-size:11px;color:var(--rd);cursor:pointer;font-family:inherit;">🗑</button>`:''}
+    </div>`).join('');
+}
+
+/* ÖNE ÇIKAN */
+function doldurDropdown(){
+  const sel=document.getElementById('oncuSec');
+  sel.innerHTML='<option value="">-- Ürün seçin --</option>';
+  KAT.forEach(k=>{
+    const ul=(MENU[k.id]||[]).filter(u=>!u.gizli);
+    if(!ul.length) return;
+    const g=document.createElement('optgroup'); g.label=k.label;
+    ul.forEach(u=>{
+      const o=document.createElement('option');
+      o.value=JSON.stringify({ad:u.ad,fiyat:u.fiyat,aciklama:u.aciklama||'',foto:u.foto||''});
+      o.textContent=u.ad+' — ₺'+u.fiyat;
+      g.appendChild(o);
+    });
+    sel.appendChild(g);
+  });
+}
+function oncuSecDegisti(){
+  const v=document.getElementById('oncuSec').value; if(!v) return;
+  try{
+    const u=JSON.parse(v);
+    document.getElementById('oAd').value=u.ad;
+    document.getElementById('oFiyat').value=u.fiyat;
+    document.getElementById('oAc').value=u.aciklama;
+    document.getElementById('oUrl').value=u.foto;
+    const oe=document.getElementById('oOnizle');
+    if(u.foto){oe.src=u.foto;oe.style.display='block';}else{oe.style.display='none';}
+  }catch(e){}
+}
+function oncuEkle(){
+  const ad=document.getElementById('oAd').value.trim();
+  const fiyat=document.getElementById('oFiyat').value.trim();
+  const ac=document.getElementById('oAc').value.trim();
+  const foto=document.getElementById('oUrl').value.trim();
+  if(!ad){ toast('⚠️ Ürün adı zorunlu'); return; }
+  if(!foto){ toast('⚠️ Fotoğraf ekleyin'); return; }
   const data=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-  if(!data.length){
-    liste.innerHTML='<div style="color:#aaa;font-size:12px;padding:20px;">Henüz öne çıkan ürün yok.</div>';
-    return;
-  }
-  liste.innerHTML=data.map(u=>`
-    <div style="background:#f8f6f2;border:1.5px solid #e8e4de;overflow:hidden;">
-      <div style="aspect-ratio:4/3;overflow:hidden;">
-        <img src="${u.foto}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
-      </div>
-      <div style="padding:12px;">
-        <div style="font-size:13px;font-weight:500;">${u.ad}</div>
-        ${u.fiyat?`<div style="font-size:12px;color:#b8965a;">₺${u.fiyat}</div>`:''}
-        ${u.aciklama?`<div style="font-size:11px;color:#888;margin-top:4px;">${u.aciklama}</div>`:''}
-        <button onclick="oncuSil(${u.id})" style="margin-top:10px;width:100%;padding:6px;background:#fff;border:1.5px solid #e8e4de;font-size:11px;color:#e74c3c;cursor:pointer;">🗑 Kaldır</button>
+  data.push({id:Date.now(),ad,fiyat,aciklama:ac,foto});
+  localStorage.setItem('cactus_oncu',JSON.stringify(data));
+  document.getElementById('oAd').value='';
+  document.getElementById('oFiyat').value='';
+  document.getElementById('oAc').value='';
+  document.getElementById('oUrl').value='';
+  document.getElementById('oOnizle').style.display='none';
+  document.getElementById('oDosyaAd').textContent='Seçilmedi';
+  document.getElementById('oncuSec').value='';
+  renderOncuGrid();
+  toast('✅ Eklendi!');
+}
+function oncuSil(id){
+  let d=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+  d=d.filter(u=>u.id!==id);
+  localStorage.setItem('cactus_oncu',JSON.stringify(d));
+  renderOncuGrid(); toast('🗑 Kaldırıldı');
+}
+function renderOncuGrid(){
+  const d=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+  document.getElementById('oncuGrid').innerHTML=!d.length?'<div style="color:var(--mist);font-size:13px;">Henüz öne çıkan ürün yok.</div>':
+  d.map(u=>`
+    <div class="oncu-kart">
+      <img class="oncu-kart-img" src="${u.foto}" alt="${u.ad}" onerror="this.style.background='var(--paper)'">
+      <div class="oncu-info">
+        <div class="oncu-ad">${u.ad}</div>
+        ${u.fiyat?`<div class="oncu-fiyat">₺${u.fiyat}</div>`:''}
+        ${u.aciklama?`<div style="font-size:11px;color:var(--mist);margin-top:4px;">${u.aciklama}</div>`:''}
+        <button class="oncu-sil" onclick="oncuSil(${u.id})">🗑 Kaldır</button>
       </div>
     </div>`).join('');
 }
 
-function renderKatTabs(){
-  const tabs=document.getElementById('katTabs');tabs.innerHTML='';
-  KATEGORILER.forEach(k=>{
-    const b=document.createElement('button');
-    b.className='kat-tab'+(aktifKat===k.id?' on':'');
-    b.textContent=k.label;
-    b.onclick=()=>{aktifKat=k.id;renderKatTabs();renderUrunler();};
-    tabs.appendChild(b);
+/* RAPOR */
+function rapGoster(){
+  const s=JSON.parse(localStorage.getItem('cactus_satislar')||'[]');
+  const bas=document.getElementById('rBas')?.value||'';
+  const bit=document.getElementById('rBit')?.value||'';
+  const od=document.getElementById('rOd')?.value||'';
+  const f=s.filter(x=>{
+    if(bas&&x.tarihISO&&x.tarihISO<bas) return false;
+    if(bit&&x.tarihISO&&x.tarihISO>bit) return false;
+    if(od&&x.odeme_tipi!==od) return false;
+    return true;
   });
-}
-
-function renderUrunler(){
-  const grid=document.getElementById('urunGrid');grid.innerHTML='';
-  (MENU[aktifKat]||[]).forEach((u,i)=>{
-    const d=document.createElement('div');
-    d.className='uk'+(u.gizli?' gizli':'');
-    d.innerHTML=`
-      <div class="uk-top">
-        <div class="uk-foto" onclick="fotoSec('${aktifKat}',${i})">
-          ${u.foto?`<img src="${u.foto}">`:`<span>${u.emoji||'☕'}</span>`}
-          <div class="uk-foto-ovr"><span>📷</span><small>FOTO SEÇ</small></div>
-        </div>
-        <div class="uk-info">
-          <div class="uk-ad">${u.ad}</div>
-          <div class="uk-tip ${u.tip}">${u.tip==='ic'?'İçecek':'Yiyecek'}</div>
-        </div>
-      </div>
-      <div class="uk-f">
-        <div><label>Ürün Adı</label><input value="${u.ad}" onchange="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
-        <div><label>Fiyat (₺)</label><input type="number" value="${u.fiyat}" onchange="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value))"></div>
-        <div><label>Açıklama</label><textarea onchange="guncelle('${aktifKat}',${i},'aciklama',this.value)">${u.aciklama||''}</textarea></div>
-      </div>
-      <div class="uk-acts">
-        <button class="uk-gizle" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
-        <button class="uk-sil" onclick="urunSil('${aktifKat}',${i})">🗑</button>
-      </div>`;
-    grid.appendChild(d);
-  });
-}
-
-function guncelle(kat,i,alan,deger){MENU[kat][i][alan]=deger;kaydet();}
-function kaydet(){localStorage.setItem('cactus_menu',JSON.stringify(MENU));}
-
-function urunGizle(kat,i){
-  MENU[kat][i].gizli=!MENU[kat][i].gizli;kaydet();renderUrunler();
-  toast(MENU[kat][i].gizli?'🙈 Gizlendi':'👁 Gösterildi');
-}
-function urunSil(kat,i){
-  if(!confirm('"'+MENU[kat][i].ad+'" silinsin mi?'))return;
-  MENU[kat].splice(i,1);kaydet();renderUrunler();toast('🗑 Silindi');
-}
-function yeniEkle(){
-  const ad=document.getElementById('yAd').value.trim();
-  const fiyat=parseInt(document.getElementById('yFiyat').value)||0;
-  if(!ad||!fiyat){toast('⚠️ Ad ve fiyat zorunlu');return;}
-  MENU[aktifKat].push({id:aktifKat+'_'+Date.now(),ad,fiyat,emoji:document.getElementById('yEmoji').value.trim()||'☕',tip:document.getElementById('yTip').value,aciklama:document.getElementById('yAciklama').value.trim(),foto:'',gizli:false});
-  kaydet();renderUrunler();urunDropdown();
-  ['yEmoji','yAd','yFiyat','yAciklama'].forEach(id=>document.getElementById(id).value='');
-  toast('✅ Eklendi');
-}
-
-// FOTO SEÇ (ürün kartından)
-function fotoSec(kat,i){
-  const inp=document.createElement('input');
-  inp.type='file';inp.accept='image/*';
-  inp.onchange=async e=>{
-    const file=e.target.files[0];if(!file)return;
-    toast('⏳ Yükleniyor...');
-    const url=await ghFotoYukle(file,kat+'_'+i+'_'+Date.now());
-    if(url){MENU[kat][i].foto=url;kaydet();renderUrunler();toast('📷 Fotoğraf eklendi!');}
-  };
-  inp.click();
-}
-
-// ÜRÜN DROPDOWN (foto paneli)
-function urunDropdown(){
-  const sel=document.getElementById('fotoUrun');
-  sel.innerHTML='<option value="">-- İsteğe bağlı --</option>';
-  KATEGORILER.forEach(k=>{
-    (MENU[k.id]||[]).forEach((u,i)=>{
-      const o=document.createElement('option');
-      o.value=k.id+'|'+i;
-      o.textContent=k.label.split(' ').slice(1).join(' ')+' › '+u.ad;
-      sel.appendChild(o);
-    });
-  });
-}
-
-// FOTO YÜKLE (foto paneli)
-async function fotoYukle(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    document.getElementById('fotoOnizleImg').src=e.target.result;
-    document.getElementById('fotoOnizle').style.display='block';
-    document.getElementById('fotoBilgi').textContent=file.name+' · '+(file.size/1024).toFixed(0)+' KB';
-  };
-  reader.readAsDataURL(file);
-  const isim=(document.getElementById('fotoIsim').value.trim()||'foto_'+Date.now()).replace(/[^a-zA-Z0-9_-]/g,'_');
-  const ext=file.name.split('.').pop().toLowerCase();
-  toast('⏳ Yükleniyor...');
-  const url=await ghFotoYukle(file,isim+'.'+ext);
-  if(url){
-    const urunSec=document.getElementById('fotoUrun').value;
-    if(urunSec){const[kat,idx]=urunSec.split('|');MENU[kat][parseInt(idx)].foto=url;kaydet();renderUrunler();}
-    FOTOLAR.push({url,isim:isim+'.'+ext,tarih:new Date().toLocaleDateString('tr')});
-    localStorage.setItem('cactus_fotolar',JSON.stringify(FOTOLAR));
-    renderFotolar();urunDropdown();
-    toast('✅ Fotoğraf yüklendi!');
+  const tC=f.reduce((a,x)=>a+(x.toplam||0),0);
+  const tI=f.reduce((a,x)=>a+(x.icecek_toplam||0),0);
+  const tY=f.reduce((a,x)=>a+(x.yiyecek_toplam||0),0);
+  const tN=f.filter(x=>x.odeme_tipi==='Nakit').reduce((a,x)=>a+(x.toplam||0),0);
+  const tK=f.filter(x=>x.odeme_tipi==='Kredi Kartı').reduce((a,x)=>a+(x.toplam||0),0);
+  document.getElementById('rOzet').innerHTML=[
+    ['TOPLAM SATIŞ',f.length+' işlem',''],
+    ['TOPLAM CİRO','₺'+tC.toLocaleString('tr-TR'),'gelir'],
+    ['İÇECEK','₺'+tI.toLocaleString('tr-TR'),(tC?Math.round(tI/tC*100):0)+'%'],
+    ['YİYECEK','₺'+tY.toLocaleString('tr-TR'),(tC?Math.round(tY/tC*100):0)+'%'],
+    ['NAKİT','₺'+tN.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Nakit').length+' işlem'],
+    ['KREDİ KARTI','₺'+tK.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Kredi Kartı').length+' işlem'],
+  ].map(([l,v,s])=>`<div class="rap-krt"><div class="rap-lbl">${l}</div><div class="rap-val">${v}</div><div class="rap-sub">${s}</div></div>`).join('');
+  if(!f.length){
+    document.getElementById('rTablo').innerHTML='<div style="padding:30px;text-align:center;color:var(--mist);">Satış verisi yok.</div>';
+    document.getElementById('rUrun').innerHTML=''; return;
   }
-  input.value='';
+  const um={};
+  f.forEach(s=>(s.urunDetay||[]).forEach(u=>{
+    if(!um[u.ad]) um[u.ad]={ad:u.ad,adet:0,ciro:0};
+    um[u.ad].adet+=u.adet||1; um[u.ad].ciro+=(u.fiyat||0)*(u.adet||1);
+  }));
+  const su=Object.values(um).sort((a,b)=>b.adet-a.adet).slice(0,10);
+  document.getElementById('rUrun').innerHTML=su.length?'<table><thead><tr><th>Ürün</th><th style="text-align:right">Adet</th><th style="text-align:right">Ciro</th></tr></thead><tbody>'+
+    su.map(u=>`<tr><td>${u.ad}</td><td style="text-align:right">${u.adet}</td><td style="text-align:right">₺${u.ciro.toLocaleString('tr-TR')}</td></tr>`).join('')+'</tbody></table>':
+    '<div style="color:var(--mist);font-size:13px;">Ürün detayı yok.</div>';
+  document.getElementById('rTablo').innerHTML='<table><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ödeme</th><th>Ürünler</th><th style="text-align:right">Toplam</th></tr></thead><tbody>'+
+    [...f].sort((a,b)=>(b.tarihISO||'').localeCompare(a.tarihISO||'')).map(s=>`<tr><td>${s.tarih||'-'}</td><td>${s.saat||'-'}</td><td>${s.masa||'-'}</td><td>${s.odeme_tipi||'-'}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.urunler||'-'}</td><td style="text-align:right;font-weight:600">₺${(s.toplam||0).toLocaleString('tr-TR')}</td></tr>`).join('')+
+    '</tbody></table>';
+}
+function rapTemizle(){
+  if(!confirm('Tüm satış verileri silinsin mi?')) return;
+  localStorage.removeItem('cactus_satislar'); rapGoster(); toast('🗑 Temizlendi');
 }
 
-function renderFotolar(){
-  const grid=document.getElementById('yukluGrid');
-  if(!FOTOLAR.length){grid.innerHTML='<div style="font-size:12px;color:var(--mist);grid-column:1/-1;padding:16px;text-align:center;">Henüz yüklenmedi</div>';return;}
-  grid.innerHTML='';
-  FOTOLAR.slice().reverse().forEach(f=>{
-    const d=document.createElement('div');d.className='yuklu-item';
-    d.innerHTML=`<img src="${f.url}" loading="lazy"><small>${f.isim}</small><button class="yuklu-kopyala" onclick="kopyala('${f.url}')" title="URL Kopyala">📋</button>`;
-    grid.appendChild(d);
-  });
+/* YAYINLA */
+function modalAc(){
+  document.getElementById('modalBg').classList.add('on');
+  document.getElementById('modalDurum').classList.remove('on');
+  document.getElementById('modalOkBtn').disabled=false;
+  document.getElementById('modalOkBtn').textContent='✅ Yayınla';
 }
-
-function kopyala(url){navigator.clipboard.writeText(url).then(()=>toast('📋 URL kopyalandı'));}
-
-// GITHUB API - FOTOĞRAF YÜKLE
-async function ghFotoYukle(file,dosyaAdi){
-  const token=getToken();if(!token){toast('⚠️ Token eksik');return null;}
-  const pg=document.getElementById('progress');pg.classList.add('on');
-  try{
-    const b64=await fileB64(file);
-    const path='images/'+dosyaAdi;
-    const url=`https://api.github.com/repos/${REPO}/contents/${path}`;
-    let sha='';
-    try{const r=await fetch(url,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const d=await r.json();sha=d.sha;}}catch(e){}
-    const body={message:'Fotoğraf: '+dosyaAdi,content:b64,branch:BRANCH};
-    if(sha)body.sha=sha;
-    const res=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
-    pg.classList.remove('on');
-    if(res.ok){const d=await res.json();return d.content.download_url;}
-    else{const e=await res.json();toast('❌ '+(e.message||res.status));return null;}
-  }catch(e){pg.classList.remove('on');toast('❌ '+e.message);return null;}
-}
-
-function fileB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
-
-// YAYINLA
-function modalAc(){document.getElementById('modalBg').classList.add('on');document.getElementById('modalDurum').classList.remove('on');document.getElementById('modalOkBtn').disabled=false;document.getElementById('modalOkBtn').textContent='✅ Yayınla';}
-
+function modalKapat(){ document.getElementById('modalBg').classList.remove('on'); }
 async function yayinla(){
-  const token=getToken();if(!token){toast('⚠️ Token eksik');return;}
-  const btn=document.getElementById('modalOkBtn');
-  const durum=document.getElementById('modalDurum');
-  btn.disabled=true;btn.textContent='⏳ Yayınlanıyor...';
-  durum.classList.add('on');durum.innerHTML='⏳ menu.html güncelleniyor...';
+  let token=localStorage.getItem('cactus_gh_token')||'';
+  if(!token){
+    token=prompt('GitHub Token (tek seferlik kaydedilir):');
+    if(!token){ toast('⚠️ Token girilmedi'); return; }
+    localStorage.setItem('cactus_gh_token',token.trim());
+    token=token.trim();
+  }
+  const btn=document.getElementById('modalOkBtn'), dur=document.getElementById('modalDurum');
+  btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
+  dur.classList.add('on'); dur.textContent='⏳ Bağlanıyor...';
   try{
-    const getRes=await fetch(`https://api.github.com/repos/${REPO}/contents/menu.html`,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
-    const getD=await getRes.json();
-    const sha=getD.sha;
-    const icerik=menuHtml();
-    const b64=btoa(unescape(encodeURIComponent(icerik)));
-    const putRes=await fetch(`https://api.github.com/repos/${REPO}/contents/menu.html`,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'Admin paneli güncelleme',content:b64,sha,branch:BRANCH})});
-    if(putRes.ok){
-      durum.innerHTML='✅ Güncellendi! Site 1-2 dakika içinde yenilenecek.';
+    const menuData={kategoriler:KAT,menu:MENU,oncu:JSON.parse(localStorage.getItem('cactus_oncu')||'[]'),guncelleme:new Date().toISOString()};
+    const jsonB64=btoa(unescape(encodeURIComponent(JSON.stringify(menuData,null,2))));
+    const jgr=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{headers:{'Authorization':'token '+token}});
+    const jgd=await jgr.json();
+    const body={message:'Menü güncellendi',content:jsonB64,branch:BRANCH};
+    if(jgd.sha) body.sha=jgd.sha;
+    const jp=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{
+      method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(jp.ok){
+      dur.textContent='✅ Yayınlandı! Site 30 saniye içinde güncellenir.';
       btn.textContent='✅ Tamamlandı';
-      toast('🚀 Site güncellendi!');
-    }else{const e=await putRes.json();durum.innerHTML='❌ '+(e.message||putRes.status);btn.disabled=false;btn.textContent='✅ Yayınla';}
-  }catch(e){durum.innerHTML='❌ '+e.message;btn.disabled=false;btn.textContent='✅ Yayınla';}
+      toast('🚀 Yayınlandı!');
+    } else {
+      const e=await jp.json();
+      if(e.message?.includes('Bad credentials')){ localStorage.removeItem('cactus_gh_token'); dur.textContent='❌ Token geçersiz.'; }
+      else{ dur.textContent='❌ '+(e.message||jp.status); }
+      btn.disabled=false; btn.textContent='✅ Yayınla';
+    }
+  }catch(e){ dur.textContent='❌ '+e.message; btn.disabled=false; btn.textContent='✅ Yayınla'; }
 }
 
-// MENU.HTML ÜRET
-function menuHtml(){
-  const katHtml=KATEGORILER.map((k,ki)=>{
-    const urunler=(MENU[k.id]||[]).filter(u=>!u.gizli);
-    if(!urunler.length)return'';
-    const emoji=k.label.split(' ')[0];
-    const katAd=k.label.split(' ').slice(1).join(' ');
-    const urunHtml=urunler.map(u=>{
-      if(u.foto)return`<div class="urun-row" data-ad="${u.ad}"><img src="${u.foto}" style="width:44px;height:44px;object-fit:cover;flex-shrink:0;border:1px solid var(--stone);margin-right:12px;" alt="${u.ad}"><span class="urun-ad">${u.ad}</span><span class="urun-fiyat">₺${u.fiyat}</span></div>`;
-      return`<div class="urun-row" data-ad="${u.ad}"><span class="urun-emoji">${u.emoji||'•'}</span><span class="urun-ad">${u.ad}</span><span class="urun-fiyat">₺${u.fiyat}</span></div>`;
-    }).join('\n');
-    return`<div class="acc-kat" id="acc-${ki}">
-  <div class="acc-hdr" onclick="accToggle(${ki})">
-    <span class="acc-emoji">${emoji}</span>
-    <div class="acc-info"><div class="acc-ad">${katAd}</div><div class="acc-meta"><span class="acc-adet">${urunler.length} çeşit</span></div></div>
-    <div class="acc-arrow">▾</div>
-  </div>
-  <div class="acc-body"><div class="urun-list">${urunHtml}</div></div>
-</div>`;
-  }).join('\n');
-
-  return`<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menü — Cactus Coffee</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<style>
-.page-hero{background:var(--ink);padding:160px 32px 80px;text-align:center;position:relative;overflow:hidden;}
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,#0a0a0a);}
-.page-hero-content{position:relative;z-index:1;}
-.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block;}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:#f8f6f2;line-height:.95;letter-spacing:-2px;}
-.page-title em{font-style:italic;color:var(--gold);}
-.menu-wrap{max-width:860px;margin:0 auto;padding:48px 32px 80px;}
-.acc-kat{margin-bottom:4px;overflow:hidden;}
-.acc-hdr{display:flex;align-items:center;gap:16px;padding:22px 28px;cursor:pointer;user-select:none;transition:opacity .2s;}
-.acc-hdr:hover{opacity:.88;}
-.acc-kat:nth-child(1) .acc-hdr{background:linear-gradient(135deg,#e8d5c4,#dfc9b5);}
-.acc-kat:nth-child(2) .acc-hdr{background:linear-gradient(135deg,#c8d8e8,#b8ccd8);}
-.acc-kat:nth-child(3) .acc-hdr{background:linear-gradient(135deg,#c8dcc8,#b8d0b8);}
-.acc-kat:nth-child(4) .acc-hdr{background:linear-gradient(135deg,#e4d4e4,#d8c4d8);}
-.acc-kat:nth-child(5) .acc-hdr{background:linear-gradient(135deg,#e8e0c8,#dcd4b8);}
-.acc-kat:nth-child(6) .acc-hdr{background:linear-gradient(135deg,#d4e4d4,#c4dac4);}
-.acc-kat:nth-child(7) .acc-hdr{background:linear-gradient(135deg,#e4ccc8,#d8c0bc);}
-.acc-kat:nth-child(8) .acc-hdr{background:linear-gradient(135deg,#d8dce8,#ccd0dc);}
-.acc-kat.open .acc-hdr{filter:brightness(.88);}
-.acc-emoji{font-size:20px;flex-shrink:0;}
-.acc-info{flex:1;}
-.acc-ad{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1;text-transform:uppercase;}
-.acc-meta{margin-top:4px;}
-.acc-adet{font-size:11px;color:rgba(10,10,10,.45);}
-.acc-arrow{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.5);border:none;transition:transform .3s;font-size:14px;color:rgba(10,10,10,.5);}
-.acc-kat.open .acc-arrow{transform:rotate(180deg);}
-.acc-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1);background:#fff;border-left:3px solid transparent;}
-.acc-kat:nth-child(1) .acc-body{border-color:#e8d5c4;}.acc-kat:nth-child(2) .acc-body{border-color:#c8d8e8;}.acc-kat:nth-child(3) .acc-body{border-color:#c8dcc8;}.acc-kat:nth-child(4) .acc-body{border-color:#e4d4e4;}.acc-kat:nth-child(5) .acc-body{border-color:#e8e0c8;}.acc-kat:nth-child(6) .acc-body{border-color:#d4e4d4;}.acc-kat:nth-child(7) .acc-body{border-color:#e4ccc8;}.acc-kat:nth-child(8) .acc-body{border-color:#d8dce8;}
-.acc-kat.open .acc-body{max-height:3000px;}
-.urun-list{padding:8px 0;}
-.urun-row{display:flex;align-items:center;padding:13px 24px;border-bottom:1px solid var(--stone);transition:background .15s;}
-.urun-row:last-child{border-bottom:none;}.urun-row:hover{background:var(--paper);}
-.urun-emoji{font-size:17px;margin-right:14px;flex-shrink:0;}
-.urun-ad{font-size:14px;color:var(--ink);flex:1;}
-.urun-fiyat{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--ink);margin-left:16px;opacity:.7;}
-@media(max-width:768px){.menu-wrap{padding:32px 16px 60px;}.acc-hdr{padding:16px 18px;}.page-hero{padding:130px 20px 60px;}}
-</style>
-</head>
-<body>
-<nav class="nav" id="nav">
-  <a href="index.html" class="nav-logo">CACTUS</a>
-  <div class="nav-links">
-    <a href="index.html">Ana Sayfa</a>
-    <a href="menu.html" class="aktif">Menü</a>
-    <a href="galeri.html">Galeri</a>
-    <a href="iletisim.html">İletişim</a>
-  </div>
-  <button class="nav-burger" onclick="toggleMenu()" id="burger"><span></span><span></span><span></span></button>
-</nav>
-<div class="nav-mob" id="navMob">
-  <a href="index.html">Ana Sayfa</a><a href="menu.html">Menü</a><a href="galeri.html">Galeri</a><a href="iletisim.html">İletişim</a>
-</div>
-<div class="page-hero">
-  <div class="page-hero-content">
-    <span class="page-eyebrow">Cactus Coffee</span>
-    <h1 class="page-title">Bizim<br><em>Menümüz</em></h1>
-  </div>
-</div>
-<div class="menu-wrap">
-${katHtml}
-</div>
-<footer class="footer">
-  <div class="footer-grid">
-    <div><div class="footer-brand">CACTUS</div><p class="footer-desc">Coffee, Snack & Dessert · Bursa.</p></div>
-    <div class="footer-col"><div class="footer-col-ttl">Sayfalar</div><a href="index.html">Ana Sayfa</a><a href="menu.html">Menü</a><a href="galeri.html">Galeri</a><a href="iletisim.html">İletişim</a></div>
-    <div class="footer-col"><div class="footer-col-ttl">Instagram</div><a href="https://instagram.com/cactuscafe.fsm" target="_blank">@cactuscafe.fsm</a><a href="https://instagram.com/cactuscafe.tr" target="_blank">@cactuscafe.tr</a><a href="https://instagram.com/cactuscafe.waffle" target="_blank">@cactuscafe.waffle</a></div>
-  </div>
-  <div class="footer-bottom"><div class="footer-copy">© 2025 Cactus Coffee · Bursa</div></div>
-</footer>
-<script>
-window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);});
-function toggleMenu(){const mob=document.getElementById('navMob'),b=document.getElementById('burger');const open=mob.classList.toggle('on');b.children[0].style.transform=open?'rotate(45deg) translateY(6.5px)':'';b.children[1].style.opacity=open?'0':'1';b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';document.body.style.overflow=open?'hidden':'';}
-function accToggle(i){document.getElementById('acc-'+i).classList.toggle('open');}
-document.querySelectorAll('.acc-kat').forEach((el,i)=>{if(i===0)el.classList.add('open');});
-<\/script>
-</body>
-</html>`;
-}
-
-let _tt;
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),3200);}
-
-if(sessionStorage.getItem('ca')==='1'){document.getElementById('giris').style.display='none';if(!getToken()){document.getElementById('setup').style.display='flex';}else{adminBaslat();}}
+/* BAŞLAT */
+if(localStorage.getItem('ca')==='1'){ document.getElementById('giris').style.display='none'; basla(); }
 </script>
 </body>
 </html>

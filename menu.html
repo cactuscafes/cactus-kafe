@@ -950,6 +950,50 @@ async function menuVerisiYukle(){
   }catch(e){}
 }
 
+// Menü verilerini yükle ve sayfayı güncelle
+async function menuVerisiYukle(){
+  try{
+    const r = await fetch('menu-data.json?t='+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d.menu) localStorage.setItem('cactus_admin_menu', JSON.stringify(d.menu));
+    if(d.kategoriler) localStorage.setItem('cactus_kat', JSON.stringify(d.kategoriler));
+
+    // Sayfadaki ürün açıklamalarını ve fiyatlarını güncelle
+    if(d.menu){
+      Object.values(d.menu).forEach(urunler=>{
+        urunler.forEach(u=>{
+          // Ürün adına göre satırı bul
+          document.querySelectorAll('.urun-ad').forEach(el=>{
+            if(el.textContent.trim()===u.ad){
+              // Fiyatı güncelle
+              const fiyatEl=el.closest('.urun-row')?.querySelector('.urun-fiyat');
+              if(fiyatEl) fiyatEl.textContent='₺'+u.fiyat;
+              // Açıklamayı güncelle
+              const aciklamaEl=el.closest('.urun-row')?.nextElementSibling;
+              if(aciklamaEl&&aciklamaEl.classList.contains('urun-aciklama')){
+                if(u.aciklama) aciklamaEl.textContent=u.aciklama;
+              }
+              // Fotoğrafı güncelle
+              if(u.foto){
+                const emojiEl=el.closest('.urun-row')?.querySelector('.urun-emoji');
+                if(emojiEl){
+                  emojiEl.innerHTML=`<img src="${u.foto}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;" alt="${u.ad}">`;
+                }
+              }
+              // Gizli ürünleri gizle
+              if(u.gizli){
+                const row=el.closest('.urun-row');
+                if(row){ row.style.display='none'; const next=row.nextElementSibling; if(next&&next.classList.contains('urun-aciklama')) next.style.display='none'; }
+              }
+            }
+          });
+        });
+      });
+    }
+  }catch(e){}
+}
+
 oncuUrunleriYukle();
 menuVerisiYukle();
 

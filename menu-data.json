@@ -12,12 +12,12 @@
     },
     {
       "id": "cay",
-      "label": "🌿 Bitkisel Çaylar",
+      "label": "🌿 Bitki Çayları",
       "tip": "ic"
     },
     {
       "id": "vitamin",
-      "label": "🍋 Vitamin İçecekler",
+      "label": "🍋 Vitamin",
       "tip": "ic"
     },
     {
@@ -660,5 +660,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:41:47.961Z"
+  "guncelleme": "2026-04-20T23:42:35.540Z"
 }

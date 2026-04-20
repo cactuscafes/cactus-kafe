@@ -242,16 +242,6 @@
         "aciklama": "Sıcak süt + çiçek balı.",
         "foto": "",
         "gizli": false
-      },
-      {
-        "id": "sicak_1776725854724",
-        "ad": "logo",
-        "fiyat": 1,
-        "emoji": "•",
-        "tip": "ic",
-        "aciklama": "logo",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776725885776-plqcx3hemz.jpg",
-        "gizli": false
       }
     ],
     "soguk": [
@@ -680,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T22:58:08.970Z"
+  "guncelleme": "2026-04-20T23:20:53.596Z"
 }

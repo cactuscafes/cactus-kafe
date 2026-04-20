@@ -170,7 +170,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Tek köken, damlatma yöntemi.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727899847-0uapro1z2jw.jpg",
         "gizli": false
       },
       {
@@ -180,7 +180,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Cezve, tercihe göre şekerli.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727913664-o1ylbzawcqr.jpg",
         "gizli": false
       },
       {
@@ -200,7 +200,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Taş dibekte dövülmüş, baharatlı.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727929342-raq35d63u6n.jpg",
         "gizli": false
       },
       {
@@ -210,7 +210,7 @@
         "emoji": "🌾",
         "tip": "ic",
         "aciklama": "Salep unu + sıcak süt + tarçın.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727945878-rubbh31xxzc.jpg",
         "gizli": false
       },
       {
@@ -220,7 +220,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Gerçek çikolata + sıcak süt.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727956506-jxj4q3vw7c.jpg",
         "gizli": false
       },
       {
@@ -670,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:27:28.015Z"
+  "guncelleme": "2026-04-20T23:32:43.117Z"
 }

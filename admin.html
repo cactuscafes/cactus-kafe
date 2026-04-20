@@ -379,10 +379,11 @@ function renderUrunler(){
   ul.map((u,i)=>`
     <div class="urun-kart${u.gizli?' gizli':''}">
       <div class="uk-ust">
-        <div class="uk-emoji" onclick="urunFoto('${aktifKat}',${i})">
+        <label class="uk-emoji" style="cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <input type="file" accept="image/*" style="display:none" onchange="handleFoto(this,'${aktifKat}',${i})">
           ${u.foto?`<img src="${u.foto}" alt="${u.ad}">`:`<span>${u.emoji||'•'}</span>`}
           <div class="uk-overlay">📷</div>
-        </div>
+        </label>
         <div><div class="uk-ad">${u.ad}</div><div class="uk-tip">${u.tip==='ic'?'İçecek':'Yiyecek'}</div></div>
       </div>
       <div style="display:grid;gap:8px;">
@@ -412,20 +413,20 @@ function urunEkle(){
   ['yE','yA','yF','yAc'].forEach(id=>document.getElementById(id).value='');
   toast('✅ Ürün eklendi');
 }
-function urunFoto(k,i){
-  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
-  inp.onchange=function(){
-    const file=this.files[0]; if(!file) return;
-    const img=new Image(), url=URL.createObjectURL(file);
-    img.onload=function(){
-      const canvas=document.createElement('canvas');
-      const r=Math.min(800/img.width,800/img.height,1);
-      canvas.width=img.width*r; canvas.height=img.height*r;
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      MENU[k][i].foto=canvas.toDataURL('image/jpeg',0.8);
-      URL.revokeObjectURL(url); menuKaydet(); renderUrunler(); toast('✅ Fotoğraf güncellendi');
-    }; img.src=url;
-  }; inp.click();
+function handleFoto(input,k,i){
+  const file=input.files[0]; if(!file) return;
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=function(){
+    const canvas=document.createElement('canvas');
+    const r=Math.min(800/img.width,800/img.height,1);
+    canvas.width=img.width*r; canvas.height=img.height*r;
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    MENU[k][i].foto=canvas.toDataURL('image/jpeg',0.8);
+    URL.revokeObjectURL(url);
+    try{ menuKaydet(); }catch(e){ toast('⚠️ Depolama dolu!'); return; }
+    renderUrunler(); toast('✅ Fotoğraf güncellendi');
+  };
+  img.src=url;
 }
 
 /* KATEGORİ */

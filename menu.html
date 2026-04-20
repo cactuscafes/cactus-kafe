@@ -866,6 +866,7 @@
   <div class="urun-popup">
     <button class="urun-popup-kapat" onclick="urunPopupKapat()">×</button>
     <div class="urun-popup-gorsel" id="popupGorsel">
+      <img id="popupFoto" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
       <span class="urun-popup-emoji-bg" id="popupEmoji">☕</span>
       <span class="urun-popup-tip-badge ic" id="popupTipBadge">İçecek</span>
     </div>
@@ -1101,6 +1102,9 @@ function urunPopupAc(ad){
   const b=document.getElementById('popupTipBadge');
   b.textContent=u.tip==='ic'?'İçecek':'Yiyecek';
   b.className='urun-popup-tip-badge '+u.tip;
+  const fotoEl=document.getElementById('popupFoto');
+  if(u.foto){fotoEl.src=u.foto;fotoEl.style.display='block';}
+  else{fotoEl.src='';fotoEl.style.display='none';}
   document.getElementById('urunPopup').classList.add('on');
   document.body.style.overflow='hidden';
 }

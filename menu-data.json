@@ -50,7 +50,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Tek shot, saf ve yoğun.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776717679140-is3t75uy5jg.heic",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776718658468-vrmaoyrx2bj.jpg",
         "gizli": false
       },
       {
@@ -60,7 +60,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Espresso + hafif süt köpüğü.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776716712543-igy3917ov4e.heic",
+        "foto": "",
         "gizli": false
       },
       {
@@ -670,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T20:55:32.745Z"
+  "guncelleme": "2026-04-20T20:57:42.591Z"
 }

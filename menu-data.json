@@ -50,7 +50,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Tek shot, saf ve yoğun.",
-        "foto": "",
+        "foto": "https://pub-2c483c992c924630969222b5abc78ec4.r2.dev/menu/1776716601815-qnkkkj4ni3h.JPG",
         "gizli": false
       },
       {
@@ -670,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T13:32:17.735Z"
+  "guncelleme": "2026-04-20T20:23:28.610Z"
 }

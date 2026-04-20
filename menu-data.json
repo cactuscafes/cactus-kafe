@@ -90,7 +90,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Espresso + bol buharda süt.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727495308-6f6qjhj5e86.jpg",
         "gizli": false
       },
       {
@@ -100,7 +100,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + karamel sos.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727507883-szbklo5gk2b.jpg",
         "gizli": false
       },
       {
@@ -110,7 +110,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + vanilya özü.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727520540-mka5c2z7e2g.jpg",
         "gizli": false
       },
       {
@@ -120,7 +120,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + fındık aroması.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727533871-gwkywhvi6uc.jpg",
         "gizli": false
       },
       {
@@ -670,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:23:21.092Z"
+  "guncelleme": "2026-04-20T23:25:38.884Z"
 }

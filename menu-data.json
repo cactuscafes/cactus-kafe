@@ -584,7 +584,7 @@
         "emoji": "🧀",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar peyniri.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729261759-pb8gakcsofl.jpg",
         "gizli": false
       },
       {
@@ -594,7 +594,7 @@
         "emoji": "🥩",
         "tip": "yi",
         "aciklama": "İnce ekmek + sucuk.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729273547-w81yiixcizl.jpg",
         "gizli": false
       },
       {
@@ -604,41 +604,11 @@
         "emoji": "🥪",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar + sucuk.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t4",
-        "ad": "Kaşarlı Sanayi",
-        "fiyat": 220,
-        "emoji": "🧀",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + bol kaşar.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t5",
-        "ad": "Sucuklu Sanayi",
-        "fiyat": 220,
-        "emoji": "🥩",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + bol sucuk.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t6",
-        "ad": "Karışık Sanayi",
-        "fiyat": 250,
-        "emoji": "🥪",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + kaşar + sucuk.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729287001-fnnjux1nlf.jpg",
         "gizli": false
       }
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:53:59.786Z"
+  "guncelleme": "2026-04-20T23:55:06.384Z"
 }

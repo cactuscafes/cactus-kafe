@@ -541,8 +541,8 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Dondurma + çilek + muz + sütlü çikolata.",
-        "foto": "",
+        "aciklama": "Çilek, muz, sütlü çikolata, beyaz çikolata, oreo parçacıkları",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg",
         "gizli": false
       },
       {
@@ -551,8 +551,8 @@
         "fiyat": 330,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Kadayıf + fıstık ezmesi + çikolata.",
-        "foto": "",
+        "aciklama": "Çilek, muz, sütlü çikolata, antep fıstığı çikolata, kadayıf parçacıkları",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
         "gizli": false
       },
       {
@@ -561,8 +561,8 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Dondurma + bitter çikolata.",
-        "foto": "",
+        "aciklama": "Çilek, muz, bitter çikolata, pasta süslemeleri",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729132232-fstvjz8rah.jpg",
         "gizli": false
       },
       {
@@ -571,18 +571,8 @@
         "fiyat": 300,
         "emoji": "🍯",
         "tip": "yi",
-        "aciklama": "Dondurma + karamel.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "w5",
-        "ad": "Meyveli Bubble Waffle",
-        "fiyat": 300,
-        "emoji": "🍓",
-        "tip": "yi",
-        "aciklama": "Dondurma + mevsim meyveleri.",
-        "foto": "",
+        "aciklama": "Çilek, muz, karamel çikolata, sütlü çikolata, lotus parçacıkları",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729143052-2aezsbs4ql.jpg",
         "gizli": false
       }
     ],
@@ -650,5 +640,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:51:17.382Z"
+  "guncelleme": "2026-04-20T23:53:59.786Z"
 }

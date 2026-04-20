@@ -130,7 +130,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Double espresso + mikroköpük süt.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727558441-5hvmkz2v4zb.jpg",
         "gizli": false
       },
       {
@@ -140,7 +140,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Espresso + süt + köpük.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727570901-lmo6dtcy9vn.jpg",
         "gizli": false
       },
       {
@@ -150,7 +150,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Espresso + çikolata + süt.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727582053-e7hk1mbdcoj.jpg",
         "gizli": false
       },
       {
@@ -160,7 +160,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Espresso + beyaz çikolata + süt.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727596660-0mrceupsdkda.jpg",
         "gizli": false
       },
       {
@@ -670,5 +670,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:25:38.884Z"
+  "guncelleme": "2026-04-20T23:27:28.015Z"
 }

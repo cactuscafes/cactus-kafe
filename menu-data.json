@@ -487,8 +487,8 @@
         "fiyat": 210,
         "emoji": "🫐",
         "tip": "ic",
-        "aciklama": "Yaban mersini + spirulina + limon.",
-        "foto": "",
+        "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
         "gizli": false
       },
       {
@@ -497,8 +497,8 @@
         "fiyat": 210,
         "emoji": "🌵",
         "tip": "ic",
-        "aciklama": "Kaktüs meyvesi + tropikal meyve.",
-        "foto": "",
+        "aciklama": "Süt, vanilya, elma",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
         "gizli": false
       },
       {
@@ -507,8 +507,8 @@
         "fiyat": 210,
         "emoji": "🍉",
         "tip": "ic",
-        "aciklama": "Karpuz + gül suyu + limon.",
-        "foto": "",
+        "aciklama": "Karpuz, limonata, çilek",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
         "gizli": false
       }
     ],
@@ -660,5 +660,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:46:15.266Z"
+  "guncelleme": "2026-04-20T23:49:07.316Z"
 }

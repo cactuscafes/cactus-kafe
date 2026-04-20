@@ -425,7 +425,7 @@
         "fiyat": 170,
         "emoji": "🍊",
         "tip": "ic",
-        "aciklama": "Portakal + limon + greyfurt.",
+        "aciklama": "Soda + limon + tuz",
         "foto": "",
         "gizli": false
       },
@@ -435,7 +435,7 @@
         "fiyat": 190,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Misket limonu + nane + soda.",
+        "aciklama": "Misket limonu + nane + su",
         "foto": "",
         "gizli": false
       },
@@ -445,7 +445,7 @@
         "fiyat": 200,
         "emoji": "🧊",
         "tip": "ic",
-        "aciklama": "Dondurulmuş meyve + buz.",
+        "aciklama": "Karpuz, çilek, orman meyvesi, mango",
         "foto": "",
         "gizli": false
       },
@@ -455,7 +455,7 @@
         "fiyat": 210,
         "emoji": "🥤",
         "tip": "ic",
-        "aciklama": "Dondurma + süt, mevsimlik.",
+        "aciklama": "Çikolata, çilek, vanilya",
         "foto": "",
         "gizli": false
       },
@@ -465,7 +465,7 @@
         "fiyat": 170,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Taze limon + şerbet + soda.",
+        "aciklama": "Ev yapımı",
         "foto": "",
         "gizli": false
       },
@@ -475,7 +475,7 @@
         "fiyat": 180,
         "emoji": "🍓",
         "tip": "ic",
-        "aciklama": "Taze çilek + limon + soda.",
+        "aciklama": "Ev yapımı limonata + çilek",
         "foto": "",
         "gizli": false
       }
@@ -660,5 +660,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:42:35.540Z"
+  "guncelleme": "2026-04-20T23:44:49.943Z"
 }

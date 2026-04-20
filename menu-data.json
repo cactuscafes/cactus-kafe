@@ -515,12 +515,12 @@
     "mesrubat": [
       {
         "id": "m1",
-        "ad": "Su",
-        "fiyat": 30,
+        "ad": "Damla Cam Şişe Su",
+        "fiyat": 40,
         "emoji": "💧",
         "tip": "ic",
         "aciklama": "Soğuk kaynak suyu.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729050301-l9bsiq8lqci.jpg",
         "gizli": false
       },
       {
@@ -530,17 +530,7 @@
         "emoji": "🫧",
         "tip": "ic",
         "aciklama": "Karbonatlı maden suyu.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "m3",
-        "ad": "Enerji İçeceği",
-        "fiyat": 140,
-        "emoji": "⚡",
-        "tip": "ic",
-        "aciklama": "Kafeinli enerji içeceği.",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
         "gizli": false
       }
     ],
@@ -660,5 +650,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:49:07.316Z"
+  "guncelleme": "2026-04-20T23:51:17.382Z"
 }

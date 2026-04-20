@@ -435,7 +435,7 @@
         "fiyat": 170,
         "emoji": "🍊",
         "tip": "ic",
-        "aciklama": "Soda + Tuz + Limon Suyu",
+        "aciklama": "Portakal + limon + greyfurt.",
         "foto": "",
         "gizli": false
       },
@@ -455,7 +455,7 @@
         "fiyat": 200,
         "emoji": "🧊",
         "tip": "ic",
-        "aciklama": "Karpuz, Çilek, Mango ",
+        "aciklama": "Dondurulmuş meyve + buz.",
         "foto": "",
         "gizli": false
       },
@@ -609,18 +609,18 @@
     "tost": [
       {
         "id": "t1",
-        "ad": "Kaşarlı Sosyete Tostu",
-        "fiyat": 250,
+        "ad": "Kaşarlı Sosyete",
+        "fiyat": 150,
         "emoji": "🧀",
         "tip": "yi",
-        "aciklama": "Kare ekmek + Kaşar",
+        "aciklama": "İnce ekmek + kaşar peyniri.",
         "foto": "",
         "gizli": false
       },
       {
         "id": "t2",
-        "ad": "Sucuklu Sosyete Tostu",
-        "fiyat": 250,
+        "ad": "Sucuklu Sosyete",
+        "fiyat": 150,
         "emoji": "🥩",
         "tip": "yi",
         "aciklama": "İnce ekmek + sucuk.",
@@ -629,16 +629,46 @@
       },
       {
         "id": "t3",
-        "ad": "Karışık Sosyete Tostu",
-        "fiyat": 280,
+        "ad": "Karışık Sosyete",
+        "fiyat": 170,
         "emoji": "🥪",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar + sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t4",
+        "ad": "Kaşarlı Sanayi",
+        "fiyat": 220,
+        "emoji": "🧀",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol kaşar.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t5",
+        "ad": "Sucuklu Sanayi",
+        "fiyat": 220,
+        "emoji": "🥩",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t6",
+        "ad": "Karışık Sanayi",
+        "fiyat": 250,
+        "emoji": "🥪",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + kaşar + sucuk.",
         "foto": "",
         "gizli": false
       }
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T13:26:12.534Z"
+  "guncelleme": "2026-04-20T13:32:17.735Z"
 }

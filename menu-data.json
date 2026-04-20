@@ -426,7 +426,7 @@
         "emoji": "🍊",
         "tip": "ic",
         "aciklama": "Soda + limon + tuz",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728707952-zcsjoamknx.jpg",
         "gizli": false
       },
       {
@@ -446,7 +446,7 @@
         "emoji": "🧊",
         "tip": "ic",
         "aciklama": "Karpuz, çilek, orman meyvesi, mango",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728736901-nikwuvmbqtq.jpg",
         "gizli": false
       },
       {
@@ -456,7 +456,7 @@
         "emoji": "🥤",
         "tip": "ic",
         "aciklama": "Çikolata, çilek, vanilya",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728748901-ydryyk6dmzn.jpg",
         "gizli": false
       },
       {
@@ -466,7 +466,7 @@
         "emoji": "🍋",
         "tip": "ic",
         "aciklama": "Ev yapımı",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728759861-9lb8jn45wmm.jpg",
         "gizli": false
       },
       {
@@ -476,7 +476,7 @@
         "emoji": "🍓",
         "tip": "ic",
         "aciklama": "Ev yapımı limonata + çilek",
-        "foto": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728770814-9qe3khp3yhm.jpg",
         "gizli": false
       }
     ],
@@ -660,5 +660,5 @@
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:44:49.943Z"
+  "guncelleme": "2026-04-20T23:46:15.266Z"
 }

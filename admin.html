@@ -349,22 +349,43 @@ function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); }
 
 const R2_WORKER='https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/';
 
+function resizeToJpeg(file, cb){
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=function(){
+    const canvas=document.createElement('canvas');
+    const r=Math.min(1200/img.width,1200/img.height,1);
+    canvas.width=img.width*r; canvas.height=img.height*r;
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(blob=>cb(blob),'image/jpeg',0.85);
+  };
+  img.src=url;
+}
+
+function uploadToR2(blob, filename, cb){
+  const fd=new FormData();
+  fd.append('file', blob, filename.replace(/.[^.]+$/, '.jpg'));
+  fetch(R2_WORKER,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(data=>cb(null,data))
+    .catch(e=>cb(e));
+}
+
 function fotoIsle(input,urlId,onizleId,adId){
   const file=input.files[0]; if(!file) return;
   if(adId) document.getElementById(adId).textContent=file.name;
   toast('⏳ Fotoğraf yükleniyor...');
-  const fd=new FormData(); fd.append('file',file,file.name);
-  fetch(R2_WORKER,{method:'POST',body:fd})
-    .then(r=>r.json())
-    .then(data=>{
+  resizeToJpeg(file, blob=>{
+    uploadToR2(blob, file.name, (err,data)=>{
+      if(err) return toast('❌ Yükleme hatası: '+err.message);
       if(data.url){
         document.getElementById(urlId).value=data.url;
         const oel=document.getElementById(onizleId);
         oel.src=data.url; oel.style.display='block';
         toast('✅ Fotoğraf yüklendi!');
       } else { toast('❌ Hata: '+(data.error||'Bilinmeyen hata')); }
-    })
-    .catch(e=>toast('❌ Yükleme hatası: '+e.message));
+    });
+  });
 }
 function urlOnizle(v,id){ const e=document.getElementById(id); if(v){e.src=v;e.style.display='block';}else{e.style.display='none';} }
 
@@ -417,17 +438,16 @@ function urunEkle(){
 function handleFoto(input,k,i){
   const file=input.files[0]; if(!file) return;
   toast('⏳ Fotoğraf yükleniyor...');
-  const fd=new FormData(); fd.append('file',file,file.name);
-  fetch(R2_WORKER,{method:'POST',body:fd})
-    .then(r=>r.json())
-    .then(data=>{
+  resizeToJpeg(file, blob=>{
+    uploadToR2(blob, file.name, (err,data)=>{
+      if(err) return toast('❌ Yükleme hatası: '+err.message);
       if(data.url){
         MENU[k][i].foto=data.url;
         try{ menuKaydet(); }catch(e){ toast('⚠️ Kayıt hatası!'); return; }
         renderUrunler(); toast('✅ Fotoğraf güncellendi');
       } else { toast('❌ Hata: '+(data.error||'Bilinmeyen hata')); }
-    })
-    .catch(e=>toast('❌ Yükleme hatası: '+e.message));
+    });
+  });
 }
 
 /* KATEGORİ */

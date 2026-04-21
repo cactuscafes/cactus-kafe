@@ -830,34 +830,31 @@ function asImgYukle(inp){
 function asLoad(){
   var wrap=document.getElementById('as-wrap');
   if(!wrap)return;
-  wrap.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;font-size:14px;">Yükleniyor...</div>';
+  wrap.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;">Yükleniyor...</div>';
   fetch('https://cactuscafes.com/index.html?t='+Date.now())
   .then(function(r){return r.text();})
   .then(function(idx){
     var bs=idx.indexOf('<body>')+6,be=idx.lastIndexOf('<\/body>');
     var body=idx.slice(bs,be).replace(/<nav[\s\S]*?<\/nav>/,'');
     wrap.innerHTML=body;
-    // popup kapat
     wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
-    // hero-overlay ve hero-content'i butonların altına al
-    wrap.querySelectorAll('.hero-overlay,.hero-content,.hero-scroll').forEach(function(el){el.style.zIndex='1';});
-    // Img butonları
+    
+    // Tüm img'lere her zaman görünür buton ekle
     wrap.querySelectorAll('img').forEach(function(img,i){
       var p=img.parentElement;
-      var cs=window.getComputedStyle(p);
-      if(cs.position==='static')p.style.position='relative';
+      p.style.position='relative';
       if(p.querySelector('.as-ib'))return;
       var b=document.createElement('button');
       b.className='as-ib';
-      b.textContent='📷 Değiştir';
-      b.setAttribute('style','position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.72);color:#fff;border:none;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:all;z-index:9999;');
-      p.addEventListener('mouseenter',function(){b.style.opacity='1';});
-      p.addEventListener('mouseleave',function(){b.style.opacity='0';});
-      b.addEventListener('click',function(e){e.stopPropagation();asAc(img,true);});
+      b.innerHTML='📷';
+      b.title='Fotoğrafı değiştir';
+      b.setAttribute('style','position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;z-index:99999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4);');
+      b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(img,true);});
       p.appendChild(b);
     });
-    // Metin butonları
-    var sels=['.hero-tagline','.hero-subtitle','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow','.hero-btn'];
+    
+    // Metin elementleri — her zaman görünür ✏️ ikonu
+    var sels=['.hero-tagline','.hero-subtitle','.hero-title','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow','.hero-btn'];
     sels.forEach(function(sel){
       wrap.querySelectorAll(sel).forEach(function(el){
         if(el.querySelector('.as-eb'))return;
@@ -865,15 +862,14 @@ function asLoad(){
         el.dataset.origText=el.innerText.replace(/✏️/g,'').trim();
         var b=document.createElement('button');
         b.className='as-eb';
-        b.textContent='✏️';
-        b.setAttribute('style','position:absolute;top:4px;right:4px;background:rgba(0,0,0,.72);color:#fff;border:none;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;opacity:0;transition:opacity .2s;z-index:9999;');
-        el.addEventListener('mouseenter',function(){b.style.opacity='1';});
-        el.addEventListener('mouseleave',function(){b.style.opacity='0';});
-        b.addEventListener('click',function(e){e.stopPropagation();asAc(el,false);});
+        b.innerHTML='✏️';
+        b.title='Metni düzenle';
+        b.setAttribute('style','position:absolute;top:2px;right:2px;background:rgba(45,90,39,.9);color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:11px;z-index:99999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);');
+        b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(el,false);});
         el.appendChild(b);
       });
     });
-    document.getElementById('as-st').textContent='Hazır — hover edip düzenleyin';
+    document.getElementById('as-st').textContent='Hazır — ✏️ veya 📷 ikonuna tıklayın';
   }).catch(function(e){wrap.innerHTML='<div style="padding:20px;color:red;">Hata: '+e.message+'</div>';});
 }
 async function asYayinla(){

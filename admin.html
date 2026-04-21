@@ -348,6 +348,7 @@ const MENU_V={
 
 let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
 let MENU=JSON.parse(localStorage.getItem('cactus_admin_menu')||'null')||JSON.parse(JSON.stringify(MENU_V));
+let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
 let aktifKat=KAT[0]?.id||'sicak';
 
 function giris(){
@@ -445,7 +446,8 @@ function renderUrunler(){
       </div>
       <div class="uk-btns">
         <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
-        <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
+        <button onclick="oncuToggle(u.id,kat.id)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:2px 4px;border-radius:4px;transition:transform .2s;" title="Öne Çıkan">${(ONCU||[]).some(function(x){return x.id===u.id;})?'⭐':'☆'}</button>
+              <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
       </div>
     </div>`).join('');
 }
@@ -915,6 +917,25 @@ async function asYayinla(){
     if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı!';}
     else{document.getElementById('as-st').textContent='❌ Hata';console.error(pd);}
   }catch(e){document.getElementById('as-st').textContent='❌ '+e.message;console.error(e);}
+}
+
+function oncuToggle(uid, katId){
+  if(!ONCU) ONCU=[];
+  const idx = ONCU.findIndex(function(x){return x.id===uid;});
+  if(idx > -1){
+    ONCU.splice(idx,1);
+    toast('⭐ Öne Çıkandan kaldırıldı');
+  } else {
+    // Tüm ürünler içinde bul
+    var urun = null;
+    Object.values(MENU).forEach(function(arr){
+      arr.forEach(function(u){ if(u.id===uid) urun=u; });
+    });
+    if(urun) ONCU.push({id:urun.id, ad:urun.ad, fiyat:urun.fiyat, foto:urun.foto||'', emoji:urun.emoji||'', katId:katId});
+    toast('⭐ Öne Çıkanlara eklendi');
+  }
+  localStorage.setItem('cactus_oncu', JSON.stringify(ONCU));
+  renderUrunler();
 }
 </script>
 </body>

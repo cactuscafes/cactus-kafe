@@ -495,6 +495,37 @@ function katDuzenle(id){
   const y=prompt('Kategori adı:',k.label); if(!y) return;
   k.label=y; katKaydet(); renderKatListe(); renderKatTabs(); toast('✅ Güncellendi');
 }
+function katSiralamaUI(){
+  const cont = document.getElementById('katSiralama');
+  if(!cont) return;
+  cont.innerHTML = KAT.map((k,i) => `
+    <div class="kat-sira-item" draggable="true" data-idx="${i}" 
+      style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:8px;cursor:grab;user-select:none;"
+      ondragstart="dragKatStart(event,${i})"
+      ondragover="event.preventDefault()"
+      ondrop="dragKatDrop(event,${i})">
+      <span style="font-size:18px;cursor:grab;">⠿</span>
+      <span style="font-size:20px;">${k.label.split(' ')[0]}</span>
+      <span style="font-size:14px;font-weight:500;">${k.label.split(' ').slice(1).join(' ')}</span>
+      <span style="margin-left:auto;font-size:11px;color:#bbb;">#${i+1}</span>
+    </div>
+  `).join('');
+}
+let dragKatIdx = null;
+function dragKatStart(e, idx){ dragKatIdx = idx; e.dataTransfer.effectAllowed='move'; }
+function dragKatDrop(e, toIdx){
+  if(dragKatIdx === null || dragKatIdx === toIdx) return;
+  const item = KAT.splice(dragKatIdx, 1)[0];
+  KAT.splice(toIdx, 0, item);
+  dragKatIdx = null;
+  katSiralamaUI();
+  renderKatTabs();
+  saveKat();
+  toast('✅ Sıra güncellendi');
+}
+function saveKat(){
+  localStorage.setItem('cactus_kat', JSON.stringify(KAT));
+}
 function renderKatListe(){
   document.getElementById('katListe').innerHTML=KAT.map((k,i)=>`
     <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1.5px solid var(--stone);margin-bottom:6px;">

@@ -474,6 +474,38 @@ function renderUrunler(){
       }
     });
   }
+
+  // ☆ Öne Çıkan butonlarını ekle
+  setTimeout(function(){
+    document.querySelectorAll('.urun-kart').forEach(function(kart){
+      if(kart.querySelector('.oncu-btn'))return;
+      var silBtn=kart.querySelector('button[onclick*="urunSil"]');
+      if(!silBtn)return;
+      var m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"],[^,]*,?\s*(\d+)\)/);
+      if(!m)m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"]s*,s*(\d+)\)/);
+      if(!m)return;
+      var katId=m[1],idx=parseInt(m[2]);
+      var urun=MENU[katId]&&MENU[katId][idx];
+      if(!urun||!urun.id)return;
+      var isOncu=ONCU&&ONCU.some(function(x){return x.id===urun.id;});
+      var btn=document.createElement('button');
+      btn.className='oncu-btn';
+      btn.title='Öne Çıkan';
+      btn.innerHTML=isOncu?'⭐':'☆';
+      btn.setAttribute('style','background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;transition:transform .15s;');
+      btn.onmouseover=function(){this.style.transform='scale(1.2)';};
+      btn.onmouseout=function(){this.style.transform='scale(1)';};
+      btn.onclick=function(){
+        if(!ONCU)ONCU=[];
+        var oidx=ONCU.findIndex(function(x){return x.id===urun.id;});
+        if(oidx>-1){ONCU.splice(oidx,1);btn.innerHTML='☆';toast('Öne Çıkandan kaldırıldı');}
+        else{ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''});btn.innerHTML='⭐';toast('⭐ Öne Çıkanlara eklendi!');}
+        localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+        yayinla();
+      };
+      silBtn.parentElement.insertBefore(btn,silBtn);
+    });
+  },100);
 }
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
 function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }

@@ -333,7 +333,8 @@ function giris(){
   } else { document.getElementById('gHata').style.display='block'; }
 }
 function cikis(){ localStorage.removeItem('ca'); location.reload(); }
-function basla(){ document.getElementById('admin').style.display='block'; renderKatTabs(); renderUrunler(); }
+function basla(){ document.getElementById('admin').style.display='block'; renderKatTabs(); renderUrunler();
+  setTimeout(katSeciciDoldur, 500); }
 function panelAc(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
@@ -434,9 +435,11 @@ function yeniFotoIsle(input){
   });});
 }
 function katSeciciDoldur(){
-  const sel=document.getElementById('yKat');if(!sel)return;
-  sel.innerHTML=KAT.map(k=>'<option value="'+k.id+'">'+k.label+'</option>').join('');
-  sel.value=aktifKat;
+  const sel=document.getElementById('yKat');
+  if(!sel) return;
+  if(typeof KAT === 'undefined' || !KAT.length) return;
+  sel.innerHTML=KAT.map(k=>'<option value="'+k.id+'">'+(k.emoji||'')+' '+k.label+'</option>').join('');
+  sel.value = aktifKat || KAT[0].id;
 }
 function urunEkle(){
   katSeciciDoldur();

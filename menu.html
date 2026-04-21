@@ -157,6 +157,7 @@ async function init() {
     const data = await res.json();
     if(data.menu) menuData = data.menu;
     if(data.kategoriler) katData = data.kategoriler;
+    if(data.oncu) menuData.oncu = data.oncu;
   } catch(e) {
     const local = localStorage.getItem('cactus_admin_menu');
     const localKat = localStorage.getItem('cactus_kat');

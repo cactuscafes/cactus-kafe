@@ -1070,22 +1070,46 @@ let asModalKey = null;
 let asModalIsImg = false;
 
 function asInit(){
-  const w = document.getElementById('as-wrapper');
-  if(!w) return;
+  const wrapper = document.getElementById('as-wrapper');
+  if(!wrapper) return;
+  
+  // Her seferinde index.html'in güncel halini fetch et
+  fetch('https://cactuscafes.com/index.html?t='+Date.now())
+  .then(r=>r.text())
+  .then(idxHtml=>{
+    // Body içeriğini çıkar, nav'ı kaldır
+    const bodyStart = idxHtml.indexOf('<body>') + 6;
+    const bodyEnd = idxHtml.lastIndexOf('</body>');
+    let body = idxHtml.slice(bodyStart, bodyEnd);
+    body = body.replace(/<nav[sS]*?</nav>/m, '');
+    
+    // Wrapper'a yaz
+    wrapper.innerHTML = body;
+    
+    // Popup'ı gizle
+    const popup = wrapper.querySelector('[class*="popup"], [id*="popup"]');
+    if(popup) popup.style.display = 'none';
+    
+    // Şimdi edit butonlarını ekle
+    asAddEditButtons();
+  })
+  .catch(e => console.error('asInit fetch hatası:', e));
+}
 
-  // Anasayfanın kendi popup'ını gizle
-  const popup = w.querySelector('.popup, [class*="popup"], [id*="popup"]');
-  if(popup) popup.style.display = 'none';
+function asAddEditButtons(){
+  const wrapper = document.getElementById('as-wrapper');
+  if(!wrapper) return;
 
   // Her IMG'e overlay butonu ekle
-  w.querySelectorAll('img').forEach((img, i) => {
+  wrapper.querySelectorAll('img').forEach((img, i) => {
     const key = 'img_' + i;
     img.setAttribute('data-as-key', key);
-    asChanges[key] = asChanges[key] || img.src;
-    
     const wrap = img.parentElement;
     if(getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
     wrap.classList.add('as-editable');
+    
+    // Zaten buton varsa ekleme
+    if(wrap.querySelector('.as-img-btn')) return;
     
     const btn = document.createElement('button');
     btn.className = 'as-img-btn';
@@ -1094,31 +1118,34 @@ function asInit(){
     wrap.appendChild(btn);
   });
 
-  // Metin elementleri — hero, başlıklar, açıklamalar
+  // Metin elementleri
   const textSelectors = [
     '.hero-tagline', '.hero-title', '.hero-subtitle',
     '.section-eyebrow', '.section-title',
     '.about-eyebrow', '.about-title', '.about-text',
     '.menu-card-title', '.menu-card-label',
     '.branch-name', '.branch-sub',
-    '.footer-bottom p', '.hero-btn',
+    '.hero-btn',
   ];
   
   textSelectors.forEach(sel => {
-    w.querySelectorAll(sel).forEach((el, i) => {
+    wrapper.querySelectorAll(sel).forEach((el, i) => {
       const key = sel.replace(/[^a-z]/g,'_') + '_' + i;
       el.setAttribute('data-as-key', key);
-      asChanges[key] = asChanges[key] || el.innerHTML;
       el.style.position = 'relative';
       el.classList.add('as-editable');
+      
+      if(el.querySelector('.as-edit-btn')) return;
       
       const btn = document.createElement('button');
       btn.className = 'as-edit-btn';
       btn.innerHTML = '✏️ Düzenle';
-      btn.onclick = (e) => { e.stopPropagation(); asAcModal(key, el.innerText, false, el); };
+      btn.onclick = (e) => { e.stopPropagation(); asAcModal(key, el.innerText.replace('✏️ Düzenle','').trim(), false, el); };
       el.appendChild(btn);
     });
   });
+  
+  document.getElementById('as-changes-count').textContent = 'Sayfa yüklendi — düzenlemek için hover edin';
 }
 
 function asAcModal(key, val, isImg, el){

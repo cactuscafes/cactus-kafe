@@ -839,6 +839,8 @@ function asLoad(){
     wrap.innerHTML=body;
     // popup kapat
     wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
+    // hero-overlay ve hero-content'i butonların altına al
+    wrap.querySelectorAll('.hero-overlay,.hero-content,.hero-scroll').forEach(function(el){el.style.zIndex='1';});
     // Img butonları
     wrap.querySelectorAll('img').forEach(function(img,i){
       var p=img.parentElement;
@@ -848,7 +850,7 @@ function asLoad(){
       var b=document.createElement('button');
       b.className='as-ib';
       b.textContent='📷 Değiştir';
-      b.setAttribute('style','position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.72);color:#fff;border:none;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:all;z-index:500;');
+      b.setAttribute('style','position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.72);color:#fff;border:none;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:all;z-index:9999;');
       p.addEventListener('mouseenter',function(){b.style.opacity='1';});
       p.addEventListener('mouseleave',function(){b.style.opacity='0';});
       b.addEventListener('click',function(e){e.stopPropagation();asAc(img,true);});
@@ -864,7 +866,7 @@ function asLoad(){
         var b=document.createElement('button');
         b.className='as-eb';
         b.textContent='✏️';
-        b.setAttribute('style','position:absolute;top:4px;right:4px;background:rgba(0,0,0,.72);color:#fff;border:none;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;opacity:0;transition:opacity .2s;z-index:500;');
+        b.setAttribute('style','position:absolute;top:4px;right:4px;background:rgba(0,0,0,.72);color:#fff;border:none;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;opacity:0;transition:opacity .2s;z-index:9999;');
         el.addEventListener('mouseenter',function(){b.style.opacity='1';});
         el.addEventListener('mouseleave',function(){b.style.opacity='0';});
         b.addEventListener('click',function(e){e.stopPropagation();asAc(el,false);});

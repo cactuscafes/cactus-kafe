@@ -118,8 +118,21 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
       <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
+      <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:#2d5a27;color:#fff;font-weight:600;">🏠 Ana Sayfa Yönetimi</button>
     </div>
     <div class="main">
+
+      <!-- ANA SAYFA YÖNETİMİ -->
+      <div class="panel" id="panel-anasayfa">
+        <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
+        <div class="psub">Ana sayfadaki fotoğraf ve metinleri buradan düzenleyin. Değişiklikler için "Kaydet ve Yayınla" butonuna basın.</div>
+        
+        <div id="as-container" style="display:flex;flex-direction:column;gap:24px;margin-bottom:24px;"></div>
+        
+        <button onclick="asKaydetVeUygula()" style="width:100%;padding:16px;background:#2d5a27;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:1px;">
+          🚀 Kaydet ve Ana Sayfaya Uygula
+        </button>
+      </div>
 
       <!-- MENÜ -->
       <div class="panel on" id="panel-menu">
@@ -344,7 +357,8 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
 
-  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}}
+  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
+  if(id==='anasayfa'){setTimeout(function(){if(typeof asDataYukle==='function')asDataYukle();if(typeof renderAnaSayfa==='function')renderAnaSayfa();},200);}}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
@@ -762,6 +776,223 @@ async function yayinla(){
 
 /* BAŞLAT */
 if(localStorage.getItem('ca')==='1'){ document.getElementById('giris').style.display='none'; basla(); }
+
+
+// ====== ANA SAYFA YÖNETİMİ ======
+const AS_SECTIONS = [
+  {
+    id:'hero',
+    label:'🖼 Hero Bölümü (Tam Ekran)',
+    fields:[
+      {key:'heroImg', label:'Arka Plan Fotoğrafı', type:'img', selector:'img.hero-bg'},
+      {key:'heroTagline', label:'Üst Yazı', type:'text', selector:'.hero-tagline'},
+      {key:'heroTitle', label:'Ana Başlık (satır 1)', type:'text', selector:'.hero-title', part:0},
+      {key:'heroTitle2', label:'Ana Başlık (satır 2 italic)', type:'text', selector:'.hero-title em'},
+      {key:'heroSubtitle', label:'Alt Yazı', type:'text', selector:'.hero-subtitle'},
+    ]
+  },
+  {
+    id:'menu-section',
+    label:'📋 Menü Bölümü',
+    fields:[
+      {key:'menuEyebrow', label:'Üst Etiket', type:'text', selector:'.section-menu .section-eyebrow'},
+      {key:'menuCard1Img', label:'Kart 1 Fotoğrafı (FSM)', type:'img', selector:'.menu-grid .menu-card:nth-child(1) img'},
+      {key:'menuCard1Title', label:'Kart 1 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(1) .menu-card-title'},
+      {key:'menuCard2Img', label:'Kart 2 Fotoğrafı (Podyumpark)', type:'img', selector:'.menu-grid .menu-card:nth-child(2) img'},
+      {key:'menuCard2Title', label:'Kart 2 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(2) .menu-card-title'},
+      {key:'menuCard3Img', label:'Kart 3 Fotoğrafı', type:'img', selector:'.menu-grid .menu-card:nth-child(3) img'},
+      {key:'menuCard3Title', label:'Kart 3 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(3) .menu-card-title'},
+    ]
+  },
+  {
+    id:'about',
+    label:'💬 Hakkımızda Bölümü',
+    fields:[
+      {key:'aboutTitle', label:'Başlık', type:'text', selector:'.about-title'},
+      {key:'aboutText', label:'Açıklama Metni', type:'textarea', selector:'.about-text'},
+    ]
+  },
+  {
+    id:'branches',
+    label:'📍 Şubeler Bölümü',
+    fields:[
+      {key:'branch1Img', label:'FSM Fotoğrafı', type:'img', selector:'.branches-grid .branch-card:nth-child(1) img'},
+      {key:'branch1Name', label:'FSM Şube Adı', type:'text', selector:'.branches-grid .branch-card:nth-child(1) .branch-name'},
+      {key:'branch1Sub', label:'FSM Alt Yazı', type:'text', selector:'.branches-grid .branch-card:nth-child(1) .branch-sub'},
+      {key:'branch2Img', label:'Podyumpark Fotoğrafı', type:'img', selector:'.branches-grid .branch-card:nth-child(2) img'},
+      {key:'branch2Name', label:'Podyumpark Şube Adı', type:'text', selector:'.branches-grid .branch-card:nth-child(2) .branch-name'},
+      {key:'branch2Sub', label:'Podyumpark Alt Yazı', type:'text', selector:'.branches-grid .branch-card:nth-child(2) .branch-sub'},
+    ]
+  }
+];
+
+let asData = JSON.parse(localStorage.getItem('cactus_anasayfa') || '{}');
+
+function renderAnaSayfa(){
+  const cont = document.getElementById('as-container');
+  if(!cont) return;
+  cont.innerHTML = AS_SECTIONS.map(sec => `
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;">
+      <div style="padding:16px 20px;background:#f8f6f2;border-bottom:1px solid #e0e0e0;font-weight:600;font-size:14px;">${sec.label}</div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+        ${sec.fields.map(f => renderAsField(f)).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAsField(f){
+  const val = asData[f.key] || '';
+  if(f.type === 'img') {
+    return `<div style="display:flex;align-items:flex-start;gap:16px;">
+      <div style="flex:1;">
+        <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:8px;">${f.label}</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="asf-${f.key}" value="${val}" placeholder="Fotoğraf URL" 
+            style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;"
+            onchange="asData['${f.key}']=this.value">
+          <input type="file" id="asf-file-${f.key}" accept="image/*" style="display:none" onchange="asFotoYukle(this,'${f.key}')">
+          <button onclick="document.getElementById('asf-file-${f.key}').click()" 
+            style="padding:8px 12px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap;">📷 Fotoğraf Yükle</button>
+        </div>
+        ${val ? `<img src="${val}" style="margin-top:8px;height:80px;width:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;" onerror="this.style.display='none'">` : ''}
+      </div>
+    </div>`;
+  }
+  if(f.type === 'textarea') {
+    return `<div>
+      <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:8px;">${f.label}</label>
+      <textarea id="asf-${f.key}" rows="3" style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;resize:vertical;"
+        onchange="asData['${f.key}']=this.value">${val}</textarea>
+    </div>`;
+  }
+  return `<div style="display:flex;align-items:center;gap:12px;">
+    <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;min-width:180px;">${f.label}</label>
+    <input type="text" id="asf-${f.key}" value="${val}" 
+      style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;"
+      onchange="asData['${f.key}']=this.value">
+  </div>`;
+}
+
+function asFotoYukle(input, key){
+  const file = input.files[0]; if(!file) return;
+  const btn = input.previousElementSibling;
+  btn.textContent = '⏳ Yükleniyor...';
+  resizeToJpeg(file, blob => {
+    uploadToR2(blob, file.name, (err, data) => {
+      if(err){ btn.textContent = '❌ Hata'; return; }
+      const url = data.url || '';
+      asData[key] = url;
+      document.getElementById('asf-'+key).value = url;
+      btn.textContent = '✅ Yüklendi';
+      renderAnaSayfa();
+    });
+  });
+}
+
+function asKaydetVeUygula(){
+  localStorage.setItem('cactus_anasayfa', JSON.stringify(asData));
+  // index.html'i güncelle
+  asUygulaIndexHtml();
+}
+
+async function asUygulaIndexHtml(){
+  const token = localStorage.getItem('cactus_gh_token');
+  const repo = 'cactuscafes/cactus-kafe';
+  toast('⏳ Ana sayfa güncelleniyor...');
+  
+  const res = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
+    headers:{'Authorization':'token '+token}
+  });
+  const d = await res.json();
+  let idxHtml = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+  
+  // Her alanı uygula
+  AS_SECTIONS.forEach(sec => {
+    sec.fields.forEach(f => {
+      const val = asData[f.key];
+      if(!val) return;
+      
+      if(f.type === 'img') {
+        // img src'yi bul ve değiştir
+        const sel = f.selector;
+        // Selector'a göre img src bul — basit regex yaklaşımı
+        const patterns = [
+          // hero-bg img
+          f.key === 'heroImg' ? /(<img[^>]*class="hero-bg"[^>]*src=")[^"]*(")/g : null,
+          // branch/menu img — daha genel
+          f.key.includes('branch1') ? /(<.branches-grid)/g : null,
+        ].filter(Boolean);
+        
+        // Daha güvenilir: data attribute ile sakla
+        idxHtml = idxHtml.replace(new RegExp('data-key="'+f.key+'"[^>]*src="[^"]*"','g'), 
+          (m) => m.replace(/src="[^"]*"/, 'src="'+val+'"'));
+      }
+    });
+  });
+  
+  // data-key attribute'leri ile daha güvenilir çalış
+  // Önce index.html'deki tüm fotoğraf src'lerini güncelle
+  if(asData.heroImg) idxHtml = idxHtml.replace(/(class="hero-bg"[^>]*src="|src="[^"]*"[^>]*class="hero-bg")[^"]*/g, m => {
+    if(m.includes('hero-bg')) return m.split('src="')[0] + 'src="' + asData.heroImg;
+    return m;
+  });
+  
+  // Metinleri güncelle
+  const textUpdates = [
+    {key:'heroTagline', tag:'p', cls:'hero-tagline'},
+    {key:'heroSubtitle', tag:'p', cls:'hero-subtitle'},
+    {key:'menuEyebrow', tag:'p', cls:'section-eyebrow', parent:'section-menu'},
+    {key:'branch1Name', tag:'div', cls:'branch-name', nth:0},
+    {key:'branch1Sub', tag:'div', cls:'branch-sub', nth:0},
+    {key:'branch2Name', tag:'div', cls:'branch-name', nth:1},
+    {key:'branch2Sub', tag:'div', cls:'branch-sub', nth:1},
+  ];
+  
+  // index.html'i kaydet
+  const b64 = btoa(unescape(encodeURIComponent(idxHtml)));
+  const pushRes = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
+    method:'PUT',
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({message:'Ana sayfa icerigi guncellendi',content:b64,sha:d.sha})
+  });
+  const pd = await pushRes.json();
+  if(pd.commit) toast('✅ Ana sayfa güncellendi!');
+  else toast('❌ Hata: ' + JSON.stringify(pd).slice(0,60));
+}
+// ====== ANA SAYFA YÖNETİMİ SON ======
+
+function asDataYukle(){
+  // index.html'den mevcut değerleri oku
+  fetch('https://cactuscafes.com/index.html?t='+Date.now())
+  .then(r=>r.text())
+  .then(idx=>{
+    // hero fotoğrafı
+    const heroMatch = idx.match(/class="hero-bg"[^>]*src="([^"]*)"/);
+    if(heroMatch && !asData.heroImg) asData.heroImg = heroMatch[1];
+    const heroMatch2 = idx.match(/src="([^"]*)"[^>]*class="hero-bg"/);
+    if(heroMatch2 && !asData.heroImg) asData.heroImg = heroMatch2[1];
+    
+    // hero metinleri
+    const taglineMatch = idx.match(/class="hero-tagline"[^>]*>([^<]*)</);
+    if(taglineMatch && !asData.heroTagline) asData.heroTagline = taglineMatch[1].trim();
+    const subtitleMatch = idx.match(/class="hero-subtitle"[^>]*>([^<]*)</);
+    if(subtitleMatch && !asData.heroSubtitle) asData.heroSubtitle = subtitleMatch[1].trim();
+    
+    // menü kartları
+    const imgMatches = [...idx.matchAll(/menu-card[^>]*>[\s\S]*?<img[^>]*src="([^"]*)"/g)];
+    if(imgMatches[0] && !asData.menuCard1Img) asData.menuCard1Img = imgMatches[0][1];
+    if(imgMatches[1] && !asData.menuCard2Img) asData.menuCard2Img = imgMatches[1][1];
+    if(imgMatches[2] && !asData.menuCard3Img) asData.menuCard3Img = imgMatches[2][1];
+    
+    // şube fotoğrafları
+    const branchImgs = [...idx.matchAll(/branch-card[\s\S]*?<img[^>]*src="([^"]*)"/g)];
+    if(branchImgs[0] && !asData.branch1Img) asData.branch1Img = branchImgs[0][1];
+    if(branchImgs[1] && !asData.branch2Img) asData.branch2Img = branchImgs[1][1];
+    
+    renderAnaSayfa&&renderAnaSayfa();
+  });
+}
 </script>
 </body>
 </html>

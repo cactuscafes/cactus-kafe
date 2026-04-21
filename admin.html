@@ -470,24 +470,26 @@ function katSeciciDoldur(){
   // sel.value = aktifKat; // seçili değeri koruyoruz
 }
 function urunEkle(){
-  // katSeciciDoldur çağırmıyoruz — seçili kategoriyi korumak için
-  const e=document.getElementById('yE').value.trim()||'•';
-  const a=document.getElementById('yA').value.trim();
-  const f=parseInt(document.getElementById('yF').value)||0;
-  const t=document.getElementById('yT').value;
-  const ac=document.getElementById('yAc').value.trim();
-  if(!a||!f){ toast('⚠️ Ad ve fiyat zorunlu'); return; }
-  if(!MENU[aktifKat]) MENU[aktifKat]=[];
-  const yKatVal=(document.getElementById('yKat')?.value)||aktifKat;
-  const yFotoVal=(document.getElementById('yFotoUrl')?.value)||'';
-  if(!MENU[yKatVal])MENU[yKatVal]=[];
-  MENU[yKatVal].push({id:yKatVal+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:yFotoVal});
-  const fb=document.getElementById('yFotoBtnTxt');if(fb){fb.textContent='📷 Fotoğraf Seç';fb.style.color='#666';}
-  document.getElementById('yFotoUrl').value='';
-  aktifKat=yKatVal;
-  menuKaydet(); renderUrunler();
-  ['yE','yA','yF','yAc'].forEach(id=>document.getElementById(id).value='');
-  toast('✅ Ürün eklendi');
+  const e=document.getElementById('yE')?.value?.trim()||'☕';
+  const a=document.getElementById('yA')?.value?.trim();
+  const f=document.getElementById('yF')?.value;
+  const ac=document.getElementById('yAc')?.value?.trim();
+  const t=document.getElementById('yT')?.value;
+  const kat=document.getElementById('yKat')?.value||aktifKat;
+  const foto=document.getElementById('yFotoUrl')?.value||'';
+  if(!a){toast('⚠️ Ad zorunlu');return;}
+  if(!MENU[kat])MENU[kat]=[];
+  MENU[kat].push({id:kat+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:foto});
+  localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+  document.getElementById('yA').value='';
+  document.getElementById('yF').value='0';
+  if(document.getElementById('yAc'))document.getElementById('yAc').value='';
+  if(document.getElementById('yFotoUrl'))document.getElementById('yFotoUrl').value='';
+  const fb=document.getElementById('yFotoBtnTxt');
+  if(fb){fb.textContent='📷 Fotoğraf Seç';fb.style.color='#666';}
+  aktifKat=kat;
+  renderKatTabs();renderUrunler();
+  toast('✅ Eklendi: '+a+' → '+kat);
 }
 function handleFoto(input,k,i){
   const file=input.files[0]; if(!file) return;

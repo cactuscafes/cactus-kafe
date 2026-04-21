@@ -123,10 +123,10 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
     <div class="main">
 
       <!-- MENÜ -->
-      <div class="panel" id="panel-anasayfa">
+      <div class="panel" id="panel-anasayfa" style="max-width:1200px;">
         <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
         <div class="psub">Elementin üzerine gelin → butona tıklayın → düzenleyin → "Uygula" basın</div>
-        <div id="as-wrap" style="border:1px solid #eee;border-radius:8px;overflow:hidden;position:relative;min-height:300px;transform-origin:top left;"></div>
+        <div id="as-wrap" style="position:relative;min-height:300px;"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="as-st" style="font-size:13px;color:#888;">-</span>
           <button onclick="asYayinla()" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
@@ -835,64 +835,49 @@ function asLoad(){
   fetch('https://cactuscafes.com/index.html?t='+Date.now())
   .then(function(r){return r.text();})
   .then(function(idx){
-    // Anasayfanın CSS'ini al
-    var styleMatch = idx.match(/<style>[\s\S]*?<\/style>/);
-    var pageStyle = styleMatch ? styleMatch[0] : '';
-    
-    // Body içeriğini al, nav kaldır
+    var styleMatch=idx.match(/<style>[\s\S]*?<\/style>/);
+    var pageStyle=styleMatch?styleMatch[0].replace('<style>','<style>#as-wrap{} '):'';
+    var fontMatches=idx.match(/<link[^>]*googleapis[^>]*>/g)||[];
     var bs=idx.indexOf('<body>')+6, be=idx.lastIndexOf('<\/body>');
     var body=idx.slice(bs,be).replace(/<nav[\s\S]*?<\/nav>/,'');
     
-    // Google Fonts link
-    var fontLinks='';
-    var fontMatches=idx.match(/<link[^>]*googleapis[^>]*>/g);
-    if(fontMatches) fontLinks=fontMatches.join('\n');
+    wrap.innerHTML=fontMatches.join('')+pageStyle+body;
     
-    // Wrap'e CSS + body yaz
-    wrap.innerHTML = fontLinks + pageStyle + body;
+    // Anasayfanın hero tam ekran olmasın — sınırlı tutalım
+    wrap.querySelectorAll('.hero,.hero-section,[class*=hero]').forEach(function(el){
+      el.style.height='auto';
+      el.style.minHeight='0';
+    });
+    wrap.querySelectorAll('.hero-bg').forEach(function(el){
+      el.style.position='relative';
+      el.style.height='500px';
+      el.style.objectFit='cover';
+      el.style.width='100%';
+    });
     
-    // wrap'i gerçek anasayfa genişliğine göre scale et
-    var panelW = wrap.parentElement.offsetWidth - 40;
-    var pageW = 1440;
-    var scale = Math.min(1, panelW / pageW);
-    wrap.style.transform = 'scale('+scale+')';
-    wrap.style.transformOrigin = 'top left';
-    wrap.style.width = pageW + 'px';
-    wrap.style.height = '';
-    wrap.parentElement.style.height = (wrap.scrollHeight * scale + 20) + 'px';
-    wrap.parentElement.style.overflow = 'hidden';
-    
-    // Popup kapat
     wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
-    
-    // hero-overlay z-index
     wrap.querySelectorAll('.hero-overlay,.hero-content').forEach(function(el){el.style.zIndex='1';});
     
     // IMG butonları
     wrap.querySelectorAll('img').forEach(function(img,i){
       var p=img.parentElement;
-      p.style.position='relative';
+      if(getComputedStyle(p).position==='static')p.style.position='relative';
       if(p.querySelector('.as-ib'))return;
       var b=document.createElement('button');
-      b.className='as-ib';
-      b.innerHTML='📷';
-      b.title='Fotoğrafı değiştir';
+      b.className='as-ib';b.innerHTML='📷';b.title='Fotoğrafı değiştir';
       b.setAttribute('style','position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.4);line-height:1;');
       b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(img,true);});
       p.appendChild(b);
     });
     
     // Metin butonları
-    var sels=['.hero-tagline','.hero-subtitle','.hero-title','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow','.hero-btn'];
-    sels.forEach(function(sel){
+    ['.hero-tagline','.hero-subtitle','.hero-title','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow','.hero-btn'].forEach(function(sel){
       wrap.querySelectorAll(sel).forEach(function(el){
         if(el.querySelector('.as-eb'))return;
-        el.style.position='relative';
+        if(getComputedStyle(el).position==='static')el.style.position='relative';
         el.dataset.origText=el.innerText.replace(/✏️/g,'').trim();
         var b=document.createElement('button');
-        b.className='as-eb';
-        b.innerHTML='✏️';
-        b.title='Metni düzenle';
+        b.className='as-eb';b.innerHTML='✏️';b.title='Metni düzenle';
         b.setAttribute('style','position:absolute;top:2px;right:2px;background:rgba(45,90,39,.9);color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;z-index:99999;box-shadow:0 2px 6px rgba(0,0,0,.3);line-height:1;');
         b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(el,false);});
         el.appendChild(b);

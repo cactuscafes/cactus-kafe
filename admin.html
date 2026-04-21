@@ -136,6 +136,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
             <div><label class="lbl">Açıklama</label><input class="yi" id="yAc" placeholder="Kısa açıklama"></div>
             <div><label class="lbl">Tür</label><select class="yi" id="yT"><option value="ic">İçecek</option><option value="yi">Yiyecek</option></select></div>
           </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"><div><label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:4px;">KATEGORİ</label><select id="yKat" style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;background:#fff;"></select></div><div><label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:4px;">FOTOĞRAF</label><input type="file" id="yFotoFile" accept="image/*" style="display:none" onchange="yeniFotoIsle(this)"><button type="button" id="yFotoBtnTxt" onclick="document.getElementById('yFotoFile').click()" style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;background:#fff;cursor:pointer;color:#666;">📷 Fotoğraf Seç</button><input type="hidden" id="yFotoUrl" value=""></div></div>
           <button onclick="urunEkle()" style="padding:10px 24px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">+ Ekle</button>
         </div>
         <div class="kat-tabs" id="katTabs"></div>
@@ -422,7 +423,23 @@ function renderUrunler(){
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
 function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }
 function urunSil(k,i){ if(!confirm('"'+MENU[k][i].ad+'" silinsin mi?')) return; MENU[k].splice(i,1); menuKaydet(); renderUrunler(); toast('🗑 Silindi'); }
+function yeniFotoIsle(input){
+  const file=input.files[0];if(!file)return;
+  const btn=document.getElementById('yFotoBtnTxt');
+  btn.textContent='⏳ Yükleniyor...';btn.style.color='#999';
+  resizeToJpeg(file,blob=>{uploadToR2(blob,file.name,(err,data)=>{
+    if(err){btn.textContent='❌ Hata';return;}
+    document.getElementById('yFotoUrl').value=data.url||'';
+    btn.textContent='✅ '+file.name.slice(0,18);btn.style.color='green';
+  });});
+}
+function katSeciciDoldur(){
+  const sel=document.getElementById('yKat');if(!sel)return;
+  sel.innerHTML=KAT.map(k=>'<option value="'+k.id+'">'+k.label+'</option>').join('');
+  sel.value=aktifKat;
+}
 function urunEkle(){
+  katSeciciDoldur();
   const e=document.getElementById('yE').value.trim()||'•';
   const a=document.getElementById('yA').value.trim();
   const f=parseInt(document.getElementById('yF').value)||0;
@@ -430,7 +447,7 @@ function urunEkle(){
   const ac=document.getElementById('yAc').value.trim();
   if(!a||!f){ toast('⚠️ Ad ve fiyat zorunlu'); return; }
   if(!MENU[aktifKat]) MENU[aktifKat]=[];
-  MENU[aktifKat].push({id:aktifKat+'_'+Date.now(),ad:a,fiyat:f,emoji:e,tip:t,aciklama:ac,foto:'',gizli:false});
+  const yKatVal=document.getElementById('yKat')?.value||aktifKat;const yFotoVal=document.getElementById('yFotoUrl')?.value||'';if(!MENU[yKatVal])MENU[yKatVal]=[];MENU[yKatVal].push({id:aktifKat+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:yFotoVal});document.getElementById('yFotoUrl').value='';const fb=document.getElementById('yFotoBtnTxt');if(fb){fb.textContent='📷 Fotoğraf Seç';fb.style.color='#666';}aktifKat=yKatVal;
   menuKaydet(); renderUrunler();
   ['yE','yA','yF','yAc'].forEach(id=>document.getElementById(id).value='');
   toast('✅ Ürün eklendi');

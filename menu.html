@@ -190,7 +190,7 @@ function renderMenu(sube) {
   const catListEl = document.getElementById('cat-list-' + sube);
   catListEl.innerHTML = katData.map((kat, idx) => {
     const urunler = (menuData[kat.id] || []).filter(u => !u.gizli);
-    if(!urunler.length) return '';
+    if(!urunler.length) return `<div class="cat-section"><div class="cat-header" style="opacity:0.4"><div class="cat-header-left"><span class="cat-name">${kat.label}</span><span class="cat-count">Yakında</span></div></div></div>`;
     
     const urunlerHTML = urunler.map(u => `
       <div class="product-card">

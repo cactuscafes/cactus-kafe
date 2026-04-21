@@ -249,16 +249,6 @@
         "gizli": false
       },
       {
-        "id": "sicak_1776750173838",
-        "ad": "podyumpark",
-        "fiyat": 1,
-        "emoji": "•",
-        "tip": "ic",
-        "aciklama": "",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg",
-        "gizli": false
-      },
-      {
         "id": "sicak_1776750204427",
         "ad": "fsm",
         "fiyat": 1,
@@ -266,7 +256,7 @@
         "tip": "ic",
         "aciklama": "",
         "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750615561-a2h894bontk.jpg",
-        "gizli": false
+        "gizli": true
       }
     ],
     "soguk": [
@@ -696,5 +686,5 @@
     "tatlilar": []
   },
   "oncu": [],
-  "guncelleme": "2026-04-21T06:47:21.975Z"
+  "guncelleme": "2026-04-21T09:46:59.524Z"
 }

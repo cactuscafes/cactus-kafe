@@ -12,12 +12,12 @@
     },
     {
       "id": "cay",
-      "label": "🌿 Bitki Çayları",
+      "label": "🌿 Bitkisel Çaylar",
       "tip": "ic"
     },
     {
       "id": "vitamin",
-      "label": "🍋 Vitamin",
+      "label": "🍋 Vitamin İçecekler",
       "tip": "ic"
     },
     {
@@ -50,7 +50,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Tek shot, saf ve yoğun.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727338834-t4xmgecupsr.jpg",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776719162791-fjx7p42rtfm.jpg",
         "gizli": false
       },
       {
@@ -70,7 +70,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Espresso + sıcak su.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727352342-ehfecl84wc.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -80,7 +80,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Espresso + eşit oranda süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -90,7 +90,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Espresso + bol buharda süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727495308-6f6qjhj5e86.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -100,7 +100,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + karamel sos.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727507883-szbklo5gk2b.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -110,7 +110,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + vanilya özü.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727520540-mka5c2z7e2g.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -120,7 +120,7 @@
         "emoji": "🥛",
         "tip": "ic",
         "aciklama": "Latte + fındık aroması.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727533871-gwkywhvi6uc.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -130,7 +130,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Double espresso + mikroköpük süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727558441-5hvmkz2v4zb.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -140,7 +140,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Espresso + süt + köpük.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727570901-lmo6dtcy9vn.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -150,7 +150,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Espresso + çikolata + süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727582053-e7hk1mbdcoj.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -160,7 +160,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Espresso + beyaz çikolata + süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727596660-0mrceupsdkda.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -170,7 +170,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Tek köken, damlatma yöntemi.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727899847-0uapro1z2jw.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -180,7 +180,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Cezve, tercihe göre şekerli.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727913664-o1ylbzawcqr.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -200,7 +200,7 @@
         "emoji": "☕",
         "tip": "ic",
         "aciklama": "Taş dibekte dövülmüş, baharatlı.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727929342-raq35d63u6n.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -210,7 +210,7 @@
         "emoji": "🌾",
         "tip": "ic",
         "aciklama": "Salep unu + sıcak süt + tarçın.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727945878-rubbh31xxzc.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -220,7 +220,7 @@
         "emoji": "🍫",
         "tip": "ic",
         "aciklama": "Gerçek çikolata + sıcak süt.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727956506-jxj4q3vw7c.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -231,6 +231,36 @@
         "tip": "ic",
         "aciklama": "Sade buharda ısıtılmış süt.",
         "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "s20",
+        "ad": "Ballı Süt",
+        "fiyat": 150,
+        "emoji": "🍯",
+        "tip": "ic",
+        "aciklama": "Sıcak süt + çiçek balı.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "sicak_1776750173838",
+        "ad": "podyumpark",
+        "fiyat": 1,
+        "emoji": "•",
+        "tip": "ic",
+        "aciklama": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg",
+        "gizli": false
+      },
+      {
+        "id": "sicak_1776750204427",
+        "ad": "fsm",
+        "fiyat": 1,
+        "emoji": "•",
+        "tip": "ic",
+        "aciklama": "",
+        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750441515-u6bsp3ldop.jpg",
         "gizli": false
       }
     ],
@@ -344,7 +374,7 @@
         "emoji": "🌼",
         "tip": "ic",
         "aciklama": "Taze ihlamur çiçeği demlemesi.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728400657-tdeimo0fu.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -354,7 +384,7 @@
         "emoji": "🌿",
         "tip": "ic",
         "aciklama": "Taze adaçayı yapraklarından.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728427615-jull6xwp3og.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -364,7 +394,7 @@
         "emoji": "🌿",
         "tip": "ic",
         "aciklama": "Melisa + hafif limon aroması.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728436917-yk5y6gypn5.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -374,7 +404,7 @@
         "emoji": "🌺",
         "tip": "ic",
         "aciklama": "Hibiskus çiçeği, ekşimsi.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728449992-a4lrthuxk5p.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -384,7 +414,7 @@
         "emoji": "🌼",
         "tip": "ic",
         "aciklama": "Papatya çiçeği demlemesi.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728460342-ixs1mut804q.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -394,7 +424,7 @@
         "emoji": "🍵",
         "tip": "ic",
         "aciklama": "Hafif demlenmiş, antioksidan.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728473699-dii6auvwh7.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -404,7 +434,7 @@
         "emoji": "❄️",
         "tip": "ic",
         "aciklama": "Tarçın + karanfil + zencefil.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728487956-dz0frbx1vxp.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -414,7 +444,7 @@
         "emoji": "🦋",
         "tip": "ic",
         "aciklama": "Butterfly pea flower, renk değiştirir.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728498228-dvy3go6eam7.jpg",
+        "foto": "",
         "gizli": false
       }
     ],
@@ -425,8 +455,8 @@
         "fiyat": 170,
         "emoji": "🍊",
         "tip": "ic",
-        "aciklama": "Soda + limon + tuz",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728707952-zcsjoamknx.jpg",
+        "aciklama": "Portakal + limon + greyfurt.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -435,7 +465,7 @@
         "fiyat": 190,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Misket limonu + nane + su",
+        "aciklama": "Misket limonu + nane + soda.",
         "foto": "",
         "gizli": false
       },
@@ -445,8 +475,8 @@
         "fiyat": 200,
         "emoji": "🧊",
         "tip": "ic",
-        "aciklama": "Karpuz, çilek, orman meyvesi, mango",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728736901-nikwuvmbqtq.jpg",
+        "aciklama": "Dondurulmuş meyve + buz.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -455,8 +485,8 @@
         "fiyat": 210,
         "emoji": "🥤",
         "tip": "ic",
-        "aciklama": "Çikolata, çilek, vanilya",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728748901-ydryyk6dmzn.jpg",
+        "aciklama": "Dondurma + süt, mevsimlik.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -465,8 +495,8 @@
         "fiyat": 170,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Ev yapımı",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728759861-9lb8jn45wmm.jpg",
+        "aciklama": "Taze limon + şerbet + soda.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -475,8 +505,8 @@
         "fiyat": 180,
         "emoji": "🍓",
         "tip": "ic",
-        "aciklama": "Ev yapımı limonata + çilek",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728770814-9qe3khp3yhm.jpg",
+        "aciklama": "Taze çilek + limon + soda.",
+        "foto": "",
         "gizli": false
       }
     ],
@@ -487,8 +517,8 @@
         "fiyat": 210,
         "emoji": "🫐",
         "tip": "ic",
-        "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
+        "aciklama": "Yaban mersini + spirulina + limon.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -497,8 +527,8 @@
         "fiyat": 210,
         "emoji": "🌵",
         "tip": "ic",
-        "aciklama": "Süt, vanilya, elma",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
+        "aciklama": "Kaktüs meyvesi + tropikal meyve.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -507,20 +537,20 @@
         "fiyat": 210,
         "emoji": "🍉",
         "tip": "ic",
-        "aciklama": "Karpuz, limonata, çilek",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
+        "aciklama": "Karpuz + gül suyu + limon.",
+        "foto": "",
         "gizli": false
       }
     ],
     "mesrubat": [
       {
         "id": "m1",
-        "ad": "Damla Cam Şişe Su",
-        "fiyat": 40,
+        "ad": "Su",
+        "fiyat": 30,
         "emoji": "💧",
         "tip": "ic",
         "aciklama": "Soğuk kaynak suyu.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729050301-l9bsiq8lqci.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -530,7 +560,17 @@
         "emoji": "🫧",
         "tip": "ic",
         "aciklama": "Karbonatlı maden suyu.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "m3",
+        "ad": "Enerji İçeceği",
+        "fiyat": 140,
+        "emoji": "⚡",
+        "tip": "ic",
+        "aciklama": "Kafeinli enerji içeceği.",
+        "foto": "",
         "gizli": false
       }
     ],
@@ -541,8 +581,8 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Çilek, muz, sütlü çikolata, beyaz çikolata, oreo parçacıkları",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg",
+        "aciklama": "Dondurma + çilek + muz + sütlü çikolata.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -551,8 +591,8 @@
         "fiyat": 330,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Çilek, muz, sütlü çikolata, antep fıstığı çikolata, kadayıf parçacıkları",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
+        "aciklama": "Kadayıf + fıstık ezmesi + çikolata.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -561,8 +601,8 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Çilek, muz, bitter çikolata, pasta süslemeleri",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729132232-fstvjz8rah.jpg",
+        "aciklama": "Dondurma + bitter çikolata.",
+        "foto": "",
         "gizli": false
       },
       {
@@ -571,8 +611,18 @@
         "fiyat": 300,
         "emoji": "🍯",
         "tip": "yi",
-        "aciklama": "Çilek, muz, karamel çikolata, sütlü çikolata, lotus parçacıkları",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729143052-2aezsbs4ql.jpg",
+        "aciklama": "Dondurma + karamel.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "w5",
+        "ad": "Meyveli Bubble Waffle",
+        "fiyat": 300,
+        "emoji": "🍓",
+        "tip": "yi",
+        "aciklama": "Dondurma + mevsim meyveleri.",
+        "foto": "",
         "gizli": false
       }
     ],
@@ -584,7 +634,7 @@
         "emoji": "🧀",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar peyniri.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729261759-pb8gakcsofl.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -594,7 +644,7 @@
         "emoji": "🥩",
         "tip": "yi",
         "aciklama": "İnce ekmek + sucuk.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729273547-w81yiixcizl.jpg",
+        "foto": "",
         "gizli": false
       },
       {
@@ -604,11 +654,41 @@
         "emoji": "🥪",
         "tip": "yi",
         "aciklama": "İnce ekmek + kaşar + sucuk.",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729287001-fnnjux1nlf.jpg",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t4",
+        "ad": "Kaşarlı Sanayi",
+        "fiyat": 220,
+        "emoji": "🧀",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol kaşar.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t5",
+        "ad": "Sucuklu Sanayi",
+        "fiyat": 220,
+        "emoji": "🥩",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + bol sucuk.",
+        "foto": "",
+        "gizli": false
+      },
+      {
+        "id": "t6",
+        "ad": "Karışık Sanayi",
+        "fiyat": 250,
+        "emoji": "🥪",
+        "tip": "yi",
+        "aciklama": "Kalın ekmek + kaşar + sucuk.",
+        "foto": "",
         "gizli": false
       }
     ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-20T23:55:06.384Z"
+  "guncelleme": "2026-04-21T05:47:28.343Z"
 }

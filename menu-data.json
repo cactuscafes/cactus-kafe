@@ -653,6 +653,13 @@
       "fiyat": 180,
       "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
       "emoji": "☕"
+    },
+    {
+      "id": "w2",
+      "ad": "Dubai Bubble Waffle",
+      "fiyat": 330,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
+      "emoji": "🧇"
     }
   ],
   "_oncu": [
@@ -662,7 +669,14 @@
       "fiyat": 180,
       "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
       "emoji": "☕"
+    },
+    {
+      "id": "w2",
+      "ad": "Dubai Bubble Waffle",
+      "fiyat": 330,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
+      "emoji": "🧇"
     }
   ],
-  "guncelleme": "2026-04-21T22:30:19.545Z"
+  "guncelleme": "2026-04-21T22:30:44.152Z"
 }

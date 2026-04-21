@@ -11,6 +11,21 @@
       "tip": "ic"
     },
     {
+      "id": "tatlilar",
+      "label": "🍰 Tatlılar",
+      "tip": "yi"
+    },
+    {
+      "id": "waffle",
+      "label": "🧇 Bubble Waffle",
+      "tip": "yi"
+    },
+    {
+      "id": "tost",
+      "label": "🥪 Tostlar",
+      "tip": "yi"
+    },
+    {
       "id": "cay",
       "label": "🌿 Bitki Çayları",
       "tip": "ic"
@@ -29,21 +44,6 @@
       "id": "mesrubat",
       "label": "🥤 Meşrubatlar",
       "tip": "ic"
-    },
-    {
-      "id": "waffle",
-      "label": "🧇 Bubble Waffle",
-      "tip": "yi"
-    },
-    {
-      "id": "tost",
-      "label": "🥪 Tostlar",
-      "tip": "yi"
-    },
-    {
-      "id": "tatlilar",
-      "label": "🍰 Tatlılar",
-      "tip": "yi"
     }
   ],
   "menu": {
@@ -707,5 +707,5 @@
       "emoji": "🍯"
     }
   ],
-  "guncelleme": "2026-04-21T22:41:36.218Z"
+  "guncelleme": "2026-04-21T22:42:49.077Z"
 }

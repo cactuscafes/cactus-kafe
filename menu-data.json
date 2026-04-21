@@ -11,6 +11,11 @@
       "tip": "ic"
     },
     {
+      "id": "tatlilar",
+      "label": "🍰 Tatlılar",
+      "tip": "yi"
+    },
+    {
       "id": "cay",
       "label": "🌿 Bitkisel Çaylar",
       "tip": "ic"
@@ -38,11 +43,6 @@
     {
       "id": "tost",
       "label": "🥪 Tostlar",
-      "tip": "yi"
-    },
-    {
-      "id": "tatlilar",
-      "label": "🍰 Tatlılar",
       "tip": "yi"
     }
   ],
@@ -696,5 +696,5 @@
     "tatlilar": []
   },
   "oncu": [],
-  "guncelleme": "2026-04-21T06:24:13.954Z"
+  "guncelleme": "2026-04-21T06:47:21.975Z"
 }

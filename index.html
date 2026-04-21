@@ -12,11 +12,11 @@
 body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.06);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.98);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);}
 .nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
 .nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
 .nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
-.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links{display:flex!important;gap:40px;list-style:none;visibility:visible!important;opacity:1!important;} .nav-links a{color:var(--dark)!important;opacity:1!important;}
 .nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dark);font-weight:400;transition:color .3s;}
 .nav-links a:hover{color:var(--gold);}
 .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
@@ -316,7 +316,6 @@ footer{padding:60px 24px 30px;}
       <ul>
         <li><a href="index.html">Ana Sayfa</a></li>
         <li><a href="menu.html">Menü</a></li>
-        <li><a href="galeri.html">Galeri</a></li>
         <li><a href="iletisim.html">İletişim</a></li>
       </ul>
     </div>

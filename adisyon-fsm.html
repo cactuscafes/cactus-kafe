@@ -6,12 +6,7 @@
 <title>Cactus Kafe — FSM Adisyon</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;},
-  {id:'ta',ad:'Tatlılar',emoji:'🍰',tip:'yi',urunler:[
-    {id:'ta1',ad:'Brownie',fiyat:280,emoji:'🍫'},
-    {id:'ta2',ad:'San Sebastian',fiyat:280,emoji:'🍮'},
-    {id:'ta3',ad:'Spoonful',fiyat:280,emoji:'🥄'}
-  ]}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
   --k1:#2C1503;--k2:#5C2E0E;--k3:#9C5B2A;
   --kr:#F7EDD8;--kr2:#EDDBBB;--kr3:#D9BF96;
@@ -582,7 +577,7 @@ const MENU_DEFAULT = {
     {id:'v5',ad:'Limonata',fiyat:170,emoji:'🍋'},{id:'v6',ad:'Çilekli Limonata',fiyat:180,emoji:'🍓'},
   ]},
   mesrubat:{label:'🥤 Meşrubat',tip:'icecek',urunler:[
-    {id:'m1',ad:'Su',fiyat:30,emoji:'💧'},{id:'m1b',ad:'Damla Cam Şişe Su',fiyat:40,emoji:'💧'},{id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧'},
+    {id:'m1',ad:'Su',fiyat:30,emoji:'💧'},{id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧'},
     {id:'m3',ad:'Enerji İçeceği',fiyat:140,emoji:'⚡'},
   ]},
   kokteyl:{label:'🍹 Kokteyl',tip:'icecek',urunler:[
@@ -599,12 +594,7 @@ const MENU_DEFAULT = {
     {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪'},{id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀'},
     {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩'},{id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪'},
   ]},
-},
-  tatlilar:{label:'🍰 Tatlılar',tip:'yiyecek',urunler:[
-    {id:'ta1',ad:'Brownie',fiyat:280,emoji:'🍫'},
-    {id:'ta2',ad:'San Sebastian',fiyat:280,emoji:'🍮'},
-    {id:'ta3',ad:'Spoonful',fiyat:280,emoji:'🥄'}
-  ]};
+};
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
 let MENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));

@@ -1190,51 +1190,26 @@ function asImgUpload(input){
 }
 
 async function asYayinla(){
-  const token = localStorage.getItem('cactus_gh_token');
-  const repo = 'cactuscafes/cactus-kafe';
+  const token=localStorage.getItem('cactus_gh_token');
+  const repo='cactuscafes/cactus-kafe';
   toast('⏳ Ana sayfa güncelleniyor...');
-  
-  // Mevcut index.html'i al
-  const res = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
-    headers:{'Authorization':'token '+token}
-  });
-  const d = await res.json();
-  
-  // as-wrapper içindeki güncel HTML'i al
-  const wrapper = document.getElementById('as-wrapper');
-  const editBtns = wrapper.querySelectorAll('.as-edit-btn, .as-img-btn');
-  editBtns.forEach(b => b.style.display='none');
-  
-  let newBody = wrapper.innerHTML;
-  
-  // Butonları geri göster
-  editBtns.forEach(b => b.style.display='');
-  
-  // class ve data attribute'lerini temizle
-  newBody = newBody.replace(/\s*class="as-editable([^"]*)"\s*/g, ' ');
-  newBody = newBody.replace(/\s*data-as-key="[^"]*"\s*/g, ' ');
-  newBody = newBody.replace(/<button class="as-edit-btn"[^>]*>.*?<\/button>/g, '');
-  newBody = newBody.replace(/<button class="as-img-btn"[^>]*>.*?<\/button>/g, '');
-  
-  // Orijinal index.html'in body'sini değiştir
-  let idxHtml = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  const bodyStart = idxHtml.indexOf('<body>') + 6;
-  const bodyEnd = idxHtml.lastIndexOf('</body>');
-  const newIdxHtml = idxHtml.slice(0,bodyStart) + '\n' + newBody + '\n' + idxHtml.slice(bodyEnd);
-  
-  const b64 = btoa(unescape(encodeURIComponent(newIdxHtml)));
-  const pushRes = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
-    method:'PUT',
-    headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({message:'Ana sayfa icerigi guncellendi',content:b64,sha:d.sha})
-  });
-  const pd = await pushRes.json();
-  if(pd.commit){
-    toast('✅ Ana sayfa güncellendi!');
-    document.getElementById('as-changes-count').textContent = 'Kaydedildi ✅';
-  } else {
-    toast('❌ Hata: ' + JSON.stringify(pd).slice(0,60));
-  }
+  try{
+    const res=await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{headers:{'Authorization':'token '+token}});
+    const d=await res.json();
+    let idxHtml=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    const wrapper=document.getElementById('as-wrapper').cloneNode(true);
+    wrapper.querySelectorAll('.as-edit-btn,.as-img-btn').forEach(b=>b.remove());
+    wrapper.querySelectorAll('.as-editable').forEach(el=>{el.classList.remove('as-editable');el.removeAttribute('data-as-key');});
+    let newBody=wrapper.innerHTML;
+    newBody=newBody.replace(/ style="position: relative;"/g,'').replace(/ style="position:relative;"/g,'');
+    const bodyStart=idxHtml.indexOf('<body>')+6;
+    const bodyEnd=idxHtml.lastIndexOf('</body>');
+    const newIdxHtml=idxHtml.slice(0,bodyStart)+'\n'+newBody+'\n'+idxHtml.slice(bodyEnd);
+    const b64=btoa(unescape(encodeURIComponent(newIdxHtml)));
+    const pd=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'Ana sayfa icerigi guncellendi',content:b64,sha:d.sha})})).json();
+    if(pd.commit){toast('✅ Ana sayfa güncellendi!');document.getElementById('as-changes-count').textContent='✅ Kaydedildi';}
+    else{toast('❌ Hata: '+JSON.stringify(pd).slice(0,60));console.error(pd);}
+  }catch(e){toast('❌ '+e.message);console.error(e);}
 }
 // ====== ANA SAYFA YÖNETİMİ SON ======
 </script>

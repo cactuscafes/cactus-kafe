@@ -715,21 +715,21 @@
   },
   "oncu": [
     {
-      "id": "s3",
-      "ad": "Americano",
-      "fiyat": 180,
+      "id": "s2",
+      "ad": "Macchiato",
+      "fiyat": 140,
       "foto": "",
       "emoji": "☕"
     }
   ],
   "_oncu": [
     {
-      "id": "s3",
-      "ad": "Americano",
-      "fiyat": 180,
+      "id": "s2",
+      "ad": "Macchiato",
+      "fiyat": 140,
       "foto": "",
       "emoji": "☕"
     }
   ],
-  "guncelleme": "2026-04-21T16:12:27.642Z"
+  "guncelleme": "2026-04-21T16:14:24.830Z"
 }

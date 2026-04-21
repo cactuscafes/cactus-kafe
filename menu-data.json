@@ -646,7 +646,23 @@
       }
     ]
   },
-  "oncu": [],
-  "_oncu": [],
-  "guncelleme": "2026-04-21T22:30:12.857Z"
+  "oncu": [
+    {
+      "id": "s4",
+      "ad": "Cortado",
+      "fiyat": 180,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
+      "emoji": "☕"
+    }
+  ],
+  "_oncu": [
+    {
+      "id": "s4",
+      "ad": "Cortado",
+      "fiyat": 180,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
+      "emoji": "☕"
+    }
+  ],
+  "guncelleme": "2026-04-21T22:30:19.545Z"
 }

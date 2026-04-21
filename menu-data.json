@@ -247,16 +247,6 @@
         "aciklama": "Sıcak süt + çiçek balı.",
         "foto": "",
         "gizli": false
-      },
-      {
-        "id": "sicak_1776750204427",
-        "ad": "fsm",
-        "fiyat": 1,
-        "emoji": "•",
-        "tip": "ic",
-        "aciklama": "",
-        "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750615561-a2h894bontk.jpg",
-        "gizli": true
       }
     ],
     "soguk": [
@@ -544,7 +534,7 @@
         "fiyat": 30,
         "emoji": "💧",
         "tip": "ic",
-        "aciklama": "Soğuk kaynak suyu.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -554,7 +544,7 @@
         "fiyat": 80,
         "emoji": "🫧",
         "tip": "ic",
-        "aciklama": "Karbonatlı maden suyu.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -564,7 +554,7 @@
         "fiyat": 140,
         "emoji": "⚡",
         "tip": "ic",
-        "aciklama": "Kafeinli enerji içeceği.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       }
@@ -576,7 +566,7 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Dondurma + çilek + muz + sütlü çikolata.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -586,7 +576,7 @@
         "fiyat": 330,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Kadayıf + fıstık ezmesi + çikolata.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -596,7 +586,7 @@
         "fiyat": 300,
         "emoji": "🧇",
         "tip": "yi",
-        "aciklama": "Dondurma + bitter çikolata.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -606,17 +596,7 @@
         "fiyat": 300,
         "emoji": "🍯",
         "tip": "yi",
-        "aciklama": "Dondurma + karamel.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "w5",
-        "ad": "Meyveli Bubble Waffle",
-        "fiyat": 300,
-        "emoji": "🍓",
-        "tip": "yi",
-        "aciklama": "Dondurma + mevsim meyveleri.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       }
@@ -731,5 +711,5 @@
       "emoji": "☕"
     }
   ],
-  "guncelleme": "2026-04-21T16:54:53.874Z"
+  "guncelleme": "2026-04-21T16:55:54.583Z"
 }

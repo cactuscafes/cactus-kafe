@@ -103,12 +103,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 <div id="admin" style="display:none">
   <nav class="nav">
     <div class="nav-logo">🌵 CACTUS Admin</div>
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:24px;margin-bottom:24px;">
-          <h3 style="font-size:15px;font-weight:600;margin-bottom:4px;">↕️ Kategori Sıralaması</h3>
-          <p style="font-size:12px;color:#888;margin-bottom:16px;">Sürükleyerek sırayı değiştirin</p>
-          <div id="katSiralama"></div>
-        </div>
-        <div style="display:flex;gap:10px;">
+    <div style="display:flex;gap:10px;">
       <button class="nav-btn btn-yayinla" onclick="modalAc()">🚀 Yayınla</button>
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
@@ -349,7 +344,7 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
 
-  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSiralamaUI&&katSiralamaUI();katSeciciDoldur&&katSeciciDoldur();},200);}}
+  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
@@ -526,7 +521,7 @@ function katSiralamaUI(){
       dragIdx=null;
       localStorage.setItem('cactus_kat',JSON.stringify(KAT));
       renderKatTabs();
-      katSiralamaUI();
+      
       katSeciciDoldur&&katSeciciDoldur();
       toast('✅ Sıra güncellendi — Yayınla butonuna basın');
     });
@@ -540,7 +535,7 @@ function dragKatDrop(e, toIdx){
   const item = KAT.splice(dragKatIdx, 1)[0];
   KAT.splice(toIdx, 0, item);
   dragKatIdx = null;
-  katSiralamaUI();
+  
   renderKatTabs();
   saveKat();
   toast('✅ Sıra güncellendi');
@@ -549,13 +544,60 @@ function saveKat(){
   localStorage.setItem('cactus_kat', JSON.stringify(KAT));
 }
 function renderKatListe(){
-  document.getElementById('katListe').innerHTML=KAT.map((k,i)=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1.5px solid var(--stone);margin-bottom:6px;">
-      <span style="font-size:20px;width:30px;">${k.label.split(' ')[0]}</span>
-      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">${k.label}</div><div style="font-size:11px;color:var(--mist);">${k.tip==='ic'?'İçecek':'Yiyecek'} · ${(MENU[k.id]||[]).length} ürün</div></div>
-      <button onclick="katDuzenle('${k.id}')" style="padding:6px 12px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">✏️</button>
-      ${i>=8?`<button onclick="katSil('${k.id}')" style="padding:6px 12px;background:#fff;border:1.5px solid #fcc;font-size:11px;color:var(--rd);cursor:pointer;font-family:inherit;">🗑</button>`:''}
-    </div>`).join('');
+  const cont=document.getElementById('katListe');
+  if(!cont)return;
+  cont.innerHTML=KAT.map((k,i)=>`
+    <div class="kat-row" draggable="true" data-idx="${i}" 
+      style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border:1px solid #eee;border-radius:10px;margin-bottom:8px;cursor:default;user-select:none;transition:background 0.15s,box-shadow 0.15s;">
+      <span class="drag-handle" title="Sırayı değiştir" style="cursor:grab;color:#ccc;font-size:18px;padding:2px 4px;border-radius:4px;transition:color 0.2s;" 
+        onmouseover="this.style.color='#666'" onmouseout="this.style.color='#ccc'">☰</span>
+      <span style="font-size:20px;">${k.label.split(' ')[0]}</span>
+      <span style="font-size:14px;font-weight:500;flex:1;">${k.label.split(' ').slice(1).join(' ')}</span>
+      <span style="font-size:12px;color:#999;">${k.tip==='ic'?'İçecek':'Yiyecek'} · ${(MENU[k.id]||[]).length} ürün</span>
+      <button onclick="katDuzenle('${k.id}')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#999;font-size:16px;" title="Düzenle">✏️</button>
+      ${(MENU[k.id]||[]).length===0?'<button onclick="katSil(\''+k.id+'\')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#ffaaaa;font-size:16px;" title="Sil">🗑️</button>':''}
+    </div>
+  `).join('');
+  
+  // Drag & drop event'leri ekle
+  let dragIdx=null;
+  cont.querySelectorAll('.kat-row').forEach((el,i)=>{
+    const handle=el.querySelector('.drag-handle');
+    handle.addEventListener('mousedown',()=>el.setAttribute('draggable','true'));
+    el.addEventListener('dragstart',e=>{
+      dragIdx=i;
+      el.style.opacity='0.5';
+      el.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';
+      e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',()=>{
+      el.style.opacity='1';
+      el.style.boxShadow='none';
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      el.style.background='#f0f8f0';
+      el.style.borderColor='#2d5a27';
+    });
+    el.addEventListener('dragleave',()=>{
+      el.style.background='#fff';
+      el.style.borderColor='#eee';
+    });
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      el.style.background='#fff';
+      el.style.borderColor='#eee';
+      if(dragIdx===null||dragIdx===i)return;
+      const moved=KAT.splice(dragIdx,1)[0];
+      KAT.splice(i,0,moved);
+      dragIdx=null;
+      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+      renderKatListe();
+      renderKatTabs();
+      katSeciciDoldur&&katSeciciDoldur();
+      toast('✅ Sıra güncellendi — Yayınla butonuna basın');
+    });
+  });
 }
 
 /* ÖNE ÇIKAN */

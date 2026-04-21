@@ -39,6 +39,11 @@
       "id": "tost",
       "label": "🥪 Tostlar",
       "tip": "yi"
+    },
+    {
+      "id": "tatlilar",
+      "label": "🍰 Tatlılar",
+      "tip": "yi"
     }
   ],
   "menu": {
@@ -687,8 +692,9 @@
         "foto": "",
         "gizli": false
       }
-    ]
+    ],
+    "tatlilar": []
   },
   "oncu": [],
-  "guncelleme": "2026-04-21T05:50:19.311Z"
+  "guncelleme": "2026-04-21T06:24:13.954Z"
 }

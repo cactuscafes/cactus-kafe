@@ -467,10 +467,10 @@ function katSeciciDoldur(){
   if(!sel) return;
   if(typeof KAT === 'undefined' || !KAT.length) return;
   sel.innerHTML=KAT.map(k=>'<option value="'+k.id+'">'+(k.emoji||'')+' '+k.label+'</option>').join('');
-  sel.value = aktifKat || KAT[0].id;
+  // sel.value = aktifKat; // seçili değeri koruyoruz
 }
 function urunEkle(){
-  katSeciciDoldur();
+  // katSeciciDoldur çağırmıyoruz — seçili kategoriyi korumak için
   const e=document.getElementById('yE').value.trim()||'•';
   const a=document.getElementById('yA').value.trim();
   const f=parseInt(document.getElementById('yF').value)||0;
@@ -478,7 +478,13 @@ function urunEkle(){
   const ac=document.getElementById('yAc').value.trim();
   if(!a||!f){ toast('⚠️ Ad ve fiyat zorunlu'); return; }
   if(!MENU[aktifKat]) MENU[aktifKat]=[];
-  const yKatVal=document.getElementById('yKat')?.value||aktifKat;const yFotoVal=document.getElementById('yFotoUrl')?.value||'';if(!MENU[yKatVal])MENU[yKatVal]=[];MENU[yKatVal].push({id:aktifKat+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:yFotoVal});document.getElementById('yFotoUrl').value='';const fb=document.getElementById('yFotoBtnTxt');if(fb){fb.textContent='📷 Fotoğraf Seç';fb.style.color='#666';}aktifKat=yKatVal;
+  const yKatVal=(document.getElementById('yKat')?.value)||aktifKat;
+  const yFotoVal=(document.getElementById('yFotoUrl')?.value)||'';
+  if(!MENU[yKatVal])MENU[yKatVal]=[];
+  MENU[yKatVal].push({id:yKatVal+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:yFotoVal});
+  const fb=document.getElementById('yFotoBtnTxt');if(fb){fb.textContent='📷 Fotoğraf Seç';fb.style.color='#666';}
+  document.getElementById('yFotoUrl').value='';
+  aktifKat=yKatVal;
   menuKaydet(); renderUrunler();
   ['yE','yA','yF','yAc'].forEach(id=>document.getElementById(id).value='');
   toast('✅ Ürün eklendi');

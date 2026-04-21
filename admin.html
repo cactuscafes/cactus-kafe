@@ -502,20 +502,36 @@ function katDuzenle(id){
   k.label=y; katKaydet(); renderKatListe(); renderKatTabs(); toast('✅ Güncellendi');
 }
 function katSiralamaUI(){
-  const cont = document.getElementById('katSiralama');
-  if(!cont) return;
-  cont.innerHTML = KAT.map((k,i) => `
-    <div class="kat-sira-item" draggable="true" data-idx="${i}" 
-      style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:8px;cursor:grab;user-select:none;"
-      ondragstart="dragKatStart(event,${i})"
-      ondragover="event.preventDefault()"
-      ondrop="dragKatDrop(event,${i})">
-      <span style="font-size:18px;cursor:grab;">⠿</span>
+  const cont=document.getElementById('katSiralama');
+  if(!cont)return;
+  cont.innerHTML=KAT.map((k,i)=>`<div class="kat-sira-item" data-idx="${i}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:8px;cursor:grab;user-select:none;transition:background 0.2s;">
+      <span style="color:#bbb;font-size:20px;cursor:grab;">☰</span>
       <span style="font-size:20px;">${k.label.split(' ')[0]}</span>
       <span style="font-size:14px;font-weight:500;">${k.label.split(' ').slice(1).join(' ')}</span>
-      <span style="margin-left:auto;font-size:11px;color:#bbb;">#${i+1}</span>
-    </div>
-  `).join('');
+      <span style="margin-left:auto;background:#f5f5f5;padding:2px 8px;border-radius:4px;font-size:11px;color:#888;">${i+1}</span>
+    </div>`).join('');
+  
+  // Touch & mouse drag
+  let dragIdx=null, dragEl=null;
+  cont.querySelectorAll('.kat-sira-item').forEach((el,i)=>{
+    el.addEventListener('dragstart',e=>{dragIdx=i;el.style.opacity='0.5';e.dataTransfer.effectAllowed='move';});
+    el.addEventListener('dragend',e=>{el.style.opacity='1';});
+    el.addEventListener('dragover',e=>{e.preventDefault();el.style.background='#f0f8f0';});
+    el.addEventListener('dragleave',e=>{el.style.background='#fff';});
+    el.addEventListener('drop',e=>{
+      e.preventDefault();el.style.background='#fff';
+      if(dragIdx===null||dragIdx===i)return;
+      const moved=KAT.splice(dragIdx,1)[0];
+      KAT.splice(i,0,moved);
+      dragIdx=null;
+      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+      renderKatTabs();
+      katSiralamaUI();
+      katSeciciDoldur&&katSeciciDoldur();
+      toast('✅ Sıra güncellendi — Yayınla butonuna basın');
+    });
+    el.setAttribute('draggable','true');
+  });
 }
 let dragKatIdx = null;
 function dragKatStart(e, idx){ dragKatIdx = idx; e.dataTransfer.effectAllowed='move'; }

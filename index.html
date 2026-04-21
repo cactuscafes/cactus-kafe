@@ -45,7 +45,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
 
 .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
-.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
+.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;display:block;text-decoration:none;}
 .menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
 .menu-card:hover img{transform:scale(1.05);}
 .menu-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px 28px;}
@@ -211,82 +211,82 @@ footer{padding:60px 24px 30px;}
   <img class="hero-bg" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&amp;q=80" alt="Cactus Coffee" data-as-key="img_0" style="height: 500px; min-height: 0px; object-fit: cover; width: 100%;">
   <div class="hero-overlay" style="height: auto; min-height: 0px; z-index: 1;"></div>
   <div class="hero-content" style="height: auto; min-height: 0px; z-index: 1;">
-    <p class="hero-tagline" style="height: auto; min-height: 0px;">Bursa'nın Kalbinde İki Şube</p>
+    <p class="hero-tagline" style="height: auto; min-height: 0px;">Bursa'nÄ±n Kalbinde Ä°ki Åube</p>
     <h1 class="hero-title" style="height: auto; min-height: 0px;">Cactus<br><em>Coffee</em></h1>
-    <p class="hero-subtitle" style="height: auto; min-height: 0px;">Snack &amp; Dessert · Her yudumda bir hikaye</p>
-    <a href="menu.html" class="hero-btn" style="height: auto; min-height: 0px;">Menüyü Gör</a>
+    <p class="hero-subtitle" style="height: auto; min-height: 0px;">Snack &amp; Dessert Â· Her yudumda bir hikaye</p>
+    <a href="menu.html" class="hero-btn" style="height: auto; min-height: 0px;">MenÃ¼yÃ¼ GÃ¶r</a>
   </div>
   <div class="hero-scroll" style="height: auto; min-height: 0px;">
     <div class="hero-scroll-line" style="height: auto; min-height: 0px;"></div>
-    <span>Keşfet</span>
+    <span>KeÅfet</span>
   </div>
 </section>
 
 <section class="section-menu">
   <div class="section-header">
-    <p class="section-eyebrow">Menümüz</p>
-    <h2 class="section-title">C | <span>Menü</span></h2>
+    <p class="section-eyebrow">MenÃ¼mÃ¼z</p>
+    <h2 class="section-title">C | <span>MenÃ¼</span></h2>
     <div class="section-divider"></div>
   </div>
   <div class="menu-grid">
-    <div class="menu-card">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776773087363-0npcn5nbrzsb.jpg" alt="FSM Şubesi" data-as-key="img_1">
+    <a href="menu.html" class="menu-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776773087363-0npcn5nbrzsb.jpg" alt="FSM Åubesi" data-as-key="img_1">
       <div class="menu-card-overlay">
-        <span class="menu-card-label">Şube</span>
-        <h3 class="menu-card-title">FSM Menü</h3>
-        <a href="menu.html" class="menu-card-link">Menü</a>
+        <span class="menu-card-label">Åube</span>
+        <h3 class="menu-card-title">FSM MenÃ¼</h3>
+        <span class="menu-card-link">MenÃ¼</span>
       </div>
-    </div>
-    <div class="menu-card">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_2">
+    </a>
+    <a href="menu.html" class="menu-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Åubesi" data-as-key="img_2">
       <div class="menu-card-overlay">
-        <span class="menu-card-label">Şube</span>
-        <h3 class="menu-card-title">Podyumpark Menü</h3>
-        <a href="menu.html" class="menu-card-link">Menü</a>
+        <span class="menu-card-label">Åube</span>
+        <h3 class="menu-card-title">Podyumpark MenÃ¼</h3>
+        <span class="menu-card-link">MenÃ¼</span>
       </div>
-    </div>
-    <div class="menu-card">
-      <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&amp;q=80" alt="Özel Menü" data-as-key="img_3">
+    </a>
+    <a href="menu.html" class="menu-card">
+      <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&amp;q=80" alt="Ãzel MenÃ¼" data-as-key="img_3">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Koleksiyon</span>
         <h3 class="menu-card-title">Podyumpark Waffle</h3>
-        <a href="menu.html" class="menu-card-link">Menü</a>
+        <span class="menu-card-link">MenÃ¼</span>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 
 <section class="section-about">
   <div class="about-inner">
     <p class="about-eyebrow">Hikayemiz</p>
-    <h2 class="about-title">Bizimle <em>Tanışın</em></h2>
+    <h2 class="about-title">Bizimle <em>TanÄ±ÅÄ±n</em></h2>
     <p class="about-text">
-      Her bir yudumun arkasında bir özen, her bir dilimin ardında bir tutku var.
-      Cactus Coffee olarak, misafirlerimize yalnızca lezzetli içecekler ve atıştırmalıklar değil;
-      huzur dolu, kaliteli anlar sunmayı hedefliyoruz.<br><br>
-      Bursa'nın kalbinde iki şubemizle, şehrin temposuna ayak uydururken
-      kendinizi özel hissettireceğiniz bir alan yaratıyoruz.
+      Her bir yudumun arkasÄ±nda bir Ã¶zen, her bir dilimin ardÄ±nda bir tutku var.
+      Cactus Coffee olarak, misafirlerimize yalnÄ±zca lezzetli iÃ§ecekler ve atÄ±ÅtÄ±rmalÄ±klar deÄil;
+      huzur dolu, kaliteli anlar sunmayÄ± hedefliyoruz.<br><br>
+      Bursa'nÄ±n kalbinde iki Åubemizle, Åehrin temposuna ayak uydururken
+      kendinizi Ã¶zel hissettireceÄiniz bir alan yaratÄ±yoruz.
     </p>
-    <a href="iletisim.html" class="about-btn">Bize Ulaşın</a>
+    <a href="iletisim.html" class="about-btn">Bize UlaÅÄ±n</a>
   </div>
 </section>
 
 <section class="section-branches">
   <div class="section-header">
-    <p class="section-eyebrow">Şubelerimiz</p>
+    <p class="section-eyebrow">Åubelerimiz</p>
     <h2 class="section-title">C | <span>Lokasyonlar</span></h2>
     <div class="section-divider"></div>
   </div>
   <div class="branches-grid">
     <div class="branch-card">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776784970135-0fqpyb1p1lnj.jpg" alt="FSM Şubesi" data-as-key="img_4">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776784970135-0fqpyb1p1lnj.jpg" alt="FSM Åubesi" data-as-key="img_4">
       <div class="branch-overlay">
-        <div class="branch-name">FSM Şubesi</div>
+        <div class="branch-name">FSM Åubesi</div>
         <div class="branch-sub">Fatih Sultan Mehmet Caddesi</div>
       </div>
     </div>
     <div class="branch-card">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_5">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Åubesi" data-as-key="img_5">
       <div class="branch-overlay">
         <div class="branch-name">Podyumpark</div>
         <div class="branch-sub">Podyumpark AVM</div>
@@ -299,25 +299,25 @@ footer{padding:60px 24px 30px;}
   <div class="footer-inner">
     <div class="">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776725885776-plqcx3hemz.jpg" alt="Cactus Coffee" style="height:64px;width:auto;object-fit:contain;filter:brightness(0) invert(1);" data-as-key="img_6">
-      <p class="footer-desc">Her yudumda bir hikaye.<br>Bursa'nın kalbinde iki şube.</p>
+      <p class="footer-desc">Her yudumda bir hikaye.<br>Bursa'nÄ±n kalbinde iki Åube.</p>
     </div>
     <div class="footer-col">
       <h4>Sayfalar</h4>
       <ul>
         <li><a href="index.html">Ana Sayfa</a></li>
-        <li><a href="menu.html">Menü</a></li>
+        <li><a href="menu.html">MenÃ¼</a></li>
         <li><a href="galeri.html">Galeri</a></li>
-        <li><a href="iletisim.html">İletişim</a></li>
+        <li><a href="iletisim.html">Ä°letiÅim</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4>İletişim</h4>
-      <p>Bursa, Türkiye<br><br>info@cactuscafes.com<br><br>Instagram: @cactuscafes</p>
+      <h4>Ä°letiÅim</h4>
+      <p>Bursa, TÃ¼rkiye<br><br>info@cactuscafes.com<br><br>Instagram: @cactuscafes</p>
     </div>
   </div>
   <div class="footer-bottom">
-    <p class="">© 2025 Cactus Coffee. Tüm hakları saklıdır.</p>
-    <p class="">Bursa, Türkiye</p>
+    <p class="">Â© 2025 Cactus Coffee. TÃ¼m haklarÄ± saklÄ±dÄ±r.</p>
+    <p class="">Bursa, TÃ¼rkiye</p>
   </div>
 </footer>
 

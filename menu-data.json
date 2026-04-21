@@ -257,6 +257,33 @@
         "aciklama": "",
         "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750615561-a2h894bontk.jpg",
         "gizli": true
+      },
+      {
+        "id": "sicak_1776785123884",
+        "emoji": "•",
+        "ad": "San Sebastian",
+        "fiyat": 280,
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
+      },
+      {
+        "id": "sicak_1776785138372",
+        "emoji": "•",
+        "ad": "Brownie",
+        "fiyat": 280,
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
+      },
+      {
+        "id": "sicak_1776785157331",
+        "emoji": "•",
+        "ad": "Spoonful",
+        "fiyat": 280,
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
       }
     ],
     "soguk": [
@@ -686,5 +713,5 @@
     "tatlilar": []
   },
   "oncu": [],
-  "guncelleme": "2026-04-21T15:23:29.989Z"
+  "guncelleme": "2026-04-21T15:26:11.286Z"
 }

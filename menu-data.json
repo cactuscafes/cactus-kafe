@@ -710,8 +710,36 @@
         "gizli": false
       }
     ],
-    "tatlilar": []
+    "tatlilar": [
+      {
+        "id": "tatlilar_1776785283325_1",
+        "emoji": "🍫",
+        "ad": "Brownie",
+        "fiyat": "280",
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
+      },
+      {
+        "id": "tatlilar_1776785283325_2",
+        "emoji": "🍮",
+        "ad": "San Sebastian",
+        "fiyat": "280",
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
+      },
+      {
+        "id": "tatlilar_1776785283325_3",
+        "emoji": "🥄",
+        "ad": "Spoonful",
+        "fiyat": "280",
+        "aciklama": "",
+        "tip": "yi",
+        "foto": ""
+      }
+    ]
   },
   "oncu": [],
-  "guncelleme": "2026-04-21T15:26:11.286Z"
+  "guncelleme": "2026-04-21T15:28:03.326Z"
 }

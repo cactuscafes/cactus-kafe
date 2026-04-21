@@ -118,10 +118,36 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
       <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
+      <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:#2d5a27;color:#fff;font-weight:600;">🏠 Ana Sayfa</button>
     </div>
     <div class="main">
 
       <!-- MENÜ -->
+      <div class="panel" id="panel-anasayfa">
+        <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
+        <div class="psub">Anasayfayı düzenleyin. Değişiklik için hover edip butona tıklayın, sonra "Uygula" basın.</div>
+        <div id="as-wrapper" style="min-height:200px;position:relative;"><div style="padding:40px;text-align:center;color:#999;">Yükleniyor...</div></div>
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;z-index:10;">
+          <span id="as-status" style="font-size:13px;color:#888;">Henüz değişiklik yok</span>
+          <button onclick="asYayinla()" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">🚀 Ana Sayfaya Uygula</button>
+        </div>
+        <div id="as-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:480px;max-width:92vw;">
+            <h3 id="as-mtitle" style="margin:0 0 14px;font-size:16px;"></h3>
+            <textarea id="as-minput" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+            <div id="as-mfile-area" style="display:none;margin-bottom:12px;">
+              <input type="file" id="as-mfile" accept="image/*" style="display:none" onchange="asImgUpload(this)">
+              <button onclick="document.getElementById('as-mfile').click()" style="padding:8px 16px;background:#1a1a1a;color:#fff;border:none;border-radius:6px;cursor:pointer;">📷 Yükle</button>
+              <span id="as-mfile-status" style="font-size:12px;color:#888;margin-left:8px;"></span>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+              <button onclick="document.getElementById('as-modal').style.display='none'" style="padding:10px 20px;background:#f5f5f5;border:none;border-radius:8px;cursor:pointer;font-weight:600;">İptal</button>
+              <button onclick="asKaydet()" style="padding:10px 20px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✅ Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel on" id="panel-menu">
         <div class="pttl">📋 Menü Yönetimi</div>
         <div class="psub">Ürün ekle, güncelle, fotoğraf ekle. Yayınla ile siteye uygula.</div>
@@ -344,7 +370,8 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
 
-  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}}
+  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
+  if(id==='anasayfa'){setTimeout(function(){asLoad&&asLoad();},200);}}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
@@ -762,6 +789,94 @@ async function yayinla(){
 
 /* BAŞLAT */
 if(localStorage.getItem('ca')==='1'){ document.getElementById('giris').style.display='none'; basla(); }
+
+// AS = Ana Sayfa Yönetimi
+let _asTarget = null, _asIsImg = false;
+function asAc(el, isImg){
+  _asTarget=el; _asIsImg=isImg;
+  document.getElementById('as-mtitle').textContent = isImg ? 'Fotoğrafı Değiştir' : 'Metni Düzenle';
+  document.getElementById('as-minput').value = isImg ? el.src : el.innerText.replace('✏️','').trim();
+  document.getElementById('as-mfile-area').style.display = isImg ? 'block' : 'none';
+  document.getElementById('as-mfile-status').textContent = '';
+  const m = document.getElementById('as-modal');
+  m.style.display = 'flex';
+}
+function asKaydet(){
+  const v = document.getElementById('as-minput').value.trim();
+  if(!v || !_asTarget) return;
+  if(_asIsImg) _asTarget.src = v;
+  else { const b=_asTarget.querySelector('.as-eb'); _asTarget.innerHTML=v; if(b) _asTarget.appendChild(b); }
+  document.getElementById('as-status').textContent = '⚠️ Kaydedilmedi — Uygula butonuna basın';
+  document.getElementById('as-modal').style.display = 'none';
+}
+function asImgUpload(inp){
+  const file=inp.files[0]; if(!file) return;
+  const st=document.getElementById('as-mfile-status'); st.textContent='⏳ Yükleniyor...';
+  resizeToJpeg(file,blob=>{uploadToR2(blob,file.name,(err,data)=>{
+    if(err){st.textContent='❌ Hata';return;}
+    document.getElementById('as-minput').value=data.url||'';
+    st.textContent='✅ Yüklendi';
+  });});
+}
+async function asYayinla(){
+  const token=localStorage.getItem('cactus_gh_token');
+  const repo='cactuscafes/cactus-kafe';
+  document.getElementById('as-status').textContent='⏳ Yükleniyor...';
+  try {
+    const d=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{headers:{'Authorization':'token '+token}})).json();
+    let idx=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    const wrap=document.getElementById('as-wrapper').cloneNode(true);
+    wrap.querySelectorAll('.as-eb,.as-ib').forEach(b=>b.remove());
+    wrap.querySelectorAll('[data-as]').forEach(el=>{el.removeAttribute('data-as');el.style.position='';el.classList.remove('as-ed');});
+    let body=wrap.innerHTML.replace(/ style="position: relative;"/g,'').replace(/ style="position:relative;"/g,'');
+    const bs=idx.indexOf('<body>')+6, be=idx.lastIndexOf('</body>');
+    const newIdx=idx.slice(0,bs)+'\n'+body+'\n'+idx.slice(be);
+    const pd=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'Ana sayfa guncellendi',content:btoa(unescape(encodeURIComponent(newIdx))),sha:d.sha})})).json();
+    if(pd.commit){document.getElementById('as-status').textContent='✅ Yayınlandı!';}
+    else{document.getElementById('as-status').textContent='❌ Hata';console.error(pd);}
+  } catch(e){document.getElementById('as-status').textContent='❌ '+e.message;}
+}
+function asLoad(){
+  fetch('https://cactuscafes.com/index.html?t='+Date.now()).then(r=>r.text()).then(idx=>{
+    const bs=idx.indexOf('<body>')+6, be=idx.lastIndexOf('</body>');
+    let body=idx.slice(bs,be).replace(/<nav[\s\S]*?<\/nav>/m,'');
+    const wrap=document.getElementById('as-wrapper');
+    wrap.innerHTML=body;
+    // popup kapat
+    wrap.querySelectorAll('[class*="popup"],[id*="popup"]').forEach(el=>el.style.display='none');
+    // IMG butonları
+    wrap.querySelectorAll('img').forEach((img,i)=>{
+      const p=img.parentElement;
+      if(getComputedStyle(p).position==='static') p.style.position='relative';
+      if(!p.querySelector('.as-ib')){
+        const b=document.createElement('button');
+        b.className='as-ib';b.textContent='📷 Değiştir';
+        b.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;opacity:0;transition:opacity .2s;font-size:13px;font-weight:600;pointer-events:none;z-index:999;white-space:nowrap;';
+        p.addEventListener('mouseenter',()=>b.style.opacity='1');
+        p.addEventListener('mouseleave',()=>b.style.opacity='0');
+        b.style.pointerEvents='all';
+        b.onclick=e=>{e.stopPropagation();asAc(img,true);};
+        p.appendChild(b);
+      }
+    });
+    // Metin butonları
+    ['.hero-tagline','.hero-subtitle','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow'].forEach(sel=>{
+      wrap.querySelectorAll(sel).forEach(el=>{
+        el.style.position='relative';
+        if(!el.querySelector('.as-eb')){
+          const b=document.createElement('button');
+          b.className='as-eb';b.textContent='✏️';
+          b.style.cssText='position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;opacity:0;transition:opacity .2s;font-size:12px;z-index:999;';
+          el.addEventListener('mouseenter',()=>b.style.opacity='1');
+          el.addEventListener('mouseleave',()=>b.style.opacity='0');
+          b.onclick=e=>{e.stopPropagation();asAc(el,false);};
+          el.appendChild(b);
+        }
+      });
+    });
+    document.getElementById('as-status').textContent='Hazır — hover edip düzenleyin';
+  }).catch(e=>console.error('asLoad:',e));
+}
 </script>
 </body>
 </html>

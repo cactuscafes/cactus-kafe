@@ -993,5 +993,38 @@ function oncuBtnClick(btn){
   localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
 }
 </script>
+
+<script>
+// Öne çıkan yıldız fix — otomatik GitHub push
+(function(){
+  function patchOncu(){
+    if(typeof window._oncuPatched !== 'undefined') return;
+    if(typeof window.oncuBtnClick === 'undefined') { setTimeout(patchOncu, 500); return; }
+    window._oncuPatched = true;
+    var _orig = window.oncuBtnClick;
+    window.oncuBtnClick = async function(el) {
+      _orig.call(this, el);
+      // 300ms bekle localStorage'ın güncellenmesi için
+      setTimeout(async function(){
+        var tok = localStorage.getItem('cactus_gh_token');
+        var menu = JSON.parse(localStorage.getItem('cactus_admin_menu')||'{}');
+        var kat = JSON.parse(localStorage.getItem('cactus_kat')||'[]');
+        var oncu = JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+        var data = { menu: menu, kategoriler: kat, oncu: oncu, guncelleme: new Date().toISOString() };
+        var r = await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json',{headers:{'Authorization':'token '+tok}});
+        var d = await r.json();
+        var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+        await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json',{
+          method:'PUT',
+          headers:{'Authorization':'token '+tok,'Content-Type':'application/json'},
+          body:JSON.stringify({message:'Oncu guncellendi',content:b64,sha:d.sha})
+        });
+        if(typeof toast==='function') toast('⭐ Öne çıkan güncellendi ve yayınlandı!');
+      }, 300);
+    };
+  }
+  setTimeout(patchOncu, 1000);
+})();
+</script>
 </body>
 </html>

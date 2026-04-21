@@ -1120,5 +1120,56 @@ if(window.innerWidth<=640){
 renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
 </script>
+
+<script>
+// D1 Rapor Entegrasyonu
+const RAPOR_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+const RAPOR_SUBE = 'fsm';
+
+async function raporKaydet(siparis) {
+  const tarih = new Date().toISOString().split('T')[0];
+  try {
+    for (const urun of siparis) {
+      await fetch(RAPOR_API + '/rapor/kaydet', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          sube: RAPOR_SUBE,
+          tarih: tarih,
+          urun_adi: urun.ad,
+          kategori: urun.kategori || '',
+          adet: urun.adet || 1,
+          birim_fiyat: urun.fiyat || 0
+        })
+      });
+    }
+  } catch(e) { console.log('Rapor kayit hatasi:', e); }
+}
+
+// Orijinal siparis tamamlama fonksiyonunu wrap et
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    // siparisOlustur veya odemeTamamla fonksiyonunu yakala
+    const fnNames = ['siparisOlustur', 'odemeTamamla', 'siparisKaydet', 'odemeAl'];
+    fnNames.forEach(fnName => {
+      if (typeof window[fnName] === 'function') {
+        const _orig = window[fnName];
+        window[fnName] = async function(...args) {
+          const result = await _orig.apply(this, args);
+          // Aktif masanın siparislerini al
+          try {
+            const masa = window.aktifMasa || window.secilenMasa;
+            if (masa && window.masalar && window.masalar[masa]) {
+              const siparisler = window.masalar[masa].siparisler || window.masalar[masa].urunler || [];
+              if (siparisler.length) await raporKaydet(siparisler);
+            }
+          } catch(e) {}
+          return result;
+        };
+      }
+    });
+  }, 1500);
+});
+</script>
 </body>
 </html>

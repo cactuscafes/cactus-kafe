@@ -45,7 +45,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
 
 .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
-.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;display:block;text-decoration:none;}
+.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
 .menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
 .menu-card:hover img{transform:scale(1.05);}
 .menu-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px 28px;}
@@ -229,28 +229,28 @@ footer{padding:60px 24px 30px;}
     <div class="section-divider"></div>
   </div>
   <div class="menu-grid">
-    <a href="menu.html" class="menu-card">
+    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776773087363-0npcn5nbrzsb.jpg" alt="FSM Şubesi" data-as-key="img_1">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Şube</span>
         <h3 class="menu-card-title">FSM Menü</h3>
-        <span class="menu-card-link">Menü</a>
+        <a href="menu.html" class="menu-card-link">Menü</a>
       </div>
     </div>
-    <a href="menu.html" class="menu-card">
+    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_2">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Şube</span>
         <h3 class="menu-card-title">Podyumpark Menü</h3>
-        <span class="menu-card-link">Menü</a>
+        <a href="menu.html" class="menu-card-link">Menü</a>
       </div>
     </div>
-    <a href="menu.html" class="menu-card">
+    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&amp;q=80" alt="Özel Menü" data-as-key="img_3">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Koleksiyon</span>
         <h3 class="menu-card-title">Podyumpark Waffle</h3>
-        <span class="menu-card-link">Menü</a>
+        <a href="menu.html" class="menu-card-link">Menü</a>
       </div>
     </div>
   </div>

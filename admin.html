@@ -446,7 +446,7 @@ function renderUrunler(){
       </div>
       <div class="uk-btns">
         <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
-        <button class="oncu-btn" data-uid='+u.id+' data-katid='+kat.id+' onclick="oncuBtnClick(this)" style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;" title="One Cikan">'+((ONCU&&ONCU.some(function(x){return x.id===u.id;}))?'&#11088;':'&#9734;')+'</button>
+        <button class="oncu-btn" data-uid="${u.id}" data-katid="${kat.id}" onclick="oncuBtnClick(this)" style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;" title="One Cikan">${(ONCU&&ONCU.some(x=>x.id===u.id))?'&#11088;':'&#9734;'}</button>
               
               <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
       </div>

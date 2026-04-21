@@ -86,7 +86,8 @@
         "tip": "ic",
         "aciklama": "Espresso + eşit oranda süt.",
         "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
-        "gizli": false
+        "gizli": false,
+        "oncu": false
       },
       {
         "id": "s5",
@@ -692,5 +693,5 @@
       "emoji": "🧇"
     }
   ],
-  "guncelleme": "2026-04-21T22:31:52.359Z"
+  "guncelleme": "2026-04-21T22:35:35.982Z"
 }

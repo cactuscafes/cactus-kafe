@@ -103,7 +103,7 @@
 <div class="page-hero">
   <div class="page-hero-content">
     <span class="page-eyebrow">Cactus Coffee</span>
-    <h1 class="page-title">Bize<br><em>Ulaşın</em></h1>
+    <h1 class="page-title">İş<br><em>Başvurusu</em></h1>
   </div>
 </div>
 
@@ -178,36 +178,38 @@
   <!-- İletişim Formu -->
   <div class="form-sec reveal">
     <div class="form-intro">
-      <div class="sec-label">Mesaj Gönderin</div>
-      <h2 class="sec-title">Sizinle<br><em>konuşalım</em></h2>
-      <p>Rezervasyon, iş başvurusu veya herhangi bir konu için bize mesaj gönderebilirsiniz. En kısa sürede geri döneceğiz.</p>
+      <div class="sec-label">İş Başvurusu</div>
+      <h2 class="sec-title">Bizimle<br><em>çalış</em></h2>
+      <p>Cactus Coffee ailesine katılmak ister misin? Pozisyon seç, formu doldur — en kısa sürede seninle iletişime geçelim.</p>
     </div>
     <div>
-      <form class="form" onsubmit="formGonder(event)">
+      <form class="form" action="https://formspree.io/f/batuhanbulut@cactuscafes.com" method="POST">
         <div class="form-row">
           <div class="form-group">
             <label>Adınız</label>
-            <input type="text" placeholder="Ad Soyad" required>
+            <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
           </div>
           <div class="form-group">
             <label>E-posta</label>
-            <input type="email" placeholder="mail@örnek.com" required>
+            <input type="email" name="email" placeholder="mail@örnek.com" required>
           </div>
         </div>
         <div class="form-group">
           <label>Konu</label>
-          <select>
-            <option>Genel Bilgi</option>
-            <option>Rezervasyon</option>
-            <option>İş Başvurusu</option>
-            <option>Öneri / Şikayet</option>
+          <select name="pozisyon">
+            <option>Barista</option>
+            <option>Kasiyer</option>
+            <option>Garson / Servis</option>
+            <option>Mutfak Personeli</option>
+            <option>Diğer</option>
           </select>
         </div>
         <div class="form-group">
           <label>Mesajınız</label>
-          <textarea placeholder="Mesajınızı buraya yazın..."></textarea>
+          <textarea name="mesaj" placeholder="Kendinizden kısaca bahsedin, deneyimlerinizi ve çalışmak istediğiniz şubeyi belirtin..." style="min-height:140px;"></textarea>
         </div>
-        <button type="submit" class="form-submit">Gönder →</button>
+        <button type="submit" class="form-submit">Başvur →</button>
+        <input type="hidden" name="_subject" value="Yeni İş Başvurusu — Cactus Coffee">
         <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
       </form>
     </div>

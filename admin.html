@@ -126,7 +126,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <div class="panel" id="panel-anasayfa">
         <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
         <div class="psub">Elementin üzerine gelin → butona tıklayın → düzenleyin → "Uygula" basın</div>
-        <div id="as-wrap" style="border:1px solid #eee;border-radius:8px;overflow:hidden;position:relative;min-height:300px;"></div>
+        <div id="as-wrap" style="border:1px solid #eee;border-radius:8px;overflow:hidden;position:relative;min-height:300px;transform-origin:top left;"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="as-st" style="font-size:13px;color:#888;">-</span>
           <button onclick="asYayinla()" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
@@ -831,15 +831,44 @@ function asLoad(){
   var wrap=document.getElementById('as-wrap');
   if(!wrap)return;
   wrap.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;">Yükleniyor...</div>';
+  
   fetch('https://cactuscafes.com/index.html?t='+Date.now())
   .then(function(r){return r.text();})
   .then(function(idx){
-    var bs=idx.indexOf('<body>')+6,be=idx.lastIndexOf('<\/body>');
+    // Anasayfanın CSS'ini al
+    var styleMatch = idx.match(/<style>[\s\S]*?<\/style>/);
+    var pageStyle = styleMatch ? styleMatch[0] : '';
+    
+    // Body içeriğini al, nav kaldır
+    var bs=idx.indexOf('<body>')+6, be=idx.lastIndexOf('<\/body>');
     var body=idx.slice(bs,be).replace(/<nav[\s\S]*?<\/nav>/,'');
-    wrap.innerHTML=body;
+    
+    // Google Fonts link
+    var fontLinks='';
+    var fontMatches=idx.match(/<link[^>]*googleapis[^>]*>/g);
+    if(fontMatches) fontLinks=fontMatches.join('\n');
+    
+    // Wrap'e CSS + body yaz
+    wrap.innerHTML = fontLinks + pageStyle + body;
+    
+    // wrap'i gerçek anasayfa genişliğine göre scale et
+    var panelW = wrap.parentElement.offsetWidth - 40;
+    var pageW = 1440;
+    var scale = Math.min(1, panelW / pageW);
+    wrap.style.transform = 'scale('+scale+')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.width = pageW + 'px';
+    wrap.style.height = '';
+    wrap.parentElement.style.height = (wrap.scrollHeight * scale + 20) + 'px';
+    wrap.parentElement.style.overflow = 'hidden';
+    
+    // Popup kapat
     wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
     
-    // Tüm img'lere her zaman görünür buton ekle
+    // hero-overlay z-index
+    wrap.querySelectorAll('.hero-overlay,.hero-content').forEach(function(el){el.style.zIndex='1';});
+    
+    // IMG butonları
     wrap.querySelectorAll('img').forEach(function(img,i){
       var p=img.parentElement;
       p.style.position='relative';
@@ -848,12 +877,12 @@ function asLoad(){
       b.className='as-ib';
       b.innerHTML='📷';
       b.title='Fotoğrafı değiştir';
-      b.setAttribute('style','position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;z-index:99999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4);');
+      b.setAttribute('style','position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.4);line-height:1;');
       b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(img,true);});
       p.appendChild(b);
     });
     
-    // Metin elementleri — her zaman görünür ✏️ ikonu
+    // Metin butonları
     var sels=['.hero-tagline','.hero-subtitle','.hero-title','.menu-card-title','.about-title','.about-text','.branch-name','.branch-sub','.section-eyebrow','.hero-btn'];
     sels.forEach(function(sel){
       wrap.querySelectorAll(sel).forEach(function(el){
@@ -864,12 +893,12 @@ function asLoad(){
         b.className='as-eb';
         b.innerHTML='✏️';
         b.title='Metni düzenle';
-        b.setAttribute('style','position:absolute;top:2px;right:2px;background:rgba(45,90,39,.9);color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:11px;z-index:99999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);');
+        b.setAttribute('style','position:absolute;top:2px;right:2px;background:rgba(45,90,39,.9);color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;z-index:99999;box-shadow:0 2px 6px rgba(0,0,0,.3);line-height:1;');
         b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asAc(el,false);});
         el.appendChild(b);
       });
     });
-    document.getElementById('as-st').textContent='Hazır — ✏️ veya 📷 ikonuna tıklayın';
+    document.getElementById('as-st').textContent='Hazır — 📷 veya ✏️ ikonuna tıklayın';
   }).catch(function(e){wrap.innerHTML='<div style="padding:20px;color:red;">Hata: '+e.message+'</div>';});
 }
 async function asYayinla(){

@@ -124,16 +124,297 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 
       <!-- ANA SAYFA YÖNETİMİ -->
       <div class="panel" id="panel-anasayfa">
-        <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
-        <div class="psub">Ana sayfadaki fotoğraf ve metinleri buradan düzenleyin. Değişiklikler için "Kaydet ve Yayınla" butonuna basın.</div>
-        
-        <div id="as-container" style="display:flex;flex-direction:column;gap:24px;margin-bottom:24px;"></div>
-        
-        <button onclick="asKaydetVeUygula()" style="width:100%;padding:16px;background:#2d5a27;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:1px;">
-          🚀 Kaydet ve Ana Sayfaya Uygula
-        </button>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+        <style id="as-page-styles">
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#b8965a;--dark:#1a1a1a;--light:#f8f6f2;}
+body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.06);}
+.nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
+.nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
+.nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
+.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dark);font-weight:400;transition:color .3s;}
+.nav-links a:hover{color:var(--gold);}
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+.nav-burger span{width:24px;height:1px;background:var(--dark);display:block;}
+
+/* HERO */
+.hero{position:relative;height:100vh;overflow:hidden;}
+.hero-bg{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
+.hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
+.hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,8vw,110px);font-weight:300;line-height:1;letter-spacing:2px;margin-bottom:8px;}
+.hero-title em{font-style:italic;color:rgba(255,255,255,0.9);}
+.hero-subtitle{font-size:10px;letter-spacing:6px;text-transform:uppercase;opacity:0.7;margin-bottom:48px;font-weight:300;}
+.hero-btn{display:inline-block;padding:16px 48px;border:1px solid rgba(255,255,255,0.7);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:all .3s;font-weight:400;}
+.hero-btn:hover{background:rgba(255,255,255,0.15);}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:3px;text-transform:uppercase;}
+.hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
+
+/* MENU SECTION */
+.section-menu{padding:100px 60px;}
+.section-header{text-align:center;margin-bottom:60px;}
+.section-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:400;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;}
+.section-title span{font-style:italic;}
+.section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
+
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
+.menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
+.menu-card:hover img{transform:scale(1.05);}
+.menu-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px 28px;}
+.menu-card-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:8px;}
+.menu-card-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;letter-spacing:1px;}
+.menu-card-link{display:inline-block;margin-top:16px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.8);border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:2px;text-decoration:none;transition:color .3s;}
+.menu-card:hover .menu-card-link{color:#fff;border-color:#fff;}
+
+/* ABOUT */
+.section-about{padding:120px 60px;background:var(--light);}
+.about-inner{max-width:900px;margin:0 auto;text-align:center;}
+.about-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.about-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;line-height:1.3;letter-spacing:1px;margin-bottom:40px;}
+.about-title em{font-style:italic;}
+.about-text{font-size:13px;line-height:2;color:#555;font-weight:300;max-width:680px;margin:0 auto 48px;}
+.about-btn{display:inline-block;padding:16px 48px;background:var(--dark);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:background .3s;}
+.about-btn:hover{background:var(--gold);}
+
+/* BRANCHES */
+.section-branches{padding:100px 60px;}
+.branches-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:60px;}
+.branch-card{position:relative;aspect-ratio:16/9;overflow:hidden;}
+.branch-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
+.branch-card:hover img{transform:scale(1.04);}
+.branch-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
+.branch-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:3px;}
+.branch-sub{font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:0.7;margin-top:8px;}
+
+/* FOOTER */
+footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
+.footer-inner{display:grid;grid-template-columns:1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
+.footer-logo-main{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:6px;text-transform:uppercase;}
+.footer-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:4px;}
+.footer-desc{font-size:12px;line-height:1.9;color:#999;margin-top:20px;font-weight:300;}
+.footer-col h4{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{text-decoration:none;color:#999;font-size:12px;font-weight:300;transition:color .3s;letter-spacing:1px;}
+.footer-col ul li a:hover{color:#fff;}
+.footer-col p{color:#999;font-size:12px;line-height:1.9;font-weight:300;}
+.footer-bottom{border-top:1px solid #333;padding-top:30px;display:flex;justify-content:space-between;align-items:center;}
+.footer-bottom p{font-size:11px;color:#666;letter-spacing:1px;}
+
+/* MOBILE */
+@media(max-width:768px){
+nav{padding:18px 24px;}
+.nav-links{display:none;}
+.nav-burger{display:flex;}
+.hero-title{font-size:48px;}
+.section-menu,.section-about,.section-branches{padding:70px 24px;}
+.menu-grid{grid-template-columns:1fr;}
+.branches-grid{grid-template-columns:1fr;}
+.footer-inner{grid-template-columns:1fr;gap:40px;}
+footer{padding:60px 24px 30px;}
+.section-menu,.section-about{padding:70px 24px;}
+}
+</style>
+        <style>
+          /* Edit overlay sistemi */
+          .as-editable { position: relative; }
+          .as-editable:hover > .as-edit-btn,
+          .as-editable:hover > .as-img-btn { opacity: 1 !important; pointer-events: all !important; }
+          .as-edit-btn {
+            position: absolute; top: 8px; right: 8px; z-index: 9999;
+            background: rgba(0,0,0,0.75); color: #fff; border: none;
+            padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+            cursor: pointer; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s; white-space: nowrap; backdrop-filter: blur(4px);
+          }
+          .as-img-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            z-index: 9999; background: rgba(0,0,0,0.7); color: #fff; border: none;
+            padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s; backdrop-filter: blur(4px);
+          }
+          .as-edit-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .as-edit-box {
+            background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          }
+          .as-edit-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1a1a1a; }
+          .as-edit-box input, .as-edit-box textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0;
+            border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit;
+          }
+          .as-edit-box textarea { min-height: 80px; resize: vertical; }
+          .as-edit-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+          .as-btn-save { background: #2d5a27; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+          .as-btn-cancel { background: #f5f5f5; color: #444; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+          .as-btn-upload { background: #1a1a1a; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+          #as-wrapper nav { display: none !important; }
+          #as-wrapper { pointer-events: auto; }
+          .as-save-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #e0e0e0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 100; }
+          .as-save-bar button { padding: 12px 32px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; border: none; }
+          .as-changes-count { font-size: 13px; color: #888; }
+        </style>
+
+        <!-- Anasayfa içeriği — birebir aynı, edit butonlarıyla -->
+        <div id="as-wrapper">
+          
+
+
+
+<section class="hero">
+  <img class="hero-bg" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&q=80" alt="Cactus Coffee">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tagline">Bursa'nın Kalbinde İki Şube</p>
+    <h1 class="hero-title">Cactus<br><em>Coffee</em></h1>
+    <p class="hero-subtitle">Snack &amp; Dessert · Her yudumda bir hikaye</p>
+    <a href="menu.html" class="hero-btn">Menüyü Gör</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Keşfet</span>
+  </div>
+</section>
+
+<section class="section-menu">
+  <div class="section-header">
+    <p class="section-eyebrow">Menümüz</p>
+    <h2 class="section-title">C | <span>Menü</span></h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750441515-u6bsp3ldop.jpg" alt="FSM Şubesi">
+      <div class="menu-card-overlay">
+        <span class="menu-card-label">Şube</span>
+        <h3 class="menu-card-title">FSM Menü</h3>
+        <a href="menu.html" class="menu-card-link">Menü</a>
+      </div>
+    </div>
+    <div class="menu-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi">
+      <div class="menu-card-overlay">
+        <span class="menu-card-label">Şube</span>
+        <h3 class="menu-card-title">Podyumpark Menü</h3>
+        <a href="menu.html" class="menu-card-link">Menü</a>
+      </div>
+    </div>
+    <div class="menu-card">
+      <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Özel Menü">
+      <div class="menu-card-overlay">
+        <span class="menu-card-label">Koleksiyon</span>
+        <h3 class="menu-card-title">Özel Menü</h3>
+        <a href="menu.html" class="menu-card-link">Menü</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-about">
+  <div class="about-inner">
+    <p class="about-eyebrow">Hikayemiz</p>
+    <h2 class="about-title">Bizimle <em>Tanışın</em></h2>
+    <p class="about-text">
+      Her bir yudumun arkasında bir özen, her bir dilimin ardında bir tutku var.
+      Cactus Coffee olarak, misafirlerimize yalnızca lezzetli içecekler ve atıştırmalıklar değil;
+      huzur dolu, kaliteli anlar sunmayı hedefliyoruz.<br><br>
+      Bursa'nın kalbinde iki şubemizle, şehrin temposuna ayak uydururken
+      kendinizi özel hissettireceğiniz bir alan yaratıyoruz.
+    </p>
+    <a href="iletisim.html" class="about-btn">Bize Ulaşın</a>
+  </div>
+</section>
+
+<section class="section-branches">
+  <div class="section-header">
+    <p class="section-eyebrow">Şubelerimiz</p>
+    <h2 class="section-title">C | <span>Lokasyonlar</span></h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="branches-grid">
+    <div class="branch-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750441515-u6bsp3ldop.jpg" alt="FSM Şubesi">
+      <div class="branch-overlay">
+        <div class="branch-name">FSM Şubesi</div>
+        <div class="branch-sub">Fatih Sultan Mehmet Caddesi</div>
+      </div>
+    </div>
+    <div class="branch-card">
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi">
+      <div class="branch-overlay">
+        <div class="branch-name">Podyumpark</div>
+        <div class="branch-sub">Podyumpark AVM</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776725885776-plqcx3hemz.jpg" alt="Cactus Coffee" style="height:64px;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
+      <p class="footer-desc">Her yudumda bir hikaye.<br>Bursa'nın kalbinde iki şube.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Sayfalar</h4>
+      <ul>
+        <li><a href="index.html">Ana Sayfa</a></li>
+        <li><a href="menu.html">Menü</a></li>
+        <li><a href="galeri.html">Galeri</a></li>
+        <li><a href="iletisim.html">İletişim</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>İletişim</h4>
+      <p>Bursa, Türkiye<br><br>info@cactuscafes.com<br><br>Instagram: @cactuscafes</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Cactus Coffee. Tüm hakları saklıdır.</p>
+    <p>Bursa, Türkiye</p>
+  </div>
+</footer>
+
+
+        </div>
+
+        <!-- Kaydet barı -->
+        <div class="as-save-bar">
+          <span class="as-changes-count" id="as-changes-count">Henüz değişiklik yok</span>
+          <button onclick="asYayinla()" style="background:#2d5a27;color:#fff;">🚀 Ana Sayfaya Uygula</button>
+        </div>
+
+        <!-- Edit modal -->
+        <div id="as-modal" class="as-edit-modal" style="display:none;">
+          <div class="as-edit-box">
+            <h3 id="as-modal-title">Metni Düzenle</h3>
+            <textarea id="as-modal-input" rows="3"></textarea>
+            <div id="as-img-upload-area" style="display:none;margin-bottom:12px;">
+              <input type="file" id="as-img-file" accept="image/*" style="display:none" onchange="asImgUpload(this)">
+              <button class="as-btn-upload" onclick="document.getElementById('as-img-file').click()">📷 Bilgisayardan Yükle</button>
+              <span id="as-img-upload-status" style="font-size:12px;color:#888;margin-left:10px;"></span>
+            </div>
+            <div class="as-edit-actions">
+              <button class="as-btn-cancel" onclick="asModalKapat()">İptal</button>
+              <button class="as-btn-save" onclick="asModalKaydet()">✅ Kaydet</button>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- MENÜ -->
       <!-- MENÜ -->
       <div class="panel on" id="panel-menu">
         <div class="pttl">📋 Menü Yönetimi</div>
@@ -358,7 +639,8 @@ function panelAc(id,el){
   if(id==='rapor') rapGoster();
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
-  if(id==='anasayfa'){setTimeout(function(){if(typeof asDataYukle==='function')asDataYukle();if(typeof renderAnaSayfa==='function')renderAnaSayfa();},200);}}
+  if(id==='anasayfa'){setTimeout(function(){if(typeof asDataYukle==='function')asDataYukle();if(typeof renderAnaSayfa==='function')renderAnaSayfa();},200);}
+  if(id==='anasayfa'){setTimeout(function(){asInit&&asInit();},300);}}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
@@ -778,221 +1060,183 @@ async function yayinla(){
 if(localStorage.getItem('ca')==='1'){ document.getElementById('giris').style.display='none'; basla(); }
 
 
+
+
+
+
 // ====== ANA SAYFA YÖNETİMİ ======
-const AS_SECTIONS = [
-  {
-    id:'hero',
-    label:'🖼 Hero Bölümü (Tam Ekran)',
-    fields:[
-      {key:'heroImg', label:'Arka Plan Fotoğrafı', type:'img', selector:'img.hero-bg'},
-      {key:'heroTagline', label:'Üst Yazı', type:'text', selector:'.hero-tagline'},
-      {key:'heroTitle', label:'Ana Başlık (satır 1)', type:'text', selector:'.hero-title', part:0},
-      {key:'heroTitle2', label:'Ana Başlık (satır 2 italic)', type:'text', selector:'.hero-title em'},
-      {key:'heroSubtitle', label:'Alt Yazı', type:'text', selector:'.hero-subtitle'},
-    ]
-  },
-  {
-    id:'menu-section',
-    label:'📋 Menü Bölümü',
-    fields:[
-      {key:'menuEyebrow', label:'Üst Etiket', type:'text', selector:'.section-menu .section-eyebrow'},
-      {key:'menuCard1Img', label:'Kart 1 Fotoğrafı (FSM)', type:'img', selector:'.menu-grid .menu-card:nth-child(1) img'},
-      {key:'menuCard1Title', label:'Kart 1 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(1) .menu-card-title'},
-      {key:'menuCard2Img', label:'Kart 2 Fotoğrafı (Podyumpark)', type:'img', selector:'.menu-grid .menu-card:nth-child(2) img'},
-      {key:'menuCard2Title', label:'Kart 2 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(2) .menu-card-title'},
-      {key:'menuCard3Img', label:'Kart 3 Fotoğrafı', type:'img', selector:'.menu-grid .menu-card:nth-child(3) img'},
-      {key:'menuCard3Title', label:'Kart 3 Başlığı', type:'text', selector:'.menu-grid .menu-card:nth-child(3) .menu-card-title'},
-    ]
-  },
-  {
-    id:'about',
-    label:'💬 Hakkımızda Bölümü',
-    fields:[
-      {key:'aboutTitle', label:'Başlık', type:'text', selector:'.about-title'},
-      {key:'aboutText', label:'Açıklama Metni', type:'textarea', selector:'.about-text'},
-    ]
-  },
-  {
-    id:'branches',
-    label:'📍 Şubeler Bölümü',
-    fields:[
-      {key:'branch1Img', label:'FSM Fotoğrafı', type:'img', selector:'.branches-grid .branch-card:nth-child(1) img'},
-      {key:'branch1Name', label:'FSM Şube Adı', type:'text', selector:'.branches-grid .branch-card:nth-child(1) .branch-name'},
-      {key:'branch1Sub', label:'FSM Alt Yazı', type:'text', selector:'.branches-grid .branch-card:nth-child(1) .branch-sub'},
-      {key:'branch2Img', label:'Podyumpark Fotoğrafı', type:'img', selector:'.branches-grid .branch-card:nth-child(2) img'},
-      {key:'branch2Name', label:'Podyumpark Şube Adı', type:'text', selector:'.branches-grid .branch-card:nth-child(2) .branch-name'},
-      {key:'branch2Sub', label:'Podyumpark Alt Yazı', type:'text', selector:'.branches-grid .branch-card:nth-child(2) .branch-sub'},
-    ]
-  }
-];
+let asChanges = {};
+let asModalKey = null;
+let asModalIsImg = false;
 
-let asData = JSON.parse(localStorage.getItem('cactus_anasayfa') || '{}');
+function asInit(){
+  const w = document.getElementById('as-wrapper');
+  if(!w) return;
 
-function renderAnaSayfa(){
-  const cont = document.getElementById('as-container');
-  if(!cont) return;
-  cont.innerHTML = AS_SECTIONS.map(sec => `
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;">
-      <div style="padding:16px 20px;background:#f8f6f2;border-bottom:1px solid #e0e0e0;font-weight:600;font-size:14px;">${sec.label}</div>
-      <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
-        ${sec.fields.map(f => renderAsField(f)).join('')}
-      </div>
-    </div>
-  `).join('');
-}
+  // Anasayfanın kendi popup'ını gizle
+  const popup = w.querySelector('.popup, [class*="popup"], [id*="popup"]');
+  if(popup) popup.style.display = 'none';
 
-function renderAsField(f){
-  const val = asData[f.key] || '';
-  if(f.type === 'img') {
-    return `<div style="display:flex;align-items:flex-start;gap:16px;">
-      <div style="flex:1;">
-        <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:8px;">${f.label}</label>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input type="text" id="asf-${f.key}" value="${val}" placeholder="Fotoğraf URL" 
-            style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;"
-            onchange="asData['${f.key}']=this.value">
-          <input type="file" id="asf-file-${f.key}" accept="image/*" style="display:none" onchange="asFotoYukle(this,'${f.key}')">
-          <button onclick="document.getElementById('asf-file-${f.key}').click()" 
-            style="padding:8px 12px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap;">📷 Fotoğraf Yükle</button>
-        </div>
-        ${val ? `<img src="${val}" style="margin-top:8px;height:80px;width:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;" onerror="this.style.display='none'">` : ''}
-      </div>
-    </div>`;
-  }
-  if(f.type === 'textarea') {
-    return `<div>
-      <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;display:block;margin-bottom:8px;">${f.label}</label>
-      <textarea id="asf-${f.key}" rows="3" style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;resize:vertical;"
-        onchange="asData['${f.key}']=this.value">${val}</textarea>
-    </div>`;
-  }
-  return `<div style="display:flex;align-items:center;gap:12px;">
-    <label style="font-size:11px;font-weight:600;letter-spacing:1px;color:#666;min-width:180px;">${f.label}</label>
-    <input type="text" id="asf-${f.key}" value="${val}" 
-      style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;"
-      onchange="asData['${f.key}']=this.value">
-  </div>`;
-}
+  // Her IMG'e overlay butonu ekle
+  w.querySelectorAll('img').forEach((img, i) => {
+    const key = 'img_' + i;
+    img.setAttribute('data-as-key', key);
+    asChanges[key] = asChanges[key] || img.src;
+    
+    const wrap = img.parentElement;
+    if(getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+    wrap.classList.add('as-editable');
+    
+    const btn = document.createElement('button');
+    btn.className = 'as-img-btn';
+    btn.innerHTML = '📷 Fotoğrafı Değiştir';
+    btn.onclick = (e) => { e.stopPropagation(); asAcModal(key, '', true, img); };
+    wrap.appendChild(btn);
+  });
 
-function asFotoYukle(input, key){
-  const file = input.files[0]; if(!file) return;
-  const btn = input.previousElementSibling;
-  btn.textContent = '⏳ Yükleniyor...';
-  resizeToJpeg(file, blob => {
-    uploadToR2(blob, file.name, (err, data) => {
-      if(err){ btn.textContent = '❌ Hata'; return; }
-      const url = data.url || '';
-      asData[key] = url;
-      document.getElementById('asf-'+key).value = url;
-      btn.textContent = '✅ Yüklendi';
-      renderAnaSayfa();
+  // Metin elementleri — hero, başlıklar, açıklamalar
+  const textSelectors = [
+    '.hero-tagline', '.hero-title', '.hero-subtitle',
+    '.section-eyebrow', '.section-title',
+    '.about-eyebrow', '.about-title', '.about-text',
+    '.menu-card-title', '.menu-card-label',
+    '.branch-name', '.branch-sub',
+    '.footer-bottom p', '.hero-btn',
+  ];
+  
+  textSelectors.forEach(sel => {
+    w.querySelectorAll(sel).forEach((el, i) => {
+      const key = sel.replace(/[^a-z]/g,'_') + '_' + i;
+      el.setAttribute('data-as-key', key);
+      asChanges[key] = asChanges[key] || el.innerHTML;
+      el.style.position = 'relative';
+      el.classList.add('as-editable');
+      
+      const btn = document.createElement('button');
+      btn.className = 'as-edit-btn';
+      btn.innerHTML = '✏️ Düzenle';
+      btn.onclick = (e) => { e.stopPropagation(); asAcModal(key, el.innerText, false, el); };
+      el.appendChild(btn);
     });
   });
 }
 
-function asKaydetVeUygula(){
-  localStorage.setItem('cactus_anasayfa', JSON.stringify(asData));
-  // index.html'i güncelle
-  asUygulaIndexHtml();
+function asAcModal(key, val, isImg, el){
+  asModalKey = key;
+  asModalIsImg = isImg;
+  window._asTargetEl = el;
+  
+  const modal = document.getElementById('as-modal');
+  const input = document.getElementById('as-modal-input');
+  const title = document.getElementById('as-modal-title');
+  const imgArea = document.getElementById('as-img-upload-area');
+  
+  title.textContent = isImg ? 'Fotoğrafı Değiştir' : 'Metni Düzenle';
+  input.value = isImg ? (el.src || '') : val;
+  input.placeholder = isImg ? 'Fotoğraf URL (veya yukarıdan yükle)' : 'Metni yazın...';
+  imgArea.style.display = isImg ? 'block' : 'none';
+  document.getElementById('as-img-upload-status').textContent = '';
+  
+  modal.style.display = 'flex';
+  setTimeout(() => input.focus(), 100);
 }
 
-async function asUygulaIndexHtml(){
+function asModalKapat(){
+  document.getElementById('as-modal').style.display = 'none';
+  asModalKey = null;
+}
+
+function asModalKaydet(){
+  const val = document.getElementById('as-modal-input').value.trim();
+  if(!val || !asModalKey) return;
+  
+  asChanges[asModalKey] = val;
+  
+  // Sayfada anında uygula
+  const el = window._asTargetEl;
+  if(el) {
+    if(asModalIsImg) {
+      el.src = val;
+    } else {
+      // Düzenle butonunu koru
+      const btn = el.querySelector('.as-edit-btn');
+      el.innerHTML = val;
+      if(btn) el.appendChild(btn);
+    }
+  }
+  
+  // Değişiklik sayısını güncelle
+  const count = Object.keys(asChanges).length;
+  document.getElementById('as-changes-count').textContent = count + ' değişiklik kaydedildi (henüz yayınlanmadı)';
+  
+  asModalKapat();
+}
+
+function asImgUpload(input){
+  const file = input.files[0]; if(!file) return;
+  const status = document.getElementById('as-img-upload-status');
+  status.textContent = '⏳ Yükleniyor...';
+  
+  resizeToJpeg(file, blob => {
+    uploadToR2(blob, file.name, (err, data) => {
+      if(err){ status.textContent = '❌ Hata!'; return; }
+      const url = data.url || '';
+      document.getElementById('as-modal-input').value = url;
+      status.textContent = '✅ Yüklendi!';
+      // Önizleme
+      if(window._asTargetEl) window._asTargetEl.src = url;
+    });
+  });
+}
+
+async function asYayinla(){
   const token = localStorage.getItem('cactus_gh_token');
   const repo = 'cactuscafes/cactus-kafe';
   toast('⏳ Ana sayfa güncelleniyor...');
   
+  // Mevcut index.html'i al
   const res = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
     headers:{'Authorization':'token '+token}
   });
   const d = await res.json();
+  
+  // as-wrapper içindeki güncel HTML'i al
+  const wrapper = document.getElementById('as-wrapper');
+  const editBtns = wrapper.querySelectorAll('.as-edit-btn, .as-img-btn');
+  editBtns.forEach(b => b.style.display='none');
+  
+  let newBody = wrapper.innerHTML;
+  
+  // Butonları geri göster
+  editBtns.forEach(b => b.style.display='');
+  
+  // class ve data attribute'lerini temizle
+  newBody = newBody.replace(/\s*class="as-editable([^"]*)"\s*/g, ' ');
+  newBody = newBody.replace(/\s*data-as-key="[^"]*"\s*/g, ' ');
+  newBody = newBody.replace(/<button class="as-edit-btn"[^>]*>.*?<\/button>/g, '');
+  newBody = newBody.replace(/<button class="as-img-btn"[^>]*>.*?<\/button>/g, '');
+  
+  // Orijinal index.html'in body'sini değiştir
   let idxHtml = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+  const bodyStart = idxHtml.indexOf('<body>') + 6;
+  const bodyEnd = idxHtml.lastIndexOf('</body>');
+  const newIdxHtml = idxHtml.slice(0,bodyStart) + '\n' + newBody + '\n' + idxHtml.slice(bodyEnd);
   
-  // Her alanı uygula
-  AS_SECTIONS.forEach(sec => {
-    sec.fields.forEach(f => {
-      const val = asData[f.key];
-      if(!val) return;
-      
-      if(f.type === 'img') {
-        // img src'yi bul ve değiştir
-        const sel = f.selector;
-        // Selector'a göre img src bul — basit regex yaklaşımı
-        const patterns = [
-          // hero-bg img
-          f.key === 'heroImg' ? /(<img[^>]*class="hero-bg"[^>]*src=")[^"]*(")/g : null,
-          // branch/menu img — daha genel
-          f.key.includes('branch1') ? /(<.branches-grid)/g : null,
-        ].filter(Boolean);
-        
-        // Daha güvenilir: data attribute ile sakla
-        idxHtml = idxHtml.replace(new RegExp('data-key="'+f.key+'"[^>]*src="[^"]*"','g'), 
-          (m) => m.replace(/src="[^"]*"/, 'src="'+val+'"'));
-      }
-    });
-  });
-  
-  // data-key attribute'leri ile daha güvenilir çalış
-  // Önce index.html'deki tüm fotoğraf src'lerini güncelle
-  if(asData.heroImg) idxHtml = idxHtml.replace(/(class="hero-bg"[^>]*src="|src="[^"]*"[^>]*class="hero-bg")[^"]*/g, m => {
-    if(m.includes('hero-bg')) return m.split('src="')[0] + 'src="' + asData.heroImg;
-    return m;
-  });
-  
-  // Metinleri güncelle
-  const textUpdates = [
-    {key:'heroTagline', tag:'p', cls:'hero-tagline'},
-    {key:'heroSubtitle', tag:'p', cls:'hero-subtitle'},
-    {key:'menuEyebrow', tag:'p', cls:'section-eyebrow', parent:'section-menu'},
-    {key:'branch1Name', tag:'div', cls:'branch-name', nth:0},
-    {key:'branch1Sub', tag:'div', cls:'branch-sub', nth:0},
-    {key:'branch2Name', tag:'div', cls:'branch-name', nth:1},
-    {key:'branch2Sub', tag:'div', cls:'branch-sub', nth:1},
-  ];
-  
-  // index.html'i kaydet
-  const b64 = btoa(unescape(encodeURIComponent(idxHtml)));
+  const b64 = btoa(unescape(encodeURIComponent(newIdxHtml)));
   const pushRes = await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
     method:'PUT',
     headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
     body:JSON.stringify({message:'Ana sayfa icerigi guncellendi',content:b64,sha:d.sha})
   });
   const pd = await pushRes.json();
-  if(pd.commit) toast('✅ Ana sayfa güncellendi!');
-  else toast('❌ Hata: ' + JSON.stringify(pd).slice(0,60));
+  if(pd.commit){
+    toast('✅ Ana sayfa güncellendi!');
+    document.getElementById('as-changes-count').textContent = 'Kaydedildi ✅';
+  } else {
+    toast('❌ Hata: ' + JSON.stringify(pd).slice(0,60));
+  }
 }
 // ====== ANA SAYFA YÖNETİMİ SON ======
-
-function asDataYukle(){
-  // index.html'den mevcut değerleri oku
-  fetch('https://cactuscafes.com/index.html?t='+Date.now())
-  .then(r=>r.text())
-  .then(idx=>{
-    // hero fotoğrafı
-    const heroMatch = idx.match(/class="hero-bg"[^>]*src="([^"]*)"/);
-    if(heroMatch && !asData.heroImg) asData.heroImg = heroMatch[1];
-    const heroMatch2 = idx.match(/src="([^"]*)"[^>]*class="hero-bg"/);
-    if(heroMatch2 && !asData.heroImg) asData.heroImg = heroMatch2[1];
-    
-    // hero metinleri
-    const taglineMatch = idx.match(/class="hero-tagline"[^>]*>([^<]*)</);
-    if(taglineMatch && !asData.heroTagline) asData.heroTagline = taglineMatch[1].trim();
-    const subtitleMatch = idx.match(/class="hero-subtitle"[^>]*>([^<]*)</);
-    if(subtitleMatch && !asData.heroSubtitle) asData.heroSubtitle = subtitleMatch[1].trim();
-    
-    // menü kartları
-    const imgMatches = [...idx.matchAll(/menu-card[^>]*>[\s\S]*?<img[^>]*src="([^"]*)"/g)];
-    if(imgMatches[0] && !asData.menuCard1Img) asData.menuCard1Img = imgMatches[0][1];
-    if(imgMatches[1] && !asData.menuCard2Img) asData.menuCard2Img = imgMatches[1][1];
-    if(imgMatches[2] && !asData.menuCard3Img) asData.menuCard3Img = imgMatches[2][1];
-    
-    // şube fotoğrafları
-    const branchImgs = [...idx.matchAll(/branch-card[\s\S]*?<img[^>]*src="([^"]*)"/g)];
-    if(branchImgs[0] && !asData.branch1Img) asData.branch1Img = branchImgs[0][1];
-    if(branchImgs[1] && !asData.branch2Img) asData.branch2Img = branchImgs[1][1];
-    
-    renderAnaSayfa&&renderAnaSayfa();
-  });
-}
 </script>
 </body>
 </html>

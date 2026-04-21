@@ -170,7 +170,7 @@ function renderMenu(sube) {
   // Spotlight: fotoğrafı olan ilk 4 ürün
   const allProducts = Object.values(menuData).flat().filter(u => u.foto && !u.gizli);
   const spotlightEl = document.getElementById('spotlight-grid-' + sube);
-  const oncuList = (data.oncu||[]).filter(u=>!u.gizli);
+  const oncuList = (menuData.oncu||[]).filter(u=>!u.gizli);
     const spotItems = oncuList.length > 0 ? oncuList.slice(0,4) : allProducts.slice(0,4);
   
   if(spotItems.length > 0) {

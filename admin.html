@@ -348,7 +348,6 @@ const MENU_V={
 
 let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
 let MENU=JSON.parse(localStorage.getItem('cactus_admin_menu')||'null')||JSON.parse(JSON.stringify(MENU_V));
-let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
 let aktifKat=KAT[0]?.id||'sicak';
 
 function giris(){
@@ -446,9 +445,7 @@ function renderUrunler(){
       </div>
       <div class="uk-btns">
         <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
-        <button class="oncu-btn" data-uid="${u.id}" data-katid="${kat.id}" onclick="oncuBtnClick(this)" style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;" title="One Cikan">${(ONCU&&ONCU.some(x=>x.id===u.id))?'&#11088;':'&#9734;'}</button>
-              
-              <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
+        <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
       </div>
     </div>`).join('');
 }
@@ -918,45 +915,6 @@ async function asYayinla(){
     if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı!';}
     else{document.getElementById('as-st').textContent='❌ Hata';console.error(pd);}
   }catch(e){document.getElementById('as-st').textContent='❌ '+e.message;console.error(e);}
-}
-
-function oncuToggle(uid, katId){
-  if(!ONCU) ONCU=[];
-  const idx = ONCU.findIndex(function(x){return x.id===uid;});
-  if(idx > -1){
-    ONCU.splice(idx,1);
-    toast('⭐ Öne Çıkandan kaldırıldı');
-  } else {
-    // Tüm ürünler içinde bul
-    var urun = null;
-    Object.values(MENU).forEach(function(arr){
-      arr.forEach(function(u){ if(u.id===uid) urun=u; });
-    });
-    if(urun) ONCU.push({id:urun.id, ad:urun.ad, fiyat:urun.fiyat, foto:urun.foto||'', emoji:urun.emoji||'', katId:katId});
-    toast('⭐ Öne Çıkanlara eklendi');
-  }
-  localStorage.setItem('cactus_oncu', JSON.stringify(ONCU));
-  renderUrunler();
-}
-
-function oncuBtnClick(btn){
-  var uid = btn.getAttribute("data-uid");
-  var katid = btn.getAttribute("data-katid");
-  if(!uid)return;
-  if(!ONCU)ONCU=[];
-  var idx=ONCU.findIndex(function(x){return x.id===uid;});
-  if(idx>-1){
-    ONCU.splice(idx,1);
-    btn.innerHTML='&#9734;';
-    toast('Öne Çıkandan kaldırıldı');
-  } else {
-    var urun=null;
-    Object.values(MENU).forEach(function(arr){arr.forEach(function(u){if(u.id===uid)urun=u;});});
-    if(urun){ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||'',katId:katid});}
-    btn.innerHTML='&#11088;';
-    toast('\u2B50 Öne Çıkanlara eklendi! Yayınla\'ya basın.');
-  }
-  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
 }
 </script>
 </body>

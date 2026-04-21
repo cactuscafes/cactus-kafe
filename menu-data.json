@@ -22,7 +22,7 @@
     },
     {
       "id": "vitamin",
-      "label": "🍋 Vitamin İçecekler",
+      "label": "🍋 Vitamin",
       "tip": "ic"
     },
     {
@@ -450,7 +450,7 @@
         "fiyat": 170,
         "emoji": "🍊",
         "tip": "ic",
-        "aciklama": "Portakal + limon + greyfurt.",
+        "aciklama": "Soda+ limon + tuz",
         "foto": "",
         "gizli": false
       },
@@ -460,7 +460,7 @@
         "fiyat": 190,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Misket limonu + nane + soda.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -470,7 +470,7 @@
         "fiyat": 200,
         "emoji": "🧊",
         "tip": "ic",
-        "aciklama": "Dondurulmuş meyve + buz.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -480,7 +480,7 @@
         "fiyat": 210,
         "emoji": "🥤",
         "tip": "ic",
-        "aciklama": "Dondurma + süt, mevsimlik.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -490,7 +490,7 @@
         "fiyat": 170,
         "emoji": "🍋",
         "tip": "ic",
-        "aciklama": "Taze limon + şerbet + soda.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
@@ -500,7 +500,7 @@
         "fiyat": 180,
         "emoji": "🍓",
         "tip": "ic",
-        "aciklama": "Taze çilek + limon + soda.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       }
@@ -512,7 +512,7 @@
         "fiyat": 210,
         "emoji": "🫐",
         "tip": "ic",
-        "aciklama": "Yaban mersini + spirulina + limon.",
+        "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
         "foto": "",
         "gizli": false
       },
@@ -522,7 +522,7 @@
         "fiyat": 210,
         "emoji": "🌵",
         "tip": "ic",
-        "aciklama": "Kaktüs meyvesi + tropikal meyve.",
+        "aciklama": "Süt, elma, vanilya",
         "foto": "",
         "gizli": false
       },
@@ -532,7 +532,7 @@
         "fiyat": 210,
         "emoji": "🍉",
         "tip": "ic",
-        "aciklama": "Karpuz + gül suyu + limon.",
+        "aciklama": "Karpuz, çilek, limonata",
         "foto": "",
         "gizli": false
       }
@@ -713,7 +713,23 @@
       }
     ]
   },
-  "oncu": [],
-  "_oncu": [],
-  "guncelleme": "2026-04-21T16:35:22.318Z"
+  "oncu": [
+    {
+      "id": "s1",
+      "ad": "Espresso",
+      "fiyat": 130,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776719162791-fjx7p42rtfm.jpg",
+      "emoji": "☕"
+    }
+  ],
+  "_oncu": [
+    {
+      "id": "s1",
+      "ad": "Espresso",
+      "fiyat": 130,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776719162791-fjx7p42rtfm.jpg",
+      "emoji": "☕"
+    }
+  ],
+  "guncelleme": "2026-04-21T16:54:53.874Z"
 }

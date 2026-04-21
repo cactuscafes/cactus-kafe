@@ -577,7 +577,7 @@ const MENU_DEFAULT = {
     {id:'v5',ad:'Limonata',fiyat:170,emoji:'🍋'},{id:'v6',ad:'Çilekli Limonata',fiyat:180,emoji:'🍓'},
   ]},
   mesrubat:{label:'🥤 Meşrubat',tip:'icecek',urunler:[
-    {id:'m1',ad:'Su',fiyat:30,emoji:'💧'},{id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧'},
+    {id:'m0',ad:'Damla Cam Şişe Su',fiyat:40,emoji:'💧'},{id:'m1',ad:'Su',fiyat:30,emoji:'💧'},{id:'m2',ad:'Sade Soda',fiyat:80,emoji:'🫧'},
     {id:'m3',ad:'Enerji İçeceği',fiyat:140,emoji:'⚡'},
   ]},
   kokteyl:{label:'🍹 Kokteyl',tip:'icecek',urunler:[
@@ -594,7 +594,15 @@ const MENU_DEFAULT = {
     {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪'},{id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀'},
     {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩'},{id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪'},
   ]},
-};
+},
+  tatlilar:{
+    label:'🍰 Tatlılar',tip:'yiyecek',
+    urunler:[
+      {id:'ta1',ad:'Brownie',fiyat:280,emoji:'🍫'},
+      {id:'ta2',ad:'San Sebastian',fiyat:280,emoji:'🍮'},
+      {id:'ta3',ad:'Spoonful',fiyat:280,emoji:'🥄'}
+    ]
+  };
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
 let MENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));

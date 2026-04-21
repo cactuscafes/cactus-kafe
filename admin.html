@@ -348,7 +348,8 @@ function panelAc(id,el){
   if(id==='kategori') renderKatListe();
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
-}
+
+  if(id==='kategori'||id==='katPage'){setTimeout(function(){katSiralamaUI&&katSiralamaUI();katSeciciDoldur&&katSeciciDoldur();},200);}}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }

@@ -103,7 +103,12 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 <div id="admin" style="display:none">
   <nav class="nav">
     <div class="nav-logo">🌵 CACTUS Admin</div>
-    <div style="display:flex;gap:10px;">
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:4px;">↕️ Kategori Sıralaması</h3>
+          <p style="font-size:12px;color:#888;margin-bottom:16px;">Sürükleyerek sırayı değiştirin</p>
+          <div id="katSiralama"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
       <button class="nav-btn btn-yayinla" onclick="modalAc()">🚀 Yayınla</button>
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
@@ -374,7 +379,7 @@ function uploadToR2(blob, filename, cb){
 }
 
 function fotoIsle(input,urlId,onizleId,adId){
-  const file=input.files[0]; if(!file) return;
+  const file=input.files[0,{id:'tatlilar',label:'🍰 Tatlılar',tip:'yi'}]; if(!file) return;
   if(adId) document.getElementById(adId).textContent=file.name;
   toast('⏳ Fotoğraf yükleniyor...');
   resizeToJpeg(file, blob=>{

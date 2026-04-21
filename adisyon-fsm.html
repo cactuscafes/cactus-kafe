@@ -599,7 +599,12 @@ const MENU_DEFAULT = {
     {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪'},{id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀'},
     {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩'},{id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪'},
   ]},
-};
+},
+  tatlilar:{label:'🍰 Tatlılar',tip:'yiyecek',urunler:[
+    {id:'ta1',ad:'Brownie',fiyat:280,emoji:'🍫'},
+    {id:'ta2',ad:'San Sebastian',fiyat:280,emoji:'🍮'},
+    {id:'ta3',ad:'Spoonful',fiyat:280,emoji:'🥄'}
+  ]};
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
 let MENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));

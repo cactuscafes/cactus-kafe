@@ -648,11 +648,11 @@
   },
   "oncu": [
     {
-      "id": "s4",
-      "ad": "Cortado",
-      "fiyat": 180,
-      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
-      "emoji": "☕"
+      "id": "w1",
+      "ad": "Classic Bubble Waffle",
+      "fiyat": 300,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg",
+      "emoji": "🧇"
     },
     {
       "id": "w2",
@@ -660,6 +660,20 @@
       "fiyat": 330,
       "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
       "emoji": "🧇"
+    },
+    {
+      "id": "w3",
+      "ad": "Bitter Bubble Waffle",
+      "fiyat": 300,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729132232-fstvjz8rah.jpg",
+      "emoji": "🧇"
+    },
+    {
+      "id": "w4",
+      "ad": "Caramel Bubble Waffle",
+      "fiyat": 300,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729143052-2aezsbs4ql.jpg",
+      "emoji": "🍯"
     }
   ],
   "_oncu": [
@@ -678,5 +692,5 @@
       "emoji": "🧇"
     }
   ],
-  "guncelleme": "2026-04-21T22:30:54.675Z"
+  "guncelleme": "2026-04-21T22:31:52.359Z"
 }

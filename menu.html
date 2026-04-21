@@ -170,18 +170,13 @@ function renderMenu(sube) {
   // Spotlight: fotoğrafı olan ilk 4 ürün
   const allProducts = Object.values(menuData).flat().filter(u => u.foto && !u.gizli);
   const spotlightEl = document.getElementById('spotlight-grid-' + sube);
-  const oncuItems = (data.oncu||[]).filter(u=>!u.gizli);
-    const spotItems = oncuItems.length > 0 
-      ? oncuItems.slice(0,4)
-      : allProducts.filter(u=>u.foto).slice(0,4);
+  const oncuList = (data.oncu||[]).filter(u=>!u.gizli);
+    const spotItems = oncuList.length > 0 ? oncuList.slice(0,4) : allProducts.slice(0,4);
   
   if(spotItems.length > 0) {
     spotlightEl.innerHTML = spotItems.map(u => `
       <div class="spotlight-card">
-        ${u.foto 
-            ? `<img src="${u.foto}" alt="${u.ad}" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block;" onerror="this.style.display='none'">`
-            : `<div style="width:100%;aspect-ratio:3/4;background:#f5f3ef;display:flex;align-items:center;justify-content:center;font-size:60px;">${u.emoji||'☕'}</div>`
-          }
+        <img src="${u.foto}" alt="${u.ad}" onerror="this.style.display='none'">
         <div class="spotlight-card-info">
           <div class="spotlight-card-name"><span class="spotlight-card-emoji">${u.emoji||''}</span>${u.ad}</div>
           <div class="spotlight-card-price">₺${u.fiyat||''}</div>

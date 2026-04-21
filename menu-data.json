@@ -713,23 +713,7 @@
       }
     ]
   },
-  "oncu": [
-    {
-      "id": "s2",
-      "ad": "Macchiato",
-      "fiyat": 140,
-      "foto": "",
-      "emoji": "☕"
-    }
-  ],
-  "_oncu": [
-    {
-      "id": "s2",
-      "ad": "Macchiato",
-      "fiyat": 140,
-      "foto": "",
-      "emoji": "☕"
-    }
-  ],
-  "guncelleme": "2026-04-21T16:14:24.830Z"
+  "oncu": [],
+  "_oncu": [],
+  "guncelleme": "2026-04-21T16:35:22.318Z"
 }

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cactus — Raporlar</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#b8965a;--dark:#1a1a1a;--green:#2d7a4f;}
+body{font-family:'Segoe UI',sans-serif;background:#f5f5f5;color:var(--dark);}
+.top{background:var(--dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.top h1{color:#fff;font-size:18px;font-weight:600;letter-spacing:2px;}
+.top a{color:#aaa;font-size:12px;text-decoration:none;}
+.wrap{max-width:1100px;margin:0 auto;padding:24px;}
+.filtre{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.filtre label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#888;display:block;margin-bottom:6px;}
+.filtre input,.filtre select{padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;background:#fff;outline:none;}
+.filtre input:focus,.filtre select:focus{border-color:var(--gold);}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-dark{background:var(--dark);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn:hover{opacity:.85;}
+.ozet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.ozet-kart{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);text-align:center;}
+.ozet-kart .sayi{font-size:32px;font-weight:700;color:var(--gold);}
+.ozet-kart .etiket{font-size:12px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}
+.tablo-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;margin-bottom:20px;}
+.tablo-baslik{padding:16px 20px;font-weight:700;font-size:15px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;}
+table{width:100%;border-collapse:collapse;}
+th{background:#f8f8f8;padding:10px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:600;}
+td{padding:10px 16px;border-bottom:1px solid #f5f5f5;font-size:14px;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafaf5;}
+.sube-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.sube-podyum{background:#e8f4e8;color:#2d7a4f;}
+.sube-fsm{background:#fff0e0;color:#c67000;}
+.loading{text-align:center;padding:40px;color:#888;}
+.bos{text-align:center;padding:40px;color:#bbb;}
+@media(max-width:600px){
+  .filtre{flex-direction:column;}
+  .ozet-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>🌵 CACTUS RAPORLAR</h1>
+  <a href="admin.html">← Admin</a>
+</div>
+
+<div class="wrap">
+  <!-- Filtre -->
+  <div class="filtre">
+    <div>
+      <label>Şube</label>
+      <select id="sube">
+        <option value="">Her İkisi</option>
+        <option value="podyum">🌿 Podyumpark</option>
+        <option value="fsm">🏙 FSM</option>
+      </select>
+    </div>
+    <div>
+      <label>Başlangıç</label>
+      <input type="date" id="baslangic">
+    </div>
+    <div>
+      <label>Bitiş</label>
+      <input type="date" id="bitis">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-gold" onclick="yukle()">🔍 Getir</button>
+      <button class="btn btn-green" onclick="pdfIndir()">📄 PDF İndir</button>
+    </div>
+  </div>
+
+  <!-- Özet kartlar -->
+  <div class="ozet-grid">
+    <div class="ozet-kart"><div class="sayi" id="toplamCiro">—</div><div class="etiket">Toplam Ciro</div></div>
+    <div class="ozet-kart"><div class="sayi" id="toplamSatis">—</div><div class="etiket">Toplam Satış</div></div>
+    <div class="ozet-kart"><div class="sayi" id="gunSayisi">—</div><div class="etiket">Gün Sayısı</div></div>
+    <div class="ozet-kart"><div class="sayi" id="ortCiro">—</div><div class="etiket">Günlük Ort. Ciro</div></div>
+  </div>
+
+  <!-- En çok satanlar -->
+  <div class="tablo-wrap" id="topWrap" style="display:none">
+    <div class="tablo-baslik">🏆 En Çok Satanlar (Top 10)</div>
+    <table><thead><tr><th>#</th><th>Ürün</th><th>Adet</th></tr></thead>
+    <tbody id="topTablo"></tbody></table>
+  </div>
+
+  <!-- Günlük özet -->
+  <div class="tablo-wrap">
+    <div class="tablo-baslik">
+      <span>📅 Günlük Özet</span>
+      <span id="satirSayisi" style="font-size:12px;color:#888;font-weight:400;"></span>
+    </div>
+    <table><thead><tr><th>Tarih</th><th>Şube</th><th>Ciro</th><th>Satış Adedi</th><th>İşlem</th></tr></thead>
+    <tbody id="gunTablo"><tr><td colspan="5" class="loading">Filtre seçip "Getir"e basın</td></tr></tbody></table>
+  </div>
+
+  <!-- Detay tablosu -->
+  <div class="tablo-wrap" id="detayWrap" style="display:none">
+    <div class="tablo-baslik">🧾 Satış Detayı</div>
+    <table><thead><tr><th>Tarih</th><th>Şube</th><th>Ürün</th><th>Kategori</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead>
+    <tbody id="detayTablo"></tbody></table>
+  </div>
+</div>
+
+<script>
+const API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+let _veriler = [], _ozet = {};
+
+// Bugün ve bu ay varsayılan
+const bugun = new Date();
+const ayBasi = new Date(bugun.getFullYear(), bugun.getMonth(), 1);
+document.getElementById('baslangic').value = ayBasi.toISOString().split('T')[0];
+document.getElementById('bitis').value = bugun.toISOString().split('T')[0];
+
+async function yukle() {
+  const sube = document.getElementById('sube').value;
+  const bas = document.getElementById('baslangic').value;
+  const bit = document.getElementById('bitis').value;
+  
+  document.getElementById('gunTablo').innerHTML = '<tr><td colspan="5" class="loading">Yükleniyor...</td></tr>';
+  
+  // Özet ve detay paralel çek
+  const [ozetRes, detayRes] = await Promise.all([
+    fetch(API + '/rapor/ozet?sube=' + sube + '&baslangic=' + bas + '&bitis=' + bit),
+    fetch(API + '/rapor/listele?sube=' + sube + '&baslangic=' + bas + '&bitis=' + bit)
+  ]);
+  
+  const ozet = await ozetRes.json();
+  const detay = await detayRes.json();
+  _veriler = detay;
+  _ozet = ozet;
+  
+  // Özet kartlar
+  const toplamCiro = ozet.gunler.reduce((a,g) => a + (g.ciro||0), 0);
+  const toplamSatis = ozet.gunler.reduce((a,g) => a + (g.adet||0), 0);
+  document.getElementById('toplamCiro').textContent = toplamCiro.toLocaleString('tr-TR') + ' ₺';
+  document.getElementById('toplamSatis').textContent = toplamSatis;
+  document.getElementById('gunSayisi').textContent = ozet.gunler.length;
+  document.getElementById('ortCiro').textContent = ozet.gunler.length ? Math.round(toplamCiro / ozet.gunler.length).toLocaleString('tr-TR') + ' ₺' : '—';
+  
+  // Günlük tablo
+  if (!ozet.gunler.length) {
+    document.getElementById('gunTablo').innerHTML = '<tr><td colspan="5" class="bos">Bu tarih aralığında veri bulunamadı</td></tr>';
+  } else {
+    document.getElementById('gunTablo').innerHTML = ozet.gunler.map(g => {
+      const subeBadge = g.sube === 'fsm' 
+        ? '<span class="sube-badge sube-fsm">FSM</span>'
+        : '<span class="sube-badge sube-podyum">Podyum</span>';
+      return '<tr><td>' + g.tarih + '</td><td>' + (g.sube ? subeBadge : '—') + '</td><td><b>' + (g.ciro||0).toLocaleString('tr-TR') + ' ₺</b></td><td>' + (g.adet||0) + '</td><td><button class="btn btn-dark" style="padding:4px 10px;font-size:11px;" onclick="gunDetay('' + g.tarih + '')">Detay</button></td></tr>';
+    }).join('');
+  }
+  document.getElementById('satirSayisi').textContent = ozet.gunler.length + ' gün';
+  
+  // En çok satanlar
+  if (ozet.en_cok && ozet.en_cok.length) {
+    document.getElementById('topWrap').style.display = 'block';
+    document.getElementById('topTablo').innerHTML = ozet.en_cok.map((u,i) =>
+      '<tr><td><b>' + (i+1) + '</b></td><td>' + u.urun_adi + '</td><td>' + u.toplam_adet + '</td></tr>'
+    ).join('');
+  }
+  
+  // Detay tablosu
+  if (detay.length) {
+    document.getElementById('detayWrap').style.display = 'block';
+    document.getElementById('detayTablo').innerHTML = detay.map(s => {
+      const badge = s.sube === 'fsm' ? '<span class="sube-badge sube-fsm">FSM</span>' : '<span class="sube-badge sube-podyum">Podyum</span>';
+      return '<tr><td>' + s.tarih + '</td><td>' + badge + '</td><td>' + s.urun_adi + '</td><td>' + (s.kategori||'—') + '</td><td>' + s.adet + '</td><td>' + (s.birim_fiyat||0).toLocaleString('tr-TR') + ' ₺</td><td><b>' + (s.toplam||0).toLocaleString('tr-TR') + ' ₺</b></td></tr>';
+    }).join('');
+  }
+}
+
+function gunDetay(tarih) {
+  const detaylar = _veriler.filter(s => s.tarih === tarih);
+  document.getElementById('detayWrap').style.display = 'block';
+  document.getElementById('detayTablo').innerHTML = detaylar.map(s => {
+    const badge = s.sube === 'fsm' ? '<span class="sube-badge sube-fsm">FSM</span>' : '<span class="sube-badge sube-podyum">Podyum</span>';
+    return '<tr><td>' + s.tarih + '</td><td>' + badge + '</td><td>' + s.urun_adi + '</td><td>' + (s.kategori||'—') + '</td><td>' + s.adet + '</td><td>' + (s.birim_fiyat||0).toLocaleString('tr-TR') + ' ₺</td><td><b>' + (s.toplam||0).toLocaleString('tr-TR') + ' ₺</b></td></tr>';
+  }).join('');
+  document.getElementById('detayWrap').scrollIntoView({behavior:'smooth'});
+}
+
+async function pdfIndir() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const sube = document.getElementById('sube').value || 'Tümü';
+  const bas = document.getElementById('baslangic').value;
+  const bit = document.getElementById('bitis').value;
+  
+  doc.setFontSize(18);
+  doc.text('Cactus Coffee - Satis Raporu', 14, 20);
+  doc.setFontSize(11);
+  doc.text('Sube: ' + (sube === 'podyum' ? 'Podyumpark' : sube === 'fsm' ? 'FSM' : 'Tumu'), 14, 30);
+  doc.text('Tarih: ' + bas + ' - ' + bit, 14, 37);
+  
+  // Özet
+  const toplamCiro = _ozet.gunler ? _ozet.gunler.reduce((a,g) => a + (g.ciro||0), 0) : 0;
+  doc.text('Toplam Ciro: ' + toplamCiro.toLocaleString('tr-TR') + ' TL', 14, 47);
+  doc.text('Gun Sayisi: ' + (_ozet.gunler ? _ozet.gunler.length : 0), 14, 54);
+  
+  // Günlük tablo
+  if (_ozet.gunler && _ozet.gunler.length) {
+    doc.autoTable({
+      startY: 62,
+      head: [['Tarih', 'Sube', 'Ciro (TL)', 'Satis Adedi']],
+      body: _ozet.gunler.map(g => [g.tarih, g.sube || '—', (g.ciro||0).toLocaleString('tr-TR'), g.adet||0]),
+      styles: {fontSize: 9},
+      headStyles: {fillColor: [184, 150, 90]}
+    });
+  }
+  
+  // En çok satanlar
+  if (_ozet.en_cok && _ozet.en_cok.length) {
+    doc.autoTable({
+      startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 80,
+      head: [['Urun', 'Toplam Adet']],
+      body: _ozet.en_cok.map(u => [u.urun_adi, u.toplam_adet]),
+      styles: {fontSize: 9},
+      headStyles: {fillColor: [45, 90, 39]},
+      didDrawPage: () => { doc.text('En Cok Satanlar (Top 10)', 14, doc.lastAutoTable.startY - 4); }
+    });
+  }
+  
+  doc.save('cactus-rapor-' + bas + '-' + bit + '.pdf');
+}
+</script>
+</body>
+</html>

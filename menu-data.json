@@ -604,61 +604,31 @@
     "tost": [
       {
         "id": "t1",
-        "ad": "Kaşarlı Sosyete",
+        "ad": "Kaşarlı Sosyete Tostu",
         "fiyat": 150,
         "emoji": "🧀",
         "tip": "yi",
-        "aciklama": "İnce ekmek + kaşar peyniri.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
       {
         "id": "t2",
-        "ad": "Sucuklu Sosyete",
+        "ad": "Sucuklu Sosyete Tostu",
         "fiyat": 150,
         "emoji": "🥩",
         "tip": "yi",
-        "aciklama": "İnce ekmek + sucuk.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       },
       {
         "id": "t3",
-        "ad": "Karışık Sosyete",
+        "ad": "Karışık Sosyete Tostu",
         "fiyat": 170,
         "emoji": "🥪",
         "tip": "yi",
-        "aciklama": "İnce ekmek + kaşar + sucuk.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t4",
-        "ad": "Kaşarlı Sanayi",
-        "fiyat": 220,
-        "emoji": "🧀",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + bol kaşar.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t5",
-        "ad": "Sucuklu Sanayi",
-        "fiyat": 220,
-        "emoji": "🥩",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + bol sucuk.",
-        "foto": "",
-        "gizli": false
-      },
-      {
-        "id": "t6",
-        "ad": "Karışık Sanayi",
-        "fiyat": 250,
-        "emoji": "🥪",
-        "tip": "yi",
-        "aciklama": "Kalın ekmek + kaşar + sucuk.",
+        "aciklama": "",
         "foto": "",
         "gizli": false
       }
@@ -711,5 +681,5 @@
       "emoji": "☕"
     }
   ],
-  "guncelleme": "2026-04-21T16:55:54.583Z"
+  "guncelleme": "2026-04-21T16:56:40.107Z"
 }

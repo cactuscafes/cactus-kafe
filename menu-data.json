@@ -713,6 +713,37 @@
       }
     ]
   },
-  "oncu": [],
-  "guncelleme": "2026-04-21T16:04:00.435Z"
+  "oncu": [
+    {
+      "id": "s1",
+      "ad": "Espresso",
+      "fiyat": 130,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776719162791-fjx7p42rtfm.jpg",
+      "emoji": "☕"
+    },
+    {
+      "id": "s3",
+      "ad": "Americano",
+      "fiyat": 180,
+      "foto": "",
+      "emoji": "☕"
+    }
+  ],
+  "_oncu": [
+    {
+      "id": "s1",
+      "ad": "Espresso",
+      "fiyat": 130,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776719162791-fjx7p42rtfm.jpg",
+      "emoji": "☕"
+    },
+    {
+      "id": "s3",
+      "ad": "Americano",
+      "fiyat": 180,
+      "foto": "",
+      "emoji": "☕"
+    }
+  ],
+  "guncelleme": "2026-04-21T16:08:15.550Z"
 }

@@ -348,6 +348,7 @@ const MENU_V={
 
 let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
 let MENU=JSON.parse(localStorage.getItem('cactus_admin_menu')||'null')||JSON.parse(JSON.stringify(MENU_V));
+let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
 let aktifKat=KAT[0]?.id||'sicak';
 
 function giris(){
@@ -448,6 +449,31 @@ function renderUrunler(){
         <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
       </div>
     </div>`).join('');
+
+  // Öne Çıkan butonlarını ekle
+  if(typeof ONCU !== 'undefined'){
+    document.querySelectorAll('[data-urun-id]').forEach(function(card){
+      var uid = card.getAttribute('data-urun-id');
+      var katid = card.getAttribute('data-kat-id');
+      var aktarBtn = card.querySelector('.oncu-toggle-btn');
+      if(!aktarBtn){
+        var silBtn = card.querySelector('button[onclick*="urunSil"]');
+        if(silBtn){
+          aktarBtn = document.createElement('button');
+          aktarBtn.className = 'oncu-toggle-btn';
+          aktarBtn.setAttribute('data-uid', uid);
+          aktarBtn.setAttribute('data-katid', katid);
+          aktarBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;';
+          aktarBtn.title = 'Öne Çıkan';
+          aktarBtn.addEventListener('click', function(){ oncuBtnClick(this); });
+          silBtn.parentElement.insertBefore(aktarBtn, silBtn);
+        }
+      }
+      if(aktarBtn){
+        aktarBtn.innerHTML = (ONCU.some(function(x){return x.id===uid;})) ? '\u2B50' : '\u2606';
+      }
+    });
+  }
 }
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
 function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }
@@ -772,7 +798,7 @@ async function yayinla(){
   btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
   dur.classList.add('on'); dur.textContent='⏳ Bağlanıyor...';
   try{
-    const menuData={kategoriler:KAT,menu:MENU,oncu:JSON.parse(localStorage.getItem('cactus_oncu')||'[]'),guncelleme:new Date().toISOString()};
+    const menuData={kategoriler:KAT,menu:MENU,oncu:ONCU,_oncu:JSON.parse(localStorage.getItem('cactus_oncu')||'[]'),guncelleme:new Date().toISOString()};
     const jsonB64=btoa(unescape(encodeURIComponent(JSON.stringify(menuData,null,2))));
     const jgr=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{headers:{'Authorization':'token '+token}});
     const jgd=await jgr.json();
@@ -915,6 +941,24 @@ async function asYayinla(){
     if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı!';}
     else{document.getElementById('as-st').textContent='❌ Hata';console.error(pd);}
   }catch(e){document.getElementById('as-st').textContent='❌ '+e.message;console.error(e);}
+}
+
+function oncuBtnClick(btn){
+  var uid=btn.getAttribute('data-uid');
+  if(!uid||!ONCU)return;
+  var idx=ONCU.findIndex(function(x){return x.id===uid;});
+  if(idx>-1){
+    ONCU.splice(idx,1);
+    btn.innerHTML='\u2606';
+    toast('Öne Çıkandan kaldırıldı');
+  }else{
+    var urun=null;
+    Object.values(MENU).forEach(function(arr){arr.forEach(function(u){if(u.id===uid)urun=u;});});
+    if(urun)ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''});
+    btn.innerHTML='\u2B50';
+    toast('\u2B50 Öne Çıkanlara eklendi! Yayınla\'ya basın.');
+  }
+  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
 }
 </script>
 </body>

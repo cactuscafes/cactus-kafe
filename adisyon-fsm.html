@@ -980,6 +980,8 @@ function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler){
     yiyecek_toplam:yi,
     toplam:toplam
   });
+  // D1 Rapor kaydı
+  (async()=>{const _t=new Date().toISOString().split('T')[0];for(const x of urunler){try{await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:'fsm',tarih:_t,urun_adi:x.ad,kategori:x.tip||'',adet:x.adet||1,birim_fiyat:x.fiyat||0})});}catch(e){}}})();
   // Son 1000 satış tut
   if(satislar.length>1000) satislar.splice(0,satislar.length-1000);
   localStorage.setItem(LK_SATIS,JSON.stringify(satislar));
@@ -1123,49 +1125,6 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
-<script>
-(function(){
-  const RAPOR_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
-  const RAPOR_SUBE = 'fsm';
-  
-  async function raporKaydet(urunler, tarih) {
-    tarih = tarih || new Date().toISOString().split('T')[0];
-    for (const u of urunler) {
-      try {
-        await fetch(RAPOR_API + '/rapor/kaydet', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({sube:RAPOR_SUBE, tarih, urun_adi:u.ad, kategori:u.kategori||'', adet:u.adet||1, birim_fiyat:u.fiyat||0})
-        });
-      } catch(e) {}
-    }
-  }
 
-  window.addEventListener('load', function(){
-    setTimeout(function(){
-      // odemeyiKaydet hook
-      if (typeof window.odemeyiKaydet === 'function') {
-        const _orig = window.odemeyiKaydet;
-        window.odemeyiKaydet = async function(masaId, yontem) {
-          // Sipariş verilerini al
-          const masaData = window.masalar && window.masalar[masaId];
-          const siparisler = masaData ? (masaData.siparisler || masaData.items || []) : [];
-          const tarih = new Date().toISOString().split('T')[0];
-          const result = _orig.call(this, masaId, yontem);
-          if (siparisler.length) await raporKaydet(siparisler, tarih);
-          return result;
-        };
-      }
-      // odemeAl hook (yedek)
-      if (typeof window.odemeAl === 'function') {
-        const _orig2 = window.odemeAl;
-        window.odemeAl = async function(...args) {
-          const result = _orig2.apply(this, args);
-          return result;
-        };
-      }
-    }, 1000);
-  });
-})();
-</script>
 </body>
 </html>

@@ -36,139 +36,47 @@ tr:last-child td{border-bottom:none;}
 </style>
 </head>
 <body>
-<div class="hdr"><h1>🌵 CACTUS RAPORLAR</h1><a href="admin.html">← Admin</a></div>
+<div class="hdr"><h1>CACTUS RAPORLAR</h1><a href="admin.html">Admin</a></div>
 <div class="tabs">
-  <button class="tab p on" id="tab-p" onclick="sekme('p')">🌿 Podyumpark</button>
-  <button class="tab f" id="tab-f" onclick="sekme('f')">🏙 FSM</button>
+  <button class="tab p on" id="tab-p" onclick="sekme('p')">Podyumpark</button>
+  <button class="tab f" id="tab-f" onclick="sekme('f')">FSM</button>
 </div>
 <div class="wrap">
   <div class="panel on" id="pp">
     <div class="filtre">
-      <div><label>Başlangıç</label><input type="date" id="bp" value="2026-04-01"></div>
-      <div><label>Bitiş</label><input type="date" id="ep" value="2026-04-30"></div>
-      <button class="btn gp" onclick="getir('podyum','p')">🔍 Getir</button>
-      <button class="btn pdf" onclick="pdfIndir('podyum','p')">📄 PDF</button>
+      <div><label>Baslangic</label><input type="date" id="bp" value="2026-04-01"></div>
+      <div><label>Bitis</label><input type="date" id="ep" value="2026-04-30"></div>
+      <button class="btn gp" onclick="getir('podyum','p')">Getir</button>
+      <button class="btn pdf" onclick="pdfIndir('podyum','p')">PDF</button>
     </div>
     <div class="cards">
-      <div class="card cp"><div class="n" id="c1p">—</div><div class="l">Ciro</div></div>
-      <div class="card cp"><div class="n" id="c2p">—</div><div class="l">Satış</div></div>
-      <div class="card cp"><div class="n" id="c3p">—</div><div class="l">Gün</div></div>
-      <div class="card cp"><div class="n" id="c4p">—</div><div class="l">Günlük Ort.</div></div>
+      <div class="card cp"><div class="n" id="c1p">-</div><div class="l">Ciro</div></div>
+      <div class="card cp"><div class="n" id="c2p">-</div><div class="l">Satis</div></div>
+      <div class="card cp"><div class="n" id="c3p">-</div><div class="l">Gun</div></div>
+      <div class="card cp"><div class="n" id="c4p">-</div><div class="l">Gunluk Ort.</div></div>
     </div>
-    <div class="box" id="top-p" style="display:none"><div class="box-ttl">🏆 En Çok Satanlar</div>
-      <table><thead><tr><th>#</th><th>Ürün</th><th>Adet</th></tr></thead><tbody id="tb-top-p"></tbody></table></div>
-    <div class="box"><div class="box-ttl">📅 Günlük Özet</div>
-      <table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satış</th><th></th></tr></thead><tbody id="tb-gun-p"><tr><td colspan="4" class="bos">Tarih aralığı seçip Getir'e basın</td></tr></tbody></table></div>
-    <div class="box" id="det-p" style="display:none"><div class="box-ttl">🧾 Detay</div>
-      <table><thead><tr><th>Tarih</th><th>Ürün</th><th>Kategori</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-p"></tbody></table></div>
+    <div class="box" id="top-p" style="display:none"><div class="box-ttl">En Cok Satanlar</div><table><thead><tr><th>#</th><th>Urun</th><th>Adet</th></tr></thead><tbody id="tb-top-p"></tbody></table></div>
+    <div class="box"><div class="box-ttl">Gunluk Ozet</div><table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satis</th><th></th></tr></thead><tbody id="tb-gun-p"><tr><td colspan="4" class="bos">Getir'e basin</td></tr></tbody></table></div>
+    <div class="box" id="det-p" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-p"></tbody></table></div>
   </div>
   <div class="panel" id="pf">
     <div class="filtre">
-      <div><label>Başlangıç</label><input type="date" id="bf" value="2026-04-01"></div>
-      <div><label>Bitiş</label><input type="date" id="ef" value="2026-04-30"></div>
-      <button class="btn gf" onclick="getir('fsm','f')">🔍 Getir</button>
-      <button class="btn pdf" onclick="pdfIndir('fsm','f')">📄 PDF</button>
+      <div><label>Baslangic</label><input type="date" id="bf" value="2026-04-01"></div>
+      <div><label>Bitis</label><input type="date" id="ef" value="2026-04-30"></div>
+      <button class="btn gf" onclick="getir('fsm','f')">Getir</button>
+      <button class="btn pdf" onclick="pdfIndir('fsm','f')">PDF</button>
     </div>
     <div class="cards">
-      <div class="card cf"><div class="n" id="c1f">—</div><div class="l">Ciro</div></div>
-      <div class="card cf"><div class="n" id="c2f">—</div><div class="l">Satış</div></div>
-      <div class="card cf"><div class="n" id="c3f">—</div><div class="l">Gün</div></div>
-      <div class="card cf"><div class="n" id="c4f">—</div><div class="l">Günlük Ort.</div></div>
+      <div class="card cf"><div class="n" id="c1f">-</div><div class="l">Ciro</div></div>
+      <div class="card cf"><div class="n" id="c2f">-</div><div class="l">Satis</div></div>
+      <div class="card cf"><div class="n" id="c3f">-</div><div class="l">Gun</div></div>
+      <div class="card cf"><div class="n" id="c4f">-</div><div class="l">Gunluk Ort.</div></div>
     </div>
-    <div class="box" id="top-f" style="display:none"><div class="box-ttl">🏆 En Çok Satanlar</div>
-      <table><thead><tr><th>#</th><th>Ürün</th><th>Adet</th></tr></thead><tbody id="tb-top-f"></tbody></table></div>
-    <div class="box"><div class="box-ttl">📅 Günlük Özet</div>
-      <table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satış</th><th></th></tr></thead><tbody id="tb-gun-f"><tr><td colspan="4" class="bos">Tarih aralığı seçip Getir'e basın</td></tr></tbody></table></div>
-    <div class="box" id="det-f" style="display:none"><div class="box-ttl">🧾 Detay</div>
-      <table><thead><tr><th>Tarih</th><th>Ürün</th><th>Kategori</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-f"></tbody></table></div>
+    <div class="box" id="top-f" style="display:none"><div class="box-ttl">En Cok Satanlar</div><table><thead><tr><th>#</th><th>Urun</th><th>Adet</th></tr></thead><tbody id="tb-top-f"></tbody></table></div>
+    <div class="box"><div class="box-ttl">Gunluk Ozet</div><table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satis</th><th></th></tr></thead><tbody id="tb-gun-f"><tr><td colspan="4" class="bos">Getir'e basin</td></tr></tbody></table></div>
+    <div class="box" id="det-f" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-f"></tbody></table></div>
   </div>
 </div>
-<script>
-var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
-var _v={p:[],f:[]};
-var _o={p:{gunler:[],en_cok:[]},f:{gunler:[],en_cok:[]}};
-
-function sekme(k){
-  ['p','f'].forEach(function(x){
-    document.getElementById('tab-'+x).classList.remove('on');
-    document.getElementById('p'+x).classList.remove('on');
-  });
-  document.getElementById('tab-'+k).classList.add('on');
-  document.getElementById('p'+k).classList.add('on');
-}
-
-function getir(sube,k){
-  var bas=document.getElementById('b'+k).value;
-  var bit=document.getElementById('e'+k).value;
-  if(!bas||!bit){alert('Tarih seçin');return;}
-  document.getElementById('tb-gun-'+k).innerHTML='<tr><td colspan="4" class="bos">Yükleniyor...</td></tr>';
-  Promise.all([
-    fetch(API+'/rapor/ozet?sube='+sube+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}),
-    fetch(API+'/rapor/listele?sube='+sube+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();})
-  ]).then(function(res){
-    var oz=res[0]; var det=res[1];
-    _v[k]=det; _o[k]=oz;
-    var ciro=oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0);
-    var satis=oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0);
-    document.getElementById('c1'+k).textContent=ciro.toLocaleString('tr-TR')+' ₺';
-    document.getElementById('c2'+k).textContent=satis;
-    document.getElementById('c3'+k).textContent=oz.gunler.length;
-    document.getElementById('c4'+k).textContent=oz.gunler.length?Math.round(ciro/oz.gunler.length).toLocaleString('tr-TR')+' ₺':'--';
-    if(!oz.gunler.length){
-      document.getElementById('tb-gun-'+k).innerHTML='<tr><td colspan="4" class="bos">Bu tarih araliginda kayit yok</td></tr>';
-    } else {
-      document.getElementById('tb-gun-'+k).innerHTML=oz.gunler.map(function(g){
-        return '<tr><td>'+g.tarih+'</td><td><b>'+(g.ciro||0).toLocaleString('tr-TR')+' ₺</b></td><td>'+(g.adet||0)+'</td><td><button onclick="detay(''+k+'',''+g.tarih+'')" style="padding:3px 8px;border:none;border-radius:4px;background:#111;color:#fff;font-size:11px;cursor:pointer">Detay</button></td></tr>';
-      }).join('');
-    }
-    if(oz.en_cok&&oz.en_cok.length){
-      document.getElementById('top-'+k).style.display='block';
-      document.getElementById('tb-top-'+k).innerHTML=oz.en_cok.map(function(u,i){
-        return '<tr><td><b>'+(i+1)+'</b></td><td>'+u.urun_adi+'</td><td>'+u.toplam_adet+'</td></tr>';
-      }).join('');
-    }
-    if(det.length){
-      document.getElementById('det-'+k).style.display='block';
-      gosterDetay(k,det);
-    }
-  }).catch(function(e){
-    document.getElementById('tb-gun-'+k).innerHTML='<tr><td colspan="4" class="bos">Hata: '+e.message+'</td></tr>';
-  });
-}
-
-function gosterDetay(k,rows){
-  document.getElementById('tb-det-'+k).innerHTML=rows.map(function(s){
-    return '<tr><td>'+s.tarih+'</td><td>'+s.urun_adi+'</td><td>'+(s.kategori||'--')+'</td><td>'+s.adet+'</td><td>'+(s.birim_fiyat||0).toLocaleString('tr-TR')+' ₺</td><td><b>'+(s.toplam||0).toLocaleString('tr-TR')+' ₺</b></td></tr>';
-  }).join('');
-}
-
-function detay(k,tarih){
-  var rows=_v[k].filter(function(s){return s.tarih===tarih;});
-  document.getElementById('det-'+k).style.display='block';
-  gosterDetay(k,rows);
-  document.getElementById('det-'+k).scrollIntoView({behavior:'smooth'});
-}
-
-function pdfIndir(sube,k){
-  if(!_o[k].gunler.length){alert("Once Getir'e basin");return;}
-  var rows=[];
-  rows.push('CACTUS COFFEE - '+(sube==='podyum'?'Podyumpark':'FSM Subesi'));
-  rows.push('Tarih: '+document.getElementById('b'+k).value+' / '+document.getElementById('e'+k).value);
-  var ciro=_o[k].gunler.reduce(function(a,g){return a+(g.ciro||0);},0);
-  rows.push('Toplam Ciro: '+ciro.toLocaleString('tr-TR')+' TL');
-  rows.push('');
-  rows.push('GUNLUK OZET:');
-  _o[k].gunler.forEach(function(g){rows.push(g.tarih+' | '+(g.ciro||0)+' TL | '+(g.adet||0)+' satis');});
-  rows.push('');
-  rows.push('EN COK SATANLAR:');
-  _o[k].en_cok.forEach(function(u,i){rows.push((i+1)+'. '+u.urun_adi+' - '+u.toplam_adet+' adet');});
-  var blob=new Blob([rows.join('
-')],{type:'text/plain;charset=utf-8'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='cactus-'+sube+'-rapor.txt';
-  a.click();
-}
-</script>
+<script src="https://cactus-rapor-api.batuhanbulut.workers.dev/rapor.js"></script>
 </body>
 </html>

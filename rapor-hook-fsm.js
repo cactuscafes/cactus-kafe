@@ -1,13 +1,12 @@
 (function(){
   var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
   var SUBE='fsm';
-  var LK='cactus_satis_fsm';
-  var _sonKayitSayisi=0;
+  var LK='cactus_satis_fsmlar';
+  var _sonKayit=0;
 
   function d1Gonder(satis){
     var tarih=satis.tarihISO||new Date().toISOString().split('T')[0];
-    var urunler=satis.urunDetay||[];
-    urunler.forEach(function(u){
+    (satis.urunDetay||[]).forEach(function(u){
       fetch(API+'/rapor/kaydet',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -18,22 +17,18 @@
 
   function kontrol(){
     try{
-      var satislar=JSON.parse(localStorage.getItem(LK)||'[]');
-      if(satislar.length>_sonKayitSayisi){
-        for(var i=_sonKayitSayisi;i<satislar.length;i++){
-          d1Gonder(satislar[i]);
-        }
-        _sonKayitSayisi=satislar.length;
+      var s=JSON.parse(localStorage.getItem(LK)||'[]');
+      if(s.length>_sonKayit){
+        for(var i=_sonKayit;i<s.length;i++) d1Gonder(s[i]);
+        _sonKayit=s.length;
       }
     }catch(e){}
   }
 
-  // Sayfa yüklenince mevcut sayıyı kaydet (önceki kayıtları gönderme)
   window.addEventListener('load',function(){
     setTimeout(function(){
-      var satislar=JSON.parse(localStorage.getItem(LK)||'[]');
-      _sonKayitSayisi=satislar.length;
-      // Sonraki değişiklikleri izle
+      var s=JSON.parse(localStorage.getItem(LK)||'[]');
+      _sonKayit=s.length;
       setInterval(kontrol,2000);
     },1000);
   });

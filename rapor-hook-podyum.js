@@ -2,7 +2,8 @@
   var API='https://cactus-rapor-api.batuhanbulut.workers.dev',SUBE='podyum',LK='cactus_satislar',_son=0;
   function gonder(s){
     var tarih=s.tarihISO||new Date().toISOString().split('T')[0];
-    var tip=s.odeme_tipi==='Nakit'?'nakit':'kredi';
+    // odeme_tipi: 'Nakit' veya 'Kredi Karti'
+    var tip=(s.odeme_tipi&&s.odeme_tipi.toLowerCase().includes('kredi'))?'kredi':'nakit';
     (s.urunDetay||[]).forEach(function(u){
       fetch(API+'/rapor/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({sube:SUBE,tarih:tarih,urun_adi:u.ad,kategori:u.tip||'',adet:u.adet||1,birim_fiyat:u.fiyat||0,odeme_tipi:tip})}).catch(function(){});

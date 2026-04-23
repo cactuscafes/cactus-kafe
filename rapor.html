@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Cactus Raporlar v1776983202251</title>
+<title>Cactus Raporlar v1776983939805</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:sans-serif;background:#f4f4f4;color:#111;}
@@ -21,10 +21,12 @@ body{font-family:sans-serif;background:#f4f4f4;color:#111;}
 .filtre input{padding:8px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:150px;}
 .btn{padding:9px 16px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;}
 .gp{background:#2d7a4f;color:#fff;}.gf{background:#c67000;color:#fff;}.pdf{background:#111;color:#fff;}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.cards2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
 .card{background:#fff;border-radius:8px;padding:14px;text-align:center;}
 .card .n{font-size:22px;font-weight:800;}.cp .n{color:#2d7a4f;}.cf .n{color:#c67000;}
 .card .l{font-size:10px;color:#aaa;margin-top:3px;text-transform:uppercase;}
+.card.nakit .n{color:#1a6b3c;}.card.kredi .n{color:#1a4b8c;}
 .box{background:#fff;border-radius:8px;overflow:hidden;margin-bottom:14px;}
 .box-ttl{padding:12px 16px;font-weight:700;font-size:13px;border-bottom:1px solid #f0f0f0;}
 table{width:100%;border-collapse:collapse;}
@@ -32,7 +34,10 @@ th{background:#f8f8f8;padding:8px 12px;text-align:left;font-size:10px;text-trans
 td{padding:8px 12px;border-bottom:1px solid #f5f5f5;font-size:12px;}
 tr:last-child td{border-bottom:none;}
 .bos{text-align:center;padding:30px;color:#bbb;}
-@media(max-width:600px){.cards{grid-template-columns:1fr 1fr;}.filtre{flex-direction:column;}}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.badge-nakit{background:#e8f5e9;color:#1a6b3c;}
+.badge-kredi{background:#e3f2fd;color:#1a4b8c;}
+@media(max-width:600px){.cards,.cards2{grid-template-columns:1fr 1fr;}.filtre{flex-direction:column;}}
 </style>
 </head>
 <body>
@@ -50,14 +55,18 @@ tr:last-child td{border-bottom:none;}
       <button class="btn pdf" onclick="pdfIndir('podyum','p')">PDF</button>
     </div>
     <div class="cards">
-      <div class="card cp"><div class="n" id="c1p">-</div><div class="l">Ciro</div></div>
+      <div class="card cp"><div class="n" id="c1p">-</div><div class="l">Toplam Ciro</div></div>
       <div class="card cp"><div class="n" id="c2p">-</div><div class="l">Satis</div></div>
       <div class="card cp"><div class="n" id="c3p">-</div><div class="l">Gun</div></div>
       <div class="card cp"><div class="n" id="c4p">-</div><div class="l">Gunluk Ort</div></div>
     </div>
+    <div class="cards2">
+      <div class="card nakit"><div class="n" id="nakit-p">-</div><div class="l">💵 Nakit Ciro</div></div>
+      <div class="card kredi"><div class="n" id="kredi-p">-</div><div class="l">💳 Kredi Karti Ciro</div></div>
+    </div>
     <div class="box" id="top-p" style="display:none"><div class="box-ttl">En Cok Satanlar</div><table><thead><tr><th>#</th><th>Urun</th><th>Adet</th></tr></thead><tbody id="tb-top-p"></tbody></table></div>
     <div class="box"><div class="box-ttl">Gunluk Ozet</div><table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satis</th><th></th></tr></thead><tbody id="tb-gun-p"><tr><td colspan="4" class="bos">Getire basin</td></tr></tbody></table></div>
-    <div class="box" id="det-p" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-p"></tbody></table></div>
+    <div class="box" id="det-p" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th><th>Odeme</th></tr></thead><tbody id="tb-det-p"></tbody></table></div>
   </div>
   <div class="panel" id="pf">
     <div class="filtre">
@@ -67,23 +76,50 @@ tr:last-child td{border-bottom:none;}
       <button class="btn pdf" onclick="pdfIndir('fsm','f')">PDF</button>
     </div>
     <div class="cards">
-      <div class="card cf"><div class="n" id="c1f">-</div><div class="l">Ciro</div></div>
+      <div class="card cf"><div class="n" id="c1f">-</div><div class="l">Toplam Ciro</div></div>
       <div class="card cf"><div class="n" id="c2f">-</div><div class="l">Satis</div></div>
       <div class="card cf"><div class="n" id="c3f">-</div><div class="l">Gun</div></div>
       <div class="card cf"><div class="n" id="c4f">-</div><div class="l">Gunluk Ort</div></div>
     </div>
+    <div class="cards2">
+      <div class="card nakit"><div class="n" id="nakit-f">-</div><div class="l">💵 Nakit Ciro</div></div>
+      <div class="card kredi"><div class="n" id="kredi-f">-</div><div class="l">💳 Kredi Karti Ciro</div></div>
+    </div>
     <div class="box" id="top-f" style="display:none"><div class="box-ttl">En Cok Satanlar</div><table><thead><tr><th>#</th><th>Urun</th><th>Adet</th></tr></thead><tbody id="tb-top-f"></tbody></table></div>
     <div class="box"><div class="box-ttl">Gunluk Ozet</div><table><thead><tr><th>Tarih</th><th>Ciro</th><th>Satis</th><th></th></tr></thead><tbody id="tb-gun-f"><tr><td colspan="4" class="bos">Getire basin</td></tr></tbody></table></div>
-    <div class="box" id="det-f" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th></tr></thead><tbody id="tb-det-f"></tbody></table></div>
+    <div class="box" id="det-f" style="display:none"><div class="box-ttl">Detay</div><table><thead><tr><th>Tarih</th><th>Urun</th><th>Kat</th><th>Adet</th><th>Birim</th><th>Toplam</th><th>Odeme</th></tr></thead><tbody id="tb-det-f"></tbody></table></div>
   </div>
 </div>
 <script>
 var _API="https://cactus-rapor-api.batuhanbulut.workers.dev";
-var _v={p:[],f:[]},_o={p:{gunler:[],en_cok:[]},f:{gunler:[],en_cok:[]}};
+var _v={p:[],f:[]},_o={p:{gunler:[],en_cok:[],odeme:[]},f:{gunler:[],en_cok:[],odeme:[]}};
 function sekme(k){["p","f"].forEach(function(x){var t=document.getElementById("tab-"+x),p=document.getElementById("p"+x);if(t)t.classList.remove("on");if(p)p.classList.remove("on");});var t=document.getElementById("tab-"+k),p=document.getElementById("p"+k);if(t)t.classList.add("on");if(p)p.classList.add("on");}
-function getir(sube,k){var bas=document.getElementById("b"+k).value,bit=document.getElementById("e"+k).value;if(!bas||!bit){alert("Tarih secin");return;}document.getElementById("tb-gun-"+k).innerHTML="<tr><td colspan=4 style=text-align:center;padding:20px;color:#888>Yukleniyor...</td></tr>";Promise.all([fetch(_API+"/rapor/ozet?sube="+sube+"&baslangic="+bas+"&bitis="+bit).then(function(r){return r.json();}),fetch(_API+"/rapor/listele?sube="+sube+"&baslangic="+bas+"&bitis="+bit).then(function(r){return r.json();})]).then(function(res){var oz=res[0],det=res[1];_v[k]=det;_o[k]=oz;var ciro=oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0);var satis=oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0);document.getElementById("c1"+k).textContent=ciro.toLocaleString("tr-TR")+" TL";document.getElementById("c2"+k).textContent=satis;document.getElementById("c3"+k).textContent=oz.gunler.length;document.getElementById("c4"+k).textContent=oz.gunler.length?Math.round(ciro/oz.gunler.length).toLocaleString("tr-TR")+" TL":"--";document.getElementById("tb-gun-"+k).innerHTML=oz.gunler.length?oz.gunler.map(function(g){return "<tr><td>"+g.tarih+"</td><td><b>"+(g.ciro||0).toLocaleString("tr-TR")+" TL</b></td><td>"+(g.adet||0)+"</td><td><button onclick=detay('"+k+"','"+g.tarih+"') style=padding:3px_8px;border:none;border-radius:4px;background:#111;color:#fff;font-size:11px;cursor:pointer>Detay</button></td></tr>";}).join(""):"<tr><td colspan=4 style=text-align:center;padding:20px;color:#bbb>Kayit yok</td></tr>";if(oz.en_cok&&oz.en_cok.length){document.getElementById("top-"+k).style.display="block";document.getElementById("tb-top-"+k).innerHTML=oz.en_cok.map(function(u,i){return "<tr><td><b>"+(i+1)+"</b></td><td>"+u.urun_adi+"</td><td>"+u.toplam_adet+"</td></tr>";}).join("");}if(det.length){document.getElementById("det-"+k).style.display="block";document.getElementById("tb-det-"+k).innerHTML=det.map(function(s){return "<tr><td>"+s.tarih+"</td><td>"+s.urun_adi+"</td><td>"+(s.kategori||"")+"</td><td>"+s.adet+"</td><td>"+(s.birim_fiyat||0)+" TL</td><td><b>"+(s.toplam||0).toLocaleString("tr-TR")+" TL</b></td></tr>";}).join("");}}).catch(function(e){document.getElementById("tb-gun-"+k).innerHTML="<tr><td colspan=4 style=color:red;text-align:center;padding:20px>Hata: "+e.message+"</td></tr>";});}
-function detay(k,tarih){var rows=_v[k].filter(function(s){return s.tarih===tarih;});document.getElementById("det-"+k).style.display="block";document.getElementById("tb-det-"+k).innerHTML=rows.map(function(s){return "<tr><td>"+s.tarih+"</td><td>"+s.urun_adi+"</td><td>"+(s.kategori||"")+"</td><td>"+s.adet+"</td><td>"+(s.birim_fiyat||0)+" TL</td><td><b>"+(s.toplam||0).toLocaleString("tr-TR")+" TL</b></td></tr>";}).join("");document.getElementById("det-"+k).scrollIntoView({behavior:"smooth"});}
-function pdfIndir(sube,k){if(!_o[k].gunler.length){alert("Once Getire basin");return;}var rows=["CACTUS "+(sube==="podyum"?"Podyumpark":"FSM"),"Tarih: "+document.getElementById("b"+k).value+" / "+document.getElementById("e"+k).value];var ciro=_o[k].gunler.reduce(function(a,g){return a+(g.ciro||0);},0);rows.push("Ciro: "+ciro.toLocaleString("tr-TR")+" TL | Gun: "+_o[k].gunler.length);rows.push("---");_o[k].gunler.forEach(function(g){rows.push(g.tarih+" "+( g.ciro||0)+" TL "+(g.adet||0)+" satis");});rows.push("---");_o[k].en_cok.forEach(function(u,i){rows.push((i+1)+". "+u.urun_adi+" "+u.toplam_adet+" adet");});var blob=new Blob([rows.join("\n")],{type:"text/plain;charset=utf-8"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cactus-"+sube+"-"+document.getElementById("b"+k).value+".txt";a.click();}
+function getir(sube,k){
+  var bas=document.getElementById("b"+k).value,bit=document.getElementById("e"+k).value;
+  if(!bas||!bit){alert("Tarih secin");return;}
+  document.getElementById("tb-gun-"+k).innerHTML="<tr><td colspan=4 style=text-align:center;padding:20px;color:#888>Yukleniyor...</td></tr>";
+  Promise.all([
+    fetch(_API+"/rapor/ozet?sube="+sube+"&baslangic="+bas+"&bitis="+bit).then(function(r){return r.json();}),
+    fetch(_API+"/rapor/listele?sube="+sube+"&baslangic="+bas+"&bitis="+bit).then(function(r){return r.json();})
+  ]).then(function(res){
+    var oz=res[0],det=res[1];_v[k]=det;_o[k]=oz;
+    var ciro=oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0);
+    var satis=oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0);
+    document.getElementById("c1"+k).textContent=ciro.toLocaleString("tr-TR")+" TL";
+    document.getElementById("c2"+k).textContent=satis;
+    document.getElementById("c3"+k).textContent=oz.gunler.length;
+    document.getElementById("c4"+k).textContent=oz.gunler.length?Math.round(ciro/oz.gunler.length).toLocaleString("tr-TR")+" TL":"--";
+    var nakit=0,kredi=0;
+    (oz.odeme||[]).forEach(function(o){if(o.odeme_tipi==="nakit"||o.odeme_tipi==="Nakit")nakit=o.ciro;else kredi=o.ciro;});
+    document.getElementById("nakit-"+k).textContent=nakit.toLocaleString("tr-TR")+" TL";
+    document.getElementById("kredi-"+k).textContent=kredi.toLocaleString("tr-TR")+" TL";
+    document.getElementById("tb-gun-"+k).innerHTML=oz.gunler.length?oz.gunler.map(function(g){return "<tr><td>"+g.tarih+"</td><td><b>"+(g.ciro||0).toLocaleString("tr-TR")+" TL</b></td><td>"+(g.adet||0)+"</td><td><button onclick=detay('"+k+"','"+g.tarih+"') style=padding:3px_8px;border:none;border-radius:4px;background:#111;color:#fff;font-size:11px;cursor:pointer>Detay</button></td></tr>";}).join(""):"<tr><td colspan=4 style=text-align:center;padding:20px;color:#bbb>Kayit yok</td></tr>";
+    if(oz.en_cok&&oz.en_cok.length){document.getElementById("top-"+k).style.display="block";document.getElementById("tb-top-"+k).innerHTML=oz.en_cok.map(function(u,i){return "<tr><td><b>"+(i+1)+"</b></td><td>"+u.urun_adi+"</td><td>"+u.toplam_adet+"</td></tr>";}).join("");}
+    if(det.length){document.getElementById("det-"+k).style.display="block";document.getElementById("tb-det-"+k).innerHTML=det.map(function(s){var tip=s.odeme_tipi||"nakit";var badge="<span class=badge badge-"+tip+">"+tip+"</span>";return "<tr><td>"+s.tarih+"</td><td>"+s.urun_adi+"</td><td>"+(s.kategori||"")+"</td><td>"+s.adet+"</td><td>"+(s.birim_fiyat||0)+" TL</td><td><b>"+(s.toplam||0).toLocaleString("tr-TR")+" TL</b></td><td>"+badge+"</td></tr>";}).join("");}
+  }).catch(function(e){document.getElementById("tb-gun-"+k).innerHTML="<tr><td colspan=4 style=color:red;text-align:center;padding:20px>Hata: "+e.message+"</td></tr>";});
+}
+function detay(k,tarih){var rows=_v[k].filter(function(s){return s.tarih===tarih;});document.getElementById("det-"+k).style.display="block";document.getElementById("tb-det-"+k).innerHTML=rows.map(function(s){var tip=s.odeme_tipi||"nakit";return "<tr><td>"+s.tarih+"</td><td>"+s.urun_adi+"</td><td>"+(s.kategori||"")+"</td><td>"+s.adet+"</td><td>"+(s.birim_fiyat||0)+" TL</td><td><b>"+(s.toplam||0).toLocaleString("tr-TR")+" TL</b></td><td><span class=badge badge-"+tip+">"+tip+"</span></td></tr>";}).join("");document.getElementById("det-"+k).scrollIntoView({behavior:"smooth"});}
+function pdfIndir(sube,k){if(!_o[k].gunler.length){alert("Once Getire basin");return;}var rows=["CACTUS "+(sube==="podyum"?"Podyumpark":"FSM")];var ciro=_o[k].gunler.reduce(function(a,g){return a+(g.ciro||0);},0);rows.push("Tarih: "+document.getElementById("b"+k).value+" / "+document.getElementById("e"+k).value);rows.push("Toplam Ciro: "+ciro.toLocaleString("tr-TR")+" TL | Gun: "+_o[k].gunler.length);var nakit=0,kredi=0;(_o[k].odeme||[]).forEach(function(o){if(o.odeme_tipi==="nakit")nakit=o.ciro;else kredi=o.ciro;});rows.push("Nakit: "+nakit.toLocaleString("tr-TR")+" TL | Kredi Karti: "+kredi.toLocaleString("tr-TR")+" TL");rows.push("---GUNLUK---");_o[k].gunler.forEach(function(g){rows.push(g.tarih+" "+(g.ciro||0)+" TL "+(g.adet||0)+" satis");});rows.push("---EN COK---");_o[k].en_cok.forEach(function(u,i){rows.push((i+1)+". "+u.urun_adi+" "+u.toplam_adet+" adet");});var blob=new Blob([rows.join("\n")],{type:"text/plain;charset=utf-8"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cactus-"+sube+"-"+document.getElementById("b"+k).value+".txt";a.click();}
 </script>
 </body>
 </html>

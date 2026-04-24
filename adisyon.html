@@ -1173,107 +1173,75 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
+
 <script>
-/* CACTUS SES v5 - zil sesleri */
-(function(){
-  window._sesCtx = null;
-
-  function getCtx(){
-    if(!window._sesCtx) window._sesCtx = new(window.AudioContext||window.webkitAudioContext)();
-    if(window._sesCtx.state==='suspended') window._sesCtx.resume();
-    return window._sesCtx;
-  }
-
-  // Bar zili: Ding-Dong (2 nota: yüksek + alçak)
-  function barZili(){
-    try{
-      var ctx=getCtx();
-      // Birinci nota: yüksek
-      var o1=ctx.createOscillator(), g1=ctx.createGain();
-      o1.connect(g1); g1.connect(ctx.destination);
-      o1.type='sine'; o1.frequency.value=1200;
-      g1.gain.setValueAtTime(0.5,ctx.currentTime);
-      g1.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
-      o1.start(ctx.currentTime); o1.stop(ctx.currentTime+0.4);
-      // İkinci nota: alçak
-      var o2=ctx.createOscillator(), g2=ctx.createGain();
-      o2.connect(g2); g2.connect(ctx.destination);
-      o2.type='sine'; o2.frequency.value=800;
-      g2.gain.setValueAtTime(0,ctx.currentTime+0.35);
-      g2.gain.setValueAtTime(0.5,ctx.currentTime+0.45);
-      g2.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.85);
-      o2.start(ctx.currentTime+0.35); o2.stop(ctx.currentTime+0.85);
-    }catch(e){}
-  }
-
-  // Mutfak zili: 3 tok bip (daha alçak, daha kısa)
-  function mutfakZili(){
-    try{
-      var ctx=getCtx();
-      [0, 0.25, 0.5].forEach(function(t){
-        var o=ctx.createOscillator(), g=ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type='square'; o.frequency.value=600;
-        g.gain.setValueAtTime(0.3,ctx.currentTime+t);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.18);
-        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.18);
+window._sesCtx=null;
+window.sesUret=function(tip){
+  try{
+    if(!window._sesCtx)window._sesCtx=new(window.AudioContext||window.webkitAudioContext)();
+    var ctx=window._sesCtx;
+    if(ctx.state==='suspended')ctx.resume();
+    if(tip==='bar'){
+      // Bar: 2 bip yüksek ton
+      [0,0.35].forEach(function(t){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='sine';o.frequency.value=900;
+        g.gain.setValueAtTime(0.5,ctx.currentTime+t);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
+        o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
       });
-    }catch(e){}
-  }
-
-  window.sesUret = function(tip){
-    if(tip==='bar') barZili();
-    else if(tip==='mutfak') mutfakZili();
-  };
-
-  // AudioContext kullanıcı etkileşimi ile aç
-  document.addEventListener('click',function(){
-    getCtx();
-  },{once:false});
-
-  // siparisiGonder hook
-  window.addEventListener('load',function(){
-    setTimeout(function(){
-      var orig=window.siparisiGonder;
-      if(!orig||orig._sesHook)return;
-      window.siparisiGonder=function(){
-        try{
-          var masaData=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-          var masa=window.aktifMasa;
-          if(!masa){
-            var aktifBtn=document.querySelector('.mbtn.aktif,.mbtn.secili');
-            if(aktifBtn){var mn=aktifBtn.querySelector('.mn');if(mn)masa=parseInt(mn.textContent);}
-          }
-          var urunler=masa?masaData[masa]||[]:[];
-          var hasBar=urunler.some(function(u){return u.tip==='ic'||u.tip==='icecek';});
-          var hasMut=urunler.some(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
-          if(hasBar) setTimeout(barZili, 300);
-          if(hasMut) setTimeout(mutfakZili, hasBar?1000:300);
-          if(!hasBar&&!hasMut) setTimeout(barZili, 300);
-        }catch(e){}
-        return orig.apply(this,arguments);
-      };
-      window.siparisiGonder._sesHook=true;
-    },1500);
-  });
-
-  // Bar/Mutfak sekmelerinde yeni sipariş gelince zil
-  (function(){
+    } else {
+      // Mutfak: 3 bip alçak ton
+      [0,0.3,0.6].forEach(function(t){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='sine';o.frequency.value=600;
+        g.gain.setValueAtTime(0.5,ctx.currentTime+t);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
+        o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
+      });
+    }
+  }catch(e){}
+};
+document.addEventListener('click',function(){
+  if(!window._sesCtx)window._sesCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(window._sesCtx.state==='suspended')window._sesCtx.resume();
+},{once:false});
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    var orig=window.siparisiGonder;
+    if(!orig||orig._sesHook)return;
+    window.siparisiGonder=function(){
+      try{
+        var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+        var masa=window.aktifMasa;
+        var urunler=masa?m[masa]||[]:[];
+        var hasBar=urunler.some(function(u){return u.tip==='ic'||u.tip==='icecek';});
+        var hasMut=urunler.some(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
+        if(hasBar)setTimeout(function(){window.sesUret('bar');},300);
+        if(hasMut)setTimeout(function(){window.sesUret('mutfak');},hasBar?900:300);
+        if(!hasBar&&!hasMut)setTimeout(function(){window.sesUret('bar');},300);
+      }catch(e){}
+      return orig.apply(this,arguments);
+    };
+    window.siparisiGonder._sesHook=true;
+  },1500);
+  setTimeout(function(){
     var _bs=-1,_ms=-1;
     function kontrol(){
       try{
         var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]').filter(function(s){return !s.hazirlandi;});
         var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]').filter(function(s){return !s.hazirlandi;});
-        if(_bs>=0&&bar.length>_bs) barZili();
-        if(_ms>=0&&mut.length>_ms) mutfakZili();
-        _bs=bar.length; _ms=mut.length;
+        if(_bs>=0&&bar.length>_bs)window.sesUret('bar');
+        if(_ms>=0&&mut.length>_ms)window.sesUret('mutfak');
+        _bs=bar.length;_ms=mut.length;
       }catch(e){}
     }
-    window.addEventListener('load',function(){
-      setTimeout(function(){kontrol();setInterval(kontrol,1500);},2000);
-    });
-  })();
-})();
+    kontrol();
+    setInterval(kontrol,1500);
+  },2000);
+});
 </script>
 <script id="cactus-sync">
 /* CACTUS SYNC v6 */

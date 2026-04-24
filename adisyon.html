@@ -1238,8 +1238,8 @@ window.addEventListener('load', function(){
         var masa = window.aktifMasa;
         var masaData = JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
         var urunler = masaData[masa] || [];
-        var icecekler = urunler.filter(function(u){return u.tip==='icecek'||u.tip==='ic';});
-        var yiyecekler = urunler.filter(function(u){return u.tip==='yiyecek'||u.tip==='yi';});
+        var icecekler = urunler.filter(function(u){return u.tip==='ic'||u.tip==='icecek';});
+        var yiyecekler = urunler.filter(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
         if (icecekler.length) {
           var barMetin = 'Bar, Masa '+masa+': '+icecekler.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
           setTimeout(function(){window.sesOku(barMetin);}, 300);

@@ -1170,8 +1170,9 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 </script>
 
 
+
 <script>
-/* CACTUS SES v2 */
+/* CACTUS SES v3 - karisik dil */
 window._sesCtx=null;
 window._sesSira=[];
 window._sesConusuyor=false;
@@ -1179,27 +1180,54 @@ window._sesConusuyor=false;
 function _sesKuyruguCalistir(){
   if(window._sesConusuyor||!window._sesSira.length)return;
   window._sesConusuyor=true;
-  var metin=window._sesSira.shift();
-  var u=new SpeechSynthesisUtterance(metin);
-  u.lang='tr-TR'; u.rate=1.1; u.pitch=1;
-  var yelda=speechSynthesis.getVoices().find(function(v){return v.name==='Yelda';});
-  if(yelda)u.voice=yelda;
-  u.onend=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
-  u.onerror=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
-  speechSynthesis.speak(u);
+  var item=window._sesSira.shift();
+
+  // item: {tr:'Bar, Masa 5:', en:'Espresso, Latte'}
+  // Önce Türkçe kısmı oku, bitince İngilizce kısmı oku
+  var seslerYuklendi=speechSynthesis.getVoices();
+  var trSes=seslerYuklendi.find(function(v){return v.name==='Yelda';});
+  var enSes=seslerYuklendi.find(function(v){return v.lang==='en-US'&&v.name.includes('Samantha');}) ||
+             seslerYuklendi.find(function(v){return v.lang==='en-US';});
+
+  if(item.en){
+    // Türkçe kısım
+    var uTR=new SpeechSynthesisUtterance(item.tr);
+    uTR.lang='tr-TR'; uTR.rate=1.1;
+    if(trSes)uTR.voice=trSes;
+
+    // İngilizce kısım (ürün isimleri)
+    var uEN=new SpeechSynthesisUtterance(item.en);
+    uEN.lang='en-US'; uEN.rate=1.05;
+    if(enSes)uEN.voice=enSes;
+
+    uEN.onend=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+    uEN.onerror=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+    uTR.onend=function(){speechSynthesis.speak(uEN);};
+    uTR.onerror=function(){speechSynthesis.speak(uEN);};
+    speechSynthesis.speak(uTR);
+  } else {
+    // Sadece Türkçe
+    var uOnly=new SpeechSynthesisUtterance(item.tr);
+    uOnly.lang='tr-TR'; uOnly.rate=1.1;
+    if(trSes)uOnly.voice=trSes;
+    uOnly.onend=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+    uOnly.onerror=function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+    speechSynthesis.speak(uOnly);
+  }
 }
 
-window.sesOku=function(metin){
-  window._sesSira.push(metin);
+window.sesOku=function(trMetin, enMetin){
+  window._sesSira.push({tr:trMetin, en:enMetin||null});
   _sesKuyruguCalistir();
 };
 
-// sesUret: geriye dönük uyumluluk
+// sesUret geriye dönük uyumluluk
 window.sesUret=function(tip,siparisler){
   if(siparisler&&siparisler.length){
     siparisler.forEach(function(s){
-      var u=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
-      window.sesOku((tip==='bar'?'Bar':'Mutfak')+', Masa '+s.masa+': '+u);
+      var enUrunler=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
+      var trMetin=(tip==='bar'?'Bar':'Mutfak')+', Masa '+s.masa+':';
+      window.sesOku(trMetin, enUrunler);
     });
   }
 };
@@ -1215,26 +1243,29 @@ window.addEventListener('load',function(){
     if(!orig||orig._sesHook)return;
     window.siparisiGonder=function(){
       try{
-        // aktifMasa: drawer headerdan veya global değişkenden al
+        var masaData=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
         var masa=window.aktifMasa;
-        // Eğer global yoksa drawer header'dan oku
         if(!masa){
-          var hdr=document.querySelector('.adis-hdr span,.adis-baslik,.drawer-baslik');
-          if(hdr){var m=hdr.textContent.match(/\d+/);if(m)masa=parseInt(m[0]);}
+          var aktifBtn=document.querySelector('.mbtn.aktif,.mbtn.secili');
+          if(!aktifBtn){
+            // Seçili butonu bul — drawer açıkken hangi masa seçili
+            var hdrSpan=document.querySelector('.adis-hdr .masa-no,.adis-hdr span');
+            if(hdrSpan){var mm=hdrSpan.textContent.match(/\d+/);if(mm)masa=parseInt(mm[0]);}
+          } else {
+            var mn=aktifBtn.querySelector('.mn');if(mn)masa=parseInt(mn.textContent);
+          }
         }
-        // localStorage'dan masayı bul — en dolu olanı al
-        var masalar=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-        if(!masa){
-          // aktif masayı bul: seçili mbtn
-          var aktifBtn=document.querySelector('.mbtn.aktif,.mbtn.secili,.mbtn.on,[class*="mbtn"][class*="aktif"]');
-          if(aktifBtn){var mn=aktifBtn.querySelector('.mn');if(mn)masa=parseInt(mn.textContent);}
-        }
-        var urunler=masa?masalar[masa]||[]:[];
+        var urunler=masa?masaData[masa]||[]:[];
         var ic=urunler.filter(function(u){return u.tip==='ic'||u.tip==='icecek';});
         var yi=urunler.filter(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
-        if(ic.length){setTimeout(function(){window.sesOku('Bar, Masa '+masa+': '+ic.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', '));},300);}
-        if(yi.length){setTimeout(function(){window.sesOku('Mutfak, Masa '+masa+': '+yi.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', '));},ic.length?1600:300);}
-        if(!ic.length&&!yi.length&&urunler.length){setTimeout(function(){window.sesOku('Siparis gonderildi');},300);}
+        if(ic.length){
+          var enIc=ic.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          setTimeout(function(){window.sesOku('Bar, Masa '+masa+':',enIc);},300);
+        }
+        if(yi.length){
+          var enYi=yi.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          setTimeout(function(){window.sesOku('Mutfak, Masa '+masa+':',enYi);},ic.length?2000:300);
+        }
       }catch(e){}
       return orig.apply(this,arguments);
     };
@@ -1250,14 +1281,14 @@ window.addEventListener('load',function(){
       var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]').filter(function(s){return !s.hazirlandi;});
       if(_barSon>=0&&bar.length>_barSon){
         bar.slice(_barSon).forEach(function(s){
-          var u=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
-          window.sesOku('Bar, Masa '+s.masa+': '+u);
+          var en=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
+          window.sesOku('Bar, Masa '+s.masa+':',en);
         });
       }
       if(_mutSon>=0&&mut.length>_mutSon){
         mut.slice(_mutSon).forEach(function(s){
-          var u=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
-          window.sesOku('Mutfak, Masa '+s.masa+': '+u);
+          var en=(s.items||[]).map(function(x){return (x.adet>1?x.adet+' ':'')+x.ad;}).join(', ');
+          window.sesOku('Mutfak, Masa '+s.masa+':',en);
         });
       }
       _barSon=bar.length;_mutSon=mut.length;

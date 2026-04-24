@@ -1121,89 +1121,89 @@ renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
 </script>
 <script src="rapor-hook-fsm.js"></script>
+
 <script>
-// Sesli Siparis Bildirimi
-(function(){
-  function sesUret(tip){
-    try{
-      var ctx=new(window.AudioContext||window.webkitAudioContext)();
-      // Bar (içecek) sesi: iki kısa bip
-      // Mutfak (yiyecek) sesi: üç kısa bip
-      var adet=tip==='bar'?2:3;
-      var frekans=tip==='bar'?880:660;
-      for(var i=0;i<adet;i++){
-        (function(i){
-          setTimeout(function(){
-            var osc=ctx.createOscillator();
-            var gain=ctx.createGain();
-            osc.connect(gain);gain.connect(ctx.destination);
-            osc.frequency.value=frekans;
-            osc.type='sine';
-            gain.gain.setValueAtTime(0.4,ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime+0.3);
-          },i*400);
-        })(i);
-      }
-    }catch(e){}
-  }
+window._sesCtx = null;
+window.sesUret = function(tip) {
+  try {
+    if (!window._sesCtx) window._sesCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = window._sesCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+    var adet = tip === 'bar' ? 2 : 3;
+    var freq = tip === 'bar' ? 900 : 600;
+    for (var i = 0; i < adet; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = freq;
+          osc.type = 'sine';
+          gain.gain.setValueAtTime(0.6, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.25);
+        }, idx * 350);
+      })(i);
+    }
+  } catch(e) { console.log('ses hatasi', e); }
+};
 
-  // siparisiGonder'i hook et
-  window.addEventListener('load',function(){
-    setTimeout(function(){
-      var orig=window.siparisiGonder;
-      if(!orig)return;
-      window.siparisiGonder=function(){
-        var result=orig.apply(this,arguments);
-        // Aktif masadaki ürünleri kontrol et — ic mi yi mi?
-        try{
-          var masa=window.aktifMasa;
-          var masalar=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-          var urunler=masalar[masa]||[];
-          var hasIc=urunler.some(function(u){return u.tip==='ic'||u.tip==='icecek';});
-          var hasYi=urunler.some(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
-          if(hasIc) setTimeout(function(){sesUret('bar');},300);
-          if(hasYi) setTimeout(function(){sesUret('mutfak');},hasIc?1200:300);
-        }catch(e){
-          // Fallback: her siparişte çal
-          setTimeout(function(){sesUret('bar');},300);
-        }
-        return result;
-      };
-    },1000);
-  });
+// AudioContext'i kullanici etkilesimi ile ac
+document.addEventListener('click', function() {
+  if (!window._sesCtx) window._sesCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (window._sesCtx.state === 'suspended') window._sesCtx.resume();
+}, { once: false });
 
-  // Bar/Mutfak sekmelerinde yeni sipariş gelince bildirim
-  var _barSon=0,_mutSon=0;
-  function bildirimKontrol(){
-    try{
-      var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
-      var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||localStorage.getItem('ca')||'[]');
-      var aktifSekme=document.querySelector('.nav-btn.on,.sekme-btn.on,[data-sekme].on');
-      var sekmeAdi=aktifSekme?aktifSekme.textContent.toLowerCase():'';
-      if(bar.length>_barSon&&(sekmeAdi.includes('bar')||sekmeAdi.includes('içecek'))){
-        sesUret('bar');
-        if(Notification.permission==='granted'){new Notification('🥤 Yeni İçecek Siparişi',{body:bar.length-_barSon+' yeni sipariş',icon:'/favicon.ico'});}
+// siparisiGonder hook
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    var orig = window.siparisiGonder;
+    if (!orig || orig._sesHook) return;
+    window.siparisiGonder = function() {
+      // Siparisi göndermeden önce masadaki ürünleri oku
+      try {
+        var masa = window.aktifMasa;
+        var masaData = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
+        var urunler = masaData[masa] || [];
+        var hasIc = urunler.some(function(u) { return u.tip === 'icecek' || u.tip === 'ic'; });
+        var hasYi = urunler.some(function(u) { return u.tip === 'yiyecek' || u.tip === 'yi'; });
+        if (hasIc) setTimeout(function() { window.sesUret('bar'); }, 200);
+        if (hasYi) setTimeout(function() { window.sesUret('mutfak'); }, hasIc ? 1000 : 200);
+        if (!hasIc && !hasYi) setTimeout(function() { window.sesUret('bar'); }, 200);
+      } catch(e) {
+        setTimeout(function() { window.sesUret('bar'); }, 200);
       }
-      if(mut.length>_mutSon&&(sekmeAdi.includes('mutfak')||sekmeAdi.includes('yiyecek'))){
-        sesUret('mutfak');
-        if(Notification.permission==='granted'){new Notification('🍳 Yeni Mutfak Siparişi',{body:mut.length-_mutSon+' yeni sipariş',icon:'/favicon.ico'});}
+      return orig.apply(this, arguments);
+    };
+    window.siparisiGonder._sesHook = true;
+  }, 1500);
+});
+
+// Bar/Mutfak sekmesinde yeni sipariş bildirimi
+(function() {
+  var _barSon = -1, _mutSon = -1;
+  function kontrol() {
+    try {
+      var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]').filter(function(s) { return !s.hazirlandi; });
+      var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]').filter(function(s) { return !s.hazirlandi; });
+      var aktifBtn = document.querySelector('.nav-btn.on, .tab-btn.on, [class*="btn"][class*="on"]');
+      var sekme = aktifBtn ? aktifBtn.textContent.toLowerCase() : '';
+      if (_barSon >= 0 && bar.length > _barSon && (sekme.includes('bar') || sekme.includes('ecek'))) {
+        window.sesUret('bar');
       }
-      _barSon=bar.length;_mutSon=mut.length;
-    }catch(e){}
+      if (_mutSon >= 0 && mut.length > _mutSon && (sekme.includes('mutfak') || sekme.includes('iyecek'))) {
+        window.sesUret('mutfak');
+      }
+      _barSon = bar.length;
+      _mutSon = mut.length;
+    } catch(e) {}
   }
-  window.addEventListener('load',function(){
-    setTimeout(function(){
-      var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
-      var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||localStorage.getItem('ca')||'[]');
-      _barSon=bar.length;_mutSon=mut.length;
-      setInterval(bildirimKontrol,1500);
-      // Bildirim izni iste
-      if(Notification&&Notification.permission==='default'){
-        Notification.requestPermission();
-      }
-    },1500);
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      kontrol(); // ilk sayimi al
+      setInterval(kontrol, 1500);
+    }, 2000);
   });
 })();
 </script>

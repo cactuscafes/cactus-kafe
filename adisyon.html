@@ -1122,125 +1122,151 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 </script>
 <script src="rapor-hook-podyum.js"></script>
 
+
 <script id="cactus-sync">
-/* CACTUS SYNC — cross-device realtime */
+/* CACTUS TAM SENKRONIZASYON v3 */
 (function(){
   var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
-  var SUBE='';// sube adisyon.html'den alınacak
+  var SUBE='';
+  var _lastSync=0;
+  var _sending=false;
 
-  // Şubeyi otomatik tespit et
-  window.addEventListener('load', function(){
-    var title = document.title.toLowerCase();
-    SUBE = title.includes('fsm') ? 'fsm' : 'podyum';
-
-    setTimeout(function(){
-      hookSiparisiGonder();
-      hookHazirlandiBtn();
-      startSyncPoll();
-    }, 2000);
+  window.addEventListener('load',function(){
+    SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';
+    setTimeout(init,2000);
   });
 
-  /* 1) siparisiGonder hook — D1'e yaz */
-  function hookSiparisiGonder(){
-    var orig = window.siparisiGonder;
-    if (!orig || orig._syncHook) return;
-    window.siparisiGonder = function(){
-      var result = orig.apply(this, arguments);
-      // Bar ve mutfak siparişlerini D1'e gönder
-      setTimeout(function(){
-        var bar = JSON.parse(localStorage.getItem('cactus_bar')||'[]');
-        var mut = JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
-        var siparisler = [];
-        // Son eklenen bar siparişi
-        var sonBar = bar.filter(function(s){return !s._synced;});
-        var sonMut = mut.filter(function(s){return !s._synced;});
-        sonBar.forEach(function(s){
-          siparisler.push({id:s.id, masa:s.masa, tip:'bar', items:s.items, zaman:Date.now()});
-          s._synced = true;
-        });
-        sonMut.forEach(function(s){
-          siparisler.push({id:s.id, masa:s.masa, tip:'mutfak', items:s.items, zaman:Date.now()});
-          s._synced = true;
-        });
-        // localStorage'ı güncelle
-        localStorage.setItem('cactus_bar', JSON.stringify(bar));
-        localStorage.setItem('cactus_mutfak', JSON.stringify(mut));
-        if (siparisler.length) {
-          fetch(API+'/siparis/gonder', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({sube:SUBE, siparisler:siparisler})
-          }).catch(function(){});
-        }
-      }, 500);
-      return result;
-    };
-    window.siparisiGonder._syncHook = true;
+  function init(){
+    hookSaveMasalar();
+    hookSiparisiGonder();
+    hookHazirlandiButtons();
+    // Her 2 saniyede senkronize et
+    setInterval(syncFromD1,2000);
+    // Sayfa açılınca D1'den yükle
+    syncFromD1();
   }
 
-  /* 2) Hazırlandı butonunu hook et — D1'e işaretle */
-  function hookHazirlandiBtn(){
-    // renderBar ve renderMut wrap
-    ['renderBar','renderMut'].forEach(function(fnName){
-      var orig = window[fnName];
-      if (!orig || orig._syncHook) return;
-      window[fnName] = function(){
-        var result = orig.apply(this, arguments);
-        // Hazırlandı butonlarına D1 sync ekle
-        setTimeout(function(){
-          document.querySelectorAll('.haz-btn, [class*="hazir-btn"], [class*="hazirla"]').forEach(function(btn){
-            if (btn._d1hooked) return;
-            btn._d1hooked = true;
-            btn.addEventListener('click', function(){
-              var sipId = btn.dataset.id || btn.closest('[data-id]')?.dataset.id;
-              if (sipId) {
-                fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:sipId})}).catch(function(){});
-              }
-            });
-          });
-        }, 300);
-        return result;
-      };
-      window[fnName]._syncHook = true;
+  /* saveMasalar hook — masa değişince D1'e yaz */
+  function hookSaveMasalar(){
+    var orig=window.saveMasalar;
+    if(!orig||orig._syncHook)return;
+    window.saveMasalar=function(){
+      var result=orig.apply(this,arguments);
+      pushMasalarToD1();
+      return result;
+    };
+    window.saveMasalar._syncHook=true;
+  }
+
+  function pushMasalarToD1(){
+    if(_sending)return;
+    _sending=true;
+    var masalar=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+    fetch(API+'/sync/masalar',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sube:SUBE,masalar:masalar})
+    }).catch(function(){}).finally(function(){_sending=false;});
+  }
+
+  /* siparisiGonder hook — D1'e sipariş yaz */
+  function hookSiparisiGonder(){
+    var orig=window.siparisiGonder;
+    if(!orig||orig._syncHook)return;
+    window.siparisiGonder=function(){
+      var result=orig.apply(this,arguments);
+      setTimeout(function(){
+        var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
+        var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
+        var siparisler=[];
+        bar.forEach(function(s){if(!s._d1){siparisler.push({id:s.id,masa:s.masa,tip:'bar',items:s.items,zaman:Date.now()});s._d1=true;}});
+        mut.forEach(function(s){if(!s._d1){siparisler.push({id:s.id,masa:s.masa,tip:'mutfak',items:s.items,zaman:Date.now()});s._d1=true;}});
+        localStorage.setItem('cactus_bar',JSON.stringify(bar));
+        localStorage.setItem('cactus_mutfak',JSON.stringify(mut));
+        if(siparisler.length){
+          fetch(API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,siparisler:siparisler})}).catch(function(){});
+        }
+      },500);
+      return result;
+    };
+    window.siparisiGonder._syncHook=true;
+  }
+
+  /* Hazırlandı butonlarını hook et */
+  function hookHazirlandiButtons(){
+    document.addEventListener('click',function(e){
+      var btn=e.target.closest('.haz-btn,[class*="hazir"]');
+      if(!btn)return;
+      var id=btn.dataset.id||btn.closest('[data-id]')?.dataset.id;
+      if(id){fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});}
     });
   }
 
-  /* 3) Polling — D1'den sipariş çek ve localStorage güncelle */
-  var _lastSync = 0;
-  function startSyncPoll(){
-    setInterval(function(){
-      var aktifSekme = document.querySelector('.nav-btn.on');
-      var sekme = aktifSekme ? aktifSekme.textContent.toLowerCase() : '';
-      var tip = sekme.includes('bar') || sekme.includes('ecek') ? 'bar' : sekme.includes('mutfak') ? 'mutfak' : null;
-      if (!tip) return; // Kasiyer veya başka sekmede polling yapmaya gerek yok
+  /* D1'den senkronize et — her cihazda çalışır */
+  function syncFromD1(){
+    fetch(API+'/sync/durum?sube='+SUBE+'&since='+(_lastSync?_lastSync-5000:0))
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var changed=false;
 
-      fetch(API+'/siparis/listele?sube='+SUBE+'&tip='+tip+'&since='+(_lastSync-60000))
-        .then(function(r){return r.json();})
-        .then(function(siparisler){
-          if (!siparisler.length) return;
-          var lkKey = tip === 'bar' ? 'cactus_bar' : 'cactus_mutfak';
-          var mevcut = JSON.parse(localStorage.getItem(lkKey)||'[]');
-          var mevcutIds = mevcut.map(function(s){return s.id;});
-          var yeniVar = false;
-          siparisler.forEach(function(s){
-            if (!mevcutIds.includes(s.id)) {
-              mevcut.push({id:s.id, masa:s.masa, saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}), items:s.items, hazirlandi:false, _synced:true});
-              yeniVar = true;
+        /* Masaları güncelle */
+        if(data.masalar&&data.masalar.length){
+          var masalar=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+          data.masalar.forEach(function(m){
+            // Sadece daha yeni versiyonu uygula
+            if(!masalar._guncelleme||m.guncelleme>masalar._guncelleme){
+              masalar[m.masa]=m.items;
+              changed=true;
             }
           });
-          if (yeniVar) {
-            localStorage.setItem(lkKey, JSON.stringify(mevcut));
-            if (typeof window['render'+(tip==='bar'?'Bar':'Mut')] === 'function') {
-              window['render'+(tip==='bar'?'Bar':'Mut')]();
-            }
-            // Ses bildirimi
-            if (typeof window.sesUret === 'function') window.sesUret(tip);
+          if(changed){
+            localStorage.setItem('cactus_masalar',JSON.stringify(masalar));
+            if(typeof renderMasalar==='function')renderMasalar();
+            if(typeof renderAdisyon==='function')renderAdisyon();
           }
-          _lastSync = Date.now();
-        }).catch(function(){});
-    }, 2000);
-  }
+        }
 
+        /* Bar siparişlerini güncelle */
+        var barChanged=false,mutChanged=false;
+        if(data.siparisler&&data.siparisler.length){
+          var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
+          var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
+          var barIds=bar.map(function(s){return s.id;});
+          var mutIds=mut.map(function(s){return s.id;});
+
+          data.siparisler.forEach(function(s){
+            if(s.tip==='bar'&&!barIds.includes(s.id)){
+              bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});
+              barChanged=true;
+            }
+            if(s.tip==='mutfak'&&!mutIds.includes(s.id)){
+              mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});
+              mutChanged=true;
+            }
+            // Hazırlandı durumunu güncelle
+            if(s.hazirlandi===1){
+              bar.forEach(function(b){if(b.id===s.id)b.hazirlandi=true;});
+              mut.forEach(function(m){if(m.id===s.id)m.hazirlandi=true;});
+            }
+          });
+
+          if(barChanged){
+            localStorage.setItem('cactus_bar',JSON.stringify(bar));
+            if(typeof renderBar==='function')renderBar();
+            if(typeof window.sesUret==='function')window.sesUret('bar');
+            if(typeof updateBadges==='function')updateBadges();
+          }
+          if(mutChanged){
+            localStorage.setItem('cactus_mutfak',JSON.stringify(mut));
+            if(typeof renderMut==='function')renderMut();
+            if(typeof window.sesUret==='function')window.sesUret('mutfak');
+            if(typeof updateBadges==='function')updateBadges();
+          }
+        }
+
+        _lastSync=data.zaman||Date.now();
+      }).catch(function(){});
+  }
 })();
 </script>
 <script id="cactus-patch">

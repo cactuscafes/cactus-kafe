@@ -1128,6 +1128,46 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
+<script id="masa-isim-patch">
+(function(){
+  var ISIM={31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'};
+  // localStorage ve global masalar objesine ekle
+  var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+  [31,32,33,34].forEach(function(n){if(!m[n])m[n]=[];});
+  localStorage.setItem('cactus_masalar',JSON.stringify(m));
+
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      if(typeof masalar!=='undefined')[31,32,33,34].forEach(function(n){if(!masalar[n])masalar[n]=[];});
+      var orig=window.renderMasalar;
+      if(!orig||orig._ekstra)return;
+      window.renderMasalar=function(){
+        orig.apply(this,arguments);
+        var grid=document.querySelector('.masa-grid');
+        if(!grid)return;
+        [31,32,33,34].forEach(function(num){
+          if(grid.querySelector('[data-ekstra="'+num+'"]'))return;
+          var btn=document.createElement('button');
+          btn.className='mbtn';
+          btn.dataset.ekstra=String(num);
+          var urunler=(typeof masalar!=='undefined'&&masalar[num])||[];
+          var adet=urunler.length;
+          var top=urunler.reduce(function(s,u){return s+u.fiyat*u.adet;},0);
+          if(adet>0)btn.classList.add('dolu');
+          btn.innerHTML=(adet>0?'<div class="mbdg">'+adet+'</div>':'')+
+            '<span class="mn">'+num+'</span>'+
+            '<span class="ml">'+ISIM[num]+'</span>'+
+            (top>0?'<span class="mf">₺'+top+'</span>':'');
+          btn.onclick=(function(n){return function(){masaSec(n);};})(num);
+          grid.appendChild(btn);
+        });
+      };
+      window.renderMasalar._ekstra=true;
+      window.renderMasalar();
+    },1500);
+  });
+})();
+</script>
 <script id="cactus-sync">
 /* CACTUS SYNC v5 - her zaman D1 master */
 (function(){

@@ -1122,6 +1122,252 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 </script>
 <script src="rapor-hook-fsm.js"></script>
 
+<script id="cactus-patch">
+/* CACTUS PATCH v2 — iskonto, not, masa tasima, arama, renkler, sure sayaci */
+(function() {
+  /* ===== 1. ISKONTO ===== */
+  var _iskonto = 0;
+
+  function iskontoUygula() {
+    var val = prompt('İskonto miktarı (₺) veya yüzde (% ile): ', '0');
+    if (val === null) return;
+    val = val.trim();
+    if (val.endsWith('%')) {
+      var pct = parseFloat(val);
+      var top = hesaplaToplamHam();
+      _iskonto = Math.round(top * pct / 100);
+    } else {
+      _iskonto = parseFloat(val) || 0;
+    }
+    renderAdisyon();
+    toast('İskonto uygulandı: ₺' + _iskonto);
+  }
+
+  function hesaplaToplamHam() {
+    if (!window.aktifMasa) return 0;
+    var masalar = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
+    return (masalar[window.aktifMasa] || []).reduce(function(a, u) { return a + (u.fiyat * u.adet); }, 0);
+  }
+
+  /* ===== 2. SIPARIS NOTU ===== */
+  var _notlar = JSON.parse(localStorage.getItem('cactus_notlar') || '{}');
+
+  function notEkle(masaId, urunIdx) {
+    var not = prompt('Sipariş notu (şekersiz, az süt vb.):');
+    if (not === null) return;
+    var key = masaId + '_' + urunIdx;
+    _notlar[key] = not;
+    localStorage.setItem('cactus_notlar', JSON.stringify(_notlar));
+    renderAdisyon();
+  }
+
+  /* ===== 3. MASA TASIMA ===== */
+  function masaTasi() {
+    var hedef = prompt('Taşınacak masa numarası:', '');
+    if (!hedef) return;
+    hedef = parseInt(hedef);
+    if (isNaN(hedef) || !window.aktifMasa) return;
+    var masalar = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
+    var kaynak = masalar[window.aktifMasa] || [];
+    masalar[hedef] = (masalar[hedef] || []).concat(kaynak);
+    masalar[window.aktifMasa] = [];
+    _iskonto = 0;
+    localStorage.setItem('cactus_masalar', JSON.stringify(masalar));
+    if (typeof saveMasalar === 'function') saveMasalar();
+    window.aktifMasa = hedef;
+    if (typeof renderMasalar === 'function') renderMasalar();
+    if (typeof renderAdisyon === 'function') renderAdisyon();
+    toast('Masa ' + window.aktifMasa + ' → Masa ' + hedef + ' taşındı');
+  }
+
+  /* ===== 4. ARAMA KUTUSU ===== */
+  function aramaKutusuEkle() {
+    var katBar = document.querySelector('.kat-bar, .kategori-bar, [class*="kat-bar"]');
+    if (!katBar || document.getElementById('cactus-arama')) return;
+    var arama = document.createElement('div');
+    arama.style.cssText = 'padding:6px 12px;background:var(--kr,#1a1411);position:sticky;top:0;z-index:10;';
+    arama.innerHTML = '<input id="cactus-arama" placeholder="🔍 Ürün ara..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;outline:none;" oninput="cactusAra(this.value)">';
+    katBar.parentNode.insertBefore(arama, katBar.nextSibling);
+  }
+
+  window.cactusAra = function(q) {
+    q = q.toLowerCase().trim();
+    document.querySelectorAll('.ukrt').forEach(function(kart) {
+      var ad = kart.querySelector('.ua, [class*="ad"], [class*="name"]');
+      var adText = ad ? ad.textContent.toLowerCase() : kart.textContent.toLowerCase();
+      kart.style.display = (!q || adText.includes(q)) ? '' : 'none';
+    });
+  };
+
+  /* ===== 5. MASA RENGI ===== */
+  function masaRenkGuncelle() {
+    var masalar = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
+    var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
+    var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]');
+    var bekleyenMasalar = {};
+    bar.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
+    mut.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
+
+    document.querySelectorAll('.masa-btn, [class*="m-btn"]').forEach(function(btn) {
+      var num = parseInt(btn.dataset.masa || btn.textContent);
+      if (isNaN(num)) return;
+      var dolu = masalar[num] && masalar[num].length > 0;
+      var bekliyor = bekleyenMasalar[num];
+      btn.style.background = bekliyor ? '#c0392b' : dolu ? '#2d7a4f' : '';
+      btn.style.color = (dolu || bekliyor) ? '#fff' : '';
+      if (!btn.querySelector('.masa-sure') && bekliyor) {
+        var sure = document.createElement('span');
+        sure.className = 'masa-sure';
+        sure.style.cssText = 'font-size:9px;display:block;opacity:0.8;';
+        btn.appendChild(sure);
+      }
+    });
+  }
+
+  /* ===== 6. BEKLEME SURESI ===== */
+  function sureGuncelle() {
+    var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
+    var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]');
+    var simdi = Date.now();
+    var bekleyenler = {};
+    bar.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){
+      var dk = Math.floor((simdi - s.zaman) / 60000);
+      bekleyenler[s.masa] = Math.max(bekleyenler[s.masa]||0, dk);
+    });
+    mut.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){
+      var dk = Math.floor((simdi - s.zaman) / 60000);
+      bekleyenler[s.masa] = Math.max(bekleyenler[s.masa]||0, dk);
+    });
+    document.querySelectorAll('.masa-sure').forEach(function(el) {
+      var btn = el.parentElement;
+      var num = parseInt(btn.dataset.masa || btn.textContent);
+      el.textContent = bekleyenler[num] ? bekleyenler[num] + 'dk' : '';
+    });
+  }
+
+  /* ===== 7. GUN SONU OZETI ===== */
+  function gunSonuGoster() {
+    var satislar = JSON.parse(localStorage.getItem('cactus_satislar') || '[]');
+    var bugun = new Date().toLocaleDateString('tr-TR');
+    var bugunSatislar = satislar.filter(function(s) { return s.tarih === bugun; });
+    if (!bugunSatislar.length) { toast('Bugün henüz satış yok'); return; }
+    var ciro = bugunSatislar.reduce(function(a,s){return a+(s.toplam||0);},0);
+    var nakit = bugunSatislar.filter(function(s){return s.odeme_tipi==='Nakit';}).reduce(function(a,s){return a+(s.toplam||0);},0);
+    var kredi = ciro - nakit;
+    var urunSayac = {};
+    bugunSatislar.forEach(function(s){(s.urunDetay||[]).forEach(function(u){urunSayac[u.ad]=(urunSayac[u.ad]||0)+u.adet;});});
+    var enCok = Object.entries(urunSayac).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+    var msg = 'GÜN SONU — ' + bugun + '\n';
+    msg += 'Toplam Ciro: ₺' + ciro + '\n';
+    msg += 'Nakit: ₺' + nakit + ' | Kredi: ₺' + kredi + '\n';
+    msg += 'İşlem: ' + bugunSatislar.length + '\n\nEn Çok Satanlar:\n';
+    enCok.forEach(function(e,i){msg+=(i+1)+'. '+e[0]+' ('+e[1]+')\n';});
+    alert(msg);
+  }
+
+  /* ===== UI ENTEGRASYONU ===== */
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+
+      /* İskonto butonu — adis-ozet içine ekle */
+      var ozet = document.querySelector('.adis-ozet');
+      if (ozet && !document.getElementById('btn-iskonto')) {
+        var iskontoRow = document.createElement('div');
+        iskontoRow.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;';
+        iskontoRow.innerHTML =
+          '<button id="btn-iskonto" onclick="iskontoUygula()" style="flex:1;padding:7px;background:rgba(255,200,0,0.15);border:1px solid rgba(255,200,0,0.3);border-radius:8px;color:#ffc107;font-size:12px;cursor:pointer;">% İskonto</button>' +
+          '<button onclick="masaTasi()" style="flex:1;padding:7px;background:rgba(100,150,255,0.15);border:1px solid rgba(100,150,255,0.3);border-radius:8px;color:#7eb3ff;font-size:12px;cursor:pointer;">↔ Taşı</button>' +
+          '<button onclick="gunSonuGoster()" style="flex:1;padding:7px;background:rgba(100,255,150,0.1);border:1px solid rgba(100,255,150,0.2);border-radius:8px;color:#7fffaa;font-size:12px;cursor:pointer;">📊 Gün</button>';
+        ozet.insertBefore(iskontoRow, ozet.firstChild);
+      }
+
+      /* Arama kutusu */
+      aramaKutusuEkle();
+
+      /* renderAdisyon'u wrap et — iskonto + not göster */
+      var origRender = window.renderAdisyon;
+      if (origRender && !origRender._patched) {
+        window.renderAdisyon = function() {
+          origRender.apply(this, arguments);
+          /* İskonto satırı güncelle */
+          var topRow = document.querySelector('.oz-top');
+          if (topRow && _iskonto > 0) {
+            var existing = document.getElementById('iskonto-row');
+            if (!existing) {
+              existing = document.createElement('div');
+              existing.id = 'iskonto-row';
+              existing.className = 'oz-row';
+              existing.style.color = '#ffc107';
+              topRow.parentNode.insertBefore(existing, topRow);
+            }
+            existing.textContent = 'İskonto: -₺' + _iskonto;
+            /* Toplam metnini güncelle */
+            var toplam = hesaplaToplamHam();
+            if (topRow) topRow.querySelector('span:last-child,b,[class*="tutar"]') && (topRow.lastElementChild ? topRow.lastElementChild.textContent = '₺' + (toplam - _iskonto) : null);
+          } else {
+            var ex = document.getElementById('iskonto-row');
+            if (ex) ex.remove();
+          }
+          /* Not ikonları ekle */
+          if (window.aktifMasa) {
+            document.querySelectorAll('.adis-item, [class*="adis-item"]').forEach(function(item, idx) {
+              if (item.querySelector('.not-ico')) return;
+              var notBtn = document.createElement('span');
+              notBtn.className = 'not-ico';
+              notBtn.textContent = _notlar[window.aktifMasa + '_' + idx] ? '📝' : '✏️';
+              notBtn.title = _notlar[window.aktifMasa + '_' + idx] || 'Not ekle';
+              notBtn.style.cssText = 'cursor:pointer;margin-left:4px;font-size:14px;opacity:0.7;';
+              notBtn.onclick = function(e) { e.stopPropagation(); notEkle(window.aktifMasa, idx); };
+              item.appendChild(notBtn);
+            });
+          }
+        };
+        window.renderAdisyon._patched = true;
+      }
+
+      /* odemeyiKaydet wrap — iskonto düş */
+      var origOdeme = window.odemeyiKaydet;
+      if (origOdeme && !origOdeme._iskontoPatched) {
+        window.odemeyiKaydet = function(masa, toplam, ic, yi, tip, urunler) {
+          var gercekToplam = toplam - _iskonto;
+          var gercekIc = ic > 0 ? Math.max(0, ic - Math.round(_iskonto * ic / toplam)) : 0;
+          var gercekYi = yi > 0 ? Math.max(0, gercekToplam - gercekIc) : 0;
+          _iskonto = 0;
+          return origOdeme.call(this, masa, gercekToplam, gercekIc, gercekYi, tip, urunler);
+        };
+        window.odemeyiKaydet._iskontoPatched = true;
+      }
+
+      /* masaSec wrap — iskonto sıfırla */
+      var origMasaSec = window.masaSec;
+      if (origMasaSec && !origMasaSec._patched) {
+        window.masaSec = function() {
+          _iskonto = 0;
+          var r = origMasaSec.apply(this, arguments);
+          setTimeout(aramaKutusuEkle, 100);
+          return r;
+        };
+        window.masaSec._patched = true;
+      }
+
+      /* Global erişim için */
+      window.iskontoUygula = iskontoUygula;
+      window.masaTasi = masaTasi;
+      window.gunSonuGoster = gunSonuGoster;
+      window.notEkle = notEkle;
+
+      /* Masa rengi ve süre sayacı */
+      masaRenkGuncelle();
+      setInterval(function() {
+        masaRenkGuncelle();
+        sureGuncelle();
+      }, 5000);
+
+    }, 1800);
+  });
+
+})();
+</script>
 <script>
 window._sesCtx = null;
 window.sesUret = function(tip) {

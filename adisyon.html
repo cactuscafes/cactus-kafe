@@ -312,7 +312,7 @@ input,select{font-family:'Lato',sans-serif;}
   .rap-filtre{gap:8px;}
 }
 </style>
-<!-- v1777069030594 -->
+<!-- v1777066974925 -->
 </head>
 <body>
 
@@ -1169,80 +1169,6 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 })();
 </script>
 
-
-
-
-
-
-<script>
-window._sesCtx=null;
-window.sesUret=function(tip){
-  try{
-    if(!window._sesCtx)window._sesCtx=new(window.AudioContext||window.webkitAudioContext)();
-    var ctx=window._sesCtx;
-    if(ctx.state==='suspended')ctx.resume();
-    if(tip==='bar'){
-      // Bar: 2 bip yüksek ton
-      [0,0.35].forEach(function(t){
-        var o=ctx.createOscillator(),g=ctx.createGain();
-        o.connect(g);g.connect(ctx.destination);
-        o.type='sine';o.frequency.value=900;
-        g.gain.setValueAtTime(0.5,ctx.currentTime+t);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
-        o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
-      });
-    } else {
-      // Mutfak: 3 bip alçak ton
-      [0,0.3,0.6].forEach(function(t){
-        var o=ctx.createOscillator(),g=ctx.createGain();
-        o.connect(g);g.connect(ctx.destination);
-        o.type='sine';o.frequency.value=600;
-        g.gain.setValueAtTime(0.5,ctx.currentTime+t);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.25);
-        o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);
-      });
-    }
-  }catch(e){}
-};
-document.addEventListener('click',function(){
-  if(!window._sesCtx)window._sesCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(window._sesCtx.state==='suspended')window._sesCtx.resume();
-},{once:false});
-window.addEventListener('load',function(){
-  setTimeout(function(){
-    var orig=window.siparisiGonder;
-    if(!orig||orig._sesHook)return;
-    window.siparisiGonder=function(){
-      try{
-        var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-        var masa=window.aktifMasa;
-        var urunler=masa?m[masa]||[]:[];
-        var hasBar=urunler.some(function(u){return u.tip==='ic'||u.tip==='icecek';});
-        var hasMut=urunler.some(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
-        if(hasBar)setTimeout(function(){window.sesUret('bar');},300);
-        if(hasMut)setTimeout(function(){window.sesUret('mutfak');},hasBar?900:300);
-        if(!hasBar&&!hasMut)setTimeout(function(){window.sesUret('bar');},300);
-      }catch(e){}
-      return orig.apply(this,arguments);
-    };
-    window.siparisiGonder._sesHook=true;
-  },1500);
-  setTimeout(function(){
-    var _bs=-1,_ms=-1;
-    function kontrol(){
-      try{
-        var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]').filter(function(s){return !s.hazirlandi;});
-        var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]').filter(function(s){return !s.hazirlandi;});
-        if(_bs>=0&&bar.length>_bs)window.sesUret('bar');
-        if(_ms>=0&&mut.length>_ms)window.sesUret('mutfak');
-        _bs=bar.length;_ms=mut.length;
-      }catch(e){}
-    }
-    kontrol();
-    setInterval(kontrol,1500);
-  },2000);
-});
-</script>
 <script id="cactus-sync">
 /* CACTUS SYNC v6 */
 (function(){
@@ -1362,8 +1288,8 @@ window.addEventListener('load',function(){
               else mut.forEach(function(m){if(m.id===s.id&&s.hazirlandi===1&&!m.hazirlandi){m.hazirlandi=true;mc=true;}});
             }
           });
-          if(bc){localStorage.setItem('cactus_bar',JSON.stringify(bar));if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();if(bYeni.length&&typeof window.sesUret==='function')window.sesUret('bar');}
-          if(mc){localStorage.setItem('cactus_mutfak',JSON.stringify(mut));if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();if(mYeni.length&&typeof window.sesUret==='function')window.sesUret('mutfak');}
+          if(bc){localStorage.setItem('cactus_bar',JSON.stringify(bar));if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
+          if(mc){localStorage.setItem('cactus_mutfak',JSON.stringify(mut));if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
         }
         _lastSync=data.zaman||Date.now();
       }).catch(function(){});

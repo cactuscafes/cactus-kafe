@@ -1169,6 +1169,131 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 })();
 </script>
 
+<script>
+/* CACTUS SES — Web Speech API */
+window._sesCtx = null;
+window._sesSira = [];
+window._sesConusuyor = false;
+
+// Ses kuyruğu — üst üste binmesin
+function _sesKuyruguCalistir() {
+  if (window._sesConusuyor || !window._sesSira.length) return;
+  window._sesConusuyor = true;
+  var metin = window._sesSira.shift();
+  var u = new SpeechSynthesisUtterance(metin);
+  u.lang = 'tr-TR';
+  u.rate = 1.1;
+  u.pitch = 1;
+  var sesler = speechSynthesis.getVoices();
+  var yelda = sesler.find(function(v){return v.name==='Yelda';});
+  if (yelda) u.voice = yelda;
+  u.onend = function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+  u.onerror = function(){window._sesConusuyor=false;_sesKuyruguCalistir();};
+  speechSynthesis.speak(u);
+}
+
+window.sesOku = function(metin) {
+  window._sesSira.push(metin);
+  _sesKuyruguCalistir();
+};
+
+// Eski sesUret — artık sesOku kullanıyor ama geriye dönük uyumluluk için bırakıldı
+window.sesUret = function(tip, siparisler) {
+  if (siparisler && siparisler.length) {
+    siparisler.forEach(function(s) {
+      var urunler = (s.items||[]).map(function(u){return u.adet>1?u.adet+' '+u.ad:u.ad;}).join(', ');
+      var metin = 'Masa ' + s.masa + ', ' + (tip==='bar'?'Bar:':'Mutfak:') + ' ' + urunler;
+      window.sesOku(metin);
+    });
+  } else {
+    // Fallback — sipariş yoksa kısa bip sesi çal
+    try {
+      if (!window._sesCtx) window._sesCtx = new (window.AudioContext||window.webkitAudioContext)();
+      var ctx = window._sesCtx;
+      if (ctx.state==='suspended') ctx.resume();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = tip==='bar'?900:600;
+      gain.gain.setValueAtTime(0.4,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.3);
+    } catch(e){}
+  }
+};
+
+// AudioContext kullanıcı etkileşimi ile aç
+document.addEventListener('click', function(){
+  if (!window._sesCtx) window._sesCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (window._sesCtx.state==='suspended') window._sesCtx.resume();
+}, {once:false});
+
+// siparisiGonder hook — sipariş içeriğiyle sesli bildirim
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    var orig = window.siparisiGonder;
+    if (!orig || orig._sesHook) return;
+    window.siparisiGonder = function(){
+      try {
+        var masa = window.aktifMasa;
+        var masaData = JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+        var urunler = masaData[masa] || [];
+        var icecekler = urunler.filter(function(u){return u.tip==='icecek'||u.tip==='ic';});
+        var yiyecekler = urunler.filter(function(u){return u.tip==='yiyecek'||u.tip==='yi';});
+        if (icecekler.length) {
+          var barMetin = 'Bar, Masa '+masa+': '+icecekler.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          setTimeout(function(){window.sesOku(barMetin);}, 300);
+        }
+        if (yiyecekler.length) {
+          var mutMetin = 'Mutfak, Masa '+masa+': '+yiyecekler.map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          setTimeout(function(){window.sesOku(mutMetin);}, icecekler.length?1500:300);
+        }
+        if (!icecekler.length && !yiyecekler.length) {
+          window.sesOku('Sipariş gönderildi');
+        }
+      } catch(e){
+        window.sesOku('Yeni sipariş');
+      }
+      return orig.apply(this, arguments);
+    };
+    window.siparisiGonder._sesHook = true;
+  }, 1500);
+});
+
+// Bar/Mutfak sekmelerinde yeni sipariş gelince sesli oku
+(function(){
+  var _barSon=-1, _mutSon=-1;
+  function kontrol(){
+    try {
+      var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]').filter(function(s){return !s.hazirlandi;});
+      var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]').filter(function(s){return !s.hazirlandi;});
+      if (_barSon>=0 && bar.length>_barSon) {
+        // Yeni gelen siparişleri bul ve oku
+        var yeni = bar.slice(_barSon);
+        yeni.forEach(function(s){
+          var urunler = (s.items||[]).map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          window.sesOku('Bar, Masa '+s.masa+': '+urunler);
+        });
+      }
+      if (_mutSon>=0 && mut.length>_mutSon) {
+        var yeniM = mut.slice(_mutSon);
+        yeniM.forEach(function(s){
+          var urunler = (s.items||[]).map(function(u){return (u.adet>1?u.adet+' ':'')+u.ad;}).join(', ');
+          window.sesOku('Mutfak, Masa '+s.masa+': '+urunler);
+        });
+      }
+      _barSon=bar.length; _mutSon=mut.length;
+    } catch(e){}
+  }
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      kontrol(); // ilk sayımı al
+      setInterval(kontrol,1500);
+      if(Notification&&Notification.permission==='default') Notification.requestPermission();
+    },2000);
+  });
+})();
+</script>
 <script id="cactus-sync">
 /* CACTUS SYNC v6 */
 (function(){
@@ -1542,90 +1667,6 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 })();
 </script>
-<script>
-window._sesCtx = null;
-window.sesUret = function(tip) {
-  try {
-    if (!window._sesCtx) window._sesCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var ctx = window._sesCtx;
-    if (ctx.state === 'suspended') ctx.resume();
-    var adet = tip === 'bar' ? 2 : 3;
-    var freq = tip === 'bar' ? 900 : 600;
-    for (var i = 0; i < adet; i++) {
-      (function(idx) {
-        setTimeout(function() {
-          var osc = ctx.createOscillator();
-          var gain = ctx.createGain();
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.frequency.value = freq;
-          osc.type = 'sine';
-          gain.gain.setValueAtTime(0.6, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-          osc.start(ctx.currentTime);
-          osc.stop(ctx.currentTime + 0.25);
-        }, idx * 350);
-      })(i);
-    }
-  } catch(e) { console.log('ses hatasi', e); }
-};
 
-// AudioContext'i kullanici etkilesimi ile ac
-document.addEventListener('click', function() {
-  if (!window._sesCtx) window._sesCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (window._sesCtx.state === 'suspended') window._sesCtx.resume();
-}, { once: false });
-
-// siparisiGonder hook
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    var orig = window.siparisiGonder;
-    if (!orig || orig._sesHook) return;
-    window.siparisiGonder = function() {
-      // Siparisi göndermeden önce masadaki ürünleri oku
-      try {
-        var masa = window.aktifMasa;
-        var masaData = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
-        var urunler = masaData[masa] || [];
-        var hasIc = urunler.some(function(u) { return u.tip === 'icecek' || u.tip === 'ic'; });
-        var hasYi = urunler.some(function(u) { return u.tip === 'yiyecek' || u.tip === 'yi'; });
-        if (hasIc) setTimeout(function() { window.sesUret('bar'); }, 200);
-        if (hasYi) setTimeout(function() { window.sesUret('mutfak'); }, hasIc ? 1000 : 200);
-        if (!hasIc && !hasYi) setTimeout(function() { window.sesUret('bar'); }, 200);
-      } catch(e) {
-        setTimeout(function() { window.sesUret('bar'); }, 200);
-      }
-      return orig.apply(this, arguments);
-    };
-    window.siparisiGonder._sesHook = true;
-  }, 1500);
-});
-
-// Bar/Mutfak sekmesinde yeni sipariş bildirimi
-(function() {
-  var _barSon = -1, _mutSon = -1;
-  function kontrol() {
-    try {
-      var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]').filter(function(s) { return !s.hazirlandi; });
-      var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]').filter(function(s) { return !s.hazirlandi; });
-      var aktifBtn = document.querySelector('.nav-btn.on, .tab-btn.on, [class*="btn"][class*="on"]');
-      var sekme = aktifBtn ? aktifBtn.textContent.toLowerCase() : '';
-      if (_barSon >= 0 && bar.length > _barSon && (sekme.includes('bar') || sekme.includes('ecek'))) {
-        window.sesUret('bar');
-      }
-      if (_mutSon >= 0 && mut.length > _mutSon && (sekme.includes('mutfak') || sekme.includes('iyecek'))) {
-        window.sesUret('mutfak');
-      }
-      _barSon = bar.length;
-      _mutSon = mut.length;
-    } catch(e) {}
-  }
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      kontrol(); // ilk sayimi al
-      setInterval(kontrol, 1500);
-    }, 2000);
-  });
-})();
-</script>
 </body>
 </html>

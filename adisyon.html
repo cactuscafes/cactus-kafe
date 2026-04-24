@@ -1125,30 +1125,41 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
+
 <script id="masa-isim-patch">
-window.MASA_ISIMLER={31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'};
-window.addEventListener('load',function(){
-  setTimeout(function(){
-    var origRM=window.renderMasalar;
-    if(!origRM||origRM._isimHook)return;
-    window.renderMasalar=function(){
-      origRM.apply(this,arguments);
-      // 31-34 numaralı masa butonlarına özel isim yaz
-      document.querySelectorAll('.mbtn').forEach(function(btn){
-        var mn=btn.querySelector('.mn');
-        var ml=btn.querySelector('.ml');
-        if(!mn||!ml)return;
-        var num=parseInt(mn.textContent);
-        if(window.MASA_ISIMLER[num]){
-          ml.textContent=window.MASA_ISIMLER[num];
-          btn.title=window.MASA_ISIMLER[num];
-        }
-      });
-    };
-    window.renderMasalar._isimHook=true;
-    window.renderMasalar(); // hemen çalıştır
-  },2500);
-});
+// Ekstra masalar: 31-34 Al-Git masaları
+(function(){
+  var EKSTRA={31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'};
+  // localStorage'a ekle
+  var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+  [31,32,33,34].forEach(function(n){if(!m[n])m[n]=[];});
+  localStorage.setItem('cactus_masalar',JSON.stringify(m));
+
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var orig=window.renderMasalar;
+      if(!orig||orig._ekstraHook)return;
+      window.renderMasalar=function(){
+        orig.apply(this,arguments);
+        var grid=document.querySelector('.masa-grid');
+        if(!grid)return;
+        [31,32,33,34].forEach(function(num){
+          if(grid.querySelector('[data-ekstra="'+num+'"]'))return;
+          var btn=document.createElement('button');
+          btn.className='mbtn';
+          btn.dataset.ekstra=num;
+          var masalar2=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+          if(masalar2[num]&&masalar2[num].length)btn.classList.add('dolu');
+          btn.innerHTML='<span class="mn">'+num+'</span><span class="ml">'+EKSTRA[num]+'</span>';
+          btn.onclick=function(){if(typeof masaSec==='function')masaSec(num);};
+          grid.appendChild(btn);
+        });
+      };
+      window.renderMasalar._ekstraHook=true;
+      window.renderMasalar();
+    },1500);
+  });
+})();
 </script>
 <script id="cactus-sync">
 /* CACTUS SYNC v5 - her zaman D1 master */

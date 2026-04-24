@@ -1126,13 +1126,15 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
+
 <script id="cactus-sync">
-/* CACTUS SYNC v6 */
+/* CACTUS SYNC v7 - masa cakisma fix */
 (function(){
   var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
   var SUBE='';
   var _lastSync=0;
-  var _pushing=false;
+  var _localWriteTime=0; // En son lokal yazma zamani
+  var LOKAL_KORUMA_MS=5000; // Lokale yazdiktan sonra 5sn D1 okuma
 
   window.addEventListener('load',function(){
     SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';
@@ -1148,31 +1150,31 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
   }
 
   function pushMasalar(){
-    if(_pushing)return;
-    _pushing=true;
-    // Her zaman localStorage'dan taze oku
+    _localWriteTime=Date.now();
     var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
     fetch(API+'/sync/masalar',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({sube:SUBE,masalar:m})
-    }).finally(function(){setTimeout(function(){_pushing=false;},500);}).catch(function(){_pushing=false;});
+    }).catch(function(){});
   }
 
   function hookSaveMasalar(){
     var orig=window.saveMasalar;
-    if(!orig||orig._sv6)return;
+    if(!orig||orig._sv7)return;
     window.saveMasalar=function(){
+      _localWriteTime=Date.now();
       var r=orig.apply(this,arguments);
       pushMasalar();
       return r;
     };
-    window.saveMasalar._sv6=true;
+    window.saveMasalar._sv7=true;
   }
 
   function hookSiparisiGonder(){
     var orig=window.siparisiGonder;
-    if(!orig||orig._sv6)return;
+    if(!orig||orig._sv7)return;
     window.siparisiGonder=function(){
+      _localWriteTime=Date.now();
       var r=orig.apply(this,arguments);
       setTimeout(function(){
         var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
@@ -1183,12 +1185,11 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
         localStorage.setItem('cactus_bar',JSON.stringify(bar));
         localStorage.setItem('cactus_mutfak',JSON.stringify(mut));
         if(sip.length){fetch(API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,siparisler:sip})}).catch(function(){});}
-        // Masa güncellemesini de gönder
         pushMasalar();
       },500);
       return r;
     };
-    window.siparisiGonder._sv6=true;
+    window.siparisiGonder._sv7=true;
   }
 
   function hookHazirlandiButtons(){
@@ -1198,30 +1199,33 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
       var id=btn.dataset.id||(btn.closest('[data-id]')&&btn.closest('[data-id]').dataset.id);
       if(id){
         fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
-        // Hazırlandıktan sonra masa güncelle
         setTimeout(pushMasalar,300);
       }
     });
   }
 
   function syncFromD1(){
-    if(_pushing)return;
+    // Son lokale yazmadan bu yana LOKAL_KORUMA_MS gecmediyse masalari D1'den okuma
+    var masaKorumaAktif = (Date.now()-_localWriteTime) < LOKAL_KORUMA_MS;
     var since=_lastSync?Math.max(0,_lastSync-5000):0;
+
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since)
       .then(function(r){return r.json();})
       .then(function(data){
-        // MASALAR
-        if(data.masalar&&data.masalar.length){
+        // MASALAR — sadece koruma süresi dolduysa ve fark varsa uygula
+        if(!masaKorumaAktif && data.masalar && data.masalar.length){
           var mevcut=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
           var changed=false;
           data.masalar.forEach(function(m){
             var mv=JSON.stringify(mevcut[m.masa]||[]);
             var yv=JSON.stringify(m.items||[]);
-            if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
+            if(mv!==yv){
+              mevcut[m.masa]=m.items||[];
+              changed=true;
+            }
           });
-          if(changed&&!_pushing){
+          if(changed){
             localStorage.setItem('cactus_masalar',JSON.stringify(mevcut));
-            // Global masalar objesini de güncelle
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
             }
@@ -1229,19 +1233,20 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
             if(typeof renderAdisyon==='function')renderAdisyon();
           }
         }
-        // SİPARİŞLER
+
+        // SİPARİŞLER — her zaman güncelle
         if(data.siparisler&&data.siparisler.length){
           var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
           var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
           var barIds=bar.map(function(s){return s.id;});
           var mutIds=mut.map(function(s){return s.id;});
-          var bc=false,mc=false,bYeni=[],mYeni=[];
+          var bc=false,mc=false;
           data.siparisler.forEach(function(s){
             if(s.tip==='bar'){
-              if(!barIds.includes(s.id)){bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});bc=true;bYeni.push(s);}
+              if(!barIds.includes(s.id)){bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});bc=true;}
               else bar.forEach(function(b){if(b.id===s.id&&s.hazirlandi===1&&!b.hazirlandi){b.hazirlandi=true;bc=true;}});
             }else{
-              if(!mutIds.includes(s.id)){mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});mc=true;mYeni.push(s);}
+              if(!mutIds.includes(s.id)){mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:s.hazirlandi===1,_d1:true});mc=true;}
               else mut.forEach(function(m){if(m.id===s.id&&s.hazirlandi===1&&!m.hazirlandi){m.hazirlandi=true;mc=true;}});
             }
           });

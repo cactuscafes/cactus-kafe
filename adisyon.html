@@ -1121,5 +1121,91 @@ renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
 </script>
 <script src="rapor-hook-podyum.js"></script>
+<script>
+// Sesli Siparis Bildirimi
+(function(){
+  function sesUret(tip){
+    try{
+      var ctx=new(window.AudioContext||window.webkitAudioContext)();
+      // Bar (içecek) sesi: iki kısa bip
+      // Mutfak (yiyecek) sesi: üç kısa bip
+      var adet=tip==='bar'?2:3;
+      var frekans=tip==='bar'?880:660;
+      for(var i=0;i<adet;i++){
+        (function(i){
+          setTimeout(function(){
+            var osc=ctx.createOscillator();
+            var gain=ctx.createGain();
+            osc.connect(gain);gain.connect(ctx.destination);
+            osc.frequency.value=frekans;
+            osc.type='sine';
+            gain.gain.setValueAtTime(0.4,ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime+0.3);
+          },i*400);
+        })(i);
+      }
+    }catch(e){}
+  }
+
+  // siparisiGonder'i hook et
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var orig=window.siparisiGonder;
+      if(!orig)return;
+      window.siparisiGonder=function(){
+        var result=orig.apply(this,arguments);
+        // Aktif masadaki ürünleri kontrol et — ic mi yi mi?
+        try{
+          var masa=window.aktifMasa;
+          var masalar=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+          var urunler=masalar[masa]||[];
+          var hasIc=urunler.some(function(u){return u.tip==='ic'||u.tip==='icecek';});
+          var hasYi=urunler.some(function(u){return u.tip==='yi'||u.tip==='yiyecek';});
+          if(hasIc) setTimeout(function(){sesUret('bar');},300);
+          if(hasYi) setTimeout(function(){sesUret('mutfak');},hasIc?1200:300);
+        }catch(e){
+          // Fallback: her siparişte çal
+          setTimeout(function(){sesUret('bar');},300);
+        }
+        return result;
+      };
+    },1000);
+  });
+
+  // Bar/Mutfak sekmelerinde yeni sipariş gelince bildirim
+  var _barSon=0,_mutSon=0;
+  function bildirimKontrol(){
+    try{
+      var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
+      var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||localStorage.getItem('ca')||'[]');
+      var aktifSekme=document.querySelector('.nav-btn.on,.sekme-btn.on,[data-sekme].on');
+      var sekmeAdi=aktifSekme?aktifSekme.textContent.toLowerCase():'';
+      if(bar.length>_barSon&&(sekmeAdi.includes('bar')||sekmeAdi.includes('içecek'))){
+        sesUret('bar');
+        if(Notification.permission==='granted'){new Notification('🥤 Yeni İçecek Siparişi',{body:bar.length-_barSon+' yeni sipariş',icon:'/favicon.ico'});}
+      }
+      if(mut.length>_mutSon&&(sekmeAdi.includes('mutfak')||sekmeAdi.includes('yiyecek'))){
+        sesUret('mutfak');
+        if(Notification.permission==='granted'){new Notification('🍳 Yeni Mutfak Siparişi',{body:mut.length-_mutSon+' yeni sipariş',icon:'/favicon.ico'});}
+      }
+      _barSon=bar.length;_mutSon=mut.length;
+    }catch(e){}
+  }
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
+      var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||localStorage.getItem('ca')||'[]');
+      _barSon=bar.length;_mutSon=mut.length;
+      setInterval(bildirimKontrol,1500);
+      // Bildirim izni iste
+      if(Notification&&Notification.permission==='default'){
+        Notification.requestPermission();
+      }
+    },1500);
+  });
+})();
+</script>
 </body>
 </html>

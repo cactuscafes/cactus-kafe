@@ -1125,6 +1125,31 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 
+<script id="masa-isim-patch">
+window.MASA_ISIMLER={31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'};
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    var origRM=window.renderMasalar;
+    if(!origRM||origRM._isimHook)return;
+    window.renderMasalar=function(){
+      origRM.apply(this,arguments);
+      // 31-34 numaralı masa butonlarına özel isim yaz
+      document.querySelectorAll('.mbtn').forEach(function(btn){
+        var mn=btn.querySelector('.mn');
+        var ml=btn.querySelector('.ml');
+        if(!mn||!ml)return;
+        var num=parseInt(mn.textContent);
+        if(window.MASA_ISIMLER[num]){
+          ml.textContent=window.MASA_ISIMLER[num];
+          btn.title=window.MASA_ISIMLER[num];
+        }
+      });
+    };
+    window.renderMasalar._isimHook=true;
+    window.renderMasalar(); // hemen çalıştır
+  },2500);
+});
+</script>
 <script id="cactus-sync">
 /* CACTUS SYNC v5 - her zaman D1 master */
 (function(){

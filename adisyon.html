@@ -638,7 +638,7 @@ function renderMasalar(){
     b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'');
     b.onclick=()=>masaSec(i);
     b.innerHTML=(adet>0?`<div class="mbdg">${adet}</div>`:'')+
-      `<span class="mn">${i}</span><span class="ml">Masa</span>`+
+      `<span class="mn">${i}</span><span class="ml">${({31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'})[i]||'Masa'}</span>`+
       (top>0?`<span class="mf">₺${top}</span>`:'');
     g.appendChild(b);
   }

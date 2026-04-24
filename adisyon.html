@@ -872,7 +872,7 @@ function sipKart(s,tip){
   const ic=tip==='bar';
   const d=document.createElement('div');
   d.className='skrt'+(s.hazirlandi?' done':'');
-  d.innerHTML=`<div class="skrt-hdr ${ic?'ic':'yi'}"><div class="skrt-masa">Masa ${s.masa}</div><div style="display:flex;align-items:center;gap:6px;"><span class="skrt-saat">${s.saat}</span>${!s.hazirlandi?'<span class="yeni-rz">YENİ</span>':''}</div></div><div class="skrt-body">${s.items.map(it=>`<div class="srow"><span class="srow-ad">${it.emoji} ${it.ad}</span><span class="srow-adet">${it.adet} adet</span></div>`).join('')}</div><div class="skrt-ftr">${s.hazirlandi?'<button class="hzr-btn done" disabled>✓ Hazırlandı</button>':`<button class="hzr-btn ${ic?'ic':'yi'}" onclick="hazirlandiMark('${s.id}','${tip}')">✓ Hazırlandı</button>`}</div>`;
+  d.innerHTML=`<div class="skrt-hdr ${ic?'ic':'yi'}"><div class="skrt-masa">Masa ${s.masa}</div><div style="display:flex;align-items:center;gap:6px;"><span class="skrt-saat">${s.saat}</span>${!s.hazirlandi?'<span class="yeni-rz">YENİ</span>':''}</div></div><div class="skrt-body">${s.items.map(it=>`<div class="srow"><span class="srow-ad">${it.emoji} ${it.ad}</span><span class="srow-adet">${it.adet} adet</span></div>`).join('')}</div><div class="skrt-ftr">${s.hazirlandi?'<button class="hzr-btn done" disabled>✓ Hazırlandı</button>':`<button class="hzr-btn ${ic?'ic':'yi'}" onclick="hazirlandiMark('${s.id}','${tip}')">✓ Hazırlandı</button>`}<button class="tmz-btn" onclick="siparisSil('${s.id}','${tip}')" style="margin-left:6px;padding:6px 12px;background:#c0392b;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">🗑 Temizle</button></div>`;
   return d;
 }
 function hazirlandiMark(id,tip){
@@ -880,6 +880,21 @@ function hazirlandiMark(id,tip){
   else{mutSip=mutSip.map(x=>x.id===id?{...x,hazirlandi:true}:x);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}
   updateBadges();toast('✓ Hazırlandı olarak işaretlendi');
 }
+function siparisSil(id, tip) {
+  var lk = tip === 'bar' ? 'cactus_bar' : 'cactus_mutfak';
+  var siparisler = JSON.parse(localStorage.getItem(lk) || '[]');
+  siparisler = siparisler.filter(function(s){ return s.id !== id; });
+  localStorage.setItem(lk, JSON.stringify(siparisler));
+  if(tip === 'bar') { if(typeof renderBar==='function') renderBar(); }
+  else { if(typeof renderMut==='function') renderMut(); }
+  if(typeof updateBadges==='function') updateBadges();
+  // D1'e de hazırlandı olarak işaretle
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({id: id})
+  }).catch(function(){});
+}
+
 function clearDone(tip){
   if(tip==='bar'){barSip=barSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.bar,JSON.stringify(barSip));renderBar();}
   else{mutSip=mutSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}

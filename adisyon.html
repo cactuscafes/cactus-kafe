@@ -881,7 +881,7 @@ function hazirlandiMark(id,tip){
   updateBadges();toast('✓ Hazırlandı olarak işaretlendi');
 }
 function siparisSil(id, tip) {
-  var lk = tip === 'bar' ? 'cactus_bar' : 'cactus_mutfak';
+  var lk = tip === 'bar' ? 'cactus_bar' : 'cactus_mut';
   var siparisler = JSON.parse(localStorage.getItem(lk) || '[]');
   siparisler = siparisler.filter(function(s){ return s.id !== id; });
   localStorage.setItem(lk, JSON.stringify(siparisler));
@@ -1236,12 +1236,12 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
       var r=orig.apply(this,arguments);
       setTimeout(function(){
         var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
-        var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
+        var mut=JSON.parse(localStorage.getItem('cactus_mut')||'[]');
         var sip=[],now=Date.now();
         bar.forEach(function(s){if(!s._d1){sip.push({id:s.id,masa:s.masa,tip:'bar',items:s.items,zaman:now});s._d1=true;}});
         mut.forEach(function(s){if(!s._d1){sip.push({id:s.id,masa:s.masa,tip:'mutfak',items:s.items,zaman:now});s._d1=true;}});
         localStorage.setItem('cactus_bar',JSON.stringify(bar));
-        localStorage.setItem('cactus_mutfak',JSON.stringify(mut));
+        localStorage.setItem('cactus_mut',JSON.stringify(mut));
         if(sip.length){fetch(API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,siparisler:sip})}).catch(function(){});}
         pushMasalar();
       },500);
@@ -1295,7 +1295,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
         // SİPARİŞLER — her zaman güncelle
         if(data.siparisler&&data.siparisler.length){
           var bar=JSON.parse(localStorage.getItem('cactus_bar')||'[]');
-          var mut=JSON.parse(localStorage.getItem('cactus_mutfak')||'[]');
+          var mut=JSON.parse(localStorage.getItem('cactus_mut')||'[]');
           var barIds=bar.map(function(s){return s.id;});
           var mutIds=mut.map(function(s){return s.id;});
           var bc=false,mc=false;
@@ -1309,7 +1309,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
             }
           });
           if(bc){localStorage.setItem('cactus_bar',JSON.stringify(bar));if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
-          if(mc){localStorage.setItem('cactus_mutfak',JSON.stringify(mut));if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
+          if(mc){localStorage.setItem('cactus_mut',JSON.stringify(mut));if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
         }
         _lastSync=data.zaman||Date.now();
       }).catch(function(){});
@@ -1397,7 +1397,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
   function masaRenkGuncelle() {
     var masalar = JSON.parse(localStorage.getItem('cactus_masalar') || '{}');
     var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
-    var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]');
+    var mut = JSON.parse(localStorage.getItem('cactus_mut') || '[]');
     var bekleyenMasalar = {};
     bar.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
     mut.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
@@ -1421,7 +1421,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
   /* ===== 6. BEKLEME SURESI ===== */
   function sureGuncelle() {
     var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
-    var mut = JSON.parse(localStorage.getItem('cactus_mutfak') || '[]');
+    var mut = JSON.parse(localStorage.getItem('cactus_mut') || '[]');
     var simdi = Date.now();
     var bekleyenler = {};
     bar.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){

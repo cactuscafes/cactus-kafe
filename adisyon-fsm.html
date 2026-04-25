@@ -774,7 +774,7 @@ function siparisiGonder(){
   const yi=a.filter(x=>x.tip==='yiyecek');
   if(ic.length){barSip.push({id:'i_'+Date.now(),masa:aktifMasa,saat,items:ic,hazirlandi:false});localStorage.setItem(LK.bar,JSON.stringify(barSip));}
   if(yi.length){mutSip.push({id:'y_'+Date.now(),masa:aktifMasa,saat,items:yi,hazirlandi:false});localStorage.setItem(LK.mut,JSON.stringify(mutSip));}
-  masalar[aktifMasa]=[];saveMasalar();updateBadges();closeDrawer();
+  masalar[aktifMasa]=[];saveMasalar();updateBadges();
   toast('📤 Sipariş bar'+(yi.length?' ve mutfağa':'')+' gönderildi!');
 }
 

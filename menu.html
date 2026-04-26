@@ -149,20 +149,16 @@ footer{padding:40px 20px 24px;}
 
 <script>
 const MENU_DATA_URL = 'menu-data.json';
-let menuData = {}, katData = [];
+var menuData = {}, katData = [];
 
 async function init() {
   try {
-    const res = await fetch(MENU_DATA_URL + '?t=' + Date.now());
-    const data = await res.json();
-    if(data.menu) menuData = data.menu;
-    if(data.kategoriler) katData = data.kategoriler;
-    if(data.oncu) menuData.oncu = data.oncu;
+    const r = await fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t=' + Date.now());
+    const data = await r.json();
+    // menuData global değişkenine ata
+    Object.keys(data).forEach(function(k) { menuData[k] = data[k]; });
   } catch(e) {
-    const local = localStorage.getItem('cactus_admin_menu');
-    const localKat = localStorage.getItem('cactus_kat');
-    if(local) menuData = JSON.parse(local);
-    if(localKat) katData = JSON.parse(localKat);
+    console.error('Menu yuklenemedi:', e);
   }
   renderMenu('fsm');
   renderMenu('podyum');

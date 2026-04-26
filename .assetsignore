@@ -1,0 +1,14 @@
+node_modules
+.git
+.github
+.claude
+.wrangler
+.DS_Store
+package.json
+package-lock.json
+wrangler.toml
+wrangler.jsonc
+.gitignore
+.dev.vars*
+.env*
+*.zip

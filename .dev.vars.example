@@ -1,0 +1,3 @@
+# Cloudflare Development Variables
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+ENVIRONMENT=development

@@ -1,0 +1,15 @@
+name = "cactus-kafe"
+compatibility_date = "2026-04-26"
+
+assets = { directory = "." }
+
+compatibility_flags = [ "nodejs_compat" ]
+
+[observability]
+enabled = true
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.staging]
+vars = { ENVIRONMENT = "staging" }

@@ -165,58 +165,28 @@ async function init() {
 }
 
 function renderMenu(sube) {
-  // Spotlight: fotoğrafı olan ilk 4 ürün
-  const allProducts = Object.values(menuData).flat().filter(u => u.foto && !u.gizli);
-  const spotlightEl = document.getElementById('spotlight-grid-' + sube);
-  const oncuList = (menuData.oncu||[]).filter(u=>!u.gizli);
-    const spotItems = oncuList.length > 0 ? oncuList.slice(0,4) : allProducts.slice(0,4);
-  
-  if(spotItems.length > 0) {
-    spotlightEl.innerHTML = spotItems.map(u => `
-      <div class="spotlight-card">
-        <img src="${u.foto}" alt="${u.ad}" onerror="this.style.display='none'">
-        <div class="spotlight-card-info">
-          <div class="spotlight-card-name"><span class="spotlight-card-emoji">${u.emoji||''}</span>${u.ad}</div>
-          <div class="spotlight-card-price">₺${u.fiyat||''}</div>
-        </div>
-      </div>
-    `).join('');
-  } else {
-    document.getElementById('spotlight-' + sube).style.display = 'none';
-  }
-
-  // Kategoriler
+  const subeData = menuData[sube];
+  if(!subeData) return;
   const catListEl = document.getElementById('cat-list-' + sube);
-  catListEl.innerHTML = katData.map((kat, idx) => {
-    const urunler = (menuData[kat.id] || []).filter(u => !u.gizli);
-    if(!urunler.length) return `<div class="cat-section"><div class="cat-header" style="opacity:0.4"><div class="cat-header-left"><span class="cat-name">${kat.label}</span><span class="cat-count">Yakında</span></div></div></div>`;
-    
-    const urunlerHTML = urunler.map(u => `
-      <div class="product-card">
-        <div class="product-img-wrap">
-          ${u.foto 
-            ? `<img src="${u.foto}" alt="${u.ad}" onerror="this.parentElement.innerHTML='<div class=product-emoji-placeholder>${u.emoji||'☕'}</div>'">`
-            : `<div class="product-emoji-placeholder">${u.emoji||'☕'}</div>`
-          }
-        </div>
-        <div class="product-name">${u.emoji||''} ${u.ad}</div>
-        ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
-        <div class="product-price">₺${u.fiyat||'–'}</div>
-      </div>
-    `).join('');
-
-    return `
-      <div class="cat-section" id="cat-${kat.id}-${sube}">
-        <div class="cat-header" onclick="toggleCat('cat-${kat.id}-${sube}')">
-          <div class="cat-header-left">
-            <span class="cat-name">${kat.label}</span>
-            <span class="cat-count">${urunler.length} çeşit</span>
-          </div>
-          <span class="cat-arrow">+</span>
-        </div>
-        <div class="cat-products">${urunlerHTML}</div>
-      </div>
-    `;
+  if(!catListEl) return;
+  const katData = Object.values(subeData);
+  // Spotlight
+  const allProducts = katData.flatMap(function(k){ return k.urunler||[]; });
+  const oncuList = (oncuData||[]).filter(function(id){ return allProducts.find(function(u){ return u.id===id; }); }).map(function(id){ return allProducts.find(function(u){ return u.id===id; }); });
+  const spotItems = oncuList.length > 0 ? oncuList.slice(0,4) : allProducts.filter(function(u){ return u.foto; }).slice(0,4);
+  const spotlightEl = document.getElementById('spotlight-' + sube);
+  const spotGridEl = document.getElementById('spotlight-grid-' + sube);
+  if(spotItems.length > 0 && spotGridEl) {
+    spotGridEl.innerHTML = spotItems.map(function(u){ return '<div class="spotlight-card"><img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.style.display='none'"><div class="spotlight-card-info"><div class="spotlight-card-name"><span class="spotlight-card-emoji">'+(u.emoji||'')+'</span>'+u.ad+'</div><div class="spotlight-card-price">\u20ba'+(u.fiyat||'')+'</div></div></div>'; }).join('');
+  } else if(spotlightEl) {
+    spotlightEl.style.display = 'none';
+  }
+  // Kategoriler
+  catListEl.innerHTML = katData.map(function(kat) {
+    const urunler = (kat.urunler||[]).filter(function(u){ return !u.gizli; });
+    if(!urunler.length) return '<div class="cat-section"><div class="cat-header" style="opacity:0.4"><div class="cat-header-left"><span class="cat-name">'+kat.label+'</span></div></div></div>';
+    const urunlerHTML = urunler.map(function(u){ return '<div class="product-card"><div class="product-img-wrap">'+(u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.parentElement.innerHTML='<div class=product-emoji-placeholder>'+(u.emoji||'☕')+'</div>'">':'<div class="product-emoji-placeholder">'+(u.emoji||'☕')+'</div>')+'</div><div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>'+(u.aciklama?'<div class="product-desc">'+u.aciklama+'</div>':'')+'<div class="product-price">\u20ba'+(u.fiyat||'\u2013')+'</div></div>'; }).join('');
+    return '<div class="cat-section" id="cat-'+kat.id+'-'+sube+'"><div class="cat-header" onclick="toggleCat('cat-'+kat.id+'-'+sube+'')"><div class="cat-header-left"><span class="cat-name">'+kat.label+'</span><span class="cat-count">'+urunler.length+' \u00e7e\u015fit</span></div><span class="cat-arrow">+</span></div><div class="cat-products">'+urunlerHTML+'</div></div>';
   }).join('');
 }
 

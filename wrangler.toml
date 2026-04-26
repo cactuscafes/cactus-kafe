@@ -11,5 +11,13 @@ enabled = true
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
+[[routes]]
+pattern = "cactuscafes.com"
+custom_domain = true
+
+[[routes]]
+pattern = "www.cactuscafes.com"
+custom_domain = true
+
 [env.staging]
 vars = { ENVIRONMENT = "staging" }

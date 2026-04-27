@@ -1040,8 +1040,8 @@ function renderYon(){
   const wi=document.getElementById('webhook-input');
   if(wi) wi.value=localStorage.getItem('cactus_webhook')||'';
 }
-function fiyatGuncelle(idx,val){MENU[yonKat].urunler[idx].fiyat=parseInt(val)||0;}
-function urunSilMenu(idx){MENU[yonKat].urunler.splice(idx,1);renderYon();}
+function fiyatGuncelle(idx,val){MENU[yonKat].urunler[idx].fiyat=parseInt(val)||0;menuKaydet();}
+function urunSilMenu(idx){MENU[yonKat].urunler.splice(idx,1);menuKaydet();renderYon();}
 function urunEkleMenu(){
   const emoji=document.getElementById('yeni-emoji').value.trim()||'☕';
   const ad=document.getElementById('yeni-ad').value.trim();
@@ -1051,7 +1051,7 @@ function urunEkleMenu(){
   document.getElementById('yeni-emoji').value='';
   document.getElementById('yeni-ad').value='';
   document.getElementById('yeni-fiyat').value='';
-  renderYon();toast('✓ '+ad+' eklendi');
+  menuKaydet();renderYon();toast('✓ '+ad+' eklendi');
 }
 function menuKaydet(){localStorage.setItem(LK.menu,JSON.stringify(MENU));renderKatBar();renderUrunler();toast('💾 Menü kaydedildi!');}
 function masaAktar(){

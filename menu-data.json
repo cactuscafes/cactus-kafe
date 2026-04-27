@@ -570,7 +570,7 @@
         {
           "id": "t1",
           "ad": "Kaşarlı Sosyete",
-          "fiyat": 150,
+          "fiyat": 250,
           "emoji": "🧀",
           "tip": "yi",
           "aciklama": "İnce ekmek + kaşar peyniri.",
@@ -580,7 +580,7 @@
         {
           "id": "t2",
           "ad": "Sucuklu Sosyete",
-          "fiyat": 150,
+          "fiyat": 250,
           "emoji": "🥩",
           "tip": "yi",
           "aciklama": "İnce ekmek + sucuk.",
@@ -590,7 +590,7 @@
         {
           "id": "t3",
           "ad": "Karışık Sosyete",
-          "fiyat": 170,
+          "fiyat": 280,
           "emoji": "🥪",
           "tip": "yi",
           "aciklama": "İnce ekmek + kaşar + sucuk.",
@@ -1207,7 +1207,7 @@
         {
           "id": "t1",
           "ad": "Kaşarlı Sosyete",
-          "fiyat": 150,
+          "fiyat": 250,
           "emoji": "🧀",
           "tip": "yi",
           "aciklama": "İnce ekmek + kaşar peyniri.",
@@ -1217,7 +1217,7 @@
         {
           "id": "t2",
           "ad": "Sucuklu Sosyete",
-          "fiyat": 150,
+          "fiyat": 250,
           "emoji": "🥩",
           "tip": "yi",
           "aciklama": "İnce ekmek + sucuk.",
@@ -1227,7 +1227,7 @@
         {
           "id": "t3",
           "ad": "Karışık Sosyete",
-          "fiyat": 170,
+          "fiyat": 280,
           "emoji": "🥪",
           "tip": "yi",
           "aciklama": "İnce ekmek + kaşar + sucuk.",

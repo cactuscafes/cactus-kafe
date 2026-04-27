@@ -369,7 +369,7 @@
       {
         "id": "c7",
         "ad": "Kış Çayı",
-        "fiyat": 190,
+        "fiyat": 200,
         "emoji": "❄️",
         "tip": "ic",
         "aciklama": "Tarçın + karanfil + zencefil.",
@@ -379,7 +379,7 @@
       {
         "id": "c8",
         "ad": "Mavi Kelebek",
-        "fiyat": 190,
+        "fiyat": 200,
         "emoji": "🦋",
         "tip": "ic",
         "aciklama": "Butterfly pea flower, renk değiştirir.",
@@ -435,7 +435,7 @@
       {
         "id": "v5",
         "ad": "Limonata",
-        "fiyat": 180,
+        "fiyat": 170,
         "emoji": "🍋",
         "tip": "ic",
         "aciklama": "Ev yapımı",
@@ -445,7 +445,7 @@
       {
         "id": "v6",
         "ad": "Çilekli Limonata",
-        "fiyat": 190,
+        "fiyat": 180,
         "emoji": "🍓",
         "tip": "ic",
         "aciklama": "Ev yapımı limonata + çilek",

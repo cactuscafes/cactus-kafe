@@ -351,6 +351,7 @@ input,select{font-family:'Lato',sans-serif;}
     </div>
     <div class="urun-pnl">
       <div class="uyari" id="uyari">⚠️ Önce masa seçin</div>
+      <div class="sube-bar" id="sube-bar" style="display:none;padding:6px 10px;background:var(--wh);border-bottom:1px solid var(--kr2);gap:6px;align-items:center;font-size:12px;"></div>
       <div class="kat-bar" id="kat-bar"></div>
       <div class="urun-grid" id="urun-grid"></div>
     </div>
@@ -597,8 +598,18 @@ const MENU_DEFAULT = {
   ]},
 };
 
-const LK={mas:'cactus_masalar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
-let MENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
+const LK={mas:'cactus_masalar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu',sube:'cactus_sube'};
+// --- Format detection: data may be branch-keyed ({fsm:{...}, podyum:{...}}) or flat ({sicak:{...}, ...}) ---
+function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
+function pickBranch(branches,sube){return branches[sube]||branches['fsm']||branches[Object.keys(branches)[0]];}
+let _rawMENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
+let BRANCHES=null;
+let aktifSube=localStorage.getItem(LK.sube)||'fsm';
+if(isBranchFormat(_rawMENU)){
+  BRANCHES=_rawMENU;
+  if(!BRANCHES[aktifSube]) aktifSube=Object.keys(BRANCHES)[0];
+}
+let MENU=BRANCHES?pickBranch(BRANCHES,aktifSube):_rawMENU;
 let masalar={};
 let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
 let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
@@ -656,13 +667,41 @@ function masaSec(no){
 
 function saveMasalar(){localStorage.setItem(LK.mas,JSON.stringify(masalar));}
 
+function renderSubeBar(){
+  const bar=document.getElementById('sube-bar');
+  if(!bar)return;
+  if(!BRANCHES){bar.style.display='none';bar.innerHTML='';return;}
+  bar.style.display='flex';
+  bar.innerHTML='<span style="opacity:.7;margin-right:4px;">Şube:</span>';
+  Object.keys(BRANCHES).forEach(k=>{
+    const b=document.createElement('button');
+    const active=(aktifSube===k);
+    b.textContent=k.toUpperCase();
+    b.style.cssText='padding:4px 12px;border-radius:14px;border:1px solid var(--kr2);cursor:pointer;font-weight:600;background:'+(active?'var(--gold,#c9a14a)':'transparent')+';color:'+(active?'#fff':'inherit')+';';
+    b.onclick=()=>subeDegistir(k);
+    bar.appendChild(b);
+  });
+}
+
+function subeDegistir(yeni){
+  if(!BRANCHES||!BRANCHES[yeni]||yeni===aktifSube)return;
+  aktifSube=yeni;
+  try{localStorage.setItem(LK.sube,yeni);}catch(e){}
+  MENU=pickBranch(BRANCHES,aktifSube);
+  aktifKat=Object.keys(MENU)[0];
+  yonKat=aktifKat;
+  renderSubeBar();renderKatBar();renderUrunler();
+  if(typeof renderYon==='function'&&document.getElementById('scr-yon')&&document.getElementById('scr-yon').classList.contains('on'))renderYon();
+}
+
 function renderKatBar(){
   const bar=document.getElementById('kat-bar');
   bar.innerHTML='';
   Object.entries(MENU).forEach(([k,v])=>{
+    if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
     b.className='ktab'+(aktifKat===k?' on':'');
-    b.textContent=v.label;
+    b.textContent=v.label||k;
     b.onclick=()=>{aktifKat=k;renderKatBar();renderUrunler();};
     bar.appendChild(b);
   });
@@ -672,12 +711,14 @@ function renderUrunler(){
   const g=document.getElementById('urun-grid');
   g.innerHTML='';
   const kat=MENU[aktifKat];
-  if(!kat)return;
+  if(!kat||!Array.isArray(kat.urunler))return;
   kat.urunler.forEach(u=>{
+    if(u&&u.gizli)return;
+    const tip=(u&&u.tip)||kat.tip||'yi';
     const d=document.createElement('button');
-    d.className='ukrt '+(kat.tip==='icecek'?'ic':'yi');
-    d.innerHTML=`<span class="ue">${u.emoji}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
-    d.onclick=()=>urunEkle({...u,tip:kat.tip},d);
+    d.className='ukrt '+(tip==='ic'||tip==='icecek'?'ic':'yi');
+    d.innerHTML=`<span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
+    d.onclick=()=>urunEkle({...u,tip},d);
     g.appendChild(d);
   });
 }
@@ -1133,7 +1174,7 @@ if(window.innerWidth<=640){
   const btn=document.getElementById('toggle-btn');
   if(pnl&&btn){pnl.classList.add('kapali');btn.textContent='▶';}
 }
-renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
+renderMasalar();renderSubeBar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
 </script>
 <script src="rapor-hook-podyum.js"></script>
@@ -1203,14 +1244,36 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
         var yeniStr = JSON.stringify(data);
         if(mevcutStr !== yeniStr){
           localStorage.setItem(LK.menu, yeniStr);
-          // MENU global'i güncelle
-          if(typeof MENU !== 'undefined'){
-            Object.keys(data).forEach(function(k){ MENU[k]=data[k]; });
-          }
-          if(typeof renderKatBar==='function') renderKatBar();
-          if(typeof renderUrunler==='function') renderUrunler();
-          console.log('Menü güncellendi');
         }
+        // Format detection: branch-keyed ({fsm:..., podyum:...}) veya flat
+        var branchFmt = (typeof isBranchFormat==='function') ? isBranchFormat(data) : (data && (data.fsm||data.podyum) && !data.urunler);
+        if(branchFmt){
+          window.BRANCHES = data;
+          if(!window.aktifSube || !data[window.aktifSube]){
+            window.aktifSube = (localStorage.getItem(LK.sube)&&data[localStorage.getItem(LK.sube)])
+              ? localStorage.getItem(LK.sube) : Object.keys(data)[0];
+          }
+          var pick = (typeof pickBranch==='function') ? pickBranch(data, window.aktifSube) : data[window.aktifSube];
+          // MENU referansını koru: anahtarları temizleyip yeniden doldur
+          if(typeof MENU!=='undefined' && MENU){
+            Object.keys(MENU).forEach(function(k){delete MENU[k];});
+            Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
+          } else { window.MENU = pick; }
+        } else {
+          if(typeof MENU!=='undefined' && MENU){
+            Object.keys(MENU).forEach(function(k){delete MENU[k];});
+            Object.keys(data).forEach(function(k){MENU[k]=data[k];});
+          } else { window.MENU = data; }
+          window.BRANCHES = null;
+        }
+        // Aktif kategori hala MENU'de var mı? Yoksa ilkine düş
+        if(typeof aktifKat!=='undefined' && !MENU[aktifKat]){
+          window.aktifKat = Object.keys(MENU)[0];
+        }
+        if(typeof renderSubeBar==='function') renderSubeBar();
+        if(typeof renderKatBar==='function') renderKatBar();
+        if(typeof renderUrunler==='function') renderUrunler();
+        console.log('Menü güncellendi'+(branchFmt?' (sube:'+window.aktifSube+')':''));
       }).catch(function(){});
   }
 

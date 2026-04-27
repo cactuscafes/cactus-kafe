@@ -174,7 +174,7 @@ function renderMenu(sube) {
   if (spotItems.length > 0 && spotGridEl) {
     spotGridEl.innerHTML = spotItems.map(function(u){
       var c='<div class="spotlight-card">';
-      c+='<img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.style.display='none'">';
+      c+='<img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.style.display=\'none\'">';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
       return c;

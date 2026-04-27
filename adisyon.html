@@ -615,6 +615,23 @@ for(let i=1;i<=34;i++) masalar[i]=[];
 const saved=JSON.parse(localStorage.getItem(LK.mas)||'null');
 if(saved) for(let i=1;i<=30;i++) masalar[i]=saved[i]||[];
 
+// Migration: stale 'ic'/'yi' tip değerlerini 'icecek'/'yiyecek' olarak normalleştir
+function _normTip(t){return (t==='ic'||t==='icecek')?'icecek':'yiyecek';}
+let _migrated=false;
+for(let i=1;i<=34;i++){
+  if(!masalar[i])continue;
+  masalar[i].forEach(it=>{
+    if(it&&it.tip&&it.tip!=='icecek'&&it.tip!=='yiyecek'){it.tip=_normTip(it.tip);_migrated=true;}
+  });
+}
+if(_migrated){try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}}
+// barSip ve mutSip için de migrate
+[['bar',barSip],['mut',mutSip]].forEach(([k,arr])=>{
+  let chg=false;
+  arr.forEach(s=>{(s.items||[]).forEach(it=>{if(it&&it.tip&&it.tip!=='icecek'&&it.tip!=='yiyecek'){it.tip=_normTip(it.tip);chg=true;}});});
+  if(chg)try{localStorage.setItem(LK[k],JSON.stringify(arr));}catch(e){}
+});
+
 function tickTime(){
   const n=new Date();
   document.getElementById('ts').textContent=n.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
@@ -681,11 +698,13 @@ function renderUrunler(){
   if(!kat||!Array.isArray(kat.urunler))return;
   kat.urunler.forEach(u=>{
     if(u&&u.gizli)return;
-    const tip=(u&&u.tip)||kat.tip||'yi';
+    const tipRaw=(u&&u.tip)||kat.tip||'yi';
+    const ic=(tipRaw==='ic'||tipRaw==='icecek');
+    const tipNorm=ic?'icecek':'yiyecek';
     const d=document.createElement('button');
-    d.className='ukrt '+(tip==='ic'||tip==='icecek'?'ic':'yi');
+    d.className='ukrt '+(ic?'ic':'yi');
     d.innerHTML=`<span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
-    d.onclick=()=>urunEkle({...u,tip},d);
+    d.onclick=()=>urunEkle({...u,tip:tipNorm},d);
     g.appendChild(d);
   });
 }
@@ -1296,7 +1315,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
   var SUBE='';
   var _lastSync=0;
   var _localWriteTime=0;
-  var LOKAL_KORUMA_MS=6000;
+  var LOKAL_KORUMA_MS=2000;
 
   window.addEventListener('load',function(){
     SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';
@@ -1309,7 +1328,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
     hookSaveMasalar();
     hookSiparisiGonder();
     hookHazirlandiButtons();
-    setInterval(syncFromD1,2000);
+    setInterval(syncFromD1,1500);
     syncFromD1();
   }
 

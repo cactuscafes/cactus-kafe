@@ -497,7 +497,7 @@
       {
         "id": "m1",
         "ad": "Damla Cam Şişe Su",
-        "fiyat": 40,
+        "fiyat": 30,
         "emoji": "💧",
         "tip": "ic",
         "aciklama": "Soğuk kaynak suyu.",
@@ -513,6 +513,12 @@
         "aciklama": "Karbonatlı maden suyu.",
         "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
         "gizli": false
+      },
+      {
+        "id": "mesrubat_1777306680249",
+        "ad": "enerji içeceği",
+        "fiyat": 140,
+        "emoji": "☕"
       }
     ]
   },

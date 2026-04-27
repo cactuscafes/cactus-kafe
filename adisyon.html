@@ -1328,22 +1328,53 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
   function masalarTamCek(){
     var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
+    // since=0 → tüm masaları çek; since=12saat → bugünkü siparişleri çek
+    var sipSince=Date.now()-(12*60*60*1000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since=0')
       .then(function(r){return r.json();})
       .then(function(data){
-        if(!data.masalar||!data.masalar.length)return;
-        var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
-        var changed=false;
-        data.masalar.forEach(function(m){
-          var mv=JSON.stringify(mevcut[m.masa]||[]);
-          var yv=JSON.stringify(m.items||[]);
-          if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
-        });
-        if(changed){
-          localStorage.setItem(lkMas,JSON.stringify(mevcut));
-          if(typeof masalar!=='undefined') data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
-          if(typeof renderMasalar==='function')renderMasalar();
-          if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
+        // ── MASALAR ──
+        if(data.masalar&&data.masalar.length){
+          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
+          var changed=false;
+          data.masalar.forEach(function(m){
+            var mv=JSON.stringify(mevcut[m.masa]||[]);
+            var yv=JSON.stringify(m.items||[]);
+            if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
+          });
+          if(changed){
+            localStorage.setItem(lkMas,JSON.stringify(mevcut));
+            if(typeof masalar!=='undefined') data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
+            if(typeof renderMasalar==='function')renderMasalar();
+            if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
+          }
+        }
+        // ── SİPARİŞLER (bar/mutfak) — son 12 saatteki bekleyenleri yükle ──
+        if(data.siparisler&&data.siparisler.length){
+          var lkBar=getLkBar(); var lkMut=getLkMut();
+          var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
+          var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
+          var barIds=bar.map(function(s){return s.id;});
+          var mutIds=mut.map(function(s){return s.id;});
+          var bc=false,mc=false;
+          data.siparisler.forEach(function(s){
+            if(s.zaman<sipSince)return; // 12 saatten eski → atla
+            if(s.hazirlandi===1){
+              bar.forEach(function(b){if(b.id===s.id&&!b.hazirlandi){b.hazirlandi=true;bc=true;}});
+              mut.forEach(function(m){if(m.id===s.id&&!m.hazirlandi){m.hazirlandi=true;mc=true;}});
+              return;
+            }
+            if(s.tip==='bar'&&!barIds.includes(s.id)){
+              bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
+              barIds.push(s.id);bc=true;
+            }
+            if(s.tip==='mutfak'&&!mutIds.includes(s.id)){
+              mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
+              mutIds.push(s.id);mc=true;
+            }
+          });
+          if(bc){localStorage.setItem(lkBar,JSON.stringify(bar));if(typeof barSip!=='undefined')barSip.splice(0,barSip.length,...bar);if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
+          if(mc){localStorage.setItem(lkMut,JSON.stringify(mut));if(typeof mutSip!=='undefined')mutSip.splice(0,mutSip.length,...mut);if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
         }
       }).catch(function(){});
   }

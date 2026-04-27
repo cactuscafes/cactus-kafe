@@ -597,7 +597,11 @@ const MENU_DEFAULT = {
 };
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
-let MENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
+// Bu sayfa FSM şubesi için. menu-data.json branch-keyed format'a geçtiğinde otomatik 'fsm' dalını seç.
+function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
+function pickBranch(branches){return branches['fsm']||branches['podyum']||branches[Object.keys(branches)[0]];}
+let _rawMENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
+let MENU=isBranchFormat(_rawMENU)?pickBranch(_rawMENU):_rawMENU;
 let masalar={};
 let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
 let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
@@ -659,9 +663,10 @@ function renderKatBar(){
   const bar=document.getElementById('kat-bar');
   bar.innerHTML='';
   Object.entries(MENU).forEach(([k,v])=>{
+    if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
     b.className='ktab'+(aktifKat===k?' on':'');
-    b.textContent=v.label;
+    b.textContent=v.label||k;
     b.onclick=()=>{aktifKat=k;renderKatBar();renderUrunler();};
     bar.appendChild(b);
   });
@@ -671,12 +676,15 @@ function renderUrunler(){
   const g=document.getElementById('urun-grid');
   g.innerHTML='';
   const kat=MENU[aktifKat];
-  if(!kat)return;
+  if(!kat||!Array.isArray(kat.urunler))return;
   kat.urunler.forEach(u=>{
+    if(u&&u.gizli)return;
+    const tip=(u&&u.tip)||kat.tip||'yi';
+    const ic=(tip==='ic'||tip==='icecek');
     const d=document.createElement('button');
-    d.className='ukrt '+(kat.tip==='icecek'?'ic':'yi');
-    d.innerHTML=`<span class="ue">${u.emoji}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
-    d.onclick=()=>urunEkle({...u,tip:kat.tip},d);
+    d.className='ukrt '+(ic?'ic':'yi');
+    d.innerHTML=`<span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
+    d.onclick=()=>urunEkle({...u,tip:ic?'icecek':'yiyecek'},d);
     g.appendChild(d);
   });
 }
@@ -707,8 +715,16 @@ function renderAdisyon(){
     a.forEach(item=>{
       const sub=item.fiyat*item.adet;
       if(item.tip==='icecek') topIc+=sub; else topYi+=sub;
-      itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}">
-        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
+      const gAdet=item.gonderilenAdet||0;
+      const tumGonderildi=(gAdet>=item.adet&&gAdet>0);
+      const kismiGonderildi=(gAdet>0&&gAdet<item.adet);
+      const rozet=tumGonderildi
+        ? '<span style="color:#27ae60;font-size:11px;font-weight:700;margin-left:6px;">✓ Gönderildi</span>'
+        : (kismiGonderildi
+          ? `<span style="color:#e67e22;font-size:11px;font-weight:700;margin-left:6px;">⏳ ${gAdet}/${item.adet} gönderildi</span>`
+          : '');
+      itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}"${tumGonderildi?' style="opacity:.78;"':''}>
+        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
         <div class="ai-ctrl">
           <button onclick="chAdet('${item.id}',-1)">−</button>
           <span class="ai-adet">${item.adet}</span>
@@ -748,6 +764,8 @@ function chAdet(id,d){
   const it=a.find(x=>x.id===id);
   if(!it)return;
   it.adet+=d;
+  // Adet, gönderilenden aşağıya inerse gönderileni de senkronla
+  if((it.gonderilenAdet||0)>it.adet) it.gonderilenAdet=Math.max(0,it.adet);
   if(it.adet<=0) masalar[aktifMasa]=a.filter(x=>x.id!==id);
   saveMasalar();renderAdisyon();renderMasalar();
 }
@@ -769,12 +787,18 @@ function masayiTemizle(){
 function siparisiGonder(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
   const a=masalar[aktifMasa];
+  // Sadece gönderilmemiş yeni adetleri gönder
+  const yeniler=a.filter(x=>x.adet>(x.gonderilenAdet||0))
+                 .map(x=>({...x,adet:x.adet-(x.gonderilenAdet||0)}));
+  if(!yeniler.length){toast('ℹ️ Yeni ürün yok, hepsi gönderildi');return;}
   const saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  const ic=a.filter(x=>x.tip==='icecek');
-  const yi=a.filter(x=>x.tip==='yiyecek');
+  const ic=yeniler.filter(x=>x.tip==='icecek');
+  const yi=yeniler.filter(x=>x.tip==='yiyecek');
   if(ic.length){barSip.push({id:'i_'+Date.now(),masa:aktifMasa,saat,items:ic,hazirlandi:false});localStorage.setItem(LK.bar,JSON.stringify(barSip));}
   if(yi.length){mutSip.push({id:'y_'+Date.now(),masa:aktifMasa,saat,items:yi,hazirlandi:false});localStorage.setItem(LK.mut,JSON.stringify(mutSip));}
-  masalar[aktifMasa]=[];saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();
+  // Tüm item'ları gönderildi olarak işaretle — masada kalmaya devam etsinler
+  a.forEach(x=>{x.gonderilenAdet=x.adet;});
+  saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();renderMasalar();
   toast('📤 Sipariş bar'+(yi.length?' ve mutfağa':'')+' gönderildi!');
 }
 
@@ -911,15 +935,19 @@ function renderYon(){
   const tabs=document.getElementById('yon-kat-tabs');
   tabs.innerHTML='';
   Object.entries(MENU).forEach(([k,v])=>{
+    if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
     b.className='mktab'+(yonKat===k?' on':'');
-    b.textContent=v.label;
+    b.textContent=v.label||k;
     b.onclick=()=>{yonKat=k;renderYon();};
     tabs.appendChild(b);
   });
   const list=document.getElementById('yon-urun-list');
   list.innerHTML='';
-  MENU[yonKat].urunler.forEach((u,i)=>{
+  if(!MENU[yonKat]||!Array.isArray(MENU[yonKat].urunler)){
+    yonKat=Object.keys(MENU).find(k=>MENU[k]&&Array.isArray(MENU[k].urunler))||yonKat;
+  }
+  (MENU[yonKat]&&Array.isArray(MENU[yonKat].urunler)?MENU[yonKat].urunler:[]).forEach((u,i)=>{
     const row=document.createElement('div');
     row.className='ul-row';
     row.innerHTML=`<span class="ul-emoji">${u.emoji}</span><span class="ul-ad">${u.ad}</span><input class="ul-fiyat" type="number" value="${u.fiyat}" onchange="fiyatGuncelle(${i},this.value)"><button class="ul-sil" onclick="urunSilMenu(${i})">×</button>`;
@@ -1160,13 +1188,21 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
         var yeniStr = JSON.stringify(data);
         if(mevcutStr !== yeniStr){
           localStorage.setItem(LK.menu, yeniStr);
-          // MENU global'i güncelle
+          // MENU global'i güncelle — branch-keyed format'ı dikkate al (FSM şubesi)
           if(typeof MENU !== 'undefined'){
-            Object.keys(data).forEach(function(k){ MENU[k]=data[k]; });
+            var pick = (typeof isBranchFormat==='function' && isBranchFormat(data))
+              ? (typeof pickBranch==='function' ? pickBranch(data) : (data.fsm||data.podyum))
+              : data;
+            // MENU referansını koruyarak içeriğini değiştir
+            Object.keys(MENU).forEach(function(k){ delete MENU[k]; });
+            Object.keys(pick).forEach(function(k){ MENU[k]=pick[k]; });
+            // aktifKat hala geçerli mi?
+            if(typeof aktifKat!=='undefined' && !MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
+            if(typeof yonKat!=='undefined' && !MENU[yonKat]) yonKat=Object.keys(MENU)[0];
           }
           if(typeof renderKatBar==='function') renderKatBar();
           if(typeof renderUrunler==='function') renderUrunler();
-          console.log('Menü güncellendi');
+          console.log('Menü güncellendi (FSM)');
         }
       }).catch(function(){});
   }

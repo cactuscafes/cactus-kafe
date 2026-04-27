@@ -351,7 +351,6 @@ input,select{font-family:'Lato',sans-serif;}
     </div>
     <div class="urun-pnl">
       <div class="uyari" id="uyari">⚠️ Önce masa seçin</div>
-      <div class="sube-bar" id="sube-bar" style="display:none;padding:6px 10px;background:var(--wh);border-bottom:1px solid var(--kr2);gap:6px;align-items:center;font-size:12px;"></div>
       <div class="kat-bar" id="kat-bar"></div>
       <div class="urun-grid" id="urun-grid"></div>
     </div>
@@ -598,18 +597,13 @@ const MENU_DEFAULT = {
   ]},
 };
 
-const LK={mas:'cactus_masalar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu',sube:'cactus_sube'};
-// --- Format detection: data may be branch-keyed ({fsm:{...}, podyum:{...}}) or flat ({sicak:{...}, ...}) ---
+const LK={mas:'cactus_masalar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
+// Şube otomatik tespit: title'da 'fsm' geçerse FSM, aksi halde Podyum.
+const SUBE=(document.title||'').toLowerCase().includes('fsm')?'fsm':'podyum';
 function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
-function pickBranch(branches,sube){return branches[sube]||branches['fsm']||branches[Object.keys(branches)[0]];}
+function pickBranch(branches){return branches[SUBE]||branches['podyum']||branches['fsm']||branches[Object.keys(branches)[0]];}
 let _rawMENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
-let BRANCHES=null;
-let aktifSube=localStorage.getItem(LK.sube)||'fsm';
-if(isBranchFormat(_rawMENU)){
-  BRANCHES=_rawMENU;
-  if(!BRANCHES[aktifSube]) aktifSube=Object.keys(BRANCHES)[0];
-}
-let MENU=BRANCHES?pickBranch(BRANCHES,aktifSube):_rawMENU;
+let MENU=isBranchFormat(_rawMENU)?pickBranch(_rawMENU):_rawMENU;
 let masalar={};
 let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
 let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
@@ -667,33 +661,6 @@ function masaSec(no){
 
 function saveMasalar(){localStorage.setItem(LK.mas,JSON.stringify(masalar));}
 
-function renderSubeBar(){
-  const bar=document.getElementById('sube-bar');
-  if(!bar)return;
-  if(!BRANCHES){bar.style.display='none';bar.innerHTML='';return;}
-  bar.style.display='flex';
-  bar.innerHTML='<span style="opacity:.7;margin-right:4px;">Şube:</span>';
-  Object.keys(BRANCHES).forEach(k=>{
-    const b=document.createElement('button');
-    const active=(aktifSube===k);
-    b.textContent=k.toUpperCase();
-    b.style.cssText='padding:4px 12px;border-radius:14px;border:1px solid var(--kr2);cursor:pointer;font-weight:600;background:'+(active?'var(--gold,#c9a14a)':'transparent')+';color:'+(active?'#fff':'inherit')+';';
-    b.onclick=()=>subeDegistir(k);
-    bar.appendChild(b);
-  });
-}
-
-function subeDegistir(yeni){
-  if(!BRANCHES||!BRANCHES[yeni]||yeni===aktifSube)return;
-  aktifSube=yeni;
-  try{localStorage.setItem(LK.sube,yeni);}catch(e){}
-  MENU=pickBranch(BRANCHES,aktifSube);
-  aktifKat=Object.keys(MENU)[0];
-  yonKat=aktifKat;
-  renderSubeBar();renderKatBar();renderUrunler();
-  if(typeof renderYon==='function'&&document.getElementById('scr-yon')&&document.getElementById('scr-yon').classList.contains('on'))renderYon();
-}
-
 function renderKatBar(){
   const bar=document.getElementById('kat-bar');
   bar.innerHTML='';
@@ -749,8 +716,16 @@ function renderAdisyon(){
     a.forEach(item=>{
       const sub=item.fiyat*item.adet;
       if(item.tip==='icecek') topIc+=sub; else topYi+=sub;
-      itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}">
-        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
+      const gAdet=item.gonderilenAdet||0;
+      const tumGonderildi=(gAdet>=item.adet&&gAdet>0);
+      const kismiGonderildi=(gAdet>0&&gAdet<item.adet);
+      const rozet=tumGonderildi
+        ? '<span style="color:#27ae60;font-size:11px;font-weight:700;margin-left:6px;">✓ Gönderildi</span>'
+        : (kismiGonderildi
+          ? `<span style="color:#e67e22;font-size:11px;font-weight:700;margin-left:6px;">⏳ ${gAdet}/${item.adet} gönderildi</span>`
+          : '');
+      itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}"${tumGonderildi?' style="opacity:.78;"':''}>
+        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
         <div class="ai-ctrl">
           <button onclick="chAdet('${item.id}',-1)">−</button>
           <span class="ai-adet">${item.adet}</span>
@@ -790,6 +765,8 @@ function chAdet(id,d){
   const it=a.find(x=>x.id===id);
   if(!it)return;
   it.adet+=d;
+  // Adet, gönderilenden aşağıya inerse gönderileni de senkronla (yanlış eklenen ürün)
+  if((it.gonderilenAdet||0)>it.adet) it.gonderilenAdet=Math.max(0,it.adet);
   if(it.adet<=0) masalar[aktifMasa]=a.filter(x=>x.id!==id);
   saveMasalar();renderAdisyon();renderMasalar();
 }
@@ -811,12 +788,18 @@ function masayiTemizle(){
 function siparisiGonder(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
   const a=masalar[aktifMasa];
+  // Sadece gönderilmemiş yeni adetleri gönder (gonderilenAdet < adet olanlar)
+  const yeniler=a.filter(x=>x.adet>(x.gonderilenAdet||0))
+                 .map(x=>({...x,adet:x.adet-(x.gonderilenAdet||0)}));
+  if(!yeniler.length){toast('ℹ️ Yeni ürün yok, hepsi gönderildi');return;}
   const saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  const ic=a.filter(x=>x.tip==='icecek');
-  const yi=a.filter(x=>x.tip==='yiyecek');
+  const ic=yeniler.filter(x=>x.tip==='icecek');
+  const yi=yeniler.filter(x=>x.tip==='yiyecek');
   if(ic.length){barSip.push({id:'i_'+Date.now(),masa:aktifMasa,saat,items:ic,hazirlandi:false});localStorage.setItem(LK.bar,JSON.stringify(barSip));}
   if(yi.length){mutSip.push({id:'y_'+Date.now(),masa:aktifMasa,saat,items:yi,hazirlandi:false});localStorage.setItem(LK.mut,JSON.stringify(mutSip));}
-  masalar[aktifMasa]=[];saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();
+  // Tüm item'ları "tamamı gönderildi" olarak işaretle — masada kalmaya devam etsinler
+  a.forEach(x=>{x.gonderilenAdet=x.adet;});
+  saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();renderMasalar();
   toast('📤 Sipariş bar'+(yi.length?' ve mutfağa':'')+' gönderildi!');
 }
 
@@ -1174,7 +1157,7 @@ if(window.innerWidth<=640){
   const btn=document.getElementById('toggle-btn');
   if(pnl&&btn){pnl.classList.add('kapali');btn.textContent='▶';}
 }
-renderMasalar();renderSubeBar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
+renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
 </script>
 <script src="rapor-hook-podyum.js"></script>
@@ -1247,33 +1230,24 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
         }
         // Format detection: branch-keyed ({fsm:..., podyum:...}) veya flat
         var branchFmt = (typeof isBranchFormat==='function') ? isBranchFormat(data) : (data && (data.fsm||data.podyum) && !data.urunler);
-        if(branchFmt){
-          window.BRANCHES = data;
-          if(!window.aktifSube || !data[window.aktifSube]){
-            window.aktifSube = (localStorage.getItem(LK.sube)&&data[localStorage.getItem(LK.sube)])
-              ? localStorage.getItem(LK.sube) : Object.keys(data)[0];
-          }
-          var pick = (typeof pickBranch==='function') ? pickBranch(data, window.aktifSube) : data[window.aktifSube];
-          // MENU referansını koru: anahtarları temizleyip yeniden doldur
-          if(typeof MENU!=='undefined' && MENU){
-            Object.keys(MENU).forEach(function(k){delete MENU[k];});
-            Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
-          } else { window.MENU = pick; }
-        } else {
-          if(typeof MENU!=='undefined' && MENU){
-            Object.keys(MENU).forEach(function(k){delete MENU[k];});
-            Object.keys(data).forEach(function(k){MENU[k]=data[k];});
-          } else { window.MENU = data; }
-          window.BRANCHES = null;
-        }
+        var pick = branchFmt
+          ? ((typeof pickBranch==='function') ? pickBranch(data) : (data[SUBE]||data.podyum||data.fsm))
+          : data;
+        // MENU referansını koru: anahtarları temizleyip yeniden doldur
+        if(typeof MENU!=='undefined' && MENU){
+          Object.keys(MENU).forEach(function(k){delete MENU[k];});
+          Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
+        } else { window.MENU = pick; }
         // Aktif kategori hala MENU'de var mı? Yoksa ilkine düş
         if(typeof aktifKat!=='undefined' && !MENU[aktifKat]){
           window.aktifKat = Object.keys(MENU)[0];
         }
-        if(typeof renderSubeBar==='function') renderSubeBar();
+        if(typeof yonKat!=='undefined' && !MENU[yonKat]){
+          window.yonKat = Object.keys(MENU)[0];
+        }
         if(typeof renderKatBar==='function') renderKatBar();
         if(typeof renderUrunler==='function') renderUrunler();
-        console.log('Menü güncellendi'+(branchFmt?' (sube:'+window.aktifSube+')':''));
+        console.log('Menü güncellendi'+(branchFmt?' (sube:'+SUBE+')':''));
       }).catch(function(){});
   }
 

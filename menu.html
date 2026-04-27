@@ -204,17 +204,12 @@ function renderMenu(sube) {
 function toggleCat(id) {
   var el=document.getElementById(id);
   if(!el) return;
-  var p=el.querySelector('.cat-products');
-  var a=el.querySelector('.cat-arrow');
-  if(!p) return;
-  var hidden=p.style.display==='none';
-  p.style.display=hidden?'':'none';
-  if(a) a.textContent=hidden?'+':'x';
+  el.classList.toggle('open');
 }
 
 function subeGoster(sube,btn) {
-  document.querySelectorAll('.sube-tab').forEach(function(b){ b.classList.remove('active'); });
-  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.sube-tab').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
   var fsm=document.getElementById('menu-fsm');
   var pod=document.getElementById('menu-podyum');
   if(fsm) fsm.style.display=sube==='fsm'?'':'none';

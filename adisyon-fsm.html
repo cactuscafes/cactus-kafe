@@ -409,8 +409,8 @@ input,select{font-family:'Lato',sans-serif;}
 
     <!-- Periyot tabs -->
     <div class="rap-periyot-tabs">
-      <button class="rptab on" onclick="rapPeriyot('gun',this)">Bugün</button>
-      <button class="rptab" onclick="rapPeriyot('hafta',this)">Bu Hafta</button>
+      <button class="rptab" onclick="rapPeriyot('gun',this)">Bugün</button>
+      <button class="rptab on" onclick="rapPeriyot('hafta',this)">Bu Hafta</button>
       <button class="rptab" onclick="rapPeriyot('ay',this)">Bu Ay</button>
       <button class="rptab" onclick="rapPeriyot('ozel',this)">Özel Aralık</button>
     </div>
@@ -976,6 +976,8 @@ function sipKart(s,tip){
 function hazirlandiMark(id,tip){
   if(tip==='bar'){barSip=barSip.map(x=>x.id===id?{...x,hazirlandi:true}:x);localStorage.setItem(LK.bar,JSON.stringify(barSip));renderBar();}
   else{mutSip=mutSip.map(x=>x.id===id?{...x,hazirlandi:true}:x);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}
+  // D1'e hazırlandı bildir — sayfa yenilenince sipariş geri gelmez
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
   updateBadges();toast('✓ Hazırlandı olarak işaretlendi');
 }
 function siparisSil(id, tip) {
@@ -994,6 +996,8 @@ function siparisSil(id, tip) {
 }
 
 function clearDone(tip){
+  const hazirlar=tip==='bar'?barSip.filter(x=>x.hazirlandi):mutSip.filter(x=>x.hazirlandi);
+  hazirlar.forEach(function(s){fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
   if(tip==='bar'){barSip=barSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.bar,JSON.stringify(barSip));renderBar();}
   else{mutSip=mutSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}
   updateBadges();toast('🗑 Temizlendi');
@@ -1080,7 +1084,7 @@ function closeDrawer(){document.getElementById('drawer').classList.remove('on');
 function closeModal(id){document.getElementById(id).classList.remove('on');}
 
 /* ══════════ RAPORLAR ══════════ */
-let rapPeriyotAktif='gun';
+let rapPeriyotAktif='hafta';
 const LK_SATIS='cactus_satis_fsmlar';
 
 function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler,nakitTutar,kartTutar){
@@ -1123,7 +1127,7 @@ function rapTarihAraligi(){
   if(rapPeriyotAktif==='gun') return {bas:bugun,bit:bugun};
   if(rapPeriyotAktif==='hafta'){
     const d=new Date(now);
-    d.setDate(d.getDate()-d.getDay()+1);
+    d.setDate(d.getDate()-7);
     return {bas:d.toISOString().split('T')[0],bit:bugun};
   }
   if(rapPeriyotAktif==='ay'){
@@ -1189,7 +1193,7 @@ function rapGoster(){
   fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit)
     .then(function(r){return r.json();})
     .then(function(oz){
-      if(!oz||!oz.gunler) return;
+      if(!oz||!oz.gunler||!oz.gunler.length) return;
       var ciro=oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0);
       var satis=oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0);
       var nakit=0,kredi=0;

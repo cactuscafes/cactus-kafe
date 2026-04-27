@@ -218,6 +218,12 @@ input,select{font-family:'Lato',sans-serif;}
 .odeme-opt{flex:1;padding:12px 8px;border:2px solid var(--kr2);border-radius:10px;background:#fff;color:var(--k2);font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;}
 .odeme-opt .oi{font-size:22px;}
 .odeme-opt.on{border-color:var(--al);background:rgba(201,168,76,.08);color:var(--k1);}
+.bolme-wrap{background:#f9f5ee;border:1px solid var(--kr2);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+.bolme-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bolme-row label{font-size:13px;font-weight:600;color:var(--k2);min-width:90px;}
+.bolme-row input{flex:1;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:8px;font-size:15px;font-weight:700;color:var(--k1);background:#fff;outline:none;text-align:right;}
+.bolme-row input:focus{border-color:var(--al);}
+.bolme-kalan{font-size:12px;font-weight:700;text-align:right;margin-top:2px;}
 
 /* ══════════ TOAST ══════════ */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--k1);color:var(--kr);padding:10px 20px;border-radius:26px;font-size:13px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .28s ease;z-index:1000;white-space:nowrap;max-width:90vw;text-align:center;}
@@ -520,6 +526,18 @@ input,select{font-family:'Lato',sans-serif;}
     <div class="odeme-secim">
       <button class="odeme-opt on" id="opt-nakit" onclick="odemeSecim('nakit')"><span class="oi">💵</span>Nakit</button>
       <button class="odeme-opt" id="opt-kart" onclick="odemeSecim('kart')"><span class="oi">💳</span>Kredi Kartı</button>
+      <button class="odeme-opt" id="opt-bol" onclick="odemeSecim('bolunmus')"><span class="oi">✂️</span>Böl</button>
+    </div>
+    <div class="bolme-wrap" id="bolme-wrap" style="display:none;">
+      <div class="bolme-row">
+        <label>💵 Nakit</label>
+        <input type="number" id="bolme-nakit" min="0" oninput="bolmeHesapla('nakit')" placeholder="0">
+      </div>
+      <div class="bolme-row">
+        <label>💳 Kredi Kartı</label>
+        <input type="number" id="bolme-kart" min="0" oninput="bolmeHesapla('kart')" placeholder="0">
+      </div>
+      <div class="bolme-kalan" id="bolme-kalan"></div>
     </div>
     <div class="mdl-btns">
       <button class="mdl-iptal" onclick="closeModal('odeme-modal')">İptal</button>
@@ -827,16 +845,48 @@ function toggleMasa(){
 }
 
 let seciliOdemeTipi='nakit';
+let _bolmeTop=0;
 function odemeSecim(tip){
   seciliOdemeTipi=tip;
   document.getElementById('opt-nakit').classList.toggle('on',tip==='nakit');
   document.getElementById('opt-kart').classList.toggle('on',tip==='kart');
+  document.getElementById('opt-bol').classList.toggle('on',tip==='bolunmus');
+  const wrap=document.getElementById('bolme-wrap');
+  if(tip==='bolunmus'){
+    wrap.style.display='block';
+    document.getElementById('bolme-nakit').value='';
+    document.getElementById('bolme-kart').value='';
+    document.getElementById('bolme-kalan').style.color='#e67e22';
+    document.getElementById('bolme-kalan').textContent='Kalan: ₺'+_bolmeTop;
+    setTimeout(()=>document.getElementById('bolme-nakit').focus(),50);
+  } else {
+    wrap.style.display='none';
+  }
+}
+function bolmeHesapla(degisen){
+  const top=_bolmeTop;
+  const nEl=document.getElementById('bolme-nakit');
+  const kEl=document.getElementById('bolme-kart');
+  if(degisen==='nakit'){
+    const n=parseFloat(nEl.value)||0;
+    kEl.value=Math.max(0,top-n)||'';
+  } else {
+    const k=parseFloat(kEl.value)||0;
+    nEl.value=Math.max(0,top-k)||'';
+  }
+  const n=parseFloat(nEl.value)||0;
+  const k=parseFloat(kEl.value)||0;
+  const kalan=Math.round((top-n-k)*100)/100;
+  const el=document.getElementById('bolme-kalan');
+  if(Math.abs(kalan)<0.5){el.style.color='#27ae60';el.textContent='✓ Tam';}
+  else{el.style.color=kalan>0?'#e67e22':'#c0392b';el.textContent=(kalan>0?'Kalan: ':'Fazla: ')+'₺'+Math.abs(kalan);}
 }
 function odemeAl(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
   const top=masalar[aktifMasa].reduce((s,x)=>s+x.fiyat*x.adet,0);
   const ic=masalar[aktifMasa].filter(x=>x.tip==='icecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
   const yi=masalar[aktifMasa].filter(x=>x.tip==='yiyecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
+  _bolmeTop=top;
   document.getElementById('odeme-modal-sub').innerHTML='Masa <strong>'+aktifMasa+'</strong> &nbsp;|&nbsp; İçecek: <strong>₺'+ic+'</strong> &nbsp;|&nbsp; Yiyecek: <strong>₺'+yi+'</strong><br><span style="font-size:16px;font-weight:700;color:var(--k1)">Toplam: ₺'+top+'</span>';
   seciliOdemeTipi='nakit';odemeSecim('nakit');
   document.getElementById('odeme-modal').classList.add('on');
@@ -846,16 +896,25 @@ function odemeOnayla(){
   const top=masalar[aktifMasa].reduce((s,x)=>s+x.fiyat*x.adet,0);
   const ic=masalar[aktifMasa].filter(x=>x.tip==='icecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
   const yi=masalar[aktifMasa].filter(x=>x.tip==='yiyecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
+  // Bölünmüş ödeme doğrulama
+  let nakitTutar=0,kartTutar=0;
+  if(seciliOdemeTipi==='bolunmus'){
+    nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
+    kartTutar=parseFloat(document.getElementById('bolme-kart').value)||0;
+    if(Math.abs(nakitTutar+kartTutar-top)>1){toast('⚠️ Nakit + Kart toplamı ₺'+top+' olmalı');return;}
+  } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}
+  else{kartTutar=top;}
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';
   const webhookUrl=localStorage.getItem('cactus_webhook')||VARSAYILAN_WEBHOOK;
+  const odTipLabel=seciliOdemeTipi==='nakit'?'Nakit':seciliOdemeTipi==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   if(webhookUrl){
     const now=new Date();
-    fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+aktifMasa,odeme_tipi:seciliOdemeTipi==='nakit'?'Nakit':'Kredi Kartı',urunler:masalar[aktifMasa].map(x=>x.ad+' x'+x.adet).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
+    fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+aktifMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:masalar[aktifMasa].map(x=>x.ad+' x'+x.adet).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
   }
   const oncekiMasa=aktifMasa;
-  const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':'💳 Kart';
+  const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
   // Yerel rapora kaydet
-  odemeyiKaydet(aktifMasa,top,ic,yi,seciliOdemeTipi,masalar[aktifMasa]);
+  odemeyiKaydet(aktifMasa,top,ic,yi,seciliOdemeTipi,masalar[aktifMasa],nakitTutar,kartTutar);
   masalar[aktifMasa]=[];saveMasalar();
   closeModal('odeme-modal');closeDrawer();
   aktifMasa=null;
@@ -1024,15 +1083,18 @@ function closeModal(id){document.getElementById(id).classList.remove('on');}
 let rapPeriyotAktif='gun';
 const LK_SATIS='cactus_satis_fsmlar';
 
-function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler){
+function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler,nakitTutar,kartTutar){
   const satislar=JSON.parse(localStorage.getItem(LK_SATIS)||'[]');
   const now=new Date();
+  const odTip=tip==='nakit'?'Nakit':tip==='kart'?'Kredi Kartı':'Nakit+Kart';
   satislar.push({
     tarih:now.toLocaleDateString('tr-TR'),
     tarihISO:now.toISOString().split('T')[0],
     saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),
     masa:'Masa '+masa,
-    odeme_tipi:tip==='nakit'?'Nakit':'Kredi Kartı',
+    odeme_tipi:odTip,
+    nakit_tutar:nakitTutar||0,
+    kart_tutar:kartTutar||0,
     urunler:urunler.map(x=>x.ad+' x'+x.adet).join(', '),
     urunDetay:urunler.map(x=>({ad:x.ad,adet:x.adet,fiyat:x.fiyat,tip:x.tip})),
     icecek_toplam:ic,
@@ -1092,16 +1154,17 @@ function rapGoster(){
   const topCiro=filtre.reduce((s,x)=>s+x.toplam,0);
   const topIc=filtre.reduce((s,x)=>s+x.icecek_toplam,0);
   const topYi=filtre.reduce((s,x)=>s+x.yiyecek_toplam,0);
-  const topNakit=filtre.filter(x=>x.odeme_tipi==='Nakit').reduce((s,x)=>s+x.toplam,0);
-  const topKart=filtre.filter(x=>x.odeme_tipi==='Kredi Kartı').reduce((s,x)=>s+x.toplam,0);
+  // Nakit+Kart bölünmüş ödemelerdeki nakit_tutar/kart_tutar da dahil
+  const topNakit=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Nakit'?x.toplam:(x.nakit_tutar||0)),0);
+  const topKart=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Kredi Kartı'?x.toplam:(x.kart_tutar||0)),0);
 
   document.getElementById('rap-ozet').innerHTML=`
     <div class="rap-krt"><div class="rap-krt-lbl">Toplam Satış</div><div class="rap-krt-val">${filtre.length}</div><div class="rap-krt-sub">işlem</div></div>
     <div class="rap-krt"><div class="rap-krt-lbl">Toplam Ciro</div><div class="rap-krt-val">₺${topCiro.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">gelir</div></div>
     <div class="rap-krt ic"><div class="rap-krt-lbl">İçecek Ciro</div><div class="rap-krt-val">₺${topIc.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${topCiro?Math.round(topIc/topCiro*100):0}% pay</div></div>
     <div class="rap-krt yi"><div class="rap-krt-lbl">Yiyecek Ciro</div><div class="rap-krt-val">₺${topYi.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${topCiro?Math.round(topYi/topCiro*100):0}% pay</div></div>
-    <div class="rap-krt nk"><div class="rap-krt-lbl">Nakit</div><div class="rap-krt-val">₺${topNakit.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Nakit').length} işlem</div></div>
-    <div class="rap-krt kt"><div class="rap-krt-lbl">Kredi Kartı</div><div class="rap-krt-val">₺${topKart.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Kredi Kartı').length} işlem</div></div>
+    <div class="rap-krt nk"><div class="rap-krt-lbl">Nakit</div><div class="rap-krt-val">₺${topNakit.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Nakit'||x.nakit_tutar>0).length} işlem</div></div>
+    <div class="rap-krt kt"><div class="rap-krt-lbl">Kredi Kartı</div><div class="rap-krt-val">₺${topKart.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Kredi Kartı'||x.kart_tutar>0).length} işlem</div></div>
   `;
 
   // Satış tablosu

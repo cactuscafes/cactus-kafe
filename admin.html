@@ -265,6 +265,7 @@ const KAT_V=[
   {id:'mesrubat',label:'🥤 Meşrubatlar',tip:'ic'},
   {id:'waffle',label:'🧇 Bubble Waffle',tip:'yi'},
   {id:'tost',label:'🥪 Tostlar',tip:'yi'},
+  {id:'tatlilar',label:'🍰 Tatlılar',tip:'yi'},
 ];
 
 const MENU_V={
@@ -360,8 +361,33 @@ function giris(){
   } else { document.getElementById('gHata').style.display='block'; }
 }
 function cikis(){ localStorage.removeItem('ca'); location.reload(); }
-function basla(){ document.getElementById('admin').style.display='block'; renderKatTabs(); renderUrunler();
-  setTimeout(katSeciciDoldur, 500); }
+function basla(){
+  document.getElementById('admin').style.display='block';
+  aktifKat=KAT[0]?.id||'sicak';
+  renderKatTabs(); renderUrunler();
+  setTimeout(katSeciciDoldur, 500);
+  // GitHub'dan güncel menüyü yükle (her zaman taze veri)
+  fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t='+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data||!data.fsm) return;
+      var kat=[]; var menu={};
+      Object.keys(data.fsm).forEach(function(catId){
+        var cat=data.fsm[catId];
+        var catTip=(cat.urunler&&cat.urunler.length)?cat.urunler[0].tip:'ic';
+        kat.push({id:catId,label:cat.label,tip:catTip});
+        menu[catId]=cat.urunler||[];
+      });
+      KAT=kat; MENU=menu;
+      localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+      aktifKat=KAT[0]?.id||'sicak';
+      renderKatTabs(); renderUrunler();
+      setTimeout(katSeciciDoldur,500);
+      toast('✅ Menü GitHub\'dan yüklendi ('+KAT.length+' kategori)');
+    })
+    .catch(function(e){console.warn('GitHub menü yükleme hatası:',e);});
+}
 function panelAc(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
@@ -404,7 +430,7 @@ function uploadToR2(blob, filename, cb){
 }
 
 function fotoIsle(input,urlId,onizleId,adId){
-  const file=input.files[0,{id:'tatlilar',label:'🍰 Tatlılar',tip:'yi'}]; if(!file) return;
+  const file=input.files[0]; if(!file) return;
   if(adId) document.getElementById(adId).textContent=file.name;
   toast('⏳ Fotoğraf yükleniyor...');
   resizeToJpeg(file, blob=>{
@@ -831,7 +857,10 @@ async function yayinla(){
   btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
   dur.classList.add('on'); dur.textContent='⏳ Bağlanıyor...';
   try{
-    const menuData={kategoriler:KAT,menu:MENU,oncu:ONCU,_oncu:JSON.parse(localStorage.getItem('cactus_oncu')||'[]'),guncelleme:new Date().toISOString()};
+    // menu-data.json formatı: {fsm:{catId:{id,label,urunler:[...]}, ...}, podyum:{...}}
+    const perBranch={};
+    KAT.forEach(function(k){perBranch[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]};});
+    const menuData={fsm:perBranch,podyum:JSON.parse(JSON.stringify(perBranch))};
     const jsonB64=btoa(unescape(encodeURIComponent(JSON.stringify(menuData,null,2))));
     const jgr=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{headers:{'Authorization':'token '+token}});
     const jgd=await jgr.json();

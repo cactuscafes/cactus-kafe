@@ -1131,7 +1131,6 @@ function rapGoster(){
   const satislar=JSON.parse(localStorage.getItem(LK_SATIS)||'[]');
   const {bas,bit}=rapTarihAraligi();
   const odemeFil=document.getElementById('rap-odeme')?.value||'';
-
   const filtre=satislar.filter(s=>{
     if(!s.tarihISO) return false;
     if(s.tarihISO<bas||s.tarihISO>bit) return false;
@@ -1139,75 +1138,63 @@ function rapGoster(){
     return true;
   });
 
-  // Özet kartlar
-  const topCiro=filtre.reduce((s,x)=>s+x.toplam,0);
-  const topIc=filtre.reduce((s,x)=>s+x.icecek_toplam,0);
-  const topYi=filtre.reduce((s,x)=>s+x.yiyecek_toplam,0);
-  // Nakit+Kart bölünmüş ödemelerdeki nakit_tutar/kart_tutar da dahil
-  const topNakit=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Nakit'?x.toplam:(x.nakit_tutar||0)),0);
-  const topKart=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Kredi Kartı'?x.toplam:(x.kart_tutar||0)),0);
+  // Yardımcı: özet kartları render et
+  function renderOzet(ciro,ic,yi,nakit,kredi,satisAdet,kaynak){
+    document.getElementById('rap-ozet').innerHTML=`
+      <div class="rap-krt"><div class="rap-krt-lbl">Toplam Satış</div><div class="rap-krt-val">${satisAdet}</div><div class="rap-krt-sub">${kaynak}</div></div>
+      <div class="rap-krt"><div class="rap-krt-lbl">Toplam Ciro</div><div class="rap-krt-val">₺${ciro.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">gelir</div></div>
+      <div class="rap-krt ic"><div class="rap-krt-lbl">İçecek Ciro</div><div class="rap-krt-val">₺${ic.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${ciro?Math.round(ic/ciro*100):0}% pay</div></div>
+      <div class="rap-krt yi"><div class="rap-krt-lbl">Yiyecek Ciro</div><div class="rap-krt-val">₺${yi.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${ciro?Math.round(yi/ciro*100):0}% pay</div></div>
+      <div class="rap-krt nk"><div class="rap-krt-lbl">Nakit</div><div class="rap-krt-val">₺${nakit.toLocaleString('tr-TR')}</div></div>
+      <div class="rap-krt kt"><div class="rap-krt-lbl">Kredi Kartı</div><div class="rap-krt-val">₺${kredi.toLocaleString('tr-TR')}</div></div>`;
+  }
 
-  document.getElementById('rap-ozet').innerHTML=`
-    <div class="rap-krt"><div class="rap-krt-lbl">Toplam Satış</div><div class="rap-krt-val">${filtre.length}</div><div class="rap-krt-sub">işlem</div></div>
-    <div class="rap-krt"><div class="rap-krt-lbl">Toplam Ciro</div><div class="rap-krt-val">₺${topCiro.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">gelir</div></div>
-    <div class="rap-krt ic"><div class="rap-krt-lbl">İçecek Ciro</div><div class="rap-krt-val">₺${topIc.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${topCiro?Math.round(topIc/topCiro*100):0}% pay</div></div>
-    <div class="rap-krt yi"><div class="rap-krt-lbl">Yiyecek Ciro</div><div class="rap-krt-val">₺${topYi.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${topCiro?Math.round(topYi/topCiro*100):0}% pay</div></div>
-    <div class="rap-krt nk"><div class="rap-krt-lbl">Nakit</div><div class="rap-krt-val">₺${topNakit.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Nakit'||x.nakit_tutar>0).length} işlem</div></div>
-    <div class="rap-krt kt"><div class="rap-krt-lbl">Kredi Kartı</div><div class="rap-krt-val">₺${topKart.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${filtre.filter(x=>x.odeme_tipi==='Kredi Kartı'||x.kart_tutar>0).length} işlem</div></div>
-  `;
+  // Önce lokal veriyle hızlı gösterim
+  const lCiro=filtre.reduce((s,x)=>s+x.toplam,0);
+  const lIc=filtre.reduce((s,x)=>s+(x.icecek_toplam||0),0);
+  const lYi=filtre.reduce((s,x)=>s+(x.yiyecek_toplam||0),0);
+  const lNakit=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Nakit'?x.toplam:(x.nakit_tutar||0)),0);
+  const lKart=filtre.reduce((s,x)=>s+(x.odeme_tipi==='Kredi Kartı'?x.toplam:(x.kart_tutar||0)),0);
+  renderOzet(lCiro,lIc,lYi,lNakit,lKart,filtre.length,'bu cihaz');
 
-  // Satış tablosu
+  // İşlem tablosu (lokal)
   if(!filtre.length){
-    document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">📋</div><p>Bu tarih aralığında satış yok.</p></div>';
-    document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Veri yok.</p></div>';
-    return;
+    document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">📋</div><p>Bu cihazda kayıt yok.</p></div>';
+  } else {
+    const sirali=[...filtre].sort((a,b)=>b.tarihISO.localeCompare(a.tarihISO)||(b.saat||'').localeCompare(a.saat||''));
+    document.getElementById('rap-tablo-ici').innerHTML=`<table class="rap-tablo"><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ödeme</th><th>Ürünler</th><th>İçecek</th><th>Yiyecek</th><th>Toplam</th></tr></thead><tbody>${
+      sirali.map(s=>`<tr><td>${s.tarih}</td><td>${s.saat}</td><td>${s.masa}</td><td><span class="odeme-${s.odeme_tipi==='Nakit'?'nakit':'kart'}">${s.odeme_tipi}</span></td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${s.urunler}</td><td>₺${s.icecek_toplam}</td><td>₺${s.yiyecek_toplam}</td><td class="toplam-cell">₺${s.toplam}</td></tr>`).join('')
+    }</tbody></table>`;
   }
 
-  const sirali=[...filtre].sort((a,b)=>b.tarihISO.localeCompare(a.tarihISO)||(b.saat||'').localeCompare(a.saat||''));
-  let rows=sirali.map(s=>`<tr>
-    <td>${s.tarih}</td>
-    <td>${s.saat}</td>
-    <td>${s.masa}</td>
-    <td><span class="odeme-${s.odeme_tipi==='Nakit'?'nakit':'kart'}">${s.odeme_tipi}</span></td>
-    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${s.urunler}</td>
-    <td>₺${s.icecek_toplam}</td>
-    <td>₺${s.yiyecek_toplam}</td>
-    <td class="toplam-cell">₺${s.toplam}</td>
-  </tr>`).join('');
-
-  document.getElementById('rap-tablo-ici').innerHTML=`
-    <table class="rap-tablo">
-      <thead><tr>
-        <th>Tarih</th><th>Saat</th><th>Masa</th><th>Ödeme</th><th>Ürünler</th><th>İçecek</th><th>Yiyecek</th><th>Toplam</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-
-  // En çok satanlar
-  const urunMap={};
-  filtre.forEach(s=>{
-    if(s.urunDetay) s.urunDetay.forEach(u=>{
-      if(!urunMap[u.ad]) urunMap[u.ad]={ad:u.ad,adet:0,ciro:0};
-      urunMap[u.ad].adet+=u.adet;
-      urunMap[u.ad].ciro+=u.fiyat*u.adet;
-    });
-  });
-  const urunSira=Object.values(urunMap).sort((a,b)=>b.adet-a.adet).slice(0,10);
-  const maxAdet=urunSira[0]?.adet||1;
-
-  if(!urunSira.length){
-    document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Ürün verisi yok.</p></div>';
-    return;
+  // En çok satanlar — lokal veriden (D1'den gelene kadar)
+  function enCokLocalRender(){
+    const urunMap={};
+    filtre.forEach(s=>{if(s.urunDetay) s.urunDetay.forEach(u=>{if(!urunMap[u.ad]) urunMap[u.ad]={ad:u.ad,adet:0,ciro:0};urunMap[u.ad].adet+=u.adet;urunMap[u.ad].ciro+=(u.fiyat||0)*u.adet;});});
+    const sira=Object.values(urunMap).sort((a,b)=>b.adet-a.adet).slice(0,10);
+    if(!sira.length){document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Veri yok.</p></div>';return;}
+    const mx=sira[0].adet||1;
+    document.getElementById('rap-urun-ici').innerHTML=sira.map((u,i)=>`<div class="urun-sira"><div class="urun-sira-no">${i+1}</div><div class="urun-sira-ad">${u.ad}</div><div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:${Math.round(u.adet/mx*100)}%"></div></div><div class="urun-sira-adet">${u.adet} adet</div><div style="font-size:11px;color:var(--al);font-weight:700;min-width:70px;text-align:right;">₺${u.ciro}</div></div>`).join('');
   }
+  enCokLocalRender();
 
-  document.getElementById('rap-urun-ici').innerHTML=urunSira.map((u,i)=>`
-    <div class="urun-sira">
-      <div class="urun-sira-no">${i+1}</div>
-      <div class="urun-sira-ad">${u.ad}</div>
-      <div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:${Math.round(u.adet/maxAdet*100)}%"></div></div>
-      <div class="urun-sira-adet">${u.adet} adet</div>
-      <div style="font-size:11px;color:var(--al);font-weight:700;min-width:70px;text-align:right;">₺${u.ciro}</div>
-    </div>`).join('');
+  // D1'den güncel (tüm cihaz) verisini çek ve özeti güncelle
+  const d1Api='https://cactus-rapor-api.batuhanbulut.workers.dev';
+  fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit)
+    .then(function(r){return r.json();})
+    .then(function(oz){
+      if(!oz||!oz.gunler) return;
+      var ciro=oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0);
+      var satis=oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0);
+      var nakit=0,kredi=0;
+      (oz.odeme||[]).forEach(function(o){if((o.odeme_tipi||'').toLowerCase().includes('nakit')) nakit+=o.ciro||0;else kredi+=o.ciro||0;});
+      renderOzet(ciro,lIc,lYi,nakit,kredi,satis,'📡 tüm cihazlar');
+      // En çok satanlar D1'den
+      if(oz.en_cok&&oz.en_cok.length){
+        var mx=oz.en_cok[0].toplam_adet||1;
+        document.getElementById('rap-urun-ici').innerHTML=oz.en_cok.slice(0,10).map(function(u,i){return '<div class="urun-sira"><div class="urun-sira-no">'+(i+1)+'</div><div class="urun-sira-ad">'+u.urun_adi+'</div><div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:'+Math.round((u.toplam_adet||0)/mx*100)+'%"></div></div><div class="urun-sira-adet">'+u.toplam_adet+' adet</div></div>';}).join('');
+      }
+    }).catch(function(){});
 }
 
 let _tt;
@@ -1510,7 +1497,33 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
     });
   }
 
+  // Gece 03:00 sıfırlaması — bar ve mutfak ekranlarını temizler (TR saati UTC+3)
+  function geceKontrolu(){
+    var now=new Date();
+    var trSaat=(now.getUTCHours()+3)%24;
+    var trDak=now.getUTCMinutes();
+    if(trSaat!==3||trDak>=30) return; // sadece 03:00-03:29 arası
+    var trTarih=new Date(now.getTime()+3*3600000).toISOString().split('T')[0];
+    if(localStorage.getItem('cactus_gece_sifir')===trTarih) return; // zaten yapıldı
+    localStorage.setItem('cactus_gece_sifir',trTarih);
+    var lkBar=getLkBar(),lkMut=getLkMut();
+    var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
+    var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
+    // D1'deki bekleyen siparişleri hazırlandı olarak işaretle
+    bar.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
+    mut.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
+    // Lokal temizle
+    localStorage.setItem(lkBar,'[]'); localStorage.setItem(lkMut,'[]');
+    if(typeof barSip!=='undefined') barSip.splice(0,barSip.length);
+    if(typeof mutSip!=='undefined') mutSip.splice(0,mutSip.length);
+    if(typeof renderBar==='function') renderBar();
+    if(typeof renderMut==='function') renderMut();
+    if(typeof updateBadges==='function') updateBadges();
+    if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Bar & Mutfak temizlendi');
+  }
+
   function syncFromD1(){
+    geceKontrolu();
     var masaKorumaAktif=(Date.now()-_localWriteTime)<LOKAL_KORUMA_MS;
     var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since)

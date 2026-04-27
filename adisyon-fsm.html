@@ -1274,8 +1274,32 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
     SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';
     // lastSync'i şimdiden başlat — sayfa açılışında eski siparişleri getirme
     _lastSync = Date.now() - 10000; // sadece son 10sn
-    setTimeout(init,2000);
+    // Masaları hemen tam çek (since=0), sipariş filtresi farklı
+    setTimeout(masalarTamCek, 500);
+    setTimeout(init, 2000);
   });
+
+  function masalarTamCek(){
+    var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
+    fetch(API+'/sync/durum?sube='+SUBE+'&since=0')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(!data.masalar||!data.masalar.length)return;
+        var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
+        var changed=false;
+        data.masalar.forEach(function(m){
+          var mv=JSON.stringify(mevcut[m.masa]||[]);
+          var yv=JSON.stringify(m.items||[]);
+          if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
+        });
+        if(changed){
+          localStorage.setItem(lkMas,JSON.stringify(mevcut));
+          if(typeof masalar!=='undefined') data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
+          if(typeof renderMasalar==='function')renderMasalar();
+          if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
+        }
+      }).catch(function(){});
+  }
 
   function init(){
     hookSaveMasalar();

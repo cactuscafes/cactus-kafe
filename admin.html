@@ -127,6 +127,10 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
       <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
       <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:#2d5a27;color:#fff;font-weight:600;">🏠 Ana Sayfa</button>
+      <div class="sb-ttl">Sayfa Düzenle</div>
+      <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
+      <button class="sb-btn" onclick="panelAc('galeri',this)">🖼 Galeri</button>
+      <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü</button>
     </div>
     <div class="main">
 
@@ -155,6 +159,40 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
           </div>
         </div>
       </div>
+
+      <!-- İLETİŞİM SAYFA EDİTÖRÜ -->
+      <div class="panel" id="panel-iletisim" style="max-width:1200px;">
+        <div class="pttl">📬 İletişim Sayfası</div>
+        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div id="il-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span id="il-st" style="font-size:13px;color:#888;">-</span>
+          <button onclick="seYayinla('iletisim.html','il-wrap','il-st','İletişim sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+        </div>
+      </div>
+
+      <!-- GALERİ SAYFA EDİTÖRÜ -->
+      <div class="panel" id="panel-galeri" style="max-width:1200px;">
+        <div class="pttl">🖼 Galeri Sayfası</div>
+        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div id="gl-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span id="gl-st" style="font-size:13px;color:#888;">-</span>
+          <button onclick="seYayinla('galeri.html','gl-wrap','gl-st','Galeri sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+        </div>
+      </div>
+
+      <!-- MENÜ SAYFA EDİTÖRÜ -->
+      <div class="panel" id="panel-menusayfa" style="max-width:1200px;">
+        <div class="pttl">📋 Menü Sayfası</div>
+        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div id="mn-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span id="mn-st" style="font-size:13px;color:#888;">-</span>
+          <button onclick="seYayinla('menu.html','mn-wrap','mn-st','Menü sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+        </div>
+      </div>
+
       <div class="panel on" id="panel-menu">
         <div class="pttl">📋 Menü Yönetimi</div>
         <div class="psub">Ürün ekle, güncelle, fotoğraf ekle. Yayınla ile siteye uygula.</div>
@@ -268,6 +306,23 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Shared Sayfa Editör Modalı -->
+<div id="se-m" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:26px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <p id="se-ml" style="font-weight:700;margin:0 0 12px;font-size:15px;"></p>
+    <textarea id="se-mi" rows="4" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+    <div id="se-mf" style="display:none;margin:10px 0;">
+      <input type="file" id="se-mfi" accept="image/*" style="display:none" onchange="seImgYukle(this)">
+      <button onclick="document.getElementById('se-mfi').click()" style="padding:8px 16px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📷 Yükle</button>
+      <span id="se-mfs" style="font-size:12px;color:#888;margin-left:8px;"></span>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+      <button onclick="seKapat()" style="padding:10px 22px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;">İptal</button>
+      <button onclick="seKaydet()" style="padding:10px 22px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✅ Kaydet</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const REPO='cactuscafes/cactus-kafe', BRANCH='main';
@@ -416,8 +471,11 @@ function panelAc(id,el){
   if(id==='basvurular') basvuruYukle();
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
-  if(id==='anasayfa'){setTimeout(function(){asLoad&&asLoad();},200);}
-  if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}}
+  if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}
+  if(id==='iletisim'){setTimeout(function(){seLoad('https://cactuscafes.com/iletisim.html','iletisim.html','il-wrap','il-st');},200);}
+  if(id==='galeri'){setTimeout(function(){seLoad('https://cactuscafes.com/galeri.html','galeri.html','gl-wrap','gl-st');},200);}
+  if(id==='menusayfa'){setTimeout(function(){seLoad('https://cactuscafes.com/menu.html','menu.html','mn-wrap','mn-st',['.menu-header-eyebrow','.menu-header-title','.menu-header-sub']);},200);}
+}
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
@@ -1049,6 +1107,192 @@ async function basvuruSil(id){
   if(!confirm('Bu başvuru silinsin mi?'))return;
   await fetch(BASVURU_API+'/basvuru/sil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
   basvuruYukle();
+}
+
+/* ===== GENERIC SAYFA EDİTÖRÜ ===== */
+var _seEl=null,_seImg=false,_seStId=null;
+
+var SE_TEXT_SELECTORS=[
+  /* İletişim */
+  '.sk-ad','.sk-tur','.sk-info-txt','.sec-label','.sec-title','.form-intro p',
+  /* Galeri */
+  '.galeri-ttl','.galeri-sub','.galeri-caption',
+  /* Genel */
+  '.page-title','.page-eyebrow','.section-eyebrow',
+  '.footer-brand','.footer-desc',
+  /* Menü sayfası başlıkları */
+  '.menu-header-eyebrow','.menu-header-title','.menu-header-sub'
+];
+
+function seLoad(pageUrl, pageFile, wrapId, stId, customSelectors){
+  var wrap=document.getElementById(wrapId);
+  if(!wrap)return;
+  wrap.innerHTML='<div style="padding:40px;text-align:center;color:#aaa;font-size:13px;">Sayfa yükleniyor...</div>';
+  var st=document.getElementById(stId);
+  if(st) st.textContent='Yükleniyor...';
+
+  fetch(pageUrl+'?t='+Date.now())
+  .then(function(r){return r.text();})
+  .then(function(html){
+    // Extract styles + fonts
+    var styleTags=(html.match(/<style[\s\S]*?<\/style>/g)||[]).join('');
+    var fontLinks=(html.match(/<link[^>]*googleapis[^>]*>/g)||[]).join('');
+
+    // Extract body content
+    var bs=html.indexOf('<body>');
+    var be=html.lastIndexOf('<\/body>');
+    if(bs<0)bs=0; else bs+=6;
+    var body=bs<be?html.slice(bs,be):html;
+
+    // Strip nav, mobile nav overlay, scripts
+    body=body.replace(/<nav[\s\S]*?<\/nav>/g,'');
+    body=body.replace(/<div[^>]*class="[^"]*nav-mob[^"]*"[\s\S]*?<\/div>/g,'');
+    body=body.replace(/<script[\s\S]*?<\/script>/g,'');
+
+    // Scope the page styles inside the wrap so they don't bleed into admin
+    var scopedStyle=styleTags.replace(/<style[^>]*>/g,'<style>').replace(/<\/style>/g,'</style>');
+
+    wrap.innerHTML=fontLinks+scopedStyle+body;
+
+    // Suppress full-height hero
+    wrap.querySelectorAll('.hero,.page-hero,[class*=hero]').forEach(function(el){
+      el.style.minHeight='0';
+      el.style.height='auto';
+    });
+    wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
+
+    // ── IMG edit buttons
+    wrap.querySelectorAll('img').forEach(function(img){
+      if(img.closest('nav'))return;
+      var p=img.parentElement;
+      if(getComputedStyle(p).position==='static') p.style.position='relative';
+      if(p.querySelector('.se-ib'))return;
+      var b=document.createElement('button');
+      b.className='se-ib'; b.innerHTML='📷'; b.title='Fotoğrafı değiştir';
+      b.setAttribute('style','position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.4);line-height:1;');
+      b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();seAc(img,true,stId);});
+      p.appendChild(b);
+    });
+
+    // ── Text edit buttons
+    var selectors=customSelectors||SE_TEXT_SELECTORS;
+    selectors.forEach(function(sel){
+      wrap.querySelectorAll(sel).forEach(function(el){
+        if(el.closest('nav'))return;
+        if(el.querySelector('.se-eb'))return;
+        if(getComputedStyle(el).position==='static') el.style.position='relative';
+        el.dataset.origText=el.innerText.replace(/✏️/g,'').trim();
+        var b=document.createElement('button');
+        b.className='se-eb'; b.innerHTML='✏️'; b.title='Metni düzenle';
+        b.setAttribute('style','position:absolute;top:2px;right:2px;background:rgba(45,90,39,.9);color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;z-index:99999;box-shadow:0 2px 6px rgba(0,0,0,.3);line-height:1;');
+        b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();seAc(el,false,stId);});
+        el.appendChild(b);
+      });
+    });
+
+    if(st) st.textContent='Hazır — 📷 veya ✏️ ikonuna tıklayın';
+  }).catch(function(e){
+    wrap.innerHTML='<div style="padding:20px;color:red;">Yüklenemedi: '+e.message+'</div>';
+    if(st) st.textContent='❌ Hata';
+  });
+}
+
+function seAc(el, isImg, stId){
+  _seEl=el; _seImg=isImg; _seStId=stId;
+  document.getElementById('se-ml').textContent=isImg?'Fotoğraf değiştir':'Metni düzenle';
+  var inp=document.getElementById('se-mi');
+  inp.value=isImg?el.src:(el.dataset.origText||el.innerText.replace(/✏️/g,'').trim());
+  document.getElementById('se-mf').style.display=isImg?'block':'none';
+  document.getElementById('se-mfs').textContent='';
+  document.getElementById('se-m').style.display='flex';
+  setTimeout(function(){inp.focus();inp.select();},80);
+}
+
+function seKapat(){document.getElementById('se-m').style.display='none';}
+
+function seKaydet(){
+  var v=document.getElementById('se-mi').value.trim();
+  if(!v||!_seEl) return;
+  if(_seImg){
+    _seEl.src=v;
+  } else {
+    var b=_seEl.querySelector('.se-eb');
+    _seEl.dataset.origText=v;
+    _seEl.innerHTML=v;
+    if(b) _seEl.appendChild(b);
+  }
+  if(_seStId) document.getElementById(_seStId).textContent='⚠️ Kaydedilmedi — Uygula butonuna basın';
+  seKapat();
+}
+
+function seImgYukle(inp){
+  var file=inp.files[0]; if(!file) return;
+  var st=document.getElementById('se-mfs'); st.textContent='⏳...';
+  resizeToJpeg(file,function(blob){
+    uploadToR2(blob,file.name,function(err,data){
+      if(err){st.textContent='❌';return;}
+      document.getElementById('se-mi').value=data.url||'';
+      st.textContent='✅';
+    });
+  });
+}
+
+async function seYayinla(pageFile, wrapId, stId, commitMsg){
+  var token=localStorage.getItem('cactus_gh_token')||'';
+  if(!token){
+    token=prompt('GitHub Token (tek seferlik kaydedilir):');
+    if(!token){toast('⚠️ Token girilmedi');return;}
+    localStorage.setItem('cactus_gh_token',token.trim());
+    token=token.trim();
+  }
+  var repo='cactuscafes/cactus-kafe';
+  var st=document.getElementById(stId);
+  if(st) st.textContent='⏳ GitHub\'a gönderiliyor...';
+  try{
+    // Fetch current file from GitHub
+    var gr=await fetch('https://api.github.com/repos/'+repo+'/contents/'+pageFile,{headers:{'Authorization':'token '+token}});
+    var gd=await gr.json();
+    if(!gd.sha){throw new Error(gd.message||'Dosya bulunamadı');}
+    var origHtml=decodeURIComponent(escape(atob(gd.content.replace(/\n/g,''))));
+
+    // Clone wrap and clean admin edit artifacts
+    var wrap=document.getElementById(wrapId).cloneNode(true);
+    wrap.querySelectorAll('.se-eb,.se-ib').forEach(function(b){b.remove();});
+    wrap.querySelectorAll('[data-orig-text]').forEach(function(el){el.removeAttribute('data-orig-text');});
+    // Remove position:relative added dynamically (only if no other inline styles)
+    wrap.querySelectorAll('[style]').forEach(function(el){
+      el.style.removeProperty('position');
+      el.style.removeProperty('min-height');
+      el.style.removeProperty('height');
+      if(!el.getAttribute('style').trim()) el.removeAttribute('style');
+    });
+
+    // Remove scoped font/style tags we injected (they're duplicates of what's in <head>)
+    wrap.querySelectorAll('style,link').forEach(function(el){el.remove();});
+
+    var newBody=wrap.innerHTML;
+    var bs=origHtml.indexOf('<body>')+6;
+    var be=origHtml.lastIndexOf('<\/body>');
+    var newHtml=origHtml.slice(0,bs)+'\n'+newBody+'\n'+origHtml.slice(be);
+
+    var pr=await fetch('https://api.github.com/repos/'+repo+'/contents/'+pageFile,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({message:commitMsg||'Sayfa guncellendi',content:btoa(unescape(encodeURIComponent(newHtml))),sha:gd.sha,branch:'main'})
+    });
+    var pd=await pr.json();
+    if(pd.commit){
+      if(st) st.textContent='✅ Yayınlandı! Site 30 sn içinde güncellenir.';
+      toast('🚀 '+pageFile+' yayınlandı!');
+    } else {
+      if(pd.message&&pd.message.includes('Bad credentials')){localStorage.removeItem('cactus_gh_token');}
+      if(st) st.textContent='❌ '+(pd.message||'Hata');
+      console.error(pd);
+    }
+  }catch(e){
+    if(st) st.textContent='❌ '+e.message;
+    console.error(e);
+  }
 }
 
 function oncuBtnClick(btn){

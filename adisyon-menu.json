@@ -193,6 +193,12 @@
         "aciklama": "Sade buharda ısıtılmış süt.",
         "foto": "",
         "gizli": false
+      },
+      {
+        "id": "sicak_1777366831417",
+        "ad": "çay",
+        "fiyat": 60,
+        "emoji": "☕"
       }
     ]
   },

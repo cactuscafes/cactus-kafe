@@ -213,7 +213,7 @@
         {
           "id": "sg1",
           "ad": "Ice Americano",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk su + buz.",
@@ -223,7 +223,7 @@
         {
           "id": "sg2",
           "ad": "Ice Latte",
-          "fiyat": 200,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk süt + buz.",
@@ -233,7 +233,7 @@
         {
           "id": "sg3",
           "ad": "Ice Flat White",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Double espresso + soğuk süt.",
@@ -243,7 +243,7 @@
         {
           "id": "sg4",
           "ad": "Ice Mocha",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + çikolata + soğuk süt.",
@@ -253,7 +253,7 @@
         {
           "id": "sg5",
           "ad": "Ice White Mocha",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + beyaz çikolata + buz.",
@@ -263,7 +263,7 @@
         {
           "id": "sg6",
           "ad": "Ice Caramel Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + karamel + soğuk süt.",
@@ -273,7 +273,7 @@
         {
           "id": "sg7",
           "ad": "Ice Caramel Macchiato",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + karamel + buz.",
@@ -283,7 +283,7 @@
         {
           "id": "sg8",
           "ad": "Ice Hazelnut Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + fındık + soğuk süt.",
@@ -293,7 +293,7 @@
         {
           "id": "sg9",
           "ad": "Ice Vanilla Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + soğuk süt.",
@@ -303,7 +303,7 @@
         {
           "id": "sg10",
           "ad": "Ice Filtre",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Soğuk demleme filtre kahve.",
@@ -319,7 +319,7 @@
         {
           "id": "c1",
           "ad": "Ihlamur",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌼",
           "tip": "ic",
           "aciklama": "Taze ihlamur çiçeği demlemesi.",
@@ -329,7 +329,7 @@
         {
           "id": "c2",
           "ad": "Adaçayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌿",
           "tip": "ic",
           "aciklama": "Taze adaçayı yapraklarından.",
@@ -339,7 +339,7 @@
         {
           "id": "c3",
           "ad": "Melisa Çayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌿",
           "tip": "ic",
           "aciklama": "Melisa + hafif limon aroması.",
@@ -349,7 +349,7 @@
         {
           "id": "c4",
           "ad": "Hibiskus",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌺",
           "tip": "ic",
           "aciklama": "Hibiskus çiçeği, ekşimsi.",
@@ -359,7 +359,7 @@
         {
           "id": "c5",
           "ad": "Papatya",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌼",
           "tip": "ic",
           "aciklama": "Papatya çiçeği demlemesi.",
@@ -369,7 +369,7 @@
         {
           "id": "c6",
           "ad": "Yeşil Çay",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🍵",
           "tip": "ic",
           "aciklama": "Hafif demlenmiş, antioksidan.",
@@ -379,7 +379,7 @@
         {
           "id": "c7",
           "ad": "Kış Çayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "❄️",
           "tip": "ic",
           "aciklama": "Tarçın + karanfil + zencefil.",
@@ -389,7 +389,7 @@
         {
           "id": "c8",
           "ad": "Mavi Kelebek",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🦋",
           "tip": "ic",
           "aciklama": "Butterfly pea flower, renk değiştirir.",
@@ -445,7 +445,7 @@
         {
           "id": "v5",
           "ad": "Limonata",
-          "fiyat": 170,
+          "fiyat": 180,
           "emoji": "🍋",
           "tip": "ic",
           "aciklama": "Ev yapımı",
@@ -455,7 +455,7 @@
         {
           "id": "v6",
           "ad": "Çilekli Limonata",
-          "fiyat": 180,
+          "fiyat": 190,
           "emoji": "🍓",
           "tip": "ic",
           "aciklama": "Ev yapımı limonata + çilek",
@@ -471,7 +471,7 @@
         {
           "id": "k1",
           "ad": "Blue Sky",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🫐",
           "tip": "ic",
           "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
@@ -481,7 +481,7 @@
         {
           "id": "k2",
           "ad": "Cactus",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🌵",
           "tip": "ic",
           "aciklama": "Süt, vanilya, elma",
@@ -491,7 +491,7 @@
         {
           "id": "k3",
           "ad": "Pink Wind",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍉",
           "tip": "ic",
           "aciklama": "Karpuz, limonata, çilek",
@@ -859,7 +859,7 @@
         {
           "id": "sg1",
           "ad": "Ice Americano",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk su + buz.",
@@ -869,7 +869,7 @@
         {
           "id": "sg2",
           "ad": "Ice Latte",
-          "fiyat": 200,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk süt + buz.",
@@ -879,7 +879,7 @@
         {
           "id": "sg3",
           "ad": "Ice Flat White",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Double espresso + soğuk süt.",
@@ -889,7 +889,7 @@
         {
           "id": "sg4",
           "ad": "Ice Mocha",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + çikolata + soğuk süt.",
@@ -899,7 +899,7 @@
         {
           "id": "sg5",
           "ad": "Ice White Mocha",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + beyaz çikolata + buz.",
@@ -909,7 +909,7 @@
         {
           "id": "sg6",
           "ad": "Ice Caramel Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + karamel + soğuk süt.",
@@ -919,7 +919,7 @@
         {
           "id": "sg7",
           "ad": "Ice Caramel Macchiato",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + karamel + buz.",
@@ -929,7 +929,7 @@
         {
           "id": "sg8",
           "ad": "Ice Hazelnut Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + fındık + soğuk süt.",
@@ -939,7 +939,7 @@
         {
           "id": "sg9",
           "ad": "Ice Vanilla Latte",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + soğuk süt.",
@@ -949,7 +949,7 @@
         {
           "id": "sg10",
           "ad": "Ice Filtre",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Soğuk demleme filtre kahve.",
@@ -965,7 +965,7 @@
         {
           "id": "c1",
           "ad": "Ihlamur",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌼",
           "tip": "ic",
           "aciklama": "Taze ihlamur çiçeği demlemesi.",
@@ -975,7 +975,7 @@
         {
           "id": "c2",
           "ad": "Adaçayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌿",
           "tip": "ic",
           "aciklama": "Taze adaçayı yapraklarından.",
@@ -985,7 +985,7 @@
         {
           "id": "c3",
           "ad": "Melisa Çayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌿",
           "tip": "ic",
           "aciklama": "Melisa + hafif limon aroması.",
@@ -995,7 +995,7 @@
         {
           "id": "c4",
           "ad": "Hibiskus",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌺",
           "tip": "ic",
           "aciklama": "Hibiskus çiçeği, ekşimsi.",
@@ -1005,7 +1005,7 @@
         {
           "id": "c5",
           "ad": "Papatya",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🌼",
           "tip": "ic",
           "aciklama": "Papatya çiçeği demlemesi.",
@@ -1015,7 +1015,7 @@
         {
           "id": "c6",
           "ad": "Yeşil Çay",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🍵",
           "tip": "ic",
           "aciklama": "Hafif demlenmiş, antioksidan.",
@@ -1025,7 +1025,7 @@
         {
           "id": "c7",
           "ad": "Kış Çayı",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "❄️",
           "tip": "ic",
           "aciklama": "Tarçın + karanfil + zencefil.",
@@ -1035,7 +1035,7 @@
         {
           "id": "c8",
           "ad": "Mavi Kelebek",
-          "fiyat": 190,
+          "fiyat": 200,
           "emoji": "🦋",
           "tip": "ic",
           "aciklama": "Butterfly pea flower, renk değiştirir.",
@@ -1091,7 +1091,7 @@
         {
           "id": "v5",
           "ad": "Limonata",
-          "fiyat": 170,
+          "fiyat": 180,
           "emoji": "🍋",
           "tip": "ic",
           "aciklama": "Ev yapımı",
@@ -1101,7 +1101,7 @@
         {
           "id": "v6",
           "ad": "Çilekli Limonata",
-          "fiyat": 180,
+          "fiyat": 190,
           "emoji": "🍓",
           "tip": "ic",
           "aciklama": "Ev yapımı limonata + çilek",
@@ -1117,7 +1117,7 @@
         {
           "id": "k1",
           "ad": "Blue Sky",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🫐",
           "tip": "ic",
           "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
@@ -1127,7 +1127,7 @@
         {
           "id": "k2",
           "ad": "Cactus",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🌵",
           "tip": "ic",
           "aciklama": "Süt, vanilya, elma",
@@ -1137,7 +1137,7 @@
         {
           "id": "k3",
           "ad": "Pink Wind",
-          "fiyat": 210,
+          "fiyat": 220,
           "emoji": "🍉",
           "tip": "ic",
           "aciklama": "Karpuz, limonata, çilek",

@@ -75,8 +75,16 @@ footer{background:var(--dark);color:#fff;padding:60px 48px 30px;margin-top:80px;
 .footer-bottom p{font-size:11px;color:#555;letter-spacing:1px;}
 
 /* MOBILE */
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+.nav-burger span{display:block;width:22px;height:1.5px;background:var(--dark);transition:all .3s;}
+.menu-mob{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.99);z-index:490;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
+.menu-mob.on{display:flex;}
+.menu-mob a{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;font-style:italic;color:var(--dark);text-decoration:none;transition:color .2s;}
+.menu-mob a:hover{color:var(--gold);}
 @media(max-width:768px){
 nav{padding:14px 20px;}
+.nav-links{display:none;}
+.nav-burger{display:flex;}
 .menu-header{padding:50px 20px 36px;}
 .sube-tabs{top:73px;}
 .sube-tab{padding:14px 24px;font-size:10px;}
@@ -98,11 +106,19 @@ footer{padding:40px 20px 24px;}
   <ul class="nav-links">
     <li><a href="index.html">Ana Sayfa</a></li>
     <li><a href="menu.html">Menü</a></li>
-    
     <li><a href="iletisim.html">İletişim</a></li>
     <li><a href="iletisim.html" style="background:#b8965a;color:#fff;padding:6px 14px;">İş Başvurusu</a></li>
   </ul>
+  <button class="nav-burger" id="menuBurger" onclick="toggleMenuNav()">
+    <span id="mb1"></span><span id="mb2"></span><span id="mb3"></span>
+  </button>
 </nav>
+<div class="menu-mob" id="menuMob">
+  <a href="index.html" onclick="toggleMenuNav()">Ana Sayfa</a>
+  <a href="menu.html" onclick="toggleMenuNav()">Menü</a>
+  <a href="iletisim.html" onclick="toggleMenuNav()">İletişim</a>
+  <a href="iletisim.html" style="font-size:16px;letter-spacing:3px;font-style:normal;font-family:'Montserrat',sans-serif;background:#b8965a;color:#fff;padding:12px 28px;text-decoration:none;">İş Başvurusu</a>
+</div>
 
 <div class="menu-header">
   <p class="menu-header-eyebrow">Cactus Coffee</p>
@@ -219,6 +235,14 @@ function subeGoster(sube,btn) {
 }
 
 window.addEventListener('load', init);
+function toggleMenuNav(){
+  var mob=document.getElementById('menuMob');
+  var isOpen=mob.classList.toggle('on');
+  document.getElementById('mb1').style.transform=isOpen?'rotate(45deg) translateY(6.5px)':'';
+  document.getElementById('mb2').style.opacity=isOpen?'0':'1';
+  document.getElementById('mb3').style.transform=isOpen?'rotate(-45deg) translateY(-6.5px)':'';
+  document.body.style.overflow=isOpen?'hidden':'';
+}
 </script>
 </body>
 </html>

@@ -100,17 +100,54 @@
   <a href="iletisim.html" onclick="toggleMenu()">İletişim</a>
 </div>
 
-<div class="page-hero">
-  <div class="page-hero-content">
-    <span class="page-eyebrow">Cactus Coffee</span>
-    <h1 class="page-title">İş<br><em>Başvurusu</em></h1>
-  </div>
-</div>
+<div class="iletisim-wrap" style="padding-top:120px;">
 
-<div class="iletisim-wrap">
+  <!-- İletişim Formu -->
+  <div class="form-sec reveal">
+    <div class="form-intro">
+      <div class="sec-label">İş Başvurusu</div>
+      <h2 class="sec-title">Bizimle<br><em>çalış</em></h2>
+      <p>Cactus Coffee ailesine katılmak ister misin? Pozisyon seç, formu doldur — en kısa sürede seninle iletişime geçelim.</p>
+    </div>
+    <div>
+      <form class="form" id="basvuruForm" onsubmit="basvuruGonder(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Adınız</label>
+            <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
+          </div>
+          <div class="form-group">
+            <label>Instagram (varsa)</label>
+            <input type="text" name="instagram" placeholder="@kullaniciadi">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="tel" name="telefon" placeholder="05XX XXX XX XX" required>
+        </div>
+        <div class="form-group">
+          <label>Konu</label>
+          <select name="pozisyon">
+            <option>Barista</option>
+            <option>Kasiyer</option>
+            <option>Garson / Servis</option>
+            <option>Mutfak Personeli</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mesajınız</label>
+          <textarea name="mesaj" placeholder="Kendinizden kısaca bahsedin, deneyimlerinizi ve çalışmak istediğiniz şubeyi belirtin..." style="min-height:140px;"></textarea>
+        </div>
+        <button type="submit" class="form-submit">Başvur →</button>
+        <input type="hidden" name="_subject" value="Yeni İş Başvurusu — Cactus Coffee">
+        <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
+      </form>
+    </div>
+  </div>
 
   <!-- Şube Kartları -->
-  <div class="iletisim-grid reveal">
+  <div class="iletisim-grid reveal" style="margin-top:80px;">
     <div class="sube-kart">
       <div class="sk-no">01</div>
       <div class="sk-ad">FSM Şubesi</div>
@@ -175,49 +212,6 @@
     </div>
   </div>
 
-  <!-- İletişim Formu -->
-  <div class="form-sec reveal">
-    <div class="form-intro">
-      <div class="sec-label">İş Başvurusu</div>
-      <h2 class="sec-title">Bizimle<br><em>çalış</em></h2>
-      <p>Cactus Coffee ailesine katılmak ister misin? Pozisyon seç, formu doldur — en kısa sürede seninle iletişime geçelim.</p>
-    </div>
-    <div>
-      <form class="form" id="basvuruForm" onsubmit="basvuruGonder(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Adınız</label>
-            <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
-          </div>
-          <div class="form-group">
-            <label>Instagram (varsa)</label>
-            <input type="text" name="instagram" placeholder="@kullaniciadi">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Telefon</label>
-          <input type="tel" name="telefon" placeholder="05XX XXX XX XX" required>
-        </div>
-        <div class="form-group">
-          <label>Konu</label>
-          <select name="pozisyon">
-            <option>Barista</option>
-            <option>Kasiyer</option>
-            <option>Garson / Servis</option>
-            <option>Mutfak Personeli</option>
-            <option>Diğer</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Mesajınız</label>
-          <textarea name="mesaj" placeholder="Kendinizden kısaca bahsedin, deneyimlerinizi ve çalışmak istediğiniz şubeyi belirtin..." style="min-height:140px;"></textarea>
-        </div>
-        <button type="submit" class="form-submit">Başvur →</button>
-        <input type="hidden" name="_subject" value="Yeni İş Başvurusu — Cactus Coffee">
-        <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
-      </form>
-    </div>
-  </div>
 
 </div>
 

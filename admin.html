@@ -1048,25 +1048,58 @@ function asLoad(){
   }).catch(function(e){wrap.innerHTML='<div style="padding:20px;color:red;">Hata: '+e.message+'</div>';});
 }
 async function asYayinla(){
-  var token=localStorage.getItem('cactus_gh_token');
+  var token=localStorage.getItem('cactus_gh_token')||'';
+  if(!token){
+    token=prompt('GitHub Token (tek seferlik kaydedilir):');
+    if(!token){toast('⚠️ Token girilmedi');return;}
+    localStorage.setItem('cactus_gh_token',token.trim());
+    token=token.trim();
+  }
   var repo='cactuscafes/cactus-kafe';
   document.getElementById('as-st').textContent='⏳ Yükleniyor...';
   try{
     var d=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{headers:{'Authorization':'token '+token}})).json();
+    if(!d.sha){throw new Error(d.message||'Dosya alınamadı');}
     var idx=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+
+    // 1. Extract the original <nav> from GitHub's file so we can put it back
+    var navMatch=idx.match(/<nav[\s\S]*?<\/nav>/);
+    var navHtml=navMatch?navMatch[0]+'\n':'';
+
+    // 2. Clone wrap and strip all admin editing artifacts
     var wrap=document.getElementById('as-wrap').cloneNode(true);
     wrap.querySelectorAll('.as-eb,.as-ib').forEach(function(b){b.remove();});
     wrap.querySelectorAll('[data-orig-text]').forEach(function(el){el.removeAttribute('data-orig-text');});
+    // Remove injected scoped style tags (added by asLoad for preview rendering)
+    wrap.querySelectorAll('style').forEach(function(s){
+      if(s.textContent.indexOf('#as-wrap')>-1) s.remove();
+    });
+    // Remove duplicate font link tags injected by asLoad
+    wrap.querySelectorAll('link[href*="googleapis"]').forEach(function(l){l.remove();});
+    // Clean up inline styles added dynamically for admin preview
     wrap.querySelectorAll('[style]').forEach(function(el){
-      el.style.position='';
+      el.style.removeProperty('position');
+      el.style.removeProperty('height');
+      el.style.removeProperty('min-height');
       if(!el.getAttribute('style').trim())el.removeAttribute('style');
     });
+
     var body=wrap.innerHTML;
-    var bs=idx.indexOf('<body>')+6,be=idx.lastIndexOf('<\/body>');
-    var newIdx=idx.slice(0,bs)+'\n'+body+'\n'+idx.slice(be);
-    var pd=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'Ana sayfa guncellendi',content:btoa(unescape(encodeURIComponent(newIdx))),sha:d.sha})})).json();
-    if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı!';}
-    else{document.getElementById('as-st').textContent='❌ Hata';console.error(pd);}
+    var bs=idx.indexOf('<body>')+6, be=idx.lastIndexOf('<\/body>');
+    // 3. Re-inject the original nav before the body content
+    var newIdx=idx.slice(0,bs)+'\n'+navHtml+body+'\n'+idx.slice(be);
+
+    var pd=await(await fetch('https://api.github.com/repos/'+repo+'/contents/index.html',{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'Ana sayfa guncellendi',content:btoa(unescape(encodeURIComponent(newIdx))),sha:d.sha,branch:'main'})
+    })).json();
+    if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı! (nav korundu)';}
+    else{
+      if(pd.message&&pd.message.indexOf('Bad credentials')>-1)localStorage.removeItem('cactus_gh_token');
+      document.getElementById('as-st').textContent='❌ '+(pd.message||'Hata');
+      console.error(pd);
+    }
   }catch(e){document.getElementById('as-st').textContent='❌ '+e.message;console.error(e);}
 }
 

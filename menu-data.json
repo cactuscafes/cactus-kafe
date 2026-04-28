@@ -203,15 +203,6 @@
           "aciklama": "",
           "tip": "ic",
           "foto": ""
-        },
-        {
-          "id": "sicak_1777368019727",
-          "emoji": "☕",
-          "ad": "Çay",
-          "fiyat": "60",
-          "aciklama": "",
-          "tip": "ic",
-          "foto": ""
         }
       ]
     },
@@ -852,15 +843,6 @@
         },
         {
           "id": "sicak_1777366881645",
-          "emoji": "☕",
-          "ad": "Çay",
-          "fiyat": "60",
-          "aciklama": "",
-          "tip": "ic",
-          "foto": ""
-        },
-        {
-          "id": "sicak_1777368019727",
           "emoji": "☕",
           "ad": "Çay",
           "fiyat": "60",

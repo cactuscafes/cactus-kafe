@@ -64,6 +64,22 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .product-desc{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px;font-weight:300;}
 .product-price{font-size:13px;font-weight:500;color:var(--dark);}
 
+/* ÜRÜN POPUP */
+.upop-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.upop-bg.on{display:flex;}
+.upop{background:#fff;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;position:relative;animation:upopIn .22s ease;}
+@keyframes upopIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.upop-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;z-index:2;display:flex;align-items:center;justify-content:center;}
+.upop-img{width:100%;aspect-ratio:1;overflow:hidden;background:#f5f5f5;}
+.upop-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.upop-emoji{width:100%;height:220px;display:flex;align-items:center;justify-content:center;font-size:72px;background:#f8f6f2;}
+.upop-body{padding:24px 28px 36px;}
+.upop-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;line-height:1.15;margin-bottom:10px;}
+.upop-desc{font-size:13px;color:#777;line-height:1.75;font-weight:300;margin-bottom:18px;}
+.upop-price{font-size:22px;font-weight:600;color:var(--gold);}
+.product-card{cursor:pointer;}
+.spotlight-card{cursor:pointer;}
+
 /* FOOTER */
 footer{background:var(--dark);color:#fff;padding:60px 48px 30px;margin-top:80px;}
 .footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:40px;}
@@ -164,9 +180,23 @@ footer{padding:40px 20px 24px;}
   </div>
 </footer>
 
+<!-- Ürün Popup -->
+<div class="upop-bg" id="upopBg" onclick="if(event.target===this)upopKapat()">
+  <div class="upop" id="upop">
+    <button class="upop-close" onclick="upopKapat()">×</button>
+    <div id="upopImg"></div>
+    <div class="upop-body">
+      <div class="upop-name" id="upopAd"></div>
+      <div class="upop-desc" id="upopAciklama"></div>
+      <div class="upop-price" id="upopFiyat"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 var menuData = {};
 var oncuData = [];
+var POPUP_DATA = [];
 
 async function init() {
   try {
@@ -192,7 +222,9 @@ function renderMenu(sube) {
   var spotlightEl = document.getElementById('spotlight-' + sube);
   if (spotItems.length > 0 && spotGridEl) {
     spotGridEl.innerHTML = spotItems.map(function(u){
-      var c='<div class="spotlight-card">';
+      var pidx = POPUP_DATA.length;
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
+      var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
       c+='<img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.style.display=\'none\'">';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
@@ -203,8 +235,11 @@ function renderMenu(sube) {
     var urunler=(kat.urunler||[]).filter(function(u){ return !u.gizli; });
     if (!urunler.length) return '';
     var uH=urunler.map(function(u){
+      var pidx = POPUP_DATA.length;
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
       var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
-      var h='<div class="product-card"><div class="product-img-wrap">'+img+'</div>';
+      var h='<div class="product-card" onclick="upopAc('+pidx+')">';
+      h+='<div class="product-img-wrap">'+img+'</div>';
       h+='<div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
@@ -234,6 +269,31 @@ function subeGoster(sube,btn) {
   if(fsm) fsm.style.display=sube==='fsm'?'':'none';
   if(pod) pod.style.display=sube==='podyum'?'':'none';
 }
+
+function upopAc(idx) {
+  var u = POPUP_DATA[idx];
+  if (!u) return;
+  // Image or emoji
+  var imgDiv = document.getElementById('upopImg');
+  if (u.foto) {
+    imgDiv.className = 'upop-img';
+    imgDiv.innerHTML = '<img src="'+u.foto+'" alt="'+u.ad+'">';
+  } else {
+    imgDiv.className = '';
+    imgDiv.innerHTML = '<div class="upop-emoji">'+(u.emoji||'☕')+'</div>';
+  }
+  document.getElementById('upopAd').textContent = (u.emoji ? u.emoji+' ' : '') + u.ad;
+  document.getElementById('upopAciklama').textContent = u.aciklama || '';
+  document.getElementById('upopAciklama').style.display = u.aciklama ? '' : 'none';
+  document.getElementById('upopFiyat').textContent = u.fiyat ? u.fiyat+' TL' : '';
+  document.getElementById('upopBg').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function upopKapat() {
+  document.getElementById('upopBg').classList.remove('on');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') upopKapat(); });
 
 window.addEventListener('load', init);
 function toggleMenuNav(){

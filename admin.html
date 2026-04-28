@@ -63,6 +63,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .oncu-ad{font-size:13px;font-weight:500;margin-bottom:2px;}
 .oncu-fiyat{font-size:12px;color:var(--gold);}
 .oncu-sil{width:100%;padding:6px;background:#fff;border:1.5px solid #fcc;color:var(--rd);font-size:11px;cursor:pointer;margin-top:8px;font-family:inherit;}
+.bsv-kart{background:#fff;border:1.5px solid var(--stone);padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:0;}
+.bsv-kart.yeni{border-left:4px solid var(--gold);}
+.bsv-ad{font-size:15px;font-weight:500;margin-bottom:6px;}
+.bsv-meta{font-size:11px;color:var(--mist);margin-bottom:8px;letter-spacing:.5px;}
+.bsv-mesaj{font-size:13px;color:#555;line-height:1.6;background:var(--paper);padding:10px 12px;margin-top:8px;}
+.bsv-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
 .rap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
 .rap-krt{background:#fff;border:1.5px solid var(--stone);padding:16px;text-align:center;}
 .rap-lbl{font-size:10px;color:var(--mist);letter-spacing:1px;margin-bottom:4px;}
@@ -115,6 +121,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('kategori',this)">🗂 Kategoriler</button>
       <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
+      <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:#2d7a4f;color:#fff;">📊 Raporlar</button>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
@@ -214,6 +221,16 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
           <button onclick="oncuEkle()" style="width:100%;padding:11px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;">+ ÖNE ÇIKANLARA EKLE</button>
         </div>
         <div class="oncu-grid" id="oncuGrid"></div>
+      </div>
+
+      <!-- BAŞVURULAR -->
+      <div class="panel" id="panel-basvurular">
+        <div class="pttl">📩 İş Başvuruları</div>
+        <div class="psub">Websitesinden gelen iş başvuruları. Yeni (altın kenarlı) = henüz okunmadı.</div>
+        <div style="display:flex;gap:10px;margin-bottom:20px;">
+          <button onclick="basvuruYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
+        </div>
+        <div id="basvuruListesi" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
 
       <!-- RAPOR -->
@@ -396,6 +413,7 @@ function panelAc(id,el){
   if(id==='kategori') renderKatListe();
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
+  if(id==='basvurular') basvuruYukle();
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
   if(id==='anasayfa'){setTimeout(function(){asLoad&&asLoad();},200);}
@@ -860,7 +878,20 @@ async function yayinla(){
 }
 
 /* BAŞLAT */
-if(localStorage.getItem('ca')==='1'){ document.getElementById('giris').style.display='none'; basla(); }
+if(localStorage.getItem('ca')==='1'){
+  document.getElementById('giris').style.display='none';
+  basla();
+  // badge for applications
+  setTimeout(function(){
+    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/basvuru/listele')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var yeni=data.filter(function(b){return !b.okundu;}).length;
+        var badge=document.getElementById('basvuruBadge');
+        if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
+      }).catch(function(){});
+  },2000);
+}
 
 
 var _asEl=null,_asImg=false;
@@ -979,6 +1010,45 @@ async function asYayinla(){
     if(pd.commit){document.getElementById('as-st').textContent='✅ Yayınlandı!';}
     else{document.getElementById('as-st').textContent='❌ Hata';console.error(pd);}
   }catch(e){document.getElementById('as-st').textContent='❌ '+e.message;console.error(e);}
+}
+
+/* ===== IS BASVURULARI ===== */
+var BASVURU_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+async function basvuruYukle(){
+  var el=document.getElementById('basvuruListesi');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--mist);font-size:13px;padding:20px 0;">Yükleniyor...</div>';
+  try{
+    var r=await fetch(BASVURU_API+'/basvuru/listele');
+    var data=await r.json();
+    var yeni=data.filter(function(b){return !b.okundu;}).length;
+    var badge=document.getElementById('basvuruBadge');
+    if(badge){badge.style.display=yeni>0?'inline':'none';badge.textContent=yeni;}
+    if(!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px;padding:20px 0;">Henüz başvuru yok.</div>';return;}
+    el.innerHTML=data.map(function(b){
+      var d=new Date(b.tarih);
+      var tarih=isNaN(d)?b.tarih:d.toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="bsv-kart'+(b.okundu?'':' yeni')+'" id="bsv-'+b.id+'">'
+        +'<div style="flex:1;">'
+        +'<div class="bsv-ad">'+b.ad_soyad+(b.instagram?' <span style="font-size:11px;color:var(--mist);font-weight:300;">'+b.instagram+'</span>':'')+'</div>'
+        +'<div class="bsv-meta">📞 '+b.telefon+' &nbsp;·&nbsp; '+(b.pozisyon||'—')+' &nbsp;·&nbsp; '+tarih+'</div>'
+        +(b.mesaj?'<div class="bsv-mesaj">'+b.mesaj+'</div>':'')
+        +'</div>'
+        +'<div class="bsv-actions">'
+        +(!b.okundu?'<button class="uk-btn" onclick="basvuruOkundu('+b.id+')">✓ Okundu</button>':'<span style="font-size:11px;color:var(--mist);">✓ Okundu</span>')
+        +'<button class="uk-btn red" onclick="basvuruSil('+b.id+')">🗑 Sil</button>'
+        +'</div></div>';
+    }).join('');
+  }catch(e){el.innerHTML='<div style="color:var(--rd);">Yüklenemedi: '+e.message+'</div>';}
+}
+async function basvuruOkundu(id){
+  await fetch(BASVURU_API+'/basvuru/okundu',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
+  basvuruYukle();
+}
+async function basvuruSil(id){
+  if(!confirm('Bu başvuru silinsin mi?'))return;
+  await fetch(BASVURU_API+'/basvuru/sil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
+  basvuruYukle();
 }
 
 function oncuBtnClick(btn){

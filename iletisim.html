@@ -183,7 +183,7 @@
       <p>Cactus Coffee ailesine katılmak ister misin? Pozisyon seç, formu doldur — en kısa sürede seninle iletişime geçelim.</p>
     </div>
     <div>
-      <form class="form" action="https://formspree.io/f/batuhanbulut@cactuscafes.com" method="POST">
+      <form class="form" id="basvuruForm" onsubmit="basvuruGonder(event)">
         <div class="form-row">
           <div class="form-group">
             <label>Adınız</label>
@@ -254,11 +254,32 @@ function toggleMenu(){
   b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';
   document.body.style.overflow=open?'hidden':'';
 }
-function formGonder(e){
+async function basvuruGonder(e){
   e.preventDefault();
-  document.getElementById('formSuccess').style.display='block';
-  e.target.reset();
-  setTimeout(()=>document.getElementById('formSuccess').style.display='none',5000);
+  const form=e.target;
+  const btn=form.querySelector('.form-submit');
+  const origText=btn.textContent;
+  btn.textContent='⏳ Gönderiliyor...';btn.disabled=true;
+  const data={
+    ad_soyad:form.querySelector('[name=ad_soyad]').value.trim(),
+    telefon:form.querySelector('[name=telefon]').value.trim(),
+    instagram:(form.querySelector('[name=instagram]')||{}).value||'',
+    pozisyon:(form.querySelector('[name=pozisyon]')||{}).value||'',
+    mesaj:(form.querySelector('[name=mesaj]')||{}).value||''
+  };
+  try{
+    const r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/basvuru/kaydet',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)
+    });
+    if(r.ok){
+      document.getElementById('formSuccess').style.display='block';
+      form.reset();btn.textContent='✓ Gönderildi';
+      setTimeout(()=>{document.getElementById('formSuccess').style.display='none';btn.textContent=origText;btn.disabled=false;},6000);
+    }else{throw new Error('Sunucu hatası');}
+  }catch(err){
+    btn.disabled=false;btn.textContent=origText;
+    alert('Hata oluştu, lütfen tekrar deneyin.');
+  }
 }
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');obs.unobserve(x.target);}});},{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));

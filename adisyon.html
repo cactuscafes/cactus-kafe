@@ -1274,81 +1274,64 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 
 
 <script id="menu-sync">
-/* MENU SYNC — GitHub master */
+/* MENU SYNC v2 — menu-data.json */
 (function(){
-  var GH_MENU_URL = 'https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/adisyon-menu.json';
-  var GH_API_URL = 'https://api.github.com/repos/cactuscafes/cactus-kafe/contents/adisyon-menu.json';
+  var GH_MENU_URL = 'https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json';
+  var GH_API_URL  = 'https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json';
+  var _lwt = 0; // yerel kayıt zamanı (ms) — overwrite koruması
 
-  // 1) Sayfa açılışında GitHub'dan menüyü çek
   function menuGuncelle(){
+    if(_lwt && Date.now()-_lwt < 60000) return; // son 60sn içinde kayıt olduysa bekle
     fetch(GH_MENU_URL+'?nc='+Date.now())
       .then(function(r){return r.json();})
       .then(function(data){
-        if(!data) return;
-        // Mevcut localStorage ile karşılaştır
-        var mevcutStr = localStorage.getItem(LK.menu);
-        var yeniStr = JSON.stringify(data);
-        if(mevcutStr !== yeniStr){
-          localStorage.setItem(LK.menu, yeniStr);
-        }
-        // Format detection: branch-keyed ({fsm:..., podyum:...}) veya flat
-        var branchFmt = (typeof isBranchFormat==='function') ? isBranchFormat(data) : (data && (data.fsm||data.podyum) && !data.urunler);
-        var pick = branchFmt
-          ? ((typeof pickBranch==='function') ? pickBranch(data) : (data[SUBE]||data.podyum||data.fsm))
+        if(!data||typeof data!=='object'||!Object.keys(data).length) return;
+        var pick = (typeof isBranchFormat==='function'&&isBranchFormat(data))
+          ? (typeof pickBranch==='function'?pickBranch(data):(data[SUBE]||data.podyum||data.fsm))
           : data;
-        // MENU referansını koru: anahtarları temizleyip yeniden doldur
-        if(typeof MENU!=='undefined' && MENU){
+        if(!pick||!Object.keys(pick).length) return;
+        localStorage.setItem(LK.menu, JSON.stringify(pick));
+        if(typeof MENU!=='undefined'&&MENU){
           Object.keys(MENU).forEach(function(k){delete MENU[k];});
           Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
-        } else { window.MENU = pick; }
-        // Aktif kategori hala MENU'de var mı? Yoksa ilkine düş
-        if(typeof aktifKat!=='undefined' && !MENU[aktifKat]){
-          window.aktifKat = Object.keys(MENU)[0];
-        }
-        if(typeof yonKat!=='undefined' && !MENU[yonKat]){
-          window.yonKat = Object.keys(MENU)[0];
+          if(typeof aktifKat!=='undefined'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
+          if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
         }
         if(typeof renderKatBar==='function') renderKatBar();
         if(typeof renderUrunler==='function') renderUrunler();
-        console.log('Menü güncellendi'+(branchFmt?' (sube:'+SUBE+')':''));
       }).catch(function(){});
   }
 
-  // 2) menuKaydet'i wrap et — GitHub'a da push et
-  window.addEventListener('load', function(){
+  window.addEventListener('load',function(){
     setTimeout(function(){
-      // İlk yüklemede GitHub'dan çek
       menuGuncelle();
-
-      // menuKaydet wrap
-      var origKaydet = window.menuKaydet;
-      if(!origKaydet || origKaydet._ghSync) return;
-      window.menuKaydet = function(){
-        var r = origKaydet.apply(this, arguments);
-        // GitHub'a push et
-        var token = localStorage.getItem('cactus_gh_token');
+      var origKaydet=window.menuKaydet;
+      if(!origKaydet||origKaydet._ghSync) return;
+      window.menuKaydet=function(){
+        var r=origKaydet.apply(this,arguments);
+        _lwt=Date.now(); // overwrite korumasını başlat
+        var token=localStorage.getItem('cactus_gh_token');
         if(!token) return r;
-        var menuJson = JSON.stringify(MENU, null, 2);
-        // Önce mevcut SHA al
-        fetch(GH_API_URL, {headers:{'Authorization':'token '+token}})
+        // menu-data.json'ı çek → ilgili şubeyi güncelle → geri yaz
+        fetch(GH_API_URL,{headers:{'Authorization':'token '+token}})
           .then(function(res){return res.json();})
           .then(function(d){
-            var b64 = btoa(unescape(encodeURIComponent(menuJson)));
-            return fetch(GH_API_URL, {
-              method:'PUT',
-              headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-              body: JSON.stringify({message:'Menu guncellendi',content:b64,sha:d.sha})
-            });
+            var cur={};
+            if(d.content){try{cur=JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,'')))));}catch(e){}}
+            cur[SUBE]=MENU;
+            if(!cur.fsm)    cur.fsm   =JSON.parse(JSON.stringify(MENU));
+            if(!cur.podyum) cur.podyum=JSON.parse(JSON.stringify(MENU));
+            var b64=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,2))));
+            return fetch(GH_API_URL,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+              body:JSON.stringify({message:'Adisyon menü güncellendi ('+SUBE+')',content:b64,sha:d.sha})});
           })
-          .then(function(){console.log('Menu GitHub a push edildi');})
-          .catch(function(e){console.log('Menu push hatasi:',e);});
+          .then(function(){_lwt=0;})
+          .catch(function(e){console.log('Menu push hatası:',e);});
         return r;
       };
-      window.menuKaydet._ghSync = true;
-    }, 1500);
-
-    // Her 30 saniyede bir GitHub'dan kontrol et
-    setInterval(menuGuncelle, 30000);
+      window.menuKaydet._ghSync=true;
+    },1500);
+    setInterval(menuGuncelle,30000);
   });
 })();
 </script>

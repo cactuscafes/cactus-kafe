@@ -489,7 +489,8 @@ function renderUrunler(){
       if(!m)return;
       var katId=m[1],idx=parseInt(m[2]);
       var urun=MENU[katId]&&MENU[katId][idx];
-      if(!urun||!urun.id)return;
+      if(!urun)return;
+      if(!urun.id){urun.id=katId+'_'+idx;MENU[katId][idx].id=urun.id;menuKaydet();}
       var isOncu=ONCU&&ONCU.some(function(x){return x.id===urun.id;});
       var btn=document.createElement('button');
       btn.className='oncu-btn';
@@ -504,7 +505,7 @@ function renderUrunler(){
         if(oidx>-1){ONCU.splice(oidx,1);btn.innerHTML='☆';toast('Öne Çıkandan kaldırıldı');}
         else{ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''});btn.innerHTML='⭐';toast('⭐ Öne Çıkanlara eklendi!');}
         localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
-        yayinla();
+        if(typeof renderOncuGrid==='function') renderOncuGrid();
       };
       silBtn.parentElement.insertBefore(btn,silBtn);
     });
@@ -731,7 +732,6 @@ function oncuEkle(){
   const ac=document.getElementById('oAc').value.trim();
   const foto=document.getElementById('oUrl').value.trim();
   if(!ad){ toast('⚠️ Ürün adı zorunlu'); return; }
-  if(!foto){ toast('⚠️ Fotoğraf ekleyin'); return; }
   const data=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
   data.push({id:Date.now(),ad,fiyat,aciklama:ac,foto});
   localStorage.setItem('cactus_oncu',JSON.stringify(data));
@@ -761,7 +761,7 @@ function renderOncuGrid(){
         <div class="oncu-ad">${u.ad}</div>
         ${u.fiyat?`<div class="oncu-fiyat">₺${u.fiyat}</div>`:''}
         ${u.aciklama?`<div style="font-size:11px;color:var(--mist);margin-top:4px;">${u.aciklama}</div>`:''}
-        <button class="oncu-sil" onclick="oncuSil(${u.id})">🗑 Kaldır</button>
+        <button class="oncu-sil" onclick="oncuSil('${u.id}')">🗑 Kaldır</button>
       </div>
     </div>`).join('');
 }
@@ -836,7 +836,7 @@ async function yayinla(){
     // menu-data.json formatı: {fsm:{catId:{id,label,urunler:[...]}, ...}, podyum:{...}}
     const perBranch={};
     KAT.forEach(function(k){perBranch[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]};});
-    const menuData={fsm:perBranch,podyum:JSON.parse(JSON.stringify(perBranch))};
+    const menuData={fsm:perBranch,podyum:JSON.parse(JSON.stringify(perBranch)),oncu:ONCU};
     const jsonB64=btoa(unescape(encodeURIComponent(JSON.stringify(menuData,null,2))));
     const jgr=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{headers:{'Authorization':'token '+token}});
     const jgd=await jgr.json();
@@ -1000,37 +1000,5 @@ function oncuBtnClick(btn){
 }
 </script>
 
-<script>
-// Öne çıkan yıldız fix — otomatik GitHub push
-(function(){
-  function patchOncu(){
-    if(typeof window._oncuPatched !== 'undefined') return;
-    if(typeof window.oncuBtnClick === 'undefined') { setTimeout(patchOncu, 500); return; }
-    window._oncuPatched = true;
-    var _orig = window.oncuBtnClick;
-    window.oncuBtnClick = async function(el) {
-      _orig.call(this, el);
-      // 300ms bekle localStorage'ın güncellenmesi için
-      setTimeout(async function(){
-        var tok = localStorage.getItem('cactus_gh_token');
-        var menu = JSON.parse(localStorage.getItem('cactus_admin_menu')||'{}');
-        var kat = JSON.parse(localStorage.getItem('cactus_kat')||'[]');
-        var oncu = JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-        var data = { menu: menu, kategoriler: kat, oncu: oncu, guncelleme: new Date().toISOString() };
-        var r = await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json',{headers:{'Authorization':'token '+tok}});
-        var d = await r.json();
-        var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
-        await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json',{
-          method:'PUT',
-          headers:{'Authorization':'token '+tok,'Content-Type':'application/json'},
-          body:JSON.stringify({message:'Oncu guncellendi',content:b64,sha:d.sha})
-        });
-        if(typeof toast==='function') toast('⭐ Öne çıkan güncellendi ve yayınlandı!');
-      }, 300);
-    };
-  }
-  setTimeout(patchOncu, 1000);
-})();
-</script>
 </body>
 </html>

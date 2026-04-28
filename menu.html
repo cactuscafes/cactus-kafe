@@ -168,7 +168,9 @@ function renderMenu(sube) {
   if (!catListEl) return;
   var katData = Object.values(subeData);
   var allProducts = katData.reduce(function(a,k){ return a.concat(k.urunler||[]); },[]);
-  var spotItems = allProducts.filter(function(u){ return u.foto; }).slice(0,4);
+  var spotItems = (menuData.oncu && menuData.oncu.length > 0)
+    ? menuData.oncu
+    : allProducts.filter(function(u){ return u.foto; }).slice(0,4);
   var spotGridEl = document.getElementById('spotlight-grid-' + sube);
   var spotlightEl = document.getElementById('spotlight-' + sube);
   if (spotItems.length > 0 && spotGridEl) {

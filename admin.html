@@ -732,9 +732,9 @@ function oncuEkle(){
   const ac=document.getElementById('oAc').value.trim();
   const foto=document.getElementById('oUrl').value.trim();
   if(!ad){ toast('⚠️ Ürün adı zorunlu'); return; }
-  const data=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-  data.push({id:Date.now(),ad,fiyat,aciklama:ac,foto});
-  localStorage.setItem('cactus_oncu',JSON.stringify(data));
+  if(!ONCU)ONCU=[];
+  ONCU.push({id:Date.now(),ad,fiyat:parseInt(fiyat)||0,aciklama:ac,foto});
+  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
   document.getElementById('oAd').value='';
   document.getElementById('oFiyat').value='';
   document.getElementById('oAc').value='';
@@ -746,13 +746,13 @@ function oncuEkle(){
   toast('✅ Eklendi!');
 }
 function oncuSil(id){
-  let d=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
-  d=d.filter(u=>u.id!==id);
-  localStorage.setItem('cactus_oncu',JSON.stringify(d));
+  if(!ONCU)ONCU=[];
+  ONCU=ONCU.filter(u=>String(u.id)!==String(id));
+  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
   renderOncuGrid(); toast('🗑 Kaldırıldı');
 }
 function renderOncuGrid(){
-  const d=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+  const d=ONCU||[];
   document.getElementById('oncuGrid').innerHTML=!d.length?'<div style="color:var(--mist);font-size:13px;">Henüz öne çıkan ürün yok.</div>':
   d.map(u=>`
     <div class="oncu-kart">

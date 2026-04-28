@@ -467,9 +467,9 @@ function renderUrunler(){
         <div><div class="uk-ad">${u.ad}</div><div class="uk-tip">${u.tip==='ic'?'İçecek':'Yiyecek'}</div></div>
       </div>
       <div style="display:grid;gap:8px;">
-        <div><label class="lbl">Ad</label><input class="yi" value="${u.ad}" onchange="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
-        <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" onchange="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value))"></div>
-        <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" onchange="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
+        <div><label class="lbl">Ad</label><input class="yi" value="${u.ad}" oninput="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
+        <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" oninput="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value)||0)"></div>
+        <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" oninput="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
       </div>
       <div class="uk-btns">
         <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
@@ -477,30 +477,7 @@ function renderUrunler(){
       </div>
     </div>`).join('');
 
-  // Öne Çıkan butonlarını ekle
-  if(typeof ONCU !== 'undefined'){
-    document.querySelectorAll('[data-urun-id]').forEach(function(card){
-      var uid = card.getAttribute('data-urun-id');
-      var katid = card.getAttribute('data-kat-id');
-      var aktarBtn = card.querySelector('.oncu-toggle-btn');
-      if(!aktarBtn){
-        var silBtn = card.querySelector('button[onclick*="urunSil"]');
-        if(silBtn){
-          aktarBtn = document.createElement('button');
-          aktarBtn.className = 'oncu-toggle-btn';
-          aktarBtn.setAttribute('data-uid', uid);
-          aktarBtn.setAttribute('data-katid', katid);
-          aktarBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;';
-          aktarBtn.title = 'Öne Çıkan';
-          aktarBtn.addEventListener('click', function(){ oncuBtnClick(this); });
-          silBtn.parentElement.insertBefore(aktarBtn, silBtn);
-        }
-      }
-      if(aktarBtn){
-        aktarBtn.innerHTML = (ONCU.some(function(x){return x.id===uid;})) ? '\u2B50' : '\u2606';
-      }
-    });
-  }
+
 
   // ☆ Öne Çıkan butonlarını ekle
   setTimeout(function(){
@@ -508,8 +485,7 @@ function renderUrunler(){
       if(kart.querySelector('.oncu-btn'))return;
       var silBtn=kart.querySelector('button[onclick*="urunSil"]');
       if(!silBtn)return;
-      var m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"],[^,]*,?\s*(\d+)\)/);
-      if(!m)m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"]s*,s*(\d+)\)/);
+      var m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"]\s*,\s*(\d+)\)/);
       if(!m)return;
       var katId=m[1],idx=parseInt(m[2]);
       var urun=MENU[katId]&&MENU[katId][idx];
@@ -564,7 +540,7 @@ function urunEkle(){
   const foto=document.getElementById('yFotoUrl')?.value||'';
   if(!a){toast('⚠️ Ad zorunlu');return;}
   if(!MENU[kat])MENU[kat]=[];
-  MENU[kat].push({id:kat+'_'+Date.now(),emoji:e,ad:a,fiyat:f,aciklama:ac,tip:t,foto:foto});
+  MENU[kat].push({id:kat+'_'+Date.now(),emoji:e,ad:a,fiyat:parseInt(f)||0,aciklama:ac,tip:t,foto:foto});
   localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
   document.getElementById('yA').value='';
   document.getElementById('yF').value='0';

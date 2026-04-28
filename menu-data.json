@@ -194,6 +194,15 @@
           "aciklama": "Sade buharda ısıtılmış süt.",
           "foto": "",
           "gizli": false
+        },
+        {
+          "id": "sicak_1777366881645",
+          "emoji": "☕",
+          "ad": "Çay",
+          "fiyat": "60",
+          "aciklama": "",
+          "tip": "ic",
+          "foto": ""
         }
       ]
     },
@@ -831,6 +840,15 @@
           "aciklama": "Sade buharda ısıtılmış süt.",
           "foto": "",
           "gizli": false
+        },
+        {
+          "id": "sicak_1777366881645",
+          "emoji": "☕",
+          "ad": "Çay",
+          "fiyat": "60",
+          "aciklama": "",
+          "tip": "ic",
+          "foto": ""
         }
       ]
     },

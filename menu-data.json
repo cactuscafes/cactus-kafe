@@ -202,7 +202,16 @@
           "fiyat": "60",
           "aciklama": "",
           "tip": "ic",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777374348880-02aaq9sur70p.jpg"
+          "foto": ""
+        },
+        {
+          "id": "sicak_1777374564240",
+          "emoji": "☕",
+          "ad": "Fincan Çay",
+          "fiyat": 80,
+          "aciklama": "",
+          "tip": "ic",
+          "foto": ""
         }
       ]
     },
@@ -848,7 +857,16 @@
           "fiyat": "60",
           "aciklama": "",
           "tip": "ic",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777374348880-02aaq9sur70p.jpg"
+          "foto": ""
+        },
+        {
+          "id": "sicak_1777374564240",
+          "emoji": "☕",
+          "ad": "Fincan Çay",
+          "fiyat": 80,
+          "aciklama": "",
+          "tip": "ic",
+          "foto": ""
         }
       ]
     },
@@ -1291,5 +1309,34 @@
       ]
     }
   },
-  "oncu": []
+  "oncu": [
+    {
+      "id": "w2",
+      "ad": "Dubai Bubble Waffle",
+      "fiyat": 330,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg",
+      "emoji": "🧇"
+    },
+    {
+      "id": "k1",
+      "ad": "Blue Sky",
+      "fiyat": 210,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
+      "emoji": "🫐"
+    },
+    {
+      "id": "s4",
+      "ad": "Cortado",
+      "fiyat": 180,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
+      "emoji": "☕"
+    },
+    {
+      "id": "w1",
+      "ad": "Classic Bubble Waffle",
+      "fiyat": 300,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg",
+      "emoji": "🧇"
+    }
+  ]
 }

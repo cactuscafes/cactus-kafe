@@ -1325,18 +1325,18 @@
       "emoji": "🧇"
     },
     {
-      "id": "sg2",
-      "ad": "Ice Latte",
-      "fiyat": 210,
-      "foto": "",
-      "emoji": "🧊"
-    },
-    {
       "id": "k1",
       "ad": "Blue Sky",
       "fiyat": 220,
       "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
       "emoji": "🫐"
+    },
+    {
+      "id": "sg2",
+      "ad": "Ice Latte",
+      "fiyat": 210,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376465169-z20gqm8j2yg.jpg",
+      "emoji": "🧊"
     }
   ]
 }

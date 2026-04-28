@@ -851,22 +851,10 @@
           "gizli": false
         },
         {
-          "id": "sicak_1777366881645",
-          "emoji": "☕",
+          "id": "sicak_1777367335537",
           "ad": "Çay",
-          "fiyat": "60",
-          "aciklama": "",
-          "tip": "ic",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777374348880-02aaq9sur70p.jpg"
-        },
-        {
-          "id": "sicak_1777375718190",
-          "emoji": "☕",
-          "ad": "Fincan Çay",
-          "fiyat": 80,
-          "aciklama": "",
-          "tip": "ic",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375716618-599qlwifnbf.jpg"
+          "fiyat": 60,
+          "emoji": "☕"
         }
       ]
     },
@@ -881,93 +869,93 @@
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk su + buz.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376456782-dvmez1zqggb.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg2",
           "ad": "Ice Latte",
-          "fiyat": 210,
+          "fiyat": 200,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + soğuk süt + buz.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376465169-z20gqm8j2yg.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg3",
           "ad": "Ice Flat White",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Double espresso + soğuk süt.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376472554-bhvkujpcvrs.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg4",
           "ad": "Ice Mocha",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + çikolata + soğuk süt.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376481177-00o1bip8xiu1m.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg5",
           "ad": "Ice White Mocha",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🍫",
           "tip": "ic",
           "aciklama": "Espresso + beyaz çikolata + buz.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376490465-yxn39t05fur.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg6",
           "ad": "Ice Caramel Latte",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + karamel + soğuk süt.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376498286-qmw9pdd6u4.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg7",
           "ad": "Ice Caramel Macchiato",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + karamel + buz.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376505880-z42tst3mknd.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg8",
           "ad": "Ice Hazelnut Latte",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + fındık + soğuk süt.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376513870-4v27pjw2j3t.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg9",
           "ad": "Ice Vanilla Latte",
-          "fiyat": 220,
+          "fiyat": 210,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Espresso + vanilya + soğuk süt.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376521435-8uq87mmifig.jpg",
+          "foto": "",
           "gizli": false
         },
         {
           "id": "sg10",
           "ad": "Ice Filtre",
-          "fiyat": 200,
+          "fiyat": 190,
           "emoji": "🧊",
           "tip": "ic",
           "aciklama": "Soğuk demleme filtre kahve.",
@@ -976,38 +964,88 @@
         }
       ]
     },
-    "kokteyl": {
-      "id": "kokteyl",
-      "label": "🍹 Kokteyl",
+    "cay": {
+      "id": "cay",
+      "label": "🌿 Çaylar",
       "urunler": [
         {
-          "id": "k1",
-          "ad": "Blue Sky",
-          "fiyat": 220,
-          "emoji": "🫐",
+          "id": "c1",
+          "ad": "Ihlamur",
+          "fiyat": 190,
+          "emoji": "🌼",
           "tip": "ic",
-          "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
+          "aciklama": "Taze ihlamur çiçeği demlemesi.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728400657-tdeimo0fu.jpg",
           "gizli": false
         },
         {
-          "id": "k2",
-          "ad": "Cactus",
-          "fiyat": 220,
-          "emoji": "🌵",
+          "id": "c2",
+          "ad": "Adaçayı",
+          "fiyat": 190,
+          "emoji": "🌿",
           "tip": "ic",
-          "aciklama": "Süt, vanilya, elma",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
+          "aciklama": "Taze adaçayı yapraklarından.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728427615-jull6xwp3og.jpg",
           "gizli": false
         },
         {
-          "id": "k3",
-          "ad": "Pink Wind",
-          "fiyat": 220,
-          "emoji": "🍉",
+          "id": "c3",
+          "ad": "Melisa Çayı",
+          "fiyat": 190,
+          "emoji": "🌿",
           "tip": "ic",
-          "aciklama": "Karpuz, limonata, çilek",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
+          "aciklama": "Melisa + hafif limon aroması.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728436917-yk5y6gypn5.jpg",
+          "gizli": false
+        },
+        {
+          "id": "c4",
+          "ad": "Hibiskus",
+          "fiyat": 190,
+          "emoji": "🌺",
+          "tip": "ic",
+          "aciklama": "Hibiskus çiçeği, ekşimsi.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728449992-a4lrthuxk5p.jpg",
+          "gizli": false
+        },
+        {
+          "id": "c5",
+          "ad": "Papatya",
+          "fiyat": 190,
+          "emoji": "🌼",
+          "tip": "ic",
+          "aciklama": "Papatya çiçeği demlemesi.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728460342-ixs1mut804q.jpg",
+          "gizli": false
+        },
+        {
+          "id": "c6",
+          "ad": "Yeşil Çay",
+          "fiyat": 190,
+          "emoji": "🍵",
+          "tip": "ic",
+          "aciklama": "Hafif demlenmiş, antioksidan.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728473699-dii6auvwh7.jpg",
+          "gizli": false
+        },
+        {
+          "id": "c7",
+          "ad": "Kış Çayı",
+          "fiyat": 190,
+          "emoji": "❄️",
+          "tip": "ic",
+          "aciklama": "Tarçın + karanfil + zencefil.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728487956-dz0frbx1vxp.jpg",
+          "gizli": false
+        },
+        {
+          "id": "c8",
+          "ad": "Mavi Kelebek",
+          "fiyat": 190,
+          "emoji": "🦋",
+          "tip": "ic",
+          "aciklama": "Butterfly pea flower, renk değiştirir.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728498228-dvy3go6eam7.jpg",
           "gizli": false
         }
       ]
@@ -1059,7 +1097,7 @@
         {
           "id": "v5",
           "ad": "Limonata",
-          "fiyat": 180,
+          "fiyat": 170,
           "emoji": "🍋",
           "tip": "ic",
           "aciklama": "Ev yapımı",
@@ -1069,11 +1107,73 @@
         {
           "id": "v6",
           "ad": "Çilekli Limonata",
-          "fiyat": 190,
+          "fiyat": 180,
           "emoji": "🍓",
           "tip": "ic",
           "aciklama": "Ev yapımı limonata + çilek",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728770814-9qe3khp3yhm.jpg",
+          "gizli": false
+        }
+      ]
+    },
+    "kokteyl": {
+      "id": "kokteyl",
+      "label": "🍹 Kokteyl",
+      "urunler": [
+        {
+          "id": "k1",
+          "ad": "Blue Sky",
+          "fiyat": 210,
+          "emoji": "🫐",
+          "tip": "ic",
+          "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
+          "gizli": false
+        },
+        {
+          "id": "k2",
+          "ad": "Cactus",
+          "fiyat": 210,
+          "emoji": "🌵",
+          "tip": "ic",
+          "aciklama": "Süt, vanilya, elma",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
+          "gizli": false
+        },
+        {
+          "id": "k3",
+          "ad": "Pink Wind",
+          "fiyat": 210,
+          "emoji": "🍉",
+          "tip": "ic",
+          "aciklama": "Karpuz, limonata, çilek",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
+          "gizli": false
+        }
+      ]
+    },
+    "mesrubat": {
+      "id": "mesrubat",
+      "label": "🥤 Meşrubat",
+      "urunler": [
+        {
+          "id": "m1",
+          "ad": "Damla Cam Şişe Su",
+          "fiyat": 40,
+          "emoji": "💧",
+          "tip": "ic",
+          "aciklama": "Soğuk kaynak suyu.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729050301-l9bsiq8lqci.jpg",
+          "gizli": false
+        },
+        {
+          "id": "m2",
+          "ad": "Sade Soda",
+          "fiyat": 80,
+          "emoji": "🫧",
+          "tip": "ic",
+          "aciklama": "Karbonatlı maden suyu.",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
           "gizli": false
         }
       ]
@@ -1124,128 +1224,6 @@
         }
       ]
     },
-    "tatlilar": {
-      "id": "tatlilar",
-      "label": "🍰 Tatlılar",
-      "urunler": [
-        {
-          "id": "tatlilar_1",
-          "emoji": "🍫",
-          "ad": "Brownie",
-          "fiyat": "280",
-          "aciklama": "",
-          "tip": "yi",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375382084-mv4htqzb8r.jpg",
-          "gizli": false
-        },
-        {
-          "id": "tatlilar_2",
-          "emoji": "🍮",
-          "ad": "San Sebastian",
-          "fiyat": "280",
-          "aciklama": "",
-          "tip": "yi",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375394004-7dffh62330x.jpg",
-          "gizli": false
-        },
-        {
-          "id": "tatlilar_3",
-          "emoji": "🥄",
-          "ad": "Spoonful",
-          "fiyat": "280",
-          "aciklama": "",
-          "tip": "yi",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375409858-fgqcigjuija.jpg",
-          "gizli": false
-        }
-      ]
-    },
-    "cay": {
-      "id": "cay",
-      "label": "🌿 Çaylar",
-      "urunler": [
-        {
-          "id": "c1",
-          "ad": "Ihlamur",
-          "fiyat": 200,
-          "emoji": "🌼",
-          "tip": "ic",
-          "aciklama": "Taze ihlamur çiçeği demlemesi.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728400657-tdeimo0fu.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c2",
-          "ad": "Adaçayı",
-          "fiyat": 200,
-          "emoji": "🌿",
-          "tip": "ic",
-          "aciklama": "Taze adaçayı yapraklarından.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728427615-jull6xwp3og.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c3",
-          "ad": "Melisa Çayı",
-          "fiyat": 200,
-          "emoji": "🌿",
-          "tip": "ic",
-          "aciklama": "Melisa + hafif limon aroması.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728436917-yk5y6gypn5.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c4",
-          "ad": "Hibiskus",
-          "fiyat": 200,
-          "emoji": "🌺",
-          "tip": "ic",
-          "aciklama": "Hibiskus çiçeği, ekşimsi.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728449992-a4lrthuxk5p.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c5",
-          "ad": "Papatya",
-          "fiyat": 200,
-          "emoji": "🌼",
-          "tip": "ic",
-          "aciklama": "Papatya çiçeği demlemesi.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728460342-ixs1mut804q.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c6",
-          "ad": "Yeşil Çay",
-          "fiyat": 200,
-          "emoji": "🍵",
-          "tip": "ic",
-          "aciklama": "Hafif demlenmiş, antioksidan.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728473699-dii6auvwh7.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c7",
-          "ad": "Kış Çayı",
-          "fiyat": 200,
-          "emoji": "❄️",
-          "tip": "ic",
-          "aciklama": "Tarçın + karanfil + zencefil.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728487956-dz0frbx1vxp.jpg",
-          "gizli": false
-        },
-        {
-          "id": "c8",
-          "ad": "Mavi Kelebek",
-          "fiyat": 200,
-          "emoji": "🦋",
-          "tip": "ic",
-          "aciklama": "Butterfly pea flower, renk değiştirir.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728498228-dvy3go6eam7.jpg",
-          "gizli": false
-        }
-      ]
-    },
     "tost": {
       "id": "tost",
       "label": "🥪 Tostlar",
@@ -1282,28 +1260,38 @@
         }
       ]
     },
-    "mesrubat": {
-      "id": "mesrubat",
-      "label": "🥤 Meşrubat",
+    "tatlilar": {
+      "id": "tatlilar",
+      "label": "🍰 Tatlılar",
       "urunler": [
         {
-          "id": "m1",
-          "ad": "Damla Cam Şişe Su",
-          "fiyat": 40,
-          "emoji": "💧",
-          "tip": "ic",
-          "aciklama": "Soğuk kaynak suyu.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729050301-l9bsiq8lqci.jpg",
+          "id": "tatlilar_1",
+          "emoji": "🍫",
+          "ad": "Brownie",
+          "fiyat": "280",
+          "aciklama": "",
+          "tip": "yi",
+          "foto": "",
           "gizli": false
         },
         {
-          "id": "m2",
-          "ad": "Sade Soda",
-          "fiyat": 80,
-          "emoji": "🫧",
-          "tip": "ic",
-          "aciklama": "Karbonatlı maden suyu.",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
+          "id": "tatlilar_2",
+          "emoji": "🍮",
+          "ad": "San Sebastian",
+          "fiyat": "280",
+          "aciklama": "",
+          "tip": "yi",
+          "foto": "",
+          "gizli": false
+        },
+        {
+          "id": "tatlilar_3",
+          "emoji": "🥄",
+          "ad": "Spoonful",
+          "fiyat": "280",
+          "aciklama": "",
+          "tip": "yi",
+          "foto": "",
           "gizli": false
         }
       ]

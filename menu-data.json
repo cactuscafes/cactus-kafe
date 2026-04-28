@@ -1323,6 +1323,20 @@
       "fiyat": 300,
       "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729132232-fstvjz8rah.jpg",
       "emoji": "🧇"
+    },
+    {
+      "id": "k1",
+      "ad": "Blue Sky",
+      "fiyat": 210,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
+      "emoji": "🫐"
+    },
+    {
+      "id": "s4",
+      "ad": "Cortado",
+      "fiyat": 180,
+      "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg",
+      "emoji": "☕"
     }
   ]
 }

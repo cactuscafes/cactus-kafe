@@ -1305,6 +1305,12 @@
           "aciklama": "Karbonatlı maden suyu.",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
           "gizli": false
+        },
+        {
+          "id": "mesrubat_1777455262206",
+          "ad": "Enerji İçeceği",
+          "fiyat": 140,
+          "emoji": "☕"
         }
       ]
     }

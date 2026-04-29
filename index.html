@@ -102,9 +102,57 @@ nav{padding:18px 24px;}
 footer{padding:60px 24px 30px;}
 .section-menu,.section-about{padding:70px 24px;}
 }
+
+/* ── INTRO SCREEN ── */
+#introScreen{position:fixed;inset:0;z-index:99999;background:#0c0c09;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .9s ease;}
+#introScreen.out{opacity:0;pointer-events:none;}
+.intro-bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 58%,rgba(45,90,39,.22) 0%,transparent 70%);pointer-events:none;}
+.intro-side-cacti{position:absolute;inset:0;pointer-events:none;}
+.intro-sc{position:absolute;bottom:0;opacity:0;animation:isc .8s ease forwards;}
+.intro-sc.l{left:5vw;animation-delay:.6s;}
+.intro-sc.r{right:5vw;animation-delay:.85s;}
+@keyframes isc{to{opacity:.14;}}
+.intro-cactus{overflow:visible;display:block;margin-bottom:26px;}
+.intro-cactus .cg{transform-box:fill-box;transform-origin:bottom center;transform:scaleY(0);animation:cactusGrow 1.15s cubic-bezier(.34,1.56,.64,1) .2s both;filter:drop-shadow(0 0 22px rgba(45,90,39,.6)) drop-shadow(0 0 48px rgba(45,90,39,.22));}
+@keyframes cactusGrow{to{transform:scaleY(1);}}
+.intro-brand{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,7vw,54px);font-weight:300;letter-spacing:14px;color:#f4f1eb;text-indent:14px;opacity:0;transform:translateY(12px);animation:itext .65s ease 1.4s both;line-height:1;}
+.intro-coffee{font-family:'Montserrat',sans-serif;font-size:clamp(8px,1.4vw,11px);font-weight:400;letter-spacing:8px;color:#b8965a;text-indent:8px;margin-top:7px;opacity:0;transform:translateY(8px);animation:itext .55s ease 1.8s both;}
+@keyframes itext{to{opacity:1;transform:translateY(0);}}
+.intro-line-wrap{width:150px;height:1px;background:rgba(255,255,255,.1);margin-top:26px;overflow:hidden;opacity:0;animation:itext .25s ease 2.15s both;}
+.intro-line{height:100%;background:#b8965a;transform:scaleX(0);transform-origin:left;animation:iline 1.35s cubic-bezier(.4,0,.2,1) 2.25s both;}
+@keyframes iline{to{transform:scaleX(1);}}
+.intro-skip{position:absolute;bottom:24px;right:28px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);font-family:'Montserrat',sans-serif;user-select:none;}
 </style>
 </head>
 <body>
+
+<!-- ═══════════ INTRO SCREEN ═══════════ -->
+<div id="introScreen" onclick="introKapat()">
+  <div class="intro-bg-glow"></div>
+
+  <!-- Background side cacti (decorative) -->
+  <div class="intro-side-cacti">
+    <svg class="intro-sc l" viewBox="0 0 200 280" width="90" height="126" fill="#2d5a27">
+      <path d="M 88 268 L 88 158 L 34 158 L 34 83 Q 34 73 45 73 Q 56 73 56 83 L 56 147 L 88 147 L 88 48 Q 88 38 100 38 Q 112 38 112 48 L 112 172 L 166 172 L 166 110 Q 166 100 155 100 Q 144 100 144 110 L 144 183 L 112 183 L 112 268 Z"/>
+    </svg>
+    <svg class="intro-sc r" viewBox="0 0 200 280" width="70" height="98" fill="#2d5a27">
+      <path d="M 88 268 L 88 158 L 34 158 L 34 83 Q 34 73 45 73 Q 56 73 56 83 L 56 147 L 88 147 L 88 48 Q 88 38 100 38 Q 112 38 112 48 L 112 172 L 166 172 L 166 110 Q 166 100 155 100 Q 144 100 144 110 L 144 183 L 112 183 L 112 268 Z"/>
+    </svg>
+  </div>
+
+  <!-- Main growing cactus -->
+  <svg class="intro-cactus" viewBox="0 0 200 280" width="110" height="154">
+    <g class="cg" fill="#2d5a27">
+      <path d="M 88 268 L 88 158 L 34 158 L 34 83 Q 34 73 45 73 Q 56 73 56 83 L 56 147 L 88 147 L 88 48 Q 88 38 100 38 Q 112 38 112 48 L 112 172 L 166 172 L 166 110 Q 166 100 155 100 Q 144 100 144 110 L 144 183 L 112 183 L 112 268 Z"/>
+    </g>
+  </svg>
+
+  <div class="intro-brand">CACTUS</div>
+  <div class="intro-coffee">COFFEE</div>
+  <div class="intro-line-wrap"><div class="intro-line"></div></div>
+  <div class="intro-skip">Geç →</div>
+</div>
+<!-- ════════════════════════════════════ -->
 
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
   <a href="index.html" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-decoration:none;text-transform:uppercase;">CACTUS</a>
@@ -470,6 +518,29 @@ function toggleMainNav(){
   document.getElementById('bs3').style.transform=isOpen?'':'rotate(-45deg) translateY(-6.5px)';
   document.body.style.overflow=isOpen?'':'hidden';
 }
+
+/* ── INTRO JS ── */
+(function(){
+  var s = document.getElementById('introScreen');
+  if(!s) return;
+  if(sessionStorage.getItem('cactus_intro')){
+    s.style.display = 'none';
+    return;
+  }
+  sessionStorage.setItem('cactus_intro','1');
+  document.body.style.overflow = 'hidden';
+  // Auto close after line finishes (2.25s start + 1.35s duration + 0.6s buffer = 4.2s)
+  var t = setTimeout(introKapat, 4200);
+  s.onclick = function(){ clearTimeout(t); introKapat(); };
+})();
+function introKapat(){
+  var s = document.getElementById('introScreen');
+  if(!s || s.classList.contains('out')) return;
+  s.classList.add('out');
+  document.body.style.overflow = '';
+  setTimeout(function(){ s.style.display = 'none'; }, 950);
+}
+
 </script>
 </body>
 </html>

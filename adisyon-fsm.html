@@ -135,6 +135,7 @@ input,select{font-family:'Lato',sans-serif;}
 .ai-ctrl button{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--kr2);background:#fff;font-size:13px;font-weight:700;color:var(--k2);display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .ai-ctrl button:hover{background:var(--k1);border-color:var(--k1);color:#fff;}
 .ai-adet{font-size:13px;font-weight:700;color:var(--k1);min-width:16px;text-align:center;}
+.ai-zaman{font-size:10px;font-weight:600;color:rgba(255,255,255,.55);background:var(--k2);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;letter-spacing:.3px;}
 .ai-sil{background:none;border:none;font-size:15px;color:var(--kr3);transition:color .15s;padding:0 2px;}
 .ai-sil:hover{color:var(--rd);}
 .adis-ozet{background:#fff;border-top:2px solid var(--kr2);padding:12px 14px;flex-shrink:0;}
@@ -782,7 +783,7 @@ function urunEkle(u,el){
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
   if(ex) ex.adet++;
-  else a.push({...u,adet:1});
+  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})});
   saveMasalar();renderAdisyon();renderMasalar();
   toast('✓ '+u.ad+' eklendi');
 }
@@ -806,7 +807,7 @@ function renderAdisyon(){
           ? `<span style="color:#e67e22;font-size:11px;font-weight:700;margin-left:6px;">⏳ ${gAdet}/${item.adet} gönderildi</span>`
           : '');
       itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}"${tumGonderildi?' style="opacity:.78;"':''}>
-        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
+        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}${item.zaman?`<span class="ai-zaman">${item.zaman}</span>`:''}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
         <div class="ai-ctrl">
           <button onclick="chAdet('${item.id}',-1)">−</button>
           <span class="ai-adet">${item.adet}</span>

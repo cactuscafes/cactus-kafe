@@ -224,6 +224,21 @@ input,select{font-family:'Lato',sans-serif;}
 .bolme-row input{flex:1;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:8px;font-size:15px;font-weight:700;color:var(--k1);background:#fff;outline:none;text-align:right;}
 .bolme-row input:focus{border-color:var(--al);}
 .bolme-kalan{font-size:12px;font-weight:700;text-align:right;margin-top:2px;}
+/* kalem seçim */
+.ks-ttl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--k2);margin-bottom:7px;}
+.ks-list{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto;margin-bottom:10px;}
+.ks-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#f9f5ee;transition:opacity .15s;}
+.ks-row.sifir{opacity:.35;}
+.ks-emoji{font-size:16px;flex-shrink:0;}
+.ks-ad{flex:1;font-size:13px;font-weight:600;color:var(--k1);}
+.ks-birim{font-size:11px;color:var(--kr3);}
+.ks-step{display:flex;align-items:center;gap:4px;}
+.ks-step button{width:26px;height:26px;border:1.5px solid var(--kr2);border-radius:6px;background:#fff;font-size:16px;font-weight:700;color:var(--k1);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.ks-step span{font-size:13px;font-weight:700;color:var(--k1);min-width:32px;text-align:center;}
+.ks-sub{font-size:13px;font-weight:700;color:var(--al);min-width:48px;text-align:right;}
+.ks-toplam{display:flex;justify-content:space-between;align-items:center;background:var(--k1);border-radius:9px;padding:9px 12px;margin-bottom:14px;}
+.ks-toplam span:first-child{font-size:11px;color:rgba(255,255,255,.6);font-weight:600;}
+.ks-toplam span:last-child{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--kr);}
 
 /* ══════════ TOAST ══════════ */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--k1);color:var(--kr);padding:10px 20px;border-radius:26px;font-size:13px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .28s ease;z-index:1000;white-space:nowrap;max-width:90vw;text-align:center;}
@@ -522,8 +537,10 @@ input,select{font-family:'Lato',sans-serif;}
 <!-- ÖDEME MODALİ -->
 <div class="moverlay" id="odeme-modal">
   <div class="mdl">
-    <div class="mdl-ttl">💳 Ödeme Al</div>
-    <div class="mdl-sub" id="odeme-modal-sub">Ödeme yöntemi seçin</div>
+    <div class="mdl-ttl">💳 Ödeme Al — <span id="odeme-masa-no" style="color:var(--al)"></span></div>
+    <div class="ks-ttl">Ödenecek ürünler</div>
+    <div class="ks-list" id="ks-list"></div>
+    <div class="ks-toplam"><span>Seçilen Toplam</span><span id="ks-toplam-val">₺0</span></div>
     <div class="odeme-secim">
       <button class="odeme-opt on" id="opt-nakit" onclick="odemeSecim('nakit')"><span class="oi">💵</span>Nakit</button>
       <button class="odeme-opt" id="opt-kart" onclick="odemeSecim('kart')"><span class="oi">💳</span>Kredi Kartı</button>
@@ -849,7 +866,21 @@ function toggleMasa(){
 }
 
 let seciliOdemeTipi='nakit';
-let _bolmeTop=0;
+let _bolmeTop=0,_secKalemler=[];
+
+function renderKalemSecim(){
+  _secKalemler=(masalar[aktifMasa]||[]).map((x,i)=>({i,ad:x.ad,fiyat:x.fiyat,tip:x.tip,emoji:x.emoji||'',max:x.adet,sec:x.adet}));
+  document.getElementById('odeme-masa-no').textContent='Masa '+aktifMasa;
+  kalemGuncelle();
+}
+function kalemGuncelle(){
+  const top=_secKalemler.reduce((s,k)=>s+k.fiyat*k.sec,0);
+  _bolmeTop=top;
+  document.getElementById('ks-toplam-val').textContent='₺'+top;
+  document.getElementById('ks-list').innerHTML=_secKalemler.map((k,i)=>`<div class="ks-row${k.sec===0?' sifir':''}"><span class="ks-emoji">${k.emoji||'🍽️'}</span><div style="flex:1"><div class="ks-ad">${k.ad}</div><div class="ks-birim">₺${k.fiyat} birim</div></div><div class="ks-step"><button onclick="kalemDeg(${i},-1)">−</button><span>${k.sec}/${k.max}</span><button onclick="kalemDeg(${i},+1)">+</button></div><div class="ks-sub">₺${k.fiyat*k.sec}</div></div>`).join('');
+  if(seciliOdemeTipi==='bolunmus'){document.getElementById('bolme-kalan').textContent='Kalan: ₺'+top;document.getElementById('bolme-nakit').value='';document.getElementById('bolme-kart').value='';}
+}
+function kalemDeg(i,d){_secKalemler[i].sec=Math.min(_secKalemler[i].max,Math.max(0,_secKalemler[i].sec+d));kalemGuncelle();}
 function odemeSecim(tip){
   seciliOdemeTipi=tip;
   document.getElementById('opt-nakit').classList.toggle('on',tip==='nakit');
@@ -879,40 +910,49 @@ function bolmeHesapla(degisen){
 }
 function odemeAl(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
-  const top=masalar[aktifMasa].reduce((s,x)=>s+x.fiyat*x.adet,0);
-  const ic=masalar[aktifMasa].filter(x=>x.tip==='icecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
-  const yi=masalar[aktifMasa].filter(x=>x.tip==='yiyecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
-  _bolmeTop=top;
-  document.getElementById('odeme-modal-sub').innerHTML='Masa <strong>'+aktifMasa+'</strong> &nbsp;|&nbsp; İçecek: <strong>₺'+ic+'</strong> &nbsp;|&nbsp; Yiyecek: <strong>₺'+yi+'</strong><br><span style="font-size:16px;font-weight:700;color:var(--k1)">Toplam: ₺'+top+'</span>';
   seciliOdemeTipi='nakit';odemeSecim('nakit');
+  renderKalemSecim();
   document.getElementById('odeme-modal').classList.add('on');
 }
 function odemeOnayla(){
   if(!aktifMasa)return;
-  const top=masalar[aktifMasa].reduce((s,x)=>s+x.fiyat*x.adet,0);
-  const ic=masalar[aktifMasa].filter(x=>x.tip==='icecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
-  const yi=masalar[aktifMasa].filter(x=>x.tip==='yiyecek').reduce((s,x)=>s+x.fiyat*x.adet,0);
+  const secilen=_secKalemler.filter(k=>k.sec>0);
+  if(!secilen.length){toast('⚠️ En az bir ürün seçin');return;}
+  const top=secilen.reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const ic=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const yi=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   let nakitTutar=0,kartTutar=0;
   if(seciliOdemeTipi==='bolunmus'){
     nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
     kartTutar=parseFloat(document.getElementById('bolme-kart').value)||0;
     if(Math.abs(nakitTutar+kartTutar-top)>1){toast('⚠️ Nakit + Kart toplamı ₺'+top+' olmalı');return;}
-  } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;} else{kartTutar=top;}
+  } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}else{kartTutar=top;}
+  // Seçilen ürünleri masadan düş
+  _secKalemler.forEach(k=>{
+    if(k.sec<=0)return;
+    const item=masalar[aktifMasa][k.i];
+    if(!item)return;
+    item.adet-=k.sec;
+    if(item.adet<=0)masalar[aktifMasa][k.i]=null;
+  });
+  masalar[aktifMasa]=masalar[aktifMasa].filter(Boolean);
+  const oncekiMasa=aktifMasa;
+  const odTipLabel=seciliOdemeTipi==='nakit'?'Nakit':seciliOdemeTipi==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';
   const webhookUrl=localStorage.getItem('cactus_webhook')||VARSAYILAN_WEBHOOK;
-  const odTipLabel=seciliOdemeTipi==='nakit'?'Nakit':seciliOdemeTipi==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   if(webhookUrl){
     const now=new Date();
-    fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+aktifMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:masalar[aktifMasa].map(x=>x.ad+' x'+x.adet).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
+    fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+oncekiMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:secilen.map(k=>k.ad+' x'+k.sec).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
   }
-  const oncekiMasa=aktifMasa;
   const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
-  odemeyiKaydet(aktifMasa,top,ic,yi,seciliOdemeTipi,masalar[aktifMasa],nakitTutar,kartTutar);
-  masalar[aktifMasa]=[];saveMasalar();
-  closeModal('odeme-modal');closeDrawer();
-  aktifMasa=null;
-  document.getElementById('adis-masa-no').textContent='Seçilmedi';
-  document.getElementById('adis-masa-mob').textContent='Seçilmedi';
+  odemeyiKaydet(oncekiMasa,top,ic,yi,seciliOdemeTipi,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
+  saveMasalar();
+  closeModal('odeme-modal');
+  if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
+    closeDrawer();aktifMasa=null;
+    document.getElementById('adis-masa-no').textContent='Seçilmedi';
+    document.getElementById('adis-masa-mob').textContent='Seçilmedi';
+  }
   renderAdisyon();renderMasalar();
   toast(tip+' — Masa '+oncekiMasa+' ₺'+top+' ödeme alındı');
 }

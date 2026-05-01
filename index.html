@@ -107,18 +107,9 @@ footer{padding:60px 24px 30px;}
 /* ── INTRO SCREEN ── */
 #introScreen{position:fixed;inset:0;z-index:99999;overflow:hidden;cursor:pointer;}
 #introScreen.out{opacity:0;transition:opacity .9s ease;pointer-events:none;}
-.intro-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.3s ease;will-change:opacity;}
+.intro-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .3s ease;will-change:opacity;}
 .intro-slide.on{opacity:1;}
-.intro-zoom{position:absolute;inset:-4%;animation:introKB 8s ease-out forwards;}
-@keyframes introKB{from{transform:scale(1)}to{transform:scale(1.07)}}
-.intro-veil{position:absolute;inset:0;background:linear-gradient(165deg,rgba(0,0,0,.22) 0%,rgba(0,0,0,.62) 100%);z-index:1;}
-.intro-logo{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;pointer-events:none;}
-.intro-logo-brand{font-family:'Cormorant Garamond',serif;font-size:clamp(46px,9vw,90px);font-weight:300;letter-spacing:20px;color:#fff;text-indent:20px;opacity:0;animation:ilogoIn .95s ease .5s both;text-shadow:0 2px 60px rgba(0,0,0,.45),0 0 120px rgba(0,0,0,.25);}
-.intro-logo-sub{font-family:'Montserrat',sans-serif;font-size:clamp(9px,1.5vw,12px);font-weight:400;letter-spacing:10px;color:#b8965a;text-indent:10px;margin-top:14px;opacity:0;animation:ilogoIn .75s ease 1.05s both;}
-.intro-logo-line{width:1px;height:0;background:#b8965a;margin:18px auto 0;animation:ilineGrow .7s ease 1.5s both;}
-@keyframes ilineGrow{to{height:36px}}
-@keyframes ilogoIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.intro-skip{position:absolute;bottom:26px;right:30px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);font-family:'Montserrat',sans-serif;z-index:3;pointer-events:none;opacity:0;animation:ilogoIn .5s ease 1.8s both;}
+.intro-veil{position:absolute;inset:0;background:rgba(0,0,0,.18);z-index:1;}
 
 </style>
 </head>
@@ -132,12 +123,6 @@ footer{padding:60px 24px 30px;}
   <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1762657440642-e60095d29d93?auto=format&fit=crop&w=1920&q=85')"><div class="intro-zoom"></div></div>
   <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1609810074355-29137827b2c4?auto=format&fit=crop&w=1920&q=85')"><div class="intro-zoom"></div></div>
   <div class="intro-veil"></div>
-  <div class="intro-logo">
-    <div class="intro-logo-brand">CACTUS</div>
-    <div class="intro-logo-sub">COFFEE</div>
-    <div class="intro-logo-line"></div>
-  </div>
-  <div class="intro-skip">Geç →</div>
 </div>
 
 
@@ -516,7 +501,7 @@ function toggleMainNav(){
   if(sessionStorage.getItem('ci')){s.style.display='none';return;}
   sessionStorage.setItem('ci','1');
   document.body.style.overflow='hidden';
-  var slides=s.querySelectorAll('.intro-slide'), i=0, DUR=820;
+  var slides=s.querySelectorAll('.intro-slide'), i=0, DUR=300;
   var t=setInterval(function(){
     slides[i].classList.remove('on');
     i++;

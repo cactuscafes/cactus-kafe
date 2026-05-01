@@ -332,6 +332,24 @@ input,select{font-family:'Lato',sans-serif;}
   .rap-ozet-grid{grid-template-columns:repeat(2,1fr);}
   .rap-filtre{gap:8px;}
 }
+/* ── Canlı Ciro ── */
+.canli-bolum{background:linear-gradient(135deg,#1a1a0e 0%,#2a200a 100%);border-radius:14px;padding:16px;margin-bottom:18px;}
+.canli-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.canli-baslik{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f4f1eb;}
+.canli-pulse{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.4);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.4);}70%{box-shadow:0 0 0 8px rgba(74,222,128,0);}100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}}
+.canli-ozet{display:flex;gap:10px;margin-bottom:14px;}
+.canli-ozet-krt{flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;}
+.canli-ozet-krt .cok-lbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;}
+.canli-ozet-krt .cok-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#f4f1eb;}
+.canli-ozet-krt.gold .cok-val{color:#b8965a;}
+.canli-masalar{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+.c-masa-kart{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;cursor:pointer;transition:background .15s;}
+.c-masa-kart:hover{background:rgba(255,255,255,.11);}
+.c-masa-no{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b8965a;margin-bottom:6px;}
+.c-masa-items{font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:8px;}
+.c-masa-top{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#f4f1eb;border-top:1px solid rgba(255,255,255,.1);padding-top:6px;}
+.canli-bos{text-align:center;padding:20px;color:rgba(255,255,255,.3);font-size:13px;}
 </style>
 <!-- v1777066974925 -->
 </head>
@@ -422,6 +440,19 @@ input,select{font-family:'Lato',sans-serif;}
 <!-- RAPORLAR -->
 <div class="scr" id="scr-rap">
   <div class="rap-wrap">
+
+    <!-- Canlı Ciro -->
+    <div class="canli-bolum">
+      <div class="canli-header">
+        <div class="canli-baslik"><span class="canli-pulse"></span>Canlı Ciro</div>
+      </div>
+      <div class="canli-ozet">
+        <div class="canli-ozet-krt"><div class="cok-lbl">Açık Masa</div><div class="cok-val" id="c-masa-say">0</div></div>
+        <div class="canli-ozet-krt gold"><div class="cok-lbl">Toplam Açık</div><div class="cok-val" id="c-toplam">₺0</div></div>
+        <div class="canli-ozet-krt"><div class="cok-lbl">Açık Ürün</div><div class="cok-val" id="c-urun-say">0</div></div>
+      </div>
+      <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Açık masa yok</div></div>
+    </div>
 
     <!-- Periyot tabs -->
     <div class="rap-periyot-tabs">
@@ -682,7 +713,7 @@ function goTo(id,el){
   if(id==='bar'){barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');renderBar();}
   if(id==='mut'){mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');renderMut();}
   if(id==='yon'){renderYon();}
-  if(id==='rap'){rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
+  if(id==='rap'){renderCanliCiro();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
 }
 
 function renderMasalar(){
@@ -1259,11 +1290,32 @@ function rapGoster(){
   }).catch(function(){});
 }
 
-// Rapor paneli açıkken 30sn'de bir otomatik yenile
-var _rapAutoRef=null;
+function renderCanliCiro(){
+  var acik=[];
+  for(var i=1;i<=30;i++){if(masalar[i]&&masalar[i].length){var top=masalar[i].reduce(function(s,x){return s+x.fiyat*x.adet;},0);acik.push({masa:i,items:masalar[i],top:top});}}
+  var genelTop=acik.reduce(function(s,m){return s+m.top;},0);
+  var genelUrun=acik.reduce(function(s,m){return s+m.items.reduce(function(ss,x){return ss+x.adet;},0);},0);
+  document.getElementById('c-masa-say').textContent=acik.length;
+  document.getElementById('c-toplam').textContent='₺'+genelTop.toLocaleString('tr-TR');
+  document.getElementById('c-urun-say').textContent=genelUrun;
+  if(!acik.length){document.getElementById('c-masalar').innerHTML='<div class="canli-bos">Şu an açık masa yok</div>';return;}
+  document.getElementById('c-masalar').innerHTML=acik.map(function(m){
+    return '<div class="c-masa-kart" onclick="masaSec('+m.masa+');goTo(\'kas\',document.querySelector(\'.htab\'))">'+
+      '<div class="c-masa-no">Masa '+m.masa+'</div>'+
+      '<div class="c-masa-items">'+m.items.map(function(x){return (x.emoji||'')+(x.emoji?' ':'')+x.ad+' ×'+x.adet;}).join('<br>')+'</div>'+
+      '<div class="c-masa-top">₺'+m.top.toLocaleString('tr-TR')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// Rapor paneli açıkken 30sn'de bir otomatik yenile, canlı ciro 5sn'de bir
+var _rapAutoRef=null,_canliRef=null;
 function rapOtomatikYenile(aktif){
-  clearInterval(_rapAutoRef);
-  if(aktif) _rapAutoRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))rapGoster();},30000);
+  clearInterval(_rapAutoRef);clearInterval(_canliRef);
+  if(aktif){
+    _rapAutoRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))rapGoster();},30000);
+    _canliRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))renderCanliCiro();},5000);
+  }
 }
 
 let _tt;

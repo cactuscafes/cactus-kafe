@@ -857,15 +857,15 @@ function rapGoster(){
   const tC=f.reduce((a,x)=>a+(x.toplam||0),0);
   const tI=f.reduce((a,x)=>a+(x.icecek_toplam||0),0);
   const tY=f.reduce((a,x)=>a+(x.yiyecek_toplam||0),0);
-  const tN=f.filter(x=>x.odeme_tipi==='Nakit').reduce((a,x)=>a+(x.toplam||0),0);
-  const tK=f.filter(x=>x.odeme_tipi==='Kredi Kartı').reduce((a,x)=>a+(x.toplam||0),0);
+  const tN=f.reduce((a,x)=>a+(x.odeme_tipi==='Nakit'?x.toplam:(x.nakit_tutar||0)),0);
+  const tK=f.reduce((a,x)=>a+(x.odeme_tipi==='Kredi Kartı'?x.toplam:(x.kart_tutar||0)),0);
   document.getElementById('rOzet').innerHTML=[
     ['TOPLAM SATIŞ',f.length+' işlem',''],
     ['TOPLAM CİRO','₺'+tC.toLocaleString('tr-TR'),'gelir'],
     ['İÇECEK','₺'+tI.toLocaleString('tr-TR'),(tC?Math.round(tI/tC*100):0)+'%'],
     ['YİYECEK','₺'+tY.toLocaleString('tr-TR'),(tC?Math.round(tY/tC*100):0)+'%'],
-    ['NAKİT','₺'+tN.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Nakit').length+' işlem'],
-    ['KREDİ KARTI','₺'+tK.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Kredi Kartı').length+' işlem'],
+    ['NAKİT','₺'+tN.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Nakit'||(x.nakit_tutar||0)>0).length+' işlem'],
+    ['KREDİ KARTI','₺'+tK.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Kredi Kartı'||(x.kart_tutar||0)>0).length+' işlem'],
   ].map(([l,v,s])=>`<div class="rap-krt"><div class="rap-lbl">${l}</div><div class="rap-val">${v}</div><div class="rap-sub">${s}</div></div>`).join('');
   if(!f.length){
     document.getElementById('rTablo').innerHTML='<div style="padding:30px;text-align:center;color:var(--mist);">Satış verisi yok.</div>';

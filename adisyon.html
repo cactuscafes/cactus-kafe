@@ -1711,7 +1711,7 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
     var bugunSatislar = satislar.filter(function(s) { return s.tarih === bugun; });
     if (!bugunSatislar.length) { toast('Bugün henüz satış yok'); return; }
     var ciro = bugunSatislar.reduce(function(a,s){return a+(s.toplam||0);},0);
-    var nakit = bugunSatislar.filter(function(s){return s.odeme_tipi==='Nakit';}).reduce(function(a,s){return a+(s.toplam||0);},0);
+    var nakit = bugunSatislar.reduce(function(a,s){return a+(s.odeme_tipi==='Nakit'?s.toplam:(s.nakit_tutar||0));},0);
     var kredi = ciro - nakit;
     var urunSayac = {};
     bugunSatislar.forEach(function(s){(s.urunDetay||[]).forEach(function(u){urunSayac[u.ad]=(urunSayac[u.ad]||0)+u.adet;});});

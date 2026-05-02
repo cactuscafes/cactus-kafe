@@ -144,6 +144,49 @@
     </div>
   </div>
 
+  <!-- İş Başvurusu Formu -->
+  <div class="form-sec reveal" style="border-top:1px solid var(--stone);padding-top:80px;margin-top:0;">
+    <div class="form-intro">
+      <div class="sec-label">İş Başvurusu</div>
+      <h2 class="sec-title">Bizimle<br><em>çalış</em></h2>
+      <p>Cactus Coffee ailesine katılmak ister misin? Pozisyon seç, formu doldur — en kısa sürede seninle iletişime geçelim.</p>
+    </div>
+    <div>
+      <form class="form" id="basvuruForm" onsubmit="basvuruGonder(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Adınız</label>
+            <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
+          </div>
+          <div class="form-group">
+            <label>Instagram (varsa)</label>
+            <input type="text" name="instagram" placeholder="@kullaniciadi">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="tel" name="telefon" placeholder="05XX XXX XX XX" required>
+        </div>
+        <div class="form-group">
+          <label>Pozisyon</label>
+          <select name="pozisyon">
+            <option>Barista</option>
+            <option>Kasiyer</option>
+            <option>Garson / Servis</option>
+            <option>Mutfak Personeli</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mesajınız</label>
+          <textarea name="mesaj" placeholder="Kendinizden kısaca bahsedin, deneyimlerinizi ve çalışmak istediğiniz şubeyi belirtin..." style="min-height:140px;"></textarea>
+        </div>
+        <button type="submit" class="form-submit">Başvur →</button>
+        <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
+      </form>
+    </div>
+  </div>
+
   <!-- Şube Kartları -->
   <div class="iletisim-grid reveal" style="margin-top:80px;">
     <div class="sube-kart">
@@ -245,6 +288,33 @@ function toggleMenu(){
   b.children[1].style.opacity=open?'0':'1';
   b.children[2].style.transform=open?'rotate(-45deg) translateY(-6.5px)':'';
   document.body.style.overflow=open?'hidden':'';
+}
+async function basvuruGonder(e){
+  e.preventDefault();
+  const form=e.target;
+  const btn=form.querySelector('.form-submit');
+  const origText=btn.textContent;
+  btn.textContent='⏳ Gönderiliyor...';btn.disabled=true;
+  const data={
+    ad_soyad:form.querySelector('[name=ad_soyad]').value.trim(),
+    telefon:form.querySelector('[name=telefon]').value.trim(),
+    instagram:(form.querySelector('[name=instagram]')||{}).value||'',
+    pozisyon:(form.querySelector('[name=pozisyon]')||{}).value||'',
+    mesaj:(form.querySelector('[name=mesaj]')||{}).value||''
+  };
+  try{
+    const r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/basvuru/kaydet',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)
+    });
+    if(r.ok){
+      document.getElementById('formSuccess').style.display='block';
+      form.reset();btn.textContent='✓ Gönderildi';
+      setTimeout(()=>{document.getElementById('formSuccess').style.display='none';btn.textContent=origText;btn.disabled=false;},6000);
+    }else{throw new Error('Sunucu hatası');}
+  }catch(err){
+    btn.disabled=false;btn.textContent=origText;
+    alert('Hata oluştu, lütfen tekrar deneyin.');
+  }
 }
 async function sikayetGonder(e){
   e.preventDefault();

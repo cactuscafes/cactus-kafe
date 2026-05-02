@@ -128,6 +128,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
       <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
       <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:#2d5a27;color:#fff;font-weight:600;">🏠 Ana Sayfa</button>
+      <button class="sb-btn" onclick="panelAc('muzik',this)">🎵 Müzik</button>
       <div class="sb-ttl">Sayfa Düzenle</div>
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
       <button class="sb-btn" onclick="panelAc('galeri',this)">🖼 Galeri</button>
@@ -169,6 +170,53 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
               <button type="button" onclick="asKaydet()" style="padding:10px 26px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✅ Uygula</button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- MÜZİK AYARLARI -->
+      <div class="panel" id="panel-muzik" style="max-width:600px;">
+        <div class="pttl">🎵 Arka Plan Müziği</div>
+        <div class="psub">Ana sayfada alçak sesli arka plan müziği ayarları.</div>
+        <div class="kart">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+            <span style="font-size:13px;font-weight:600;">Müzik Aktif</span>
+            <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
+              <input type="checkbox" id="mz-enabled" style="opacity:0;width:0;height:0;" onchange="muzikOnizle()">
+              <span id="mz-toggle" onclick="document.getElementById('mz-enabled').click()" style="position:absolute;inset:0;background:#ccc;border-radius:26px;transition:.3s;cursor:pointer;"></span>
+              <span id="mz-knob" onclick="document.getElementById('mz-enabled').click()" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;"></span>
+            </label>
+          </div>
+
+          <div style="margin-bottom:18px;">
+            <label class="lbl">Müzik URL (mp3, ogg, wav)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input class="yi" id="mz-url" placeholder="https://... veya R2 linki" style="flex:1;" oninput="muzikOnizle()">
+              <input type="file" id="mz-file" accept="audio/*" style="display:none" onchange="muzikDosyaYukle(this)">
+              <button type="button" onclick="document.getElementById('mz-file').click()" style="padding:9px 14px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:13px;">🎵 Yükle</button>
+            </div>
+            <div id="mz-upload-st" style="font-size:12px;color:#888;margin-top:6px;"></div>
+          </div>
+
+          <div style="margin-bottom:22px;">
+            <label class="lbl">Ses Seviyesi — <span id="mz-vol-lbl">18%</span></label>
+            <input type="range" id="mz-vol" min="1" max="60" value="18" style="width:100%;accent-color:#2d5a27;cursor:pointer;" oninput="muzikVolGun(this.value)">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px;"><span>Sessiz</span><span>Orta</span><span>Yüksek</span></div>
+          </div>
+
+          <!-- Önizleme oynatıcı -->
+          <div id="mz-preview-box" style="display:none;background:#f8f6f2;border-radius:10px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+            <button type="button" id="mz-play-btn" onclick="muzikTestToggle()" style="width:44px;height:44px;border-radius:50%;background:#2d5a27;color:#fff;border:none;cursor:pointer;font-size:18px;flex-shrink:0;">▶</button>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Önizleme</div>
+              <div id="mz-preview-name" style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;"></div>
+            </div>
+          </div>
+          <audio id="mz-audio" style="display:none;"></audio>
+
+          <div style="display:flex;justify-content:flex-end;">
+            <button type="button" onclick="muzikKaydet()" style="padding:12px 32px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">🚀 Kaydet & Yayınla</button>
+          </div>
+          <div id="mz-st" style="font-size:13px;color:#888;text-align:right;margin-top:10px;"></div>
         </div>
       </div>
 
@@ -505,6 +553,7 @@ function panelAc(id,el){
   if(id==='rapor') rapGoster();
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
+  if(id==='muzik'){setTimeout(function(){muzikYukle();},150);}
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
   if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}
@@ -1215,6 +1264,164 @@ async function asYayinla(){
       console.error(pj);
     }
   }catch(e){st.textContent='❌ '+e.message;console.error(e);}
+}
+
+/* ===== MÜZİK AYARLARI ===== */
+var _mzAudio=null,_mzPlaying=false;
+
+async function muzikYukle(){
+  var st=document.getElementById('mz-st');
+  st.textContent='⏳ Yükleniyor...';
+  try{
+    var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{'User-Agent':'cactus-admin'});
+    var d=await r.json();
+    if(!d.content)throw new Error(d.message||'Dosya alınamadı');
+    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    var parser=new DOMParser();
+    var doc=parser.parseFromString(html,'text/html');
+    var cfg=doc.getElementById('music-cfg');
+    var url=cfg?cfg.dataset.url||'':'';
+    var enabled=cfg?cfg.dataset.enabled==='1':false;
+    var vol=cfg?parseInt((parseFloat(cfg.dataset.vol||'0.18')*100).toFixed(0)):18;
+    document.getElementById('mz-url').value=url;
+    document.getElementById('mz-enabled').checked=enabled;
+    document.getElementById('mz-vol').value=vol;
+    muzikVolGun(vol);
+    muzikToggleUI(enabled);
+    muzikOnizle();
+    st.textContent=url?'✅ Yüklendi':'URL girilmemiş';
+  }catch(e){
+    st.textContent='❌ '+e.message;
+    console.error(e);
+  }
+}
+
+function muzikVolGun(v){
+  document.getElementById('mz-vol-lbl').textContent=v+'%';
+  if(_mzAudio)_mzAudio.volume=v/100;
+}
+
+function muzikToggleUI(enabled){
+  var knob=document.getElementById('mz-knob');
+  var toggle=document.getElementById('mz-toggle');
+  if(enabled){
+    toggle.style.background='#2d5a27';
+    knob.style.left='25px';
+  }else{
+    toggle.style.background='#ccc';
+    knob.style.left='3px';
+  }
+}
+
+function muzikOnizle(){
+  var url=document.getElementById('mz-url').value.trim();
+  var enabled=document.getElementById('mz-enabled').checked;
+  muzikToggleUI(enabled);
+  var box=document.getElementById('mz-preview-box');
+  var nameEl=document.getElementById('mz-preview-name');
+  if(url){
+    box.style.display='flex';
+    nameEl.textContent=url.split('/').pop()||url;
+    if(_mzAudio&&_mzAudio.src!==url){
+      _mzAudio.pause();_mzPlaying=false;
+      document.getElementById('mz-play-btn').textContent='▶';
+    }
+  }else{
+    box.style.display='none';
+    if(_mzAudio){_mzAudio.pause();_mzPlaying=false;}
+  }
+}
+
+function muzikTestToggle(){
+  var url=document.getElementById('mz-url').value.trim();
+  var vol=parseInt(document.getElementById('mz-vol').value)/100;
+  if(!url)return;
+  var btn=document.getElementById('mz-play-btn');
+  if(!_mzAudio||_mzAudio.getAttribute('data-src')!==url){
+    if(_mzAudio){_mzAudio.pause();}
+    _mzAudio=document.getElementById('mz-audio');
+    _mzAudio.src=url;
+    _mzAudio.setAttribute('data-src',url);
+    _mzAudio.volume=vol;
+    _mzAudio.loop=true;
+    _mzPlaying=false;
+  }
+  if(_mzPlaying){
+    _mzAudio.pause();
+    _mzPlaying=false;
+    btn.textContent='▶';
+  }else{
+    _mzAudio.volume=vol;
+    _mzAudio.play().then(function(){
+      _mzPlaying=true;
+      btn.textContent='⏸';
+    }).catch(function(e){
+      document.getElementById('mz-st').textContent='❌ Oynatılamadı: '+e.message;
+    });
+  }
+}
+
+async function muzikKaydet(){
+  var token=localStorage.getItem('cactus_gh_token')||'';
+  if(!token){
+    token=prompt('GitHub Token:');
+    if(!token){toast('⚠️ Token girilmedi');return;}
+    localStorage.setItem('cactus_gh_token',token.trim());
+    token=token.trim();
+  }
+  var st=document.getElementById('mz-st');
+  st.textContent='⏳ Kaydediliyor...';
+  try{
+    var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{headers:{'Authorization':'token '+token}});
+    var d=await r.json();
+    if(!d.sha)throw new Error(d.message||'Dosya alınamadı');
+    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    var parser=new DOMParser();
+    var doc=parser.parseFromString(html,'text/html');
+    var cfg=doc.getElementById('music-cfg');
+    if(!cfg){st.textContent='❌ music-cfg elementi bulunamadı';return;}
+    var url=document.getElementById('mz-url').value.trim();
+    var enabled=document.getElementById('mz-enabled').checked;
+    var vol=(parseInt(document.getElementById('mz-vol').value)/100).toFixed(2);
+    cfg.dataset.url=url;
+    cfg.dataset.enabled=enabled?'1':'0';
+    cfg.dataset.vol=vol;
+    var newHtml='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+    var pr=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'Muzik ayarlari guncellendi',content:btoa(unescape(encodeURIComponent(newHtml))),sha:d.sha,branch:'main'})
+    });
+    var pj=await pr.json();
+    if(pj.commit){
+      st.textContent='✅ Yayınlandı!';
+      toast('✅ Müzik ayarları kaydedildi');
+    }else{
+      if(pj.message&&pj.message.indexOf('Bad credentials')>-1)localStorage.removeItem('cactus_gh_token');
+      st.textContent='❌ '+(pj.message||'Hata');
+    }
+  }catch(e){st.textContent='❌ '+e.message;console.error(e);}
+}
+
+function muzikDosyaYukle(input){
+  var file=input.files[0];if(!file)return;
+  var stEl=document.getElementById('mz-upload-st');
+  stEl.textContent='⏳ Yükleniyor...';
+  var worker=R2_WORKER;
+  var fd=new FormData();
+  fd.append('file',file,file.name);
+  fetch(worker+'upload',{method:'POST',body:fd})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.url){
+        document.getElementById('mz-url').value=data.url;
+        stEl.textContent='✅ Yüklendi';
+        muzikOnizle();
+      }else{
+        stEl.textContent='❌ '+(data.error||'Hata');
+      }
+    })
+    .catch(function(e){stEl.textContent='❌ '+e.message;});
 }
 
 /* ===== IS BASVURULARI ===== */

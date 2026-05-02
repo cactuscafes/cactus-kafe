@@ -136,87 +136,38 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
     <div class="main">
 
       <!-- MENÜ -->
-      <div class="panel" id="panel-anasayfa" style="max-width:900px;">
-        <div class="pttl">🏠 Ana Sayfa İçerik Yönetimi</div>
-        <div class="psub">Her alanı düzenleyin, fotoğraf yükleyin. Hazır olunca "Yayınla" basın.</div>
+      <div class="panel" id="panel-anasayfa" style="max-width:1400px;padding-bottom:0;">
+        <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
+        <div class="psub">📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla</div>
 
-        <div id="as-loading" style="padding:40px;text-align:center;color:#aaa;">⏳ Yükleniyor...</div>
+        <div id="as-loading" style="padding:40px;text-align:center;color:#aaa;font-size:14px;">⏳ Sayfa yükleniyor...</div>
+        <div style="position:relative;overflow:hidden;">
+          <iframe id="as-iframe" style="display:none;width:100%;border:none;min-height:400px;" scrolling="no"></iframe>
+        </div>
 
-        <div id="as-form" style="display:none;">
-
-          <!-- HERO -->
-          <div class="kart" style="margin-bottom:16px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#2d5a27;margin-bottom:18px;">🎯 HERO BÖLÜMÜ</div>
-            <div style="margin-bottom:14px;">
-              <label class="lbl">Arkaplan Görseli</label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input class="yi" id="as-hero-img" placeholder="Görsel URL" style="flex:1;" oninput="asPreviewImg('as-hero-img')">
-                <input type="file" id="as-hero-img-f" accept="image/*" style="display:none" onchange="asUploadImg(this,'as-hero-img')">
-                <button type="button" onclick="document.getElementById('as-hero-img-f').click()" style="padding:9px 14px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:13px;">📷 Yükle</button>
-              </div>
-              <img id="as-hero-img-preview" style="margin-top:8px;max-height:120px;border-radius:8px;object-fit:cover;display:none;">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-              <div><label class="lbl">Üst Metin (tagline)</label><input class="yi" id="as-hero-tagline" placeholder="Bursa'nın Kalbinde İki Şube"></div>
-              <div><label class="lbl">Ana Başlık</label><input class="yi" id="as-hero-title" placeholder="Cactus"></div>
-            </div>
-            <div style="margin-bottom:12px;"><label class="lbl">Alt Başlık</label><input class="yi" id="as-hero-subtitle" placeholder="· COFFEE, SNACK &amp; DESSERT ·"></div>
-            <div><label class="lbl">Buton Metni</label><input class="yi" id="as-hero-btn" placeholder="Menüyü Gör"></div>
-          </div>
-
-          <!-- HAKKIMIZDA -->
-          <div class="kart" style="margin-bottom:16px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#2d5a27;margin-bottom:18px;">📖 HAKKIMIZDA</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-              <div><label class="lbl">Üst Etiket</label><input class="yi" id="as-about-eyebrow" placeholder="Hikayemiz"></div>
-              <div><label class="lbl">Başlık (HTML destekli)</label><input class="yi" id="as-about-title" placeholder="Bizimle &lt;em&gt;Tanışın&lt;/em&gt;"></div>
-            </div>
-            <div style="margin-bottom:12px;"><label class="lbl">Açıklama (HTML destekli, &lt;br&gt; kullanabilirsiniz)</label><textarea class="yi" id="as-about-text" rows="5" style="resize:vertical;"></textarea></div>
-            <div><label class="lbl">Buton Metni</label><input class="yi" id="as-about-btn" placeholder="Bize Ulaşın"></div>
-          </div>
-
-          <!-- ŞUBELER -->
-          <div class="kart" style="margin-bottom:16px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#2d5a27;margin-bottom:18px;">📍 ŞUBELER</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-              <div>
-                <div style="font-size:11px;font-weight:600;color:#999;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">FSM Şubesi</div>
-                <div style="margin-bottom:10px;">
-                  <label class="lbl">Görsel</label>
-                  <div style="display:flex;gap:6px;align-items:center;">
-                    <input class="yi" id="as-b1-img" placeholder="URL" style="flex:1;" oninput="asPreviewImg('as-b1-img')">
-                    <input type="file" id="as-b1-img-f" accept="image/*" style="display:none" onchange="asUploadImg(this,'as-b1-img')">
-                    <button type="button" onclick="document.getElementById('as-b1-img-f').click()" style="padding:8px 12px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📷</button>
-                  </div>
-                  <img id="as-b1-img-preview" style="margin-top:6px;max-height:80px;border-radius:6px;object-fit:cover;display:none;">
-                </div>
-                <div style="margin-bottom:8px;"><label class="lbl">Şube Adı</label><input class="yi" id="as-b1-name" placeholder="FSM Şubesi"></div>
-                <div><label class="lbl">Alt Metin</label><input class="yi" id="as-b1-sub" placeholder="Fatih Sultan Mehmet Caddesi"></div>
-              </div>
-              <div>
-                <div style="font-size:11px;font-weight:600;color:#999;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Podyumpark</div>
-                <div style="margin-bottom:10px;">
-                  <label class="lbl">Görsel</label>
-                  <div style="display:flex;gap:6px;align-items:center;">
-                    <input class="yi" id="as-b2-img" placeholder="URL" style="flex:1;" oninput="asPreviewImg('as-b2-img')">
-                    <input type="file" id="as-b2-img-f" accept="image/*" style="display:none" onchange="asUploadImg(this,'as-b2-img')">
-                    <button type="button" onclick="document.getElementById('as-b2-img-f').click()" style="padding:8px 12px;background:#111;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">📷</button>
-                  </div>
-                  <img id="as-b2-img-preview" style="margin-top:6px;max-height:80px;border-radius:6px;object-fit:cover;display:none;">
-                </div>
-                <div style="margin-bottom:8px;"><label class="lbl">Şube Adı</label><input class="yi" id="as-b2-name" placeholder="Podyumpark"></div>
-                <div><label class="lbl">Alt Metin</label><input class="yi" id="as-b2-sub" placeholder="Podyumpark AVM"></div>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /as-form -->
-
-        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:10;">
           <span id="as-st" style="font-size:13px;color:#888;">-</span>
           <div style="display:flex;gap:10px;">
             <button type="button" onclick="asLoad()" style="padding:10px 18px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">🔄 Yenile</button>
             <button type="button" onclick="asYayinla()" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Yayınla</button>
+          </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="as-m" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:999999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:14px;padding:26px;width:540px;max-width:94vw;box-shadow:0 24px 64px rgba(0,0,0,.35);">
+            <p id="as-ml" style="font-weight:700;margin:0 0 14px;font-size:15px;"></p>
+            <img id="as-preview" style="max-height:130px;width:100%;border-radius:8px;object-fit:cover;margin-bottom:12px;display:none;">
+            <textarea id="as-mi" rows="4" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
+            <div id="as-mf" style="display:none;margin-top:10px;display:flex;align-items:center;gap:10px;">
+              <input type="file" id="as-mfi" accept="image/*" style="display:none" onchange="asImgUpload(this)">
+              <button type="button" onclick="document.getElementById('as-mfi').click()" style="padding:8px 18px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;">📷 Yeni Fotoğraf Yükle</button>
+              <span id="as-mfs" style="font-size:12px;color:#888;"></span>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+              <button type="button" onclick="document.getElementById('as-m').style.display='none'" style="padding:10px 22px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;">İptal</button>
+              <button type="button" onclick="asKaydet()" style="padding:10px 26px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✅ Uygula</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1044,16 +995,15 @@ if(localStorage.getItem('ca')==='1'){
 }
 
 
-var _asGhSha='',_asRawHtml='';
+var _asGhSha='',_asRawHtml='',_asEl=null,_asIsImg=false;
 
 async function asLoad(){
   var loading=document.getElementById('as-loading');
-  var form=document.getElementById('as-form');
+  var iframe=document.getElementById('as-iframe');
   var st=document.getElementById('as-st');
-  if(!loading||!form)return;
   loading.style.display='block';
-  loading.innerHTML='<div style="padding:40px;text-align:center;color:#aaa;">⏳ Yükleniyor...</div>';
-  form.style.display='none';
+  loading.innerHTML='<div style="padding:40px;text-align:center;color:#aaa;font-size:14px;">⏳ Sayfa yükleniyor...</div>';
+  iframe.style.display='none';
   st.textContent='Yükleniyor...';
   try{
     var token=localStorage.getItem('cactus_gh_token')||'';
@@ -1064,71 +1014,153 @@ async function asLoad(){
     if(!d.content)throw new Error(d.message||'Dosya alınamadı');
     _asGhSha=d.sha;
     _asRawHtml=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-    var parser=new DOMParser();
-    var doc=parser.parseFromString(_asRawHtml,'text/html');
-    function gv(sel,attr){var el=doc.querySelector(sel);if(!el)return '';if(attr)return el.getAttribute(attr)||'';return el.textContent||'';}
-    function gh(sel){var el=doc.querySelector(sel);if(!el)return '';return el.innerHTML||'';}
-    // Hero
-    document.getElementById('as-hero-img').value=gv('img.hero-bg','src');
-    asPreviewImg('as-hero-img');
-    document.getElementById('as-hero-tagline').value=gv('.hero-tagline').trim();
-    document.getElementById('as-hero-title').value=gv('.hero-title').trim();
-    document.getElementById('as-hero-subtitle').value=gv('.hero-subtitle').trim();
-    document.getElementById('as-hero-btn').value=gv('.hero-btn').trim();
-    // About (first section-about)
-    var fa=doc.querySelector('.section-about');
-    if(fa){
-      document.getElementById('as-about-eyebrow').value=(fa.querySelector('.about-eyebrow')||{textContent:''}).textContent.trim();
-      document.getElementById('as-about-title').value=(fa.querySelector('.about-title')||{innerHTML:''}).innerHTML.trim();
-      document.getElementById('as-about-text').value=(fa.querySelector('.about-text')||{innerHTML:''}).innerHTML.trim();
-      document.getElementById('as-about-btn').value=(fa.querySelector('.about-btn')||{textContent:''}).textContent.trim();
-    }
-    // Branches
-    var brs=doc.querySelectorAll('.branch-card');
-    if(brs[0]){
-      var i1=brs[0].querySelector('img');
-      document.getElementById('as-b1-img').value=i1?(i1.getAttribute('src')||''):'';
-      asPreviewImg('as-b1-img');
-      document.getElementById('as-b1-name').value=(brs[0].querySelector('.branch-name')||{textContent:''}).textContent.trim();
-      document.getElementById('as-b1-sub').value=(brs[0].querySelector('.branch-sub')||{textContent:''}).textContent.trim();
-    }
-    if(brs[1]){
-      var i2=brs[1].querySelector('img');
-      document.getElementById('as-b2-img').value=i2?(i2.getAttribute('src')||''):'';
-      asPreviewImg('as-b2-img');
-      document.getElementById('as-b2-name').value=(brs[1].querySelector('.branch-name')||{textContent:''}).textContent.trim();
-      document.getElementById('as-b2-sub').value=(brs[1].querySelector('.branch-sub')||{textContent:''}).textContent.trim();
-    }
-    loading.style.display='none';
-    form.style.display='block';
-    st.textContent='✅ Yüklendi — alanları düzenleyin';
+    // Suppress intro animation and WA button in preview
+    var preview=_asRawHtml
+      .replace(/(<div[^>]*class="[^"]*cactus-intro[^"]*")/,'$1 style="display:none!important;"')
+      .replace(/(<a[^>]*wa\.me[^>]*style=")[^"]*(")/,'$1display:none!important;$2')
+      .replace(/(<a[^>]*wa\.me[^>]*)(>)/,'$1 style="display:none!important;"$2');
+    iframe.onload=null;
+    iframe.onload=function(){asIframeLoaded();};
+    iframe.srcdoc=preview;
   }catch(e){
-    loading.innerHTML='<div style="color:red;padding:20px;">❌ Hata: '+e.message+'</div>';
+    loading.innerHTML='<div style="color:red;padding:20px;font-size:14px;">❌ Hata: '+e.message+'</div>';
     st.textContent='❌ '+e.message;
     console.error(e);
   }
 }
 
-function asPreviewImg(inputId){
-  var preview=document.getElementById(inputId+'-preview');
-  var input=document.getElementById(inputId);
-  if(!preview||!input)return;
-  var url=input.value.trim();
-  if(url){preview.src=url;preview.style.display='block';}
-  else{preview.style.display='none';}
+function asIframeLoaded(){
+  var iframe=document.getElementById('as-iframe');
+  var idoc=iframe.contentDocument;
+  var st=document.getElementById('as-st');
+  if(!idoc){st.textContent='❌ iframe erişim hatası';return;}
+
+  // Hide nav and fixed/sticky elements in preview
+  idoc.querySelectorAll('nav,.cactus-intro').forEach(function(el){el.style.display='none';});
+  idoc.querySelectorAll('*').forEach(function(el){
+    try{
+      var cs=idoc.defaultView.getComputedStyle(el);
+      if(cs.position==='fixed'||cs.position==='sticky'){el.style.position='relative';}
+    }catch(e){}
+  });
+  // Prevent link navigation inside iframe
+  idoc.querySelectorAll('a[href]').forEach(function(a){
+    a.addEventListener('click',function(e){e.preventDefault();});
+  });
+
+  // Inject edit button styles
+  var s=idoc.createElement('style');
+  s.id='__as_style';
+  s.textContent='.as-ib,.as-eb{position:absolute!important;border:none;cursor:pointer;display:flex!important;align-items:center;justify-content:center;line-height:1;z-index:99999;transition:transform .12s;}'
+    +'.as-ib{top:8px!important;right:8px!important;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.82);color:#fff;font-size:17px;box-shadow:0 2px 10px rgba(0,0,0,.4);}'
+    +'.as-ib:hover{transform:scale(1.13);background:#000;}'
+    +'.as-eb{top:3px!important;right:3px!important;width:27px;height:27px;border-radius:50%;background:rgba(45,90,39,.92);color:#fff;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.3);}'
+    +'.as-eb:hover{transform:scale(1.13);}';
+  idoc.head.appendChild(s);
+
+  // IMG edit buttons — skip tiny icons/logos
+  idoc.querySelectorAll('img').forEach(function(img){
+    if(img.width<40&&img.height<40)return;
+    var p=img.parentElement;if(!p)return;
+    if(p.querySelector('.as-ib'))return;
+    var cs=idoc.defaultView.getComputedStyle(p);
+    if(cs.position==='static')p.style.position='relative';
+    var b=idoc.createElement('button');
+    b.className='as-ib';b.type='button';b.innerHTML='📷';b.title='Fotoğrafı değiştir';
+    b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asEdit(img,true);});
+    p.appendChild(b);
+  });
+
+  // TEXT edit buttons
+  var textSels=[
+    '.hero-tagline','.hero-title','.hero-subtitle','.hero-btn',
+    '.about-eyebrow','.about-title','.about-text','.about-btn',
+    '.branch-name','.branch-sub',
+    '.section-eyebrow','.section-title',
+    '.menu-card-title','.map-col-label',
+    'footer p','footer h3','footer h4','footer a:not([href^="http"])'
+  ];
+  textSels.forEach(function(sel){
+    idoc.querySelectorAll(sel).forEach(function(el){
+      if(el.querySelector('.as-eb'))return;
+      if(!el.textContent.trim())return;
+      var cs=idoc.defaultView.getComputedStyle(el);
+      if(cs.position==='static')el.style.position='relative';
+      el.dataset.asOrig=el.innerHTML;
+      var b=idoc.createElement('button');
+      b.className='as-eb';b.type='button';b.innerHTML='✏️';b.title='Metni düzenle';
+      b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();asEdit(el,false);});
+      el.appendChild(b);
+    });
+  });
+
+  // Auto-size iframe to full page height
+  var resize=function(){
+    iframe.style.height=(idoc.documentElement.scrollHeight+40)+'px';
+  };
+  resize();
+  setTimeout(resize,500);
+
+  document.getElementById('as-loading').style.display='none';
+  iframe.style.display='block';
+  st.textContent='✅ Hazır — 📷 veya ✏️ ikonuna tıklayın';
 }
 
-function asUploadImg(input,targetId){
+function asEdit(el,isImg){
+  _asEl=el;_asIsImg=isImg;
+  var ml=document.getElementById('as-ml');
+  var mi=document.getElementById('as-mi');
+  var mf=document.getElementById('as-mf');
+  var prev=document.getElementById('as-preview');
+  ml.textContent=isImg?'📷 Fotoğraf değiştir':'✏️ Metni düzenle';
+  if(isImg){
+    mi.value=el.getAttribute('src')||'';
+    mi.rows=2;
+    prev.src=el.getAttribute('src')||'';
+    prev.style.display='block';
+    mf.style.display='flex';
+    document.getElementById('as-mfs').textContent='';
+  }else{
+    var html=(el.dataset.asOrig||el.innerHTML).replace(/<button[^>]*class="as-eb"[\s\S]*?<\/button>/g,'').trim();
+    mi.value=html;
+    mi.rows=5;
+    prev.style.display='none';
+    mf.style.display='none';
+  }
+  document.getElementById('as-m').style.display='flex';
+  setTimeout(function(){mi.focus();mi.select();},80);
+}
+
+function asKaydet(){
+  var v=document.getElementById('as-mi').value;
+  if(!_asEl)return;
+  if(_asIsImg){
+    _asEl.setAttribute('src',v.trim());
+    document.getElementById('as-preview').src=v.trim();
+  }else{
+    var b=_asEl.querySelector('.as-eb');
+    _asEl.innerHTML=v;
+    _asEl.dataset.asOrig=v;
+    if(b)_asEl.appendChild(b);
+    // Resize iframe after text change
+    var iframe=document.getElementById('as-iframe');
+    if(iframe.contentDocument)setTimeout(function(){iframe.style.height=(iframe.contentDocument.documentElement.scrollHeight+40)+'px';},120);
+  }
+  document.getElementById('as-st').textContent='⚠️ Kaydedilmemiş değişiklikler — Yayınla butonuna basın';
+  document.getElementById('as-m').style.display='none';
+}
+
+function asImgUpload(input){
   var file=input.files[0];if(!file)return;
-  var st=document.getElementById('as-st');
-  st.textContent='⏳ Görsel yükleniyor...';
+  var st=document.getElementById('as-mfs');
+  st.textContent='⏳ Yükleniyor...';
   resizeToJpeg(file,function(blob){
     uploadToR2(blob,file.name,function(err,data){
-      if(err){st.textContent='❌ Yükleme hatası';return;}
+      if(err){st.textContent='❌ Hata';return;}
       var url=(data&&data.url)||'';
-      var inp=document.getElementById(targetId);
-      if(inp){inp.value=url;asPreviewImg(targetId);}
-      st.textContent='✅ Görsel yüklendi';
+      document.getElementById('as-mi').value=url;
+      document.getElementById('as-preview').src=url;
+      st.textContent='✅ Yüklendi';
     });
   });
 }
@@ -1142,55 +1174,39 @@ async function asYayinla(){
     token=token.trim();
   }
   var st=document.getElementById('as-st');
+  var iframe=document.getElementById('as-iframe');
+  if(!iframe.contentDocument||iframe.style.display==='none'){st.textContent='❌ Önce sayfayı yükleyin';return;}
   st.textContent='⏳ Kaydediliyor...';
   try{
-    if(!_asGhSha||!_asRawHtml){
+    if(!_asGhSha){
       var rd=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{headers:{'Authorization':'token '+token}});
       var rj=await rd.json();
       if(!rj.sha)throw new Error(rj.message||'Dosya alınamadı');
       _asGhSha=rj.sha;
-      _asRawHtml=decodeURIComponent(escape(atob(rj.content.replace(/\n/g,''))));
     }
-    var parser=new DOMParser();
-    var doc=parser.parseFromString(_asRawHtml,'text/html');
-    function g(id){var el=document.getElementById(id);return el?el.value.trim():'';}
-    // Hero
-    var heroImg=g('as-hero-img');
-    if(heroImg){var hb=doc.querySelector('img.hero-bg');if(hb)hb.setAttribute('src',heroImg);}
-    var ht=g('as-hero-tagline');if(ht){var el=doc.querySelector('.hero-tagline');if(el)el.textContent=ht;}
-    var htl=g('as-hero-title');if(htl){var el=doc.querySelector('.hero-title');if(el)el.textContent=htl;}
-    var hs=g('as-hero-subtitle');if(hs){var el=doc.querySelector('.hero-subtitle');if(el)el.textContent=hs;}
-    var hb2=g('as-hero-btn');if(hb2){var el=doc.querySelector('.hero-btn');if(el)el.textContent=hb2;}
-    // About (first section-about only)
-    var fa=doc.querySelector('.section-about');
-    if(fa){
-      var ae=g('as-about-eyebrow');if(ae){var el=fa.querySelector('.about-eyebrow');if(el)el.textContent=ae;}
-      var at=g('as-about-title');if(at){var el=fa.querySelector('.about-title');if(el)el.innerHTML=at;}
-      var atx=g('as-about-text');if(atx){var el=fa.querySelector('.about-text');if(el)el.innerHTML=atx;}
-      var ab=g('as-about-btn');if(ab){var el=fa.querySelector('.about-btn');if(el)el.textContent=ab;}
-    }
-    // Branches
-    var brs=doc.querySelectorAll('.branch-card');
-    if(brs[0]){
-      var b1i=g('as-b1-img');if(b1i){var im=brs[0].querySelector('img');if(im)im.setAttribute('src',b1i);}
-      var b1n=g('as-b1-name');if(b1n){var el=brs[0].querySelector('.branch-name');if(el)el.textContent=b1n;}
-      var b1s=g('as-b1-sub');if(b1s){var el=brs[0].querySelector('.branch-sub');if(el)el.textContent=b1s;}
-    }
-    if(brs[1]){
-      var b2i=g('as-b2-img');if(b2i){var im=brs[1].querySelector('img');if(im)im.setAttribute('src',b2i);}
-      var b2n=g('as-b2-name');if(b2n){var el=brs[1].querySelector('.branch-name');if(el)el.textContent=b2n;}
-      var b2s=g('as-b2-sub');if(b2s){var el=brs[1].querySelector('.branch-sub');if(el)el.textContent=b2s;}
-    }
-    var newHtml='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
-    var newContent=btoa(unescape(encodeURIComponent(newHtml)));
+    // Clone iframe doc and strip all admin artifacts
+    var clone=iframe.contentDocument.documentElement.cloneNode(true);
+    clone.querySelectorAll('.as-ib,.as-eb,#__as_style').forEach(function(el){el.remove();});
+    clone.querySelectorAll('[data-as-orig]').forEach(function(el){el.removeAttribute('data-as-orig');});
+    // Restore nav and intro visibility
+    var nav=clone.querySelector('nav');if(nav)nav.style.removeProperty('display');
+    var intro=clone.querySelector('.cactus-intro');if(intro)intro.style.removeProperty('display');
+    // Remove inline position:relative/absolute added by admin (leave others)
+    clone.querySelectorAll('[style]').forEach(function(el){
+      if(el.style.position==='relative'&&!el.getAttribute('style').replace('position: relative;','').replace('position:relative;','').trim()){
+        el.removeAttribute('style');
+      }
+    });
+    var newHtml='<!DOCTYPE html>\n'+clone.outerHTML;
     var pr=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{
       method:'PUT',
       headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-      body:JSON.stringify({message:'Ana sayfa icerik guncellendi',content:newContent,sha:_asGhSha,branch:'main'})
+      body:JSON.stringify({message:'Ana sayfa guncellendi',content:btoa(unescape(encodeURIComponent(newHtml))),sha:_asGhSha,branch:'main'})
     });
     var pj=await pr.json();
     if(pj.commit){
-      _asGhSha='';_asRawHtml='';
+      _asGhSha=pj.content?pj.content.sha:'';
+      _asRawHtml='';
       st.textContent='✅ Yayınlandı!';
       toast('✅ Ana sayfa güncellendi');
     }else{

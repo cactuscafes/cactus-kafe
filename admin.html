@@ -122,6 +122,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
+      <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:#2d7a4f;color:#fff;">📊 Raporlar</button>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
@@ -269,6 +270,29 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
           <button onclick="basvuruYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
         </div>
         <div id="basvuruListesi" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- ŞİKAYET & ÖNERİLER -->
+      <div class="panel" id="panel-sikayetler">
+        <div class="pttl">💬 Şikayet & Öneriler</div>
+        <div class="psub">Websitesinden gelen müşteri geri bildirimleri. Altın kenarlı = henüz okunmadı.</div>
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+          <button onclick="sikayetYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
+          <select id="sikayetTipFilter" onchange="sikayetYukle()" style="padding:8px 12px;border:1.5px solid var(--stone);font-size:12px;font-family:inherit;background:#fff;">
+            <option value="">Tümü</option>
+            <option value="Şikayet">Şikayet</option>
+            <option value="Öneri">Öneri</option>
+            <option value="Teşekkür">Teşekkür</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+          <select id="sikayetSubeFilter" onchange="sikayetYukle()" style="padding:8px 12px;border:1.5px solid var(--stone);font-size:12px;font-family:inherit;background:#fff;">
+            <option value="">Tüm Şubeler</option>
+            <option value="FSM">FSM</option>
+            <option value="Podyumpark">Podyumpark</option>
+            <option value="Genel">Genel</option>
+          </select>
+        </div>
+        <div id="sikayetListesi" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
 
       <!-- RAPOR -->
@@ -469,6 +493,7 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
   if(id==='basvurular') basvuruYukle();
+  if(id==='sikayetler') sikayetYukle();
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
   if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}
@@ -948,6 +973,13 @@ if(localStorage.getItem('ca')==='1'){
         var badge=document.getElementById('basvuruBadge');
         if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
       }).catch(function(){});
+    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sikayet/listele')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var yeni=data.filter(function(s){return !s.okundu;}).length;
+        var badge=document.getElementById('sikayetBadge');
+        if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
+      }).catch(function(){});
   },2000);
 }
 
@@ -1140,6 +1172,55 @@ async function basvuruSil(id){
   if(!confirm('Bu başvuru silinsin mi?'))return;
   await fetch(BASVURU_API+'/basvuru/sil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
   basvuruYukle();
+}
+
+/* ===== ŞİKAYET & ÖNERİLER ===== */
+var SIKAYET_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+async function sikayetYukle(){
+  var el=document.getElementById('sikayetListesi');
+  if(!el)return;
+  el.innerHTML='<div style="color:var(--mist);font-size:13px;padding:20px 0;">Yükleniyor...</div>';
+  var tipF=document.getElementById('sikayetTipFilter').value;
+  var subeF=document.getElementById('sikayetSubeFilter').value;
+  try{
+    var r=await fetch(SIKAYET_API+'/sikayet/listele');
+    var data=await r.json();
+    if(tipF) data=data.filter(function(s){return s.tip===tipF;});
+    if(subeF) data=data.filter(function(s){return s.sube===subeF;});
+    var yeni=data.filter(function(s){return !s.okundu;}).length;
+    var badge=document.getElementById('sikayetBadge');
+    if(badge){badge.style.display=yeni>0?'inline':'none';badge.textContent=yeni;}
+    if(!data.length){el.innerHTML='<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';return;}
+    var tipRenk={'Şikayet':'#e74c3c','Öneri':'#2d7a4f','Teşekkür':'#b8965a','Diğer':'#888'};
+    el.innerHTML=data.map(function(s){
+      var d=new Date(s.tarih);
+      var tarih=isNaN(d)?s.tarih:d.toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+      var renk=tipRenk[s.tip]||'#888';
+      return '<div class="bsv-kart'+(s.okundu?'':' yeni')+'" id="sk-'+s.id+'">'
+        +'<div style="flex:1;">'
+        +'<div class="bsv-ad" style="display:flex;align-items:center;gap:10px;">'
+        +s.ad
+        +'<span style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;background:'+renk+';padding:2px 8px;">'+s.tip+'</span>'
+        +(s.sube?'<span style="font-size:11px;color:var(--mist);">'+s.sube+'</span>':'')
+        +'</div>'
+        +'<div class="bsv-meta">'+tarih+'</div>'
+        +'<div class="bsv-mesaj">'+s.mesaj+'</div>'
+        +'</div>'
+        +'<div class="bsv-actions">'
+        +(!s.okundu?'<button class="uk-btn" onclick="sikayetOkundu('+s.id+')">✓ Okundu</button>':'<span style="font-size:11px;color:var(--mist);">✓ Okundu</span>')
+        +'<button class="uk-btn red" onclick="sikayetSil('+s.id+')">🗑 Sil</button>'
+        +'</div></div>';
+    }).join('');
+  }catch(e){el.innerHTML='<div style="color:var(--rd);">Yüklenemedi: '+e.message+'</div>';}
+}
+async function sikayetOkundu(id){
+  await fetch(SIKAYET_API+'/sikayet/okundu',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
+  sikayetYukle();
+}
+async function sikayetSil(id){
+  if(!confirm('Bu kayıt silinsin mi?'))return;
+  await fetch(SIKAYET_API+'/sikayet/sil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
+  sikayetYukle();
 }
 
 /* ===== GENERIC SAYFA EDİTÖRÜ ===== */

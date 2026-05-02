@@ -867,12 +867,6 @@
           "aciklama": "",
           "tip": "ic",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375716618-599qlwifnbf.jpg"
-        },
-        {
-          "id": "sicak_1777564145658",
-          "ad": "Ballı Süt",
-          "fiyat": 150,
-          "emoji": "☕"
         }
       ]
     },
@@ -1311,12 +1305,6 @@
           "aciklama": "Karbonatlı maden suyu.",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729066448-l3ew1i6ody.jpg",
           "gizli": false
-        },
-        {
-          "id": "mesrubat_1777455296634",
-          "ad": "Enerji İçeceği",
-          "fiyat": 140,
-          "emoji": "☕"
         }
       ]
     }

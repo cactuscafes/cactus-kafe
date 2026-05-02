@@ -113,8 +113,50 @@
 
 <div class="iletisim-wrap" style="padding-top:120px;">
 
+  <!-- Şikayet & Öneri Formu -->
+  <div class="form-sec reveal" id="sikayet">
+    <div class="form-intro">
+      <div class="sec-label">Görüşleriniz</div>
+      <h2 class="sec-title">Şikayet &<br><em>Öneriler</em></h2>
+      <p>Deneyiminizi bizimle paylaşın. Her geri bildirim bizi daha iyi yapar. İsterseniz anonim gönderebilirsiniz.</p>
+    </div>
+    <div>
+      <form class="form" id="sikayetForm" onsubmit="sikayetGonder(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Adınız (isteğe bağlı)</label>
+            <input type="text" name="ad" placeholder="Anonim bırakabilirsiniz">
+          </div>
+          <div class="form-group">
+            <label>Şube</label>
+            <select name="sube">
+              <option value="FSM">FSM Şubesi</option>
+              <option value="Podyumpark">Podyumpark</option>
+              <option value="Genel">Genel</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Tür</label>
+          <select name="tip">
+            <option value="Şikayet">Şikayet</option>
+            <option value="Öneri">Öneri</option>
+            <option value="Teşekkür">Teşekkür</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mesajınız *</label>
+          <textarea name="mesaj" placeholder="Deneyiminizi, önerinizi veya şikayetinizi yazın..." style="min-height:160px;" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Gönder →</button>
+        <div class="form-success" id="sikayetSuccess">✓ Geri bildiriminiz alındı, teşekkür ederiz!</div>
+      </form>
+    </div>
+  </div>
+
   <!-- İş Başvurusu Formu -->
-  <div class="form-sec reveal" id="basvuru">
+  <div class="form-sec reveal" id="basvuru" style="border-top:1px solid var(--stone);padding-top:80px;margin-top:0;">
     <div class="form-intro">
       <div class="sec-label">İş Başvurusu</div>
       <h2 class="sec-title">Bizimle<br><em>çalış</em></h2>
@@ -152,48 +194,6 @@
         </div>
         <button type="submit" class="form-submit">Başvur →</button>
         <div class="form-success" id="formSuccess">✓ Mesajınız alındı! En kısa sürede geri döneceğiz.</div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Şikayet & Öneri Formu -->
-  <div class="form-sec reveal" id="sikayet" style="border-top:1px solid var(--stone);padding-top:80px;margin-top:0;">
-    <div class="form-intro">
-      <div class="sec-label">Görüşleriniz</div>
-      <h2 class="sec-title">Şikayet &<br><em>Öneriler</em></h2>
-      <p>Deneyiminizi bizimle paylaşın. Her geri bildirim bizi daha iyi yapar. İsterseniz anonim gönderebilirsiniz.</p>
-    </div>
-    <div>
-      <form class="form" id="sikayetForm" onsubmit="sikayetGonder(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Adınız (isteğe bağlı)</label>
-            <input type="text" name="ad" placeholder="Anonim bırakabilirsiniz">
-          </div>
-          <div class="form-group">
-            <label>Şube</label>
-            <select name="sube">
-              <option value="FSM">FSM Şubesi</option>
-              <option value="Podyumpark">Podyumpark</option>
-              <option value="Genel">Genel</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Tür</label>
-          <select name="tip">
-            <option value="Şikayet">Şikayet</option>
-            <option value="Öneri">Öneri</option>
-            <option value="Teşekkür">Teşekkür</option>
-            <option value="Diğer">Diğer</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Mesajınız *</label>
-          <textarea name="mesaj" placeholder="Deneyiminizi, önerinizi veya şikayetinizi yazın..." style="min-height:160px;" required></textarea>
-        </div>
-        <button type="submit" class="form-submit">Gönder →</button>
-        <div class="form-success" id="sikayetSuccess">✓ Geri bildiriminiz alındı, teşekkür ederiz!</div>
       </form>
     </div>
   </div>

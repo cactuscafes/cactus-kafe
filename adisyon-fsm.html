@@ -1072,9 +1072,10 @@ function siparisSil(id, tip) {
 
 function clearAll(tip){
   if(!confirm((tip==='bar'?'Bar':'Mutfak')+' — tüm siparişler silinsin mi?'))return;
+  const _api='https://cactus-rapor-api.batuhanbulut.workers.dev';
   const liste=tip==='bar'?barSip:mutSip;
   liste.forEach(function(s){
-    fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});
+    fetch(_api+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});
   });
   if(tip==='bar'){barSip=[];localStorage.setItem(LK.bar,'[]');renderBar();}
   else{mutSip=[];localStorage.setItem(LK.mut,'[]');renderMut();}

@@ -1089,7 +1089,10 @@ function asIframeLoaded(){
   idoc.querySelectorAll('*').forEach(function(el){
     try{
       var cs=idoc.defaultView.getComputedStyle(el);
-      if(cs.position==='fixed'||cs.position==='sticky'){el.style.position='relative';}
+      if(cs.position==='fixed'||cs.position==='sticky'){
+        el.dataset.asOrigPos=cs.position; // remember for restore
+        el.style.position='relative';
+      }
     }catch(e){}
   });
   // Prevent link navigation inside iframe
@@ -1237,12 +1240,18 @@ async function asYayinla(){
     var clone=iframe.contentDocument.documentElement.cloneNode(true);
     clone.querySelectorAll('.as-ib,.as-eb,#__as_style').forEach(function(el){el.remove();});
     clone.querySelectorAll('[data-as-orig]').forEach(function(el){el.removeAttribute('data-as-orig');});
+    // Restore original position (fixed/sticky) on elements changed for preview
+    clone.querySelectorAll('[data-as-orig-pos]').forEach(function(el){
+      el.style.position=el.dataset.asOrigPos;
+      el.removeAttribute('data-as-orig-pos');
+    });
     // Restore nav and intro visibility
     var nav=clone.querySelector('nav');if(nav)nav.style.removeProperty('display');
     var intro=clone.querySelector('.cactus-intro');if(intro)intro.style.removeProperty('display');
-    // Remove inline position:relative/absolute added by admin (leave others)
+    // Remove leftover bare position:relative styles added only for admin layout
     clone.querySelectorAll('[style]').forEach(function(el){
-      if(el.style.position==='relative'&&!el.getAttribute('style').replace('position: relative;','').replace('position:relative;','').trim()){
+      var s=el.getAttribute('style')||'';
+      if(!s.trim()||s.replace(/position\s*:\s*relative\s*;?/gi,'').trim()===''){
         el.removeAttribute('style');
       }
     });

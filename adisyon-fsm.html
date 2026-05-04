@@ -670,6 +670,7 @@ const MENU_DEFAULT = {
 };
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
+const SUBE='fsm';
 // Bu sayfa FSM şubesi için. menu-data.json branch-keyed format'a geçtiğinde otomatik 'fsm' dalını seç.
 function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
 function pickBranch(branches){return branches['fsm']||branches['podyum']||branches[Object.keys(branches)[0]];}

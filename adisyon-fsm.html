@@ -617,6 +617,28 @@ input,select{font-family:'Lato',sans-serif;}
 
 <div class="toast" id="toast"></div>
 
+<!-- SADAKAT KARTI PANELI -->
+<div id="kart-overlay" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center;padding:0 12px 24px;" onclick="if(event.target===this)kartPanelKapat()">
+  <div id="kart-panel" style="background:#fff;border-radius:16px 16px 12px 12px;width:100%;max-width:420px;padding:22px 20px 20px;transform:translateY(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);">
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;margin-bottom:6px;">Sadakat Kartı</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:14px;">Müşteri pulunu ekle</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input id="kart-tel" type="tel" inputmode="numeric" placeholder="05XX XXX XX XX" maxlength="11"
+        style="flex:1;padding:11px 12px;border:1.5px solid #e0dbd3;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;outline:none;"
+        onfocus="this.style.borderColor='#b8965a'" onblur="this.style.borderColor='#e0dbd3'"
+        onkeydown="if(event.key==='Enter')kartPulEkle()">
+      <button onclick="kartPulEkle()" id="kart-ekle-btn"
+        style="padding:11px 18px;background:#0e0e0e;color:#fff;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;">
+        +1 Pul
+      </button>
+    </div>
+    <div id="kart-sonuc" style="font-size:12px;min-height:18px;text-align:center;"></div>
+    <button onclick="kartPanelKapat()" style="display:block;width:100%;margin-top:12px;padding:11px;background:none;border:1.5px solid #e0dbd3;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;color:#999;cursor:pointer;">
+      Atla
+    </button>
+  </div>
+</div>
+
 <script>
 const MENU_DEFAULT = {
   sicak:{label:'☕ Sıcak',tip:'icecek',urunler:[
@@ -998,6 +1020,7 @@ function odemeOnayla(){
   }
   renderAdisyon();renderMasalar();
   toast(tip+' — Masa '+oncekiMasa+' ₺'+top+' ödeme alındı');
+  setTimeout(function(){ kartPanelAc(oncekiMasa); }, 600);
 }
 
 function openTransfer(){
@@ -1321,6 +1344,56 @@ function rapOtomatikYenile(aktif){
     _rapAutoRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))rapGoster();},30000);
     _canliRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))renderCanliCiro();},5000);
   }
+}
+
+/* ══════════ SADAKAT KARTI ══════════ */
+var _kartSube = SUBE;
+function kartPanelAc(masa){
+  var ov = document.getElementById('kart-overlay');
+  var panel = document.getElementById('kart-panel');
+  document.getElementById('kart-tel').value = '';
+  document.getElementById('kart-sonuc').textContent = '';
+  document.getElementById('kart-ekle-btn').disabled = false;
+  ov.style.display = 'flex';
+  setTimeout(function(){ panel.style.transform = 'translateY(0)'; }, 20);
+}
+function kartPanelKapat(){
+  var ov = document.getElementById('kart-overlay');
+  var panel = document.getElementById('kart-panel');
+  panel.style.transform = 'translateY(100%)';
+  setTimeout(function(){ ov.style.display = 'none'; }, 350);
+}
+function kartPulEkle(){
+  var tel = document.getElementById('kart-tel').value.replace(/\D/g,'');
+  var sonuc = document.getElementById('kart-sonuc');
+  var btn = document.getElementById('kart-ekle-btn');
+  if(tel.length < 10){ sonuc.style.color='#c0392b'; sonuc.textContent='Geçerli telefon numarası girin.'; return; }
+  btn.disabled = true;
+  sonuc.style.color = '#888';
+  sonuc.textContent = 'Ekleniyor...';
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/ekle', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({telefon: tel, miktar: 1, sube: _kartSube, aciklama: 'Adisyon satın alma'})
+  }).then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d.ok){
+      var m = d.musteri;
+      var pul = m.pul || 0;
+      var esik = 10;
+      var bedava = Math.floor(pul / esik);
+      sonuc.style.color = '#2d7a4f';
+      sonuc.textContent = '✓ Pul eklendi! Toplam: ' + (pul % esik) + '/' + esik + (bedava > 0 ? ' 🎉 '+bedava+' bedava hak!' : '');
+      setTimeout(function(){ kartPanelKapat(); }, 2000);
+    } else {
+      sonuc.style.color = '#c0392b';
+      sonuc.textContent = d.error || 'Hata oluştu.';
+      btn.disabled = false;
+    }
+  }).catch(function(){
+    sonuc.style.color = '#c0392b';
+    sonuc.textContent = 'Bağlantı hatası.';
+    btn.disabled = false;
+  });
 }
 
 let _tt;

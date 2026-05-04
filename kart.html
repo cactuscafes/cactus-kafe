@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0e0e0e">
+<title>Sadakat Kartım — Cactus Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--gold:#b8965a;--dark:#0e0e0e;--cream:#f7f4ef;--border:#e8e2d9;}
+body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--dark);padding:24px 20px;text-align:center;}
+.hdr-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:8px;color:#fff;text-transform:uppercase;}
+.hdr-sub{font-size:9px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-top:3px;}
+
+/* GİRİŞ EKRANI */
+.giris{max-width:420px;margin:0 auto;padding:48px 20px;}
+.giris-baslik{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;text-align:center;margin-bottom:8px;line-height:1.15;}
+.giris-baslik em{font-style:italic;color:var(--gold);}
+.giris-alt{font-size:11px;color:#888;text-align:center;letter-spacing:1px;margin-bottom:36px;line-height:1.7;}
+.giris-form{display:flex;flex-direction:column;gap:12px;}
+.giris-input{padding:15px 16px;border:1.5px solid var(--border);background:#fff;font-family:'Montserrat',sans-serif;font-size:14px;color:var(--dark);outline:none;border-radius:8px;transition:border-color .2s;}
+.giris-input:focus{border-color:var(--gold);}
+.giris-btn{padding:15px;background:var(--dark);color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:background .2s;}
+.giris-btn:hover{background:#333;}
+.giris-btn:disabled{background:#ccc;cursor:default;}
+.giris-hata{font-size:12px;color:#c0392b;text-align:center;padding:8px;}
+
+/* KART EKRANI */
+.kart-wrap{max-width:420px;margin:0 auto;padding:24px 16px 60px;}
+
+/* Dijital kart */
+.dijital-kart{background:linear-gradient(135deg,#0e0e0e 0%,#2a2a2a 100%);border-radius:18px;padding:28px 24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.18);position:relative;overflow:hidden;}
+.dijital-kart::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(184,150,90,.08);}
+.dijital-kart::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(184,150,90,.05);}
+.dk-ust{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+.dk-logo{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:5px;color:#fff;text-transform:uppercase;}
+.dk-tip{font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.dk-ad{font-size:13px;color:#ccc;letter-spacing:1px;margin-bottom:20px;font-weight:300;}
+
+/* Pul ızgarası */
+.pul-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px;}
+.pul{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .3s;background:transparent;}
+.pul.dolu{background:var(--gold);border-color:var(--gold);}
+.pul.dolu::after{content:'☕';}
+.pul.bos::after{content:'';}
+.pul.next{border-color:rgba(184,150,90,.5);animation:pulseNext 1.5s ease-in-out infinite;}
+@keyframes pulseNext{0%,100%{border-color:rgba(184,150,90,.3);}50%{border-color:rgba(184,150,90,.8);}}
+
+.dk-alt{display:flex;justify-content:space-between;align-items:flex-end;}
+.dk-pul-say{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;}
+.dk-pul-lbl{font-size:9px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.dk-hediye{text-align:right;}
+.dk-hediye-no{font-size:11px;color:var(--gold);letter-spacing:1px;}
+.dk-hediye-txt{font-size:9px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+
+/* Bedava hakkı */
+.bedava-banner{background:linear-gradient(135deg,#1a3a1a,#2d5a27);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.bedava-ikon{font-size:28px;flex-shrink:0;}
+.bedava-txt{flex:1;}
+.bedava-baslik{font-size:13px;color:#fff;font-weight:500;margin-bottom:2px;}
+.bedava-alt{font-size:11px;color:rgba(255,255,255,.6);}
+
+/* İstatistik */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-krt{background:#fff;border-radius:10px;padding:16px;text-align:center;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--dark);}
+.stat-lbl{font-size:10px;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+
+/* Geçmiş */
+.gecmis-baslik{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding:0 4px;}
+.gecmis-item{background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.gecmis-ikon{font-size:18px;flex-shrink:0;}
+.gecmis-bilgi{flex:1;}
+.gecmis-acik{font-size:12px;color:var(--dark);font-weight:400;}
+.gecmis-tarih{font-size:10px;color:#aaa;margin-top:2px;}
+.gecmis-miktar{font-size:13px;font-weight:600;}
+.gecmis-miktar.pos{color:#2d7a4f;}
+.gecmis-miktar.neg{color:#c0392b;}
+
+/* Çıkış */
+.cikis-btn{display:block;width:100%;padding:13px;background:none;border:1.5px solid var(--border);color:#aaa;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:8px;margin-top:8px;transition:all .2s;}
+.cikis-btn:hover{border-color:#888;color:var(--dark);}
+
+/* Yükleniyor */
+.yukl{text-align:center;padding:60px 20px;color:#aaa;}
+
+/* Gizle/Göster */
+.sayfa{display:none;}.sayfa.on{display:block;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">CACTUS</div>
+  <div class="hdr-sub">Sadakat Kartı</div>
+</div>
+
+<!-- GİRİŞ SAYFASI -->
+<div class="sayfa on" id="sayfaGiris">
+  <div class="giris">
+    <h1 class="giris-baslik">Her kahve bir<br><em>adım</em> daha yakın</h1>
+    <p class="giris-alt">10 alışverişte 1 bedava içecek.<br>Telefon numaranla giriş yap.</p>
+    <div class="giris-form">
+      <input class="giris-input" id="telInput" type="tel" placeholder="05XX XXX XX XX"
+        inputmode="numeric" maxlength="11" oninput="telFormat(this)" onkeydown="if(event.key==='Enter')girisYap()">
+      <input class="giris-input" id="adInput" type="text" placeholder="Adın (opsiyonel)"
+        onkeydown="if(event.key==='Enter')girisYap()">
+      <button class="giris-btn" id="girisBtn" onclick="girisYap()">Kartımı Gör →</button>
+      <div class="giris-hata" id="girisHata"></div>
+    </div>
+  </div>
+</div>
+
+<!-- KART SAYFASI -->
+<div class="sayfa" id="sayfaKart">
+  <div class="kart-wrap">
+
+    <!-- Dijital kart -->
+    <div class="dijital-kart">
+      <div class="dk-ust">
+        <div><div class="dk-logo">CACTUS</div><div class="dk-tip">Sadakat Kartı</div></div>
+      </div>
+      <div class="dk-ad" id="dkAd">Üye</div>
+      <div class="pul-grid" id="pulGrid"></div>
+      <div class="dk-alt">
+        <div><div class="dk-pul-say" id="dkPulSay">0</div><div class="dk-pul-lbl">Pul</div></div>
+        <div class="dk-hediye"><div class="dk-hediye-no" id="dkHediyeNo">0 hak</div><div class="dk-hediye-txt">Bedava içecek</div></div>
+      </div>
+    </div>
+
+    <!-- Bedava hakkı varsa -->
+    <div class="bedava-banner" id="bedavaBanner" style="display:none">
+      <div class="bedava-ikon">🎉</div>
+      <div class="bedava-txt">
+        <div class="bedava-baslik">Bedava içecek hakkın var!</div>
+        <div class="bedava-alt">Kasiyere göster, içeceğini seç.</div>
+      </div>
+    </div>
+
+    <!-- İstatistik -->
+    <div class="stat-row">
+      <div class="stat-krt">
+        <div class="stat-val" id="statPul">0</div>
+        <div class="stat-lbl">Mevcut pul</div>
+      </div>
+      <div class="stat-krt">
+        <div class="stat-val" id="statToplam">0</div>
+        <div class="stat-lbl">Toplam kazanılan</div>
+      </div>
+    </div>
+
+    <!-- Geçmiş -->
+    <div class="gecmis-baslik">Son İşlemler</div>
+    <div id="gecmisListe"></div>
+
+    <button class="cikis-btn" onclick="cikisYap()">Çıkış Yap</button>
+  </div>
+</div>
+
+<!-- YÜKLENIYOR -->
+<div class="sayfa" id="sayfaYukl">
+  <div class="yukl">⏳ Yükleniyor...</div>
+</div>
+
+<script>
+var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+var ESiK = 10; // 10 pul = 1 bedava
+
+function telFormat(input){
+  var v = input.value.replace(/\D/g,'');
+  input.value = v;
+}
+
+function sayfa(id){
+  document.querySelectorAll('.sayfa').forEach(function(s){s.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+}
+
+function girisYap(){
+  var tel = document.getElementById('telInput').value.replace(/\D/g,'');
+  var ad = document.getElementById('adInput').value.trim();
+  var hata = document.getElementById('girisHata');
+  if(tel.length < 10){ hata.textContent = 'Geçerli bir telefon numarası girin.'; return; }
+  hata.textContent = '';
+  document.getElementById('girisBtn').disabled = true;
+  sayfa('sayfaYukl');
+
+  fetch(API+'/kart/kayit', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({telefon: tel, ad: ad})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d.ok){ throw new Error(d.error||'Hata'); }
+    localStorage.setItem('cactus_kart_tel', tel);
+    kartGoster(d.musteri);
+    kartGecmisCek(tel);
+  })
+  .catch(function(e){
+    sayfa('sayfaGiris');
+    document.getElementById('girisHata').textContent = 'Bağlantı hatası. Tekrar dene.';
+    document.getElementById('girisBtn').disabled = false;
+  });
+}
+
+function kartGecmisCek(tel){
+  fetch(API+'/kart/bak?telefon='+tel)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.ok) gecmisRender(d.gecmis||[]);
+    }).catch(function(){});
+}
+
+function kartGoster(m){
+  sayfa('sayfaKart');
+  var pul = m.pul || 0;
+  var topKaz = m.toplam_kazanilan || 0;
+  var bedavaHak = Math.floor(pul / ESiK);
+  var gosterPul = pul % ESiK;
+
+  document.getElementById('dkAd').textContent = m.ad || ('05**' + (m.telefon||'').slice(-4));
+  document.getElementById('dkPulSay').textContent = gosterPul + '/' + ESiK;
+  document.getElementById('dkHediyeNo').textContent = bedavaHak + ' hak';
+  document.getElementById('statPul').textContent = pul;
+  document.getElementById('statToplam').textContent = topKaz;
+
+  // Bedava banner
+  document.getElementById('bedavaBanner').style.display = bedavaHak > 0 ? 'flex' : 'none';
+
+  // Pul ızgarası (10 pul)
+  var grid = document.getElementById('pulGrid');
+  grid.innerHTML = '';
+  for(var i = 0; i < ESiK; i++){
+    var div = document.createElement('div');
+    if(i < gosterPul) div.className = 'pul dolu';
+    else if(i === gosterPul && gosterPul < ESiK) div.className = 'pul next';
+    else div.className = 'pul bos';
+    grid.appendChild(div);
+  }
+}
+
+function gecmisRender(gecmis){
+  var liste = document.getElementById('gecmisListe');
+  if(!gecmis.length){
+    liste.innerHTML = '<div style="font-size:12px;color:#aaa;text-align:center;padding:20px;">Henüz işlem yok.</div>';
+    return;
+  }
+  liste.innerHTML = gecmis.map(function(g){
+    var ikon = g.tip === 'kazandi' ? '☕' : '🎁';
+    var miktar = g.tip === 'kazandi' ? '+'+g.miktar : '-'+g.miktar;
+    var renk = g.tip === 'kazandi' ? 'pos' : 'neg';
+    var tarih = g.tarih ? new Date(g.tarih).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '';
+    return '<div class="gecmis-item">'
+      +'<div class="gecmis-ikon">'+ikon+'</div>'
+      +'<div class="gecmis-bilgi">'
+      +'<div class="gecmis-acik">'+(g.aciklama||'İşlem')+'</div>'
+      +'<div class="gecmis-tarih">'+tarih+(g.sube?' · '+g.sube:'')+'</div>'
+      +'</div>'
+      +'<div class="gecmis-miktar '+renk+'">'+miktar+' pul</div>'
+      +'</div>';
+  }).join('');
+}
+
+function cikisYap(){
+  localStorage.removeItem('cactus_kart_tel');
+  sayfa('sayfaGiris');
+  document.getElementById('telInput').value = '';
+  document.getElementById('adInput').value = '';
+  document.getElementById('girisBtn').disabled = false;
+}
+
+// Otomatik giriş — daha önce giriş yaptıysa
+(function(){
+  var tel = localStorage.getItem('cactus_kart_tel');
+  if(!tel){ sayfa('sayfaGiris'); return; }
+  sayfa('sayfaYukl');
+  fetch(API+'/kart/bak?telefon='+tel)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.ok){ kartGoster(d.musteri); gecmisRender(d.gecmis||[]); }
+      else { localStorage.removeItem('cactus_kart_tel'); sayfa('sayfaGiris'); }
+    })
+    .catch(function(){ sayfa('sayfaGiris'); });
+})();
+</script>
+</body>
+</html>

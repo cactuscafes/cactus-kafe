@@ -473,9 +473,12 @@ footer{padding:60px 24px 30px;}
 @media(max-width:768px){
   .maps-header{padding:0 24px 40px;}
   .review-btn{margin:4px;font-size:9px;padding:11px 18px;letter-spacing:2px;}
-  .maps-grid{grid-template-columns:1fr;}
-  .map-col-label{padding:16px 24px;}
-  .map-col-footer{padding:12px 24px;}
+  .maps-grid{grid-template-columns:1fr 1fr;}
+  .map-col-label{padding:12px 14px;}
+  .map-col-label p:first-child{font-size:16px!important;}
+  .map-col-label p:last-child{font-size:8px!important;letter-spacing:1px!important;}
+  .map-col-footer{padding:10px 14px;}
+  .maps-grid iframe{height:200px!important;}
   .ig-section{padding:60px 16px;}
   .ig-grid{grid-template-columns:repeat(3,1fr);gap:10px;max-width:100%;}
   .ig-card{padding:28px 10px;}
@@ -628,8 +631,8 @@ footer{padding:60px 24px 30px;}
   footer > div:first-child{grid-template-columns:1fr 1fr!important;}
 }
 @media(max-width:600px){
-  footer{padding:60px 24px 0!important;}
-  footer > div:first-child{grid-template-columns:1fr!important;gap:40px!important;}
+  footer{padding:60px 20px 0!important;}
+  footer > div:first-child{grid-template-columns:1fr 1fr!important;gap:28px!important;}
 }
 </style>
 

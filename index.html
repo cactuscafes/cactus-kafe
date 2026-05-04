@@ -119,7 +119,7 @@ footer{padding:60px 24px 30px;}
 </head>
 <body>
 <!-- INTRO -->
-<div id="introScreen" style="display: none; position: relative;">
+<div id="introScreen">
   <div class="intro-slide on" style="background-image:url('https://images.unsplash.com/photo-1525541616755-4f56dd0a39d2?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
   <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1542662919566-cf60b9e8cb82?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
   <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1649612427727-31f1e184e9e8?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
@@ -659,6 +659,7 @@ function toggleMainNav(){
   if(!s)return;
   if(sessionStorage.getItem('ci')){s.style.display='none';return;}
   sessionStorage.setItem('ci','1');
+  s.style.cssText='position:fixed;inset:0;z-index:99999;overflow:hidden;cursor:pointer;';
   document.body.style.overflow='hidden';
   var slides=s.querySelectorAll('.intro-slide'), i=0, DUR=300;
   var t=setInterval(function(){

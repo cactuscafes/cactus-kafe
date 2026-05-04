@@ -81,14 +81,35 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .spotlight-card{cursor:pointer;}
 
 /* FOOTER */
-footer{background:var(--dark);color:#fff;padding:60px 48px 30px;margin-top:80px;}
-.footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:40px;}
-.footer-logo img{height:48px;width:auto;filter:brightness(0) invert(1);}
-.footer-links{display:flex;gap:32px;}
-.footer-links a{text-decoration:none;color:#888;font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:color .3s;}
-.footer-links a:hover{color:#fff;}
-.footer-bottom{border-top:1px solid #333;padding-top:24px;display:flex;justify-content:space-between;}
-.footer-bottom p{font-size:11px;color:#555;letter-spacing:1px;}
+footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
+.ft-grid{display:grid;grid-template-columns:1.6fr 1fr 1.4fr 1fr;gap:48px;padding-bottom:60px;border-bottom:1px solid #222;}
+.ft-brand-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:8px;text-transform:uppercase;margin-bottom:10px;}
+.ft-brand-tag{font-size:11px;color:#666;letter-spacing:2px;line-height:1.7;margin-bottom:28px;font-weight:300;}
+.ft-social{display:flex;gap:12px;}
+.ft-social a{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #333;color:#888;text-decoration:none;font-size:15px;transition:all .3s;}
+.ft-social a:hover{border-color:#b8965a;color:#b8965a;}
+.ft-col-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#555;margin-bottom:22px;font-weight:600;}
+.ft-links{display:flex;flex-direction:column;gap:12px;}
+.ft-links a{text-decoration:none;color:#888;font-size:12px;letter-spacing:1px;transition:color .3s;font-weight:300;}
+.ft-links a:hover{color:#fff;}
+.ft-branch{margin-bottom:22px;}
+.ft-branch-name{font-size:12px;color:#ccc;font-weight:500;margin-bottom:6px;letter-spacing:1px;}
+.ft-branch-detail{font-size:11px;color:#666;line-height:1.8;font-weight:300;}
+.ft-branch-detail a{color:#666;text-decoration:none;transition:color .2s;}
+.ft-branch-detail a:hover{color:#b8965a;}
+.ft-contact-item{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.ft-contact-icon{font-size:14px;flex-shrink:0;}
+.ft-contact-text{font-size:11px;color:#888;line-height:1.5;font-weight:300;}
+.ft-contact-text a{color:#888;text-decoration:none;transition:color .2s;}
+.ft-contact-text a:hover{color:#b8965a;}
+.ft-wa-btn{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:10px 18px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25d366;text-decoration:none;font-size:11px;letter-spacing:1px;transition:all .3s;}
+.ft-wa-btn:hover{background:rgba(37,211,102,0.2);border-color:rgba(37,211,102,0.5);}
+.ft-bottom{display:flex;justify-content:space-between;align-items:center;padding:20px 0;gap:16px;}
+.ft-copy{font-size:11px;color:#444;letter-spacing:1px;}
+.ft-top-btn{background:none;border:1px solid #333;color:#666;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .3s;font-family:'Montserrat',sans-serif;}
+.ft-top-btn:hover{border-color:#666;color:#fff;}
+@media(max-width:900px){.ft-grid{grid-template-columns:1fr 1fr;gap:36px;}}
+@media(max-width:560px){.ft-grid{grid-template-columns:1fr;gap:28px;}footer{padding:48px 20px 0;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
 
 /* MOBILE */
 .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
@@ -204,18 +225,72 @@ footer{padding:40px 20px 24px;}
 </div>
 
 <footer>
-  <div class="footer-inner">
-    <div class="footer-logo"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776725885776-plqcx3hemz.jpg" alt="Cactus Coffee"></div>
-    <div class="footer-links">
-      <a href="index.html">Ana Sayfa</a>
-      <a href="menu.html">Menü</a>
-      
-      <a href="iletisim.html">İletişim</a>
+  <div class="ft-grid">
+    <!-- Marka -->
+    <div>
+      <div class="ft-brand-name">CACTUS</div>
+      <div class="ft-brand-tag">Specialty coffee & food<br>Bursa, Türkiye</div>
+      <div class="ft-social">
+        <a href="https://instagram.com/cactuscoffeebursa" target="_blank" title="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://wa.me/905555555555" target="_blank" title="WhatsApp">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Sayfalar -->
+    <div>
+      <div class="ft-col-title">Sayfalar</div>
+      <div class="ft-links">
+        <a href="index.html">Ana Sayfa</a>
+        <a href="menu.html">Menü</a>
+        <a href="iletisim.html">İletişim</a>
+        <a href="iletisim.html#basvuru">İş Başvurusu</a>
+      </div>
+    </div>
+
+    <!-- Şubeler -->
+    <div>
+      <div class="ft-col-title">Şubelerimiz</div>
+      <div class="ft-branch">
+        <div class="ft-branch-name">🏙 FSM Şubesi</div>
+        <div class="ft-branch-detail">
+          Fatih Sultan Mehmet Bulvarı<br>Nilüfer, Bursa<br>
+          <a href="https://maps.google.com/?q=Cactus+Coffee+FSM+Nilüfer+Bursa" target="_blank">Haritada Gör →</a>
+        </div>
+      </div>
+      <div class="ft-branch">
+        <div class="ft-branch-name">🌿 Podyumpark Şubesi</div>
+        <div class="ft-branch-detail">
+          Podyumpark AVM, Nilüfer<br>Bursa<br>
+          <a href="https://maps.google.com/?q=Cactus+Coffee+Podyumpark+Nilüfer+Bursa" target="_blank">Haritada Gör →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- İletişim -->
+    <div>
+      <div class="ft-col-title">İletişim</div>
+      <div class="ft-contact-item">
+        <span class="ft-contact-icon">📍</span>
+        <div class="ft-contact-text">Nilüfer, Bursa<br>Türkiye</div>
+      </div>
+      <div class="ft-contact-item">
+        <span class="ft-contact-icon">🕐</span>
+        <div class="ft-contact-text">Her gün<br>08:00 – 23:00</div>
+      </div>
+      <a class="ft-wa-btn" href="https://wa.me/905555555555" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp'tan Yaz
+      </a>
     </div>
   </div>
-  <div class="footer-bottom">
-    <p>© 2025 Cactus Coffee. Tüm hakları saklıdır.</p>
-    <p>Bursa, Türkiye</p>
+
+  <div class="ft-bottom">
+    <p class="ft-copy">© 2025 Cactus Coffee. Tüm hakları saklıdır.</p>
+    <button class="ft-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Yukarı</button>
   </div>
 </footer>
 

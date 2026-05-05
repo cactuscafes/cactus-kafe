@@ -123,6 +123,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
+      <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:#2d7a4f;color:#fff;">📊 Raporlar</button>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
@@ -370,6 +371,24 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
         <div id="rUrun" style="margin-bottom:24px;overflow-x:auto;"></div>
         <div style="font-size:12px;font-weight:600;margin-bottom:10px;">İşlem Detayları</div>
         <div id="rTablo" style="overflow-x:auto;"></div>
+      </div>
+
+      <!-- SADAKAT KARTI -->
+      <div class="panel" id="panel-sadakat">
+        <div class="pttl">🎖 Sadakat Kartı</div>
+        <div class="psub">Kayıtlı müşteriler · 10 pul = 1 bedava içecek</div>
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+          <button onclick="kartListeYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
+          <select id="kartFilter" onchange="kartListeRender()" style="padding:8px 12px;border:1.5px solid var(--stone);font-size:12px;font-family:inherit;background:#fff;">
+            <option value="hepsi">Tüm Müşteriler</option>
+            <option value="bedava">Bedava Hakkı Olanlar</option>
+          </select>
+          <span id="kartSayac" style="font-size:12px;color:var(--mist);"></span>
+        </div>
+        <!-- Özet kartlar -->
+        <div id="kartOzet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
+        <!-- Müşteri listesi -->
+        <div id="kartListesi"></div>
       </div>
 
     </div>
@@ -1723,6 +1742,103 @@ function oncuBtnClick(btn){
     toast('\u2B50 Öne Çıkanlara eklendi! Yayınla\'ya basın.');
   }
   localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+}
+
+/* ══════════ SADAKAT KARTI ══════════ */
+var KART_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _kartVerisi = [];
+
+async function kartListeYukle(){
+  var listEl = document.getElementById('kartListesi');
+  var ozetEl = document.getElementById('kartOzet');
+  var sayacEl = document.getElementById('kartSayac');
+  if(!listEl) return;
+  listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Yükleniyor...</div>';
+  try {
+    var r = await fetch(KART_API + '/kart/listele');
+    _kartVerisi = await r.json();
+    // Badge: bedava hakkı olanlar
+    var bedavaCount = _kartVerisi.filter(function(m){ return m.pul >= 10; }).length;
+    var badge = document.getElementById('sadakatBadge');
+    if(badge){ badge.style.display = bedavaCount > 0 ? 'inline' : 'none'; badge.textContent = bedavaCount; }
+    // Özet
+    var toplam = _kartVerisi.length;
+    var toplamPul = _kartVerisi.reduce(function(s,m){ return s + (m.toplam_kazanilan||0); }, 0);
+    ozetEl.innerHTML = [
+      {label:'Kayıtlı Müşteri', val: toplam},
+      {label:'Bedava Hakkı Olan', val: bedavaCount, hl: bedavaCount > 0},
+      {label:'Toplam Kazanılan Pul', val: toplamPul}
+    ].map(function(k){
+      return '<div class="kart" style="text-align:center;'+(k.hl?'border-color:var(--gold);':'')+'">'
+        +'<div style="font-size:24px;font-weight:700;font-family:\'Cormorant Garamond\',serif;color:'+(k.hl?'var(--gold)':'var(--ink)')+'">' + k.val + '</div>'
+        +'<div style="font-size:11px;color:var(--mist);letter-spacing:1px;margin-top:2px;">' + k.label + '</div>'
+        +'</div>';
+    }).join('');
+    sayacEl.textContent = toplam + ' müşteri';
+    kartListeRender();
+  } catch(e){
+    listEl.innerHTML = '<div style="color:var(--rd);font-size:13px;padding:20px 0;">Yüklenemedi: ' + e.message + '</div>';
+  }
+}
+
+function kartListeRender(){
+  var listEl = document.getElementById('kartListesi');
+  if(!listEl) return;
+  var filtre = document.getElementById('kartFilter') ? document.getElementById('kartFilter').value : 'hepsi';
+  var data = filtre === 'bedava' ? _kartVerisi.filter(function(m){ return m.pul >= 10; }) : _kartVerisi;
+  if(!data.length){
+    listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
+    return;
+  }
+  listEl.innerHTML = '<table><thead><tr>'
+    + '<th>Telefon</th><th>Ad</th><th style="text-align:center">Pul</th>'
+    + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th></th>'
+    + '</tr></thead><tbody>'
+    + data.map(function(m){
+        var bedava = m.pul >= 10;
+        var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+        var pulBar = '';
+        for(var i=0;i<10;i++){
+          pulBar += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:1px;background:'+(i<(m.pul%10)?'var(--gold)':'#e0dbd3')+';"></span>';
+        }
+        return '<tr style="'+(bedava?'background:rgba(184,150,90,.06);':'')+'">'
+          + '<td style="font-weight:600;">' + m.telefon + '</td>'
+          + '<td style="color:var(--mist);">' + (m.ad||'—') + '</td>'
+          + '<td style="text-align:center;">'
+            + '<div style="font-size:16px;font-weight:700;color:'+(bedava?'var(--gold)':'var(--ink)')+'">' + m.pul + '</div>'
+            + '<div>' + pulBar + '</div>'
+          + '</td>'
+          + '<td style="text-align:center;color:var(--mist);">' + (m.toplam_kazanilan||0) + '</td>'
+          + '<td style="color:var(--mist);font-size:12px;">' + sonIslem + '</td>'
+          + '<td style="color:var(--mist);font-size:11px;">' + (m.sube||'—') + '</td>'
+          + '<td>'
+            + (bedava
+              ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="padding:6px 14px;background:var(--gold);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;border-radius:4px;white-space:nowrap;">✓ Bedavayı Kullandı</button>'
+              : '<span style="font-size:11px;color:#ccc;">' + (10 - m.pul) + ' pul kaldı</span>')
+          + '</td>'
+          + '</tr>';
+      }).join('')
+    + '</tbody></table>';
+}
+
+async function kartSifirla(telefon){
+  if(!confirm(telefon + ' numaralı müşterinin bedava içeceğini kullandı olarak işaretlensin mi?\n(10 pul düşülecek)')) return;
+  try {
+    var r = await fetch(KART_API + '/kart/kullan', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({telefon: telefon, esik: 10, aciklama: 'Admin — bedava içecek kullanıldı'})
+    });
+    var d = await r.json();
+    if(d.ok){
+      toast('✓ Bedava içecek kullanıldı. Kalan pul: ' + d.musteri.pul);
+      await kartListeYukle();
+    } else {
+      toast('Hata: ' + (d.error || 'Bilinmeyen hata'));
+    }
+  } catch(e){
+    toast('Bağlantı hatası.');
+  }
 }
 </script>
 

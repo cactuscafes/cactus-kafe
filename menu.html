@@ -112,7 +112,7 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 @media(max-width:560px){.ft-grid{grid-template-columns:1fr;gap:28px;}footer{padding:48px 20px 0;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
 
 /* SADAKAT KARTI BANNER */
-.sk-banner{background:#0e0e0e;padding:56px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;border-top:1px solid #1a1a1a;}
+.sk-banner{background:#0e0e0e;padding:56px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;}
 .sk-banner-left{max-width:520px;}
 .sk-banner-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#b8965a;margin-bottom:14px;}
 .sk-banner-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3.5vw,38px);font-weight:300;color:#f4f1eb;line-height:1.2;margin-bottom:12px;}
@@ -194,6 +194,7 @@ footer{padding:40px 20px 24px;}
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
     <a href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">İletişim</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
     <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#b8965a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
@@ -206,6 +207,7 @@ footer{padding:40px 20px 24px;}
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Ana Sayfa</a>
   <a href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">İletişim</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
   <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#b8965a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
@@ -220,27 +222,6 @@ footer{padding:40px 20px 24px;}
   <p class="menu-header-eyebrow">Cactus Coffee</p>
   <h1 class="menu-header-title">C | <em>Menü</em></h1>
   <p class="menu-header-sub">FSM Şubesi &nbsp;·&nbsp; Podyumpark Şubesi</p>
-</div>
-
-<div class="sube-tabs">
-  <button class="sube-tab on" onclick="subeGoster('fsm',this)">🏙 FSM Şubesi</button>
-  <button class="sube-tab" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
-</div>
-
-<div id="menu-fsm">
-  <div class="spotlight" id="spotlight-fsm">
-    <p class="spotlight-title">Öne Çıkanlar</p>
-    <div class="spotlight-grid" id="spotlight-grid-fsm"></div>
-  </div>
-  <div class="cat-list" id="cat-list-fsm"></div>
-</div>
-
-<div id="menu-podyum" style="display:none;">
-  <div class="spotlight" id="spotlight-podyum">
-    <p class="spotlight-title">Öne Çıkanlar</p>
-    <div class="spotlight-grid" id="spotlight-grid-podyum"></div>
-  </div>
-  <div class="cat-list" id="cat-list-podyum"></div>
 </div>
 
 <!-- SADAKAT KARTI BANNER -->
@@ -267,6 +248,27 @@ footer{padding:40px 20px 24px;}
     <div class="sk-stamp-label">7 / 10 pul</div>
   </div>
 </section>
+
+<div class="sube-tabs">
+  <button class="sube-tab on" onclick="subeGoster('fsm',this)">🏙 FSM Şubesi</button>
+  <button class="sube-tab" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
+</div>
+
+<div id="menu-fsm">
+  <div class="spotlight" id="spotlight-fsm">
+    <p class="spotlight-title">Öne Çıkanlar</p>
+    <div class="spotlight-grid" id="spotlight-grid-fsm"></div>
+  </div>
+  <div class="cat-list" id="cat-list-fsm"></div>
+</div>
+
+<div id="menu-podyum" style="display:none;">
+  <div class="spotlight" id="spotlight-podyum">
+    <p class="spotlight-title">Öne Çıkanlar</p>
+    <div class="spotlight-grid" id="spotlight-grid-podyum"></div>
+  </div>
+  <div class="cat-list" id="cat-list-podyum"></div>
+</div>
 
 <footer>
   <div class="ft-grid">

@@ -111,6 +111,25 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 @media(max-width:900px){.ft-grid{grid-template-columns:1fr 1fr;gap:36px;}}
 @media(max-width:560px){.ft-grid{grid-template-columns:1fr;gap:28px;}footer{padding:48px 20px 0;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
 
+/* SADAKAT KARTI BANNER */
+.sk-banner{background:#0e0e0e;padding:56px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;border-top:1px solid #1a1a1a;}
+.sk-banner-left{max-width:520px;}
+.sk-banner-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#b8965a;margin-bottom:14px;}
+.sk-banner-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3.5vw,38px);font-weight:300;color:#f4f1eb;line-height:1.2;margin-bottom:12px;}
+.sk-banner-title em{font-style:italic;color:#b8965a;}
+.sk-banner-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:28px;}
+.sk-banner-cta{display:inline-block;padding:13px 32px;background:#b8965a;color:#0e0e0e;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-decoration:none;transition:background .2s;}
+.sk-banner-cta:hover{background:#d4ae72;}
+.sk-stamp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;flex-shrink:0;}
+.sk-stamp{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.sk-stamp.dolu{background:rgba(184,150,90,.18);border:1.5px solid #b8965a;}
+.sk-stamp.bos{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);}
+.sk-stamp-label{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-top:14px;text-align:center;}
+@keyframes skPulse{0%,100%{box-shadow:0 0 0 0 rgba(184,150,90,.5);}60%{box-shadow:0 0 0 8px rgba(184,150,90,0);}}
+.sk-stamp.next{background:rgba(184,150,90,.08);border:1.5px dashed #b8965a;animation:skPulse 2s ease-in-out infinite;}
+@media(max-width:900px){.sk-banner{flex-direction:column;align-items:flex-start;padding:48px 40px;}.sk-stamp-grid{grid-template-columns:repeat(5,1fr);}}
+@media(max-width:560px){.sk-banner{padding:40px 20px;}.sk-stamp{width:38px;height:38px;font-size:14px;}.sk-stamp-grid{gap:8px;}}
+
 /* MOBILE */
 .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
 .nav-burger span{display:block;width:22px;height:1.5px;background:var(--dark);transition:all .3s;}
@@ -223,6 +242,31 @@ footer{padding:40px 20px 24px;}
   </div>
   <div class="cat-list" id="cat-list-podyum"></div>
 </div>
+
+<!-- SADAKAT KARTI BANNER -->
+<section class="sk-banner">
+  <div class="sk-banner-left">
+    <div class="sk-banner-eyebrow">Dijital Sadakat Kartı</div>
+    <h2 class="sk-banner-title">10 kahve, 1 tanesi<br><em>bizden.</em></h2>
+    <p class="sk-banner-sub">Her siparişinde pul kazan. 10 pul doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
+    <a href="kart.html" class="sk-banner-cta">Kartımı Gör →</a>
+  </div>
+  <div>
+    <div class="sk-stamp-grid">
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp dolu">☕</div>
+      <div class="sk-stamp next">☕</div>
+      <div class="sk-stamp bos"></div>
+      <div class="sk-stamp bos"></div>
+    </div>
+    <div class="sk-stamp-label">7 / 10 pul</div>
+  </div>
+</section>
 
 <footer>
   <div class="ft-grid">

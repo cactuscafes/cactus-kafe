@@ -212,6 +212,12 @@
           "aciklama": "",
           "tip": "ic",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777375716618-599qlwifnbf.jpg"
+        },
+        {
+          "id": "sicak_1777999877610",
+          "ad": "servis ücreti",
+          "fiyat": 40,
+          "emoji": "☕"
         }
       ]
     },

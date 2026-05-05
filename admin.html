@@ -392,11 +392,9 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
           </div>
           <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
           <div style="background:var(--paper);border:1px solid var(--stone);padding:12px 16px;font-size:11px;color:var(--mist);line-height:1.8;margin-top:8px;">
-            <strong style="color:var(--ink);">Kurulum (tek seferlik):</strong><br>
-            1. <a href="https://resend.com" target="_blank" style="color:var(--gold);">resend.com</a>'da ücretsiz hesap aç → API key al<br>
-            2. Terminalde: <code style="background:#eee;padding:1px 5px;">cd /tmp/rapor-worker && npx wrangler secret put RESEND_API_KEY</code><br>
-            3. Otomatik gönderim için: <code style="background:#eee;padding:1px 5px;">npx wrangler secret put RAPOR_EMAIL</code> (alıcı adres)<br>
-            4. Domain doğrulaması için Resend panelinde <strong>cactuscafes.com</strong> ekle
+            <strong style="color:var(--ink);">Kurulum (tek seferlik) — Terminalde çalıştırın:</strong><br>
+            <code style="background:#eee;padding:2px 8px;display:inline-block;margin-top:4px;color:var(--ink);font-size:11px;">bash /tmp/setup-email.sh</code><br>
+            <span style="display:block;margin-top:6px;">Script Resend.com'u açar, API key'i sorar ve her şeyi otomatik kurar.</span>
           </div>
         </div>
       </div>

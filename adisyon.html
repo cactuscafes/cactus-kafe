@@ -979,6 +979,7 @@ function odemeOnayla(){
   const ic=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   const yi=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
+  const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
   let nakitTutar=0,kartTutar=0;
   if(seciliOdemeTipi==='bolunmus'){
     nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
@@ -1014,7 +1015,7 @@ function odemeOnayla(){
   renderAdisyon();renderMasalar();
   toast(tip+' — Masa '+oncekiMasa+' ₺'+top+' ödeme alındı');
   // Sadakat kartı pul paneli — opsiyonel
-  setTimeout(function(){ kartPanelAc(oncekiMasa, icSayisi); }, 600);
+  setTimeout(function(){ kartPanelAc(oncekiMasa, icSayisi, icUrunler); }, 600);
 }
 
 function openTransfer(){
@@ -1342,8 +1343,10 @@ function rapOtomatikYenile(aktif){
 /* ══════════ SADAKAT KARTI ══════════ */
 var _kartSube = SUBE;
 var _kartIcSayisi = 0;
-function kartPanelAc(masa, icSayisi){
+var _kartIcUrunler = [];
+function kartPanelAc(masa, icSayisi, icUrunler){
   _kartIcSayisi = icSayisi || 0;
+  _kartIcUrunler = icUrunler || [];
   var ov = document.getElementById('kart-overlay');
   var panel = document.getElementById('kart-panel');
   var liste = document.getElementById('kart-kisi-list');
@@ -1365,29 +1368,41 @@ function kartPanelKapat(){
 function kartKisiEkle(){
   var liste = document.getElementById('kart-kisi-list');
   var idx = liste.children.length + 1;
+  // içecek seçenekleri
+  var opts = _kartIcUrunler.length
+    ? _kartIcUrunler.map(function(u){ return '<option value="'+u+'">'+u+'</option>'; }).join('')
+    : '<option value="İçecek">İçecek</option>';
   var row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:7px;align-items:center;';
-  row.innerHTML = '<span style="font-size:10px;color:#bbb;width:16px;text-align:center;flex-shrink:0;">'+idx+'</span>'
+  row.style.cssText = 'border:1.5px solid #e0dbd3;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;';
+  row.innerHTML = '<div style="display:flex;gap:8px;align-items:center;">'
+    + '<span style="font-size:10px;color:#b8965a;font-weight:600;min-width:14px;">'+idx+'</span>'
+    + '<select style="flex:1;padding:5px 8px;border:1px solid #e8e3db;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;color:#555;background:#faf8f5;outline:none;">'+opts+'</select>'
+    + '</div>'
+    + '<div style="display:flex;gap:7px;align-items:center;">'
     + '<input type="tel" inputmode="numeric" placeholder="05XX XXX XX XX" maxlength="11"'
-    + ' style="flex:1;padding:9px 10px;border:1.5px solid #e0dbd3;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:13px;outline:none;"'
+    + ' style="flex:1;padding:8px 10px;border:1.5px solid #e0dbd3;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:13px;outline:none;"'
     + ' onfocus="this.style.borderColor=\'#b8965a\'" onblur="this.style.borderColor=\'#e0dbd3\'"'
     + ' onkeydown="if(event.key===\'Enter\')kartPulEkleRow(this.nextElementSibling)">'
-    + '<button onclick="kartPulEkleRow(this)" style="padding:9px 13px;background:#0e0e0e;color:#fff;border:none;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;white-space:nowrap;">+1 Pul</button>'
-    + '<span style="font-size:11px;min-width:50px;color:#888;"></span>';
+    + '<button onclick="kartPulEkleRow(this)" style="padding:8px 13px;background:#0e0e0e;color:#fff;border:none;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;white-space:nowrap;">+1 Pul</button>'
+    + '<span style="font-size:11px;min-width:46px;color:#888;text-align:right;"></span>'
+    + '</div>';
   liste.appendChild(row);
-  row.querySelector('input').focus();
+  row.querySelector('input[type="tel"]').focus();
 }
 function kartPulEkleRow(btn){
-  var row = btn.parentElement;
-  var input = row.querySelector('input');
-  var sonucSpan = row.querySelector('span:last-child');
+  var wrap = btn.parentElement;
+  var row = wrap.parentElement;
+  var input = wrap.querySelector('input[type="tel"]');
+  var sel = row.querySelector('select');
+  var sonucSpan = wrap.querySelector('span');
   var tel = input.value.replace(/\D/g,'');
+  var icecekAdi = sel ? sel.value : 'İçecek';
   if(tel.length < 10){ sonucSpan.style.color='#c0392b'; sonucSpan.textContent='Geçersiz'; return; }
-  btn.disabled = true; input.disabled = true;
+  btn.disabled = true; input.disabled = true; if(sel) sel.disabled = true;
   sonucSpan.style.color = '#888'; sonucSpan.textContent = '...';
   fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/ekle', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({telefon: tel, miktar: 1, sube: _kartSube, aciklama: 'Adisyon satın alma'})
+    body: JSON.stringify({telefon: tel, miktar: 1, sube: _kartSube, aciklama: icecekAdi})
   }).then(function(r){ return r.json(); })
   .then(function(d){
     if(d.ok){
@@ -1396,11 +1411,11 @@ function kartPulEkleRow(btn){
       sonucSpan.textContent = '✓ '+(pul%esik)+'/'+esik+(bedava>0?' 🎉':'');
     } else {
       sonucSpan.style.color='#c0392b'; sonucSpan.textContent=d.error||'Hata';
-      btn.disabled=false; input.disabled=false;
+      btn.disabled=false; input.disabled=false; if(sel) sel.disabled=false;
     }
   }).catch(function(){
     sonucSpan.style.color='#c0392b'; sonucSpan.textContent='Hata';
-    btn.disabled=false; input.disabled=false;
+    btn.disabled=false; input.disabled=false; if(sel) sel.disabled=false;
   });
 }
 

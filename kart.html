@@ -33,20 +33,20 @@
 body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--latte);min-height:100vh;overflow-x:hidden;}
 
 /* ── NAV ── */
-#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(11,26,7,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(200,168,106,.12);}
-#mainNav a.logo{text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:var(--latte);text-transform:uppercase;}
+#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
+#mainNav a.logo{text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;}
 .nav-links{display:flex;gap:32px;align-items:center;}
-.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(245,234,216,.6);font-family:'Montserrat',sans-serif;font-weight:400;transition:color .2s;}
-.nav-links a:hover{color:var(--latte);}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;transition:color .2s;}
+.nav-links a:hover{color:var(--amber);}
 .nav-links a.aktif{color:var(--amber);}
-.nav-links a.nav-cta{background:var(--amber);color:var(--espresso);padding:9px 18px;font-weight:600;}
-.nav-links a.nav-cta:hover{background:var(--amber2);color:var(--espresso);}
+.nav-links a.nav-cta{background:var(--amber);color:#fff;padding:9px 18px;font-weight:600;}
+.nav-links a.nav-cta:hover{background:var(--amber2);color:#fff;}
 #mainBurger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
-#mainBurger span{width:24px;height:1.5px;background:var(--latte);display:block;transition:all .3s;}
-#mainMobMenu{display:none;position:fixed;inset:0;background:rgba(26,12,4,.98);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
-#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:rgba(245,234,216,.7);font-family:'Montserrat',sans-serif;transition:color .2s;}
+#mainBurger span{width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;}
+#mainMobMenu{display:none;position:fixed;inset:0;background:rgba(255,255,255,.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
+#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;transition:color .2s;}
 #mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber);}
-#mainMobMenu a.nav-cta{background:var(--amber);color:var(--espresso);padding:14px 36px;font-weight:700;}
+#mainMobMenu a.nav-cta{background:var(--amber);color:#fff;padding:14px 36px;font-weight:700;}
 @media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
 
 /* ── GİRİŞ HERO ── */

@@ -371,6 +371,34 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
         <div id="rUrun" style="margin-bottom:24px;overflow-x:auto;"></div>
         <div style="font-size:12px;font-weight:600;margin-bottom:10px;">İşlem Detayları</div>
         <div id="rTablo" style="overflow-x:auto;"></div>
+
+        <!-- E-POSTA RAPORU -->
+        <div style="margin-top:32px;border-top:1.5px solid var(--stone);padding-top:24px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Haftalık Raporu E-Posta ile Gönder</div>
+          <div style="font-size:12px;color:var(--mist);margin-bottom:16px;">Resend API ile şimdi gönderin veya her Pazartesi 08:00'de otomatik gönderilir.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+            <div style="flex:1;min-width:220px;">
+              <label class="lbl">Alıcı E-posta</label>
+              <input id="emailAlici" class="yi" type="email" placeholder="ornek@mail.com" style="width:100%;">
+            </div>
+            <div style="min-width:150px;">
+              <label class="lbl">Dönem</label>
+              <select id="emailDonem" class="yi" style="width:100%;">
+                <option value="gecen-hafta">Geçen Hafta</option>
+                <option value="bu-hafta">Bu Hafta</option>
+              </select>
+            </div>
+            <button onclick="emailGonder()" id="emailBtn" style="padding:9px 20px;background:#b8965a;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Şimdi Gönder</button>
+          </div>
+          <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
+          <div style="background:var(--paper);border:1px solid var(--stone);padding:12px 16px;font-size:11px;color:var(--mist);line-height:1.8;margin-top:8px;">
+            <strong style="color:var(--ink);">Kurulum (tek seferlik):</strong><br>
+            1. <a href="https://resend.com" target="_blank" style="color:var(--gold);">resend.com</a>'da ücretsiz hesap aç → API key al<br>
+            2. Terminalde: <code style="background:#eee;padding:1px 5px;">cd /tmp/rapor-worker && npx wrangler secret put RESEND_API_KEY</code><br>
+            3. Otomatik gönderim için: <code style="background:#eee;padding:1px 5px;">npx wrangler secret put RAPOR_EMAIL</code> (alıcı adres)<br>
+            4. Domain doğrulaması için Resend panelinde <strong>cactuscafes.com</strong> ekle
+          </div>
+        </div>
       </div>
 
       <!-- SADAKAT KARTI -->
@@ -1743,6 +1771,42 @@ function oncuBtnClick(btn){
   }
   localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
 }
+
+/* ══════════ HAFTALIK E-POSTA ══════════ */
+async function emailGonder(){
+  var alici = document.getElementById('emailAlici').value.trim();
+  var donem = document.getElementById('emailDonem').value;
+  var sonuc = document.getElementById('emailSonuc');
+  var btn   = document.getElementById('emailBtn');
+  if(!alici){ sonuc.style.color='var(--rd)'; sonuc.textContent='⚠️ Alıcı e-posta adresi girin.'; return; }
+  btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
+  sonuc.style.color = 'var(--mist)'; sonuc.textContent = '';
+  try {
+    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/haftalik-gonder', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email: alici, donem: donem})
+    });
+    var d = await r.json();
+    if(d.ok){
+      sonuc.style.color = '#2d7a4f';
+      sonuc.textContent = '✓ E-posta gönderildi → ' + d.alici;
+      localStorage.setItem('cactus_rapor_email', alici);
+    } else {
+      sonuc.style.color = 'var(--rd)';
+      sonuc.textContent = '✗ ' + (d.error || 'Hata oluştu');
+    }
+  } catch(e){
+    sonuc.style.color = 'var(--rd)';
+    sonuc.textContent = '✗ Bağlantı hatası: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '📨 Şimdi Gönder';
+}
+// Önceden kaydedilmiş e-postayı yükle
+document.addEventListener('DOMContentLoaded', function(){
+  var saved = localStorage.getItem('cactus_rapor_email');
+  if(saved){ var el=document.getElementById('emailAlici'); if(el) el.value=saved; }
+});
 
 /* ══════════ SADAKAT KARTI ══════════ */
 var KART_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';

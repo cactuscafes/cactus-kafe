@@ -89,6 +89,67 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 .modal-iptal{flex:1;padding:12px;background:#fff;border:1.5px solid var(--stone);font-size:13px;cursor:pointer;font-family:inherit;}
 .modal-durum{font-size:13px;padding:10px;background:var(--paper);margin-top:12px;display:none;}
 .modal-durum.on{display:block;}
+
+/* ── Hamburger ── */
+.nav-ham{display:none;background:none;border:none;cursor:pointer;padding:8px;margin-left:-4px;}
+.nav-ham span{display:block;width:20px;height:2px;background:#fff;margin:4px 0;border-radius:2px;transition:.25s;}
+
+/* ── Sidebar overlay backdrop ── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:85;}
+.sb-overlay.on{display:block;}
+
+/* ── Müşteri kart (mobil sadakat listesi) ── */
+.mob-musteri-kart{background:#fff;border:1.5px solid var(--stone);padding:16px;border-radius:6px;}
+.mob-musteri-kart.bedava{border-color:var(--gold);}
+
+@media(max-width:768px){
+  /* Nav */
+  .nav{padding:0 14px;}
+  .nav-ham{display:block;}
+  .nav-logo{font-size:14px;letter-spacing:1px;}
+  .btn-yayinla{font-size:10px;padding:6px 10px;letter-spacing:.5px;}
+  .btn-cikis{font-size:10px;padding:6px 8px;}
+
+  /* Sidebar → fixed off-canvas drawer */
+  .wrap{grid-template-columns:1fr;}
+  .sb{
+    position:fixed;top:52px;left:-270px;bottom:0;
+    width:270px;z-index:90;overflow-y:auto;
+    transition:left .26s ease;
+    box-shadow:4px 0 24px rgba(0,0,0,.12);
+  }
+  .sb.mob-open{left:0;}
+
+  /* Main content */
+  .main{padding:14px;}
+  .pttl{font-size:21px;}
+  .psub{font-size:11px;}
+
+  /* Grids */
+  .urun-grid{grid-template-columns:1fr!important;}
+  .oncu-grid{grid-template-columns:repeat(2,1fr)!important;}
+  .rap-grid{grid-template-columns:repeat(2,1fr)!important;}
+  #kartOzet{grid-template-columns:1fr 1fr 1fr!important;}
+
+  /* Table overflow */
+  #rUrun,#rTablo{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+  /* Report date filters */
+  #rBas,#rBit,#rOd{width:100%!important;}
+
+  /* Başvuru kartlar stack */
+  .bsv-kart{flex-direction:column!important;}
+  .bsv-actions{flex-direction:row!important;flex-wrap:wrap;}
+
+  /* Toast */
+  .toast{right:12px;left:12px;bottom:12px;text-align:center;}
+
+  /* Modal */
+  .modal{padding:24px 18px;}
+
+  /* Giris kart */
+  .giris-kart{padding:32px 24px;}
+}
 </style>
 </head>
 <body>
@@ -108,14 +169,20 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 
 <div id="admin" style="display:none">
   <nav class="nav">
-    <div class="nav-logo">🌵 CACTUS Admin</div>
-    <div style="display:flex;gap:10px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="nav-ham" id="navHam" onclick="mobSbToggle()" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-logo">🌵 CACTUS Admin</div>
+    </div>
+    <div style="display:flex;gap:8px;">
       <button class="nav-btn btn-yayinla" onclick="modalAc()">🚀 Yayınla</button>
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
   </nav>
   <div class="wrap">
-    <div class="sb">
+    <div class="sb-overlay" id="sbOverlay" onclick="mobSbKapat()"></div>
+    <div class="sb" id="mainSb">
       <div class="sb-ttl">Yönetim</div>
       <button class="sb-btn on" onclick="panelAc('menu',this)">📋 Menü</button>
       <button class="sb-btn" onclick="panelAc('kategori',this)">🗂 Kategoriler</button>
@@ -588,11 +655,21 @@ function basla(){
     })
     .catch(function(e){console.warn('GitHub menü yükleme hatası:',e);});
 }
+function mobSbToggle(){
+  document.getElementById('mainSb').classList.toggle('mob-open');
+  document.getElementById('sbOverlay').classList.toggle('on');
+}
+function mobSbKapat(){
+  document.getElementById('mainSb').classList.remove('mob-open');
+  document.getElementById('sbOverlay').classList.remove('on');
+}
+
 function panelAc(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('panel-'+id).classList.add('on');
   el.classList.add('on');
+  mobSbKapat(); // mobilde drawer'ı kapat
   if(id==='kategori') renderKatListe();
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
@@ -1852,6 +1929,45 @@ function kartListeRender(){
     listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
     return;
   }
+
+  // ── Mobil: kart görünümü ──
+  if(window.innerWidth < 700){
+    listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'
+      + data.map(function(m){
+          var bedava = m.pul >= 10;
+          var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+          var pulBar = '';
+          for(var i=0;i<10;i++){
+            pulBar += '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;margin:2px;background:'+(i<(m.pul%10)?'var(--gold)':'#e8e4de')+';"></span>';
+          }
+          var mJson = encodeURIComponent(JSON.stringify(m));
+          return '<div class="mob-musteri-kart'+(bedava?' bedava':'')+'">'
+            + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">'
+              + '<div>'
+                + '<div style="font-size:15px;font-weight:600;">' + (m.ad||'—') + '</div>'
+                + '<div style="font-size:12px;color:var(--mist);margin-top:2px;">' + m.telefon + (m.sube?' · '+m.sube:'') + '</div>'
+              + '</div>'
+              + '<div style="text-align:right;">'
+                + '<div style="font-size:26px;font-weight:700;line-height:1;color:'+(bedava?'var(--gold)':'var(--ink)');'">'+ m.pul +'</div>'
+                + '<div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mist);margin-top:2px;">'+(bedava?'BEDAVA HAKKI VAR':'pul')+'</div>'
+              + '</div>'
+            + '</div>'
+            + '<div style="margin-bottom:8px;">'+ pulBar +'</div>'
+            + '<div style="font-size:11px;color:var(--mist);margin-bottom:12px;">Toplam '+(m.toplam_kazanilan||0)+' pul · Son: '+sonIslem+'</div>'
+            + '<div style="display:flex;gap:8px;">'
+              + (bedava
+                ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="flex:1;padding:10px 8px;background:var(--gold);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border-radius:4px;">✓ Bedavayı Kullandı</button>'
+                : '<div style="flex:1;padding:10px 8px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;color:var(--mist);text-align:center;border-radius:4px;">'+(10-m.pul)+' pul kaldı</div>')
+              + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:10px 14px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✎</button>'
+              + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:10px 14px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✕</button>'
+            + '</div>'
+          + '</div>';
+        }).join('')
+      + '</div>';
+    return;
+  }
+
+  // ── Masaüstü: tablo görünümü ──
   listEl.innerHTML = '<table><thead><tr>'
     + '<th>Telefon</th><th>Ad</th><th style="text-align:center">Pul</th>'
     + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'

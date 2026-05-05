@@ -203,7 +203,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
           inputmode="numeric" maxlength="11" oninput="telFormat(this)" onkeydown="if(event.key==='Enter')girisYap()">
         <input class="giris-input" id="adInput" type="text" placeholder="Adın (ilk kez için)"
           onkeydown="if(event.key==='Enter')girisYap()">
-        <button class="giris-btn" id="girisBtn" onclick="girisYap()">Kartımı Gör →</button>
+        <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Gör →</button>
         <div class="giris-hata" id="girisHata"></div>
       </div>
     </div>
@@ -311,7 +311,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
 var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
 var ESIK = 10;
 
-function telFormat(input){input.value=input.value.replace(/\D/g,'');}
+function telFormat(input){
+  input.value=input.value.replace(/\D/g,'');
+  var btn=document.getElementById('girisBtn');
+  if(btn) btn.disabled=input.value.length!==11;
+}
 
 function sayfa(id){
   document.querySelectorAll('.sayfa').forEach(function(s){s.classList.remove('on');});
@@ -322,7 +326,7 @@ function girisYap(){
   var tel=document.getElementById('telInput').value.replace(/\D/g,'');
   var ad=document.getElementById('adInput').value.trim();
   var hata=document.getElementById('girisHata');
-  if(tel.length<10){hata.textContent='Geçerli bir telefon numarası girin.';return;}
+  if(tel.length!==11||!tel.startsWith('0')){hata.textContent='Lütfen 11 haneli numaranı gir (05XX XXX XX XX).';return;}
   hata.textContent='';
   document.getElementById('girisBtn').disabled=true;
   sayfa('sayfaYukl');

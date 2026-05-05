@@ -21,7 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Montserrat:wght@300;400;500&amp;display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#b8965a;--dark:#1a1a1a;--light:#f8f6f2;}
+:root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;}
 body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
 
 /* NAV */
@@ -122,37 +122,21 @@ footer{padding:60px 24px 30px;}
 }
 
 
-/* ── INTRO SCREEN ── */
-#introScreen{position:fixed;inset:0;z-index:99999;overflow:hidden;cursor:pointer;}
-#introScreen.out{opacity:0;transition:opacity .9s ease;pointer-events:none;}
-.intro-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .3s ease;will-change:opacity;}
-.intro-slide.on{opacity:1;}
-.intro-veil{position:absolute;inset:0;background:rgba(0,0,0,.18);z-index:1;}
-
 </style>
 </head>
 <body>
-<!-- INTRO -->
-<div id="introScreen">
-  <div class="intro-slide on" style="background-image:url('https://images.unsplash.com/photo-1525541616755-4f56dd0a39d2?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1542662919566-cf60b9e8cb82?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1649612427727-31f1e184e9e8?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1553550804-882a79f33e44?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1762657440642-e60095d29d93?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-slide" style="background-image:url('https://images.unsplash.com/photo-1609810074355-29137827b2c4?auto=format&amp;fit=crop&amp;w=1920&amp;q=85')"><div class="intro-zoom"></div></div>
-  <div class="intro-veil"></div>
-</div>
+
 
 
 
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
   <a href="index.html" style="text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
-    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
+    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
     <a href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#b8965a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
     <span id="bs1" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
@@ -164,8 +148,8 @@ footer{padding:60px 24px 30px;}
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Ana Sayfa</a>
   <a href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#b8965a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
 @media(max-width:768px){
@@ -174,226 +158,19 @@ footer{padding:60px 24px 30px;}
   #mainBurger{display:flex!important;}
 }
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Montserrat:wght@300;400;500&amp;display=swap" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Montserrat:wght@300;400;500&amp;display=swap" rel="stylesheet"><style>#as-wrap{} 
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#b8965a;--dark:#1a1a1a;--light:#f8f6f2;}
-body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.98);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);}
-.nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
-.nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
-.nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
-.nav-links{display:flex!important;gap:40px;list-style:none;visibility:visible!important;opacity:1!important;} .nav-links a{color:var(--dark)!important;opacity:1!important;}
-.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dark);font-weight:400;transition:color .3s;}
-.nav-links a:hover{color:var(--gold);}
-.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
-.nav-burger span{width:24px;height:1px;background:var(--dark);display:block;}
-
-/* HERO */
-.hero{position:relative;height:100vh;overflow:hidden;}
-.hero-bg{width:100%;height:100%;object-fit:cover;display:block;}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
-.hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
-.hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,8vw,110px);font-weight:300;line-height:1;letter-spacing:2px;margin-bottom:8px;}
-.hero-title em{font-style:italic;color:rgba(255,255,255,0.9);}
-.hero-subtitle{font-size:10px;letter-spacing:6px;text-transform:uppercase;opacity:0.7;margin-bottom:48px;font-weight:300;}
-.hero-btn{display:inline-block;padding:16px 48px;border:1px solid rgba(255,255,255,0.7);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:all .3s;font-weight:400;}
-.hero-btn:hover{background:rgba(255,255,255,0.15);}
-.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:3px;text-transform:uppercase;}
-.hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
-
-/* MENU SECTION */
-.section-menu{padding:100px 60px;}
-.section-header{text-align:center;margin-bottom:60px;}
-.section-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:400;}
-.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;}
-.section-title span{font-style:italic;}
-.section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
-
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
-.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
-.menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
-.menu-card:hover img{transform:scale(1.05);}
-.menu-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px 28px;}
-.menu-card-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:8px;}
-.menu-card-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;letter-spacing:1px;}
-.menu-card-link{display:inline-block;margin-top:16px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.8);border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:2px;text-decoration:none;transition:color .3s;}
-.menu-card:hover .menu-card-link{color:#fff;border-color:#fff;}
-
-/* ABOUT */
-.section-about{padding:120px 60px;background:var(--light);}
-.about-inner{max-width:900px;margin:0 auto;text-align:center;}
-.about-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
-.about-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;line-height:1.3;letter-spacing:1px;margin-bottom:40px;}
-.about-title em{font-style:italic;}
-.about-text{font-size:13px;line-height:2;color:#555;font-weight:300;max-width:680px;margin:0 auto 48px;}
-.about-btn{display:inline-block;padding:16px 48px;background:var(--dark);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:background .3s;}
-.about-btn:hover{background:var(--gold);}
-
-/* BRANCHES */
-.section-branches{padding:100px 60px;}
-.branches-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:60px;}
-.branch-card{position:relative;aspect-ratio:16/9;overflow:hidden;}
-.branch-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
-.branch-card:hover img{transform:scale(1.04);}
-.branch-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
-.branch-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:3px;}
-.branch-sub{font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:0.7;margin-top:8px;}
-
-/* FOOTER */
-footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
-.footer-inner{display:grid;grid-template-columns:1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
-.footer-logo-main{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:6px;text-transform:uppercase;}
-.footer-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:4px;}
-.footer-desc{font-size:12px;line-height:1.9;color:#999;margin-top:20px;font-weight:300;}
-.footer-col h4{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
-.footer-col ul{list-style:none;}
-.footer-col ul li{margin-bottom:10px;}
-.footer-col ul li a{text-decoration:none;color:#999;font-size:12px;font-weight:300;transition:color .3s;letter-spacing:1px;}
-.footer-col ul li a:hover{color:#fff;}
-.footer-col p{color:#999;font-size:12px;line-height:1.9;font-weight:300;}
-.footer-bottom{border-top:1px solid #333;padding-top:30px;display:flex;justify-content:space-between;align-items:center;}
-.footer-bottom p{font-size:11px;color:#666;letter-spacing:1px;}
-
-/* MOBILE */
-@media(max-width:768px){
-nav{padding:18px 24px;}
-.nav-links{display:none;}
-.nav-burger{display:flex;}
-.hero-title{font-size:48px;}
-.section-menu,.section-about,.section-branches{padding:70px 24px;}
-.menu-grid{grid-template-columns:repeat(3,1fr);gap:1px;}
-.menu-card{aspect-ratio:2/3;}
-.menu-card-title{font-size:14px;}
-.menu-card-label{font-size:7px;}
-.menu-card-overlay{padding:12px 10px;}
-.menu-card-link{font-size:7px;margin-top:6px;}
-.branches-grid{grid-template-columns:1fr;}
-.footer-inner{grid-template-columns:1fr;gap:40px;}
-footer{padding:60px 24px 30px;}
-.section-menu,.section-about{padding:70px 24px;}
-}
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Montserrat:wght@300;400;500&amp;display=swap" rel="stylesheet"><style>#as-wrap{} 
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#b8965a;--dark:#1a1a1a;--light:#f8f6f2;}
-body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.06);}
-.nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
-.nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
-.nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
-.nav-links{display:flex;gap:40px;list-style:none;}
-.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dark);font-weight:400;transition:color .3s;}
-.nav-links a:hover{color:var(--gold);}
-.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
-.nav-burger span{width:24px;height:1px;background:var(--dark);display:block;}
-
-/* HERO */
-.hero{position:relative;height:100vh;overflow:hidden;}
-.hero-bg{width:100%;height:100%;object-fit:cover;display:block;}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
-.hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
-.hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,8vw,110px);font-weight:300;line-height:1;letter-spacing:2px;margin-bottom:8px;}
-.hero-title em{font-style:italic;color:rgba(255,255,255,0.9);}
-.hero-subtitle{font-size:10px;letter-spacing:6px;text-transform:uppercase;opacity:0.7;margin-bottom:48px;font-weight:300;}
-.hero-btn{display:inline-block;padding:16px 48px;border:1px solid rgba(255,255,255,0.7);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:all .3s;font-weight:400;}
-.hero-btn:hover{background:rgba(255,255,255,0.15);}
-.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:3px;text-transform:uppercase;}
-.hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
-
-/* MENU SECTION */
-.section-menu{padding:100px 60px;}
-.section-header{text-align:center;margin-bottom:60px;}
-.section-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:400;}
-.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;}
-.section-title span{font-style:italic;}
-.section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
-
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
-.menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
-.menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
-.menu-card:hover img{transform:scale(1.05);}
-.menu-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px 28px;}
-.menu-card-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:8px;}
-.menu-card-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;letter-spacing:1px;}
-.menu-card-link{display:inline-block;margin-top:16px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.8);border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:2px;text-decoration:none;transition:color .3s;}
-.menu-card:hover .menu-card-link{color:#fff;border-color:#fff;}
-
-/* ABOUT */
-.section-about{padding:120px 60px;background:var(--light);}
-.about-inner{max-width:900px;margin:0 auto;text-align:center;}
-.about-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
-.about-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;line-height:1.3;letter-spacing:1px;margin-bottom:40px;}
-.about-title em{font-style:italic;}
-.about-text{font-size:13px;line-height:2;color:#555;font-weight:300;max-width:680px;margin:0 auto 48px;}
-.about-btn{display:inline-block;padding:16px 48px;background:var(--dark);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:background .3s;}
-.about-btn:hover{background:var(--gold);}
-
-/* BRANCHES */
-.section-branches{padding:100px 60px;}
-.branches-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:60px;}
-.branch-card{position:relative;aspect-ratio:16/9;overflow:hidden;}
-.branch-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
-.branch-card:hover img{transform:scale(1.04);}
-.branch-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
-.branch-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:3px;}
-.branch-sub{font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:0.7;margin-top:8px;}
-
-/* FOOTER */
-footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
-.footer-inner{display:grid;grid-template-columns:1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
-.footer-logo-main{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:6px;text-transform:uppercase;}
-.footer-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:4px;}
-.footer-desc{font-size:12px;line-height:1.9;color:#999;margin-top:20px;font-weight:300;}
-.footer-col h4{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
-.footer-col ul{list-style:none;}
-.footer-col ul li{margin-bottom:10px;}
-.footer-col ul li a{text-decoration:none;color:#999;font-size:12px;font-weight:300;transition:color .3s;letter-spacing:1px;}
-.footer-col ul li a:hover{color:#fff;}
-.footer-col p{color:#999;font-size:12px;line-height:1.9;font-weight:300;}
-.footer-bottom{border-top:1px solid #333;padding-top:30px;display:flex;justify-content:space-between;align-items:center;}
-.footer-bottom p{font-size:11px;color:#666;letter-spacing:1px;}
-
-/* MOBILE */
-@media(max-width:768px){
-nav{padding:18px 24px;}
-.nav-links{display:none;}
-.nav-burger{display:flex;}
-.hero-title{font-size:48px;}
-.section-menu,.section-about,.section-branches{padding:70px 24px;}
-.menu-grid{grid-template-columns:repeat(3,1fr);gap:1px;}
-.menu-card{aspect-ratio:2/3;}
-.menu-card-title{font-size:14px;}
-.menu-card-label{font-size:7px;}
-.menu-card-overlay{padding:12px 10px;}
-.menu-card-link{font-size:7px;margin-top:6px;}
-.branches-grid{grid-template-columns:1fr;}
-.footer-inner{grid-template-columns:1fr;gap:40px;}
-footer{padding:60px 24px 30px;}
-.section-menu,.section-about{padding:70px 24px;}
-}
-</style>
-
-          
 
 
-
-<section class="hero" style="height: auto; min-height: 0px;">
-  <img class="hero-bg" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&amp;q=80" alt="Cactus Coffee" data-as-key="img_0" style="height: 500px; min-height: 0px; object-fit: cover; width: 100%;">
-  <div class="hero-overlay" style="height: auto; min-height: 0px; z-index: 1;"></div>
-  <div class="hero-content" style="height: auto; min-height: 0px; z-index: 1;">
-    <p class="hero-tagline" style="height: auto; min-height: 0px; position: relative;">Bursa'nın Kalbinde İki Şube</p>
-    <h1 class="hero-title" style="height: auto; min-height: 0px; position: relative;">Cactus</h1>
-    <p class="hero-subtitle" style="height: auto; min-height: 0px; position: relative;">· COFFEE, SNACK &amp; DESSERT · HER YUDUMDA BİR HİKAYE</p>
-    <a href="menu.html" class="hero-btn" style="height: auto; min-height: 0px; position: relative;">Menüyü Gör</a>
+<section class="hero">
+  <img class="hero-bg" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&q=80" alt="Cactus Coffee">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tagline">Bursa'nın Kalbinde İki Şube</p>
+    <h1 class="hero-title">Cactus</h1>
+    <p class="hero-subtitle">· COFFEE, SNACK &amp; DESSERT · HER YUDUMDA BİR HİKAYE</p>
+    <a href="menu.html" class="hero-btn">Menüyü Gör</a>
   </div>
-  <div class="hero-scroll" style="height: auto; min-height: 0px;">
-    <div class="hero-scroll-line" style="height: auto; min-height: 0px;"></div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
     <span>Keşfet</span>
   </div>
 </section>
@@ -551,95 +328,27 @@ footer{padding:60px 24px 30px;}
 </section>
 
 
-<!-- === GOOGLE MAPS & REVIEWS === -->
-<style>
-.maps-section{background:#f8f6f2;padding:80px 0 0;}
-.maps-header{text-align:center;padding:0 60px 60px;}
-.maps-grid{display:grid;grid-template-columns:1fr 1fr;}
-.map-col-label{padding:20px 40px;background:#fff;border-bottom:1px solid #eee;}
-.map-col-footer{padding:14px 40px;background:#fff;border-top:1px solid #eee;text-align:center;}
-.review-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#fff;border:1px solid #b8965a;color:#b8965a;text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-family:'Montserrat',sans-serif;transition:all .3s;margin:0 8px;}
-.review-btn:hover{background:#b8965a;color:#fff;}
-.ig-section{padding:100px 60px;background:#fff;}
-.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;}
-.ig-card{text-decoration:none;display:flex;flex-direction:column;align-items:center;padding:48px 24px;border:1px solid #eee;transition:border-color .3s;}
-.ig-card:hover{border-color:#b8965a;}
-.ig-card.ig-center{background:#fafafa;}
-@media(max-width:768px){
-  .maps-header{padding:0 24px 40px;}
-  .review-btn{margin:4px;font-size:9px;padding:11px 18px;letter-spacing:2px;}
-  .maps-grid{grid-template-columns:1fr 1fr;}
-  .map-col-label{padding:12px 14px;}
-  .map-col-label p:first-child{font-size:16px!important;}
-  .map-col-label p:last-child{font-size:8px!important;letter-spacing:1px!important;}
-  .map-col-footer{padding:10px 14px;}
-  .maps-grid iframe{height:200px!important;}
-  .ig-section{padding:60px 16px;}
-  .ig-grid{grid-template-columns:repeat(3,1fr);gap:10px;max-width:100%;}
-  .ig-card{padding:28px 10px;}
-  .ig-name{font-size:13px;}
-  .ig-handle{font-size:9px;}
-}
-</style>
-
-<section class="maps-section">
-  <div class="maps-header">
-    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#b8965a;margin-bottom:16px;font-family:'Montserrat',sans-serif;">Bizi Bulun</p>
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi Değerlendirin</h2>
-    <div style="width:60px;height:1px;background:#b8965a;margin:20px auto 40px;"></div>
-    <a class="review-btn" href="https://g.page/r/CQQuHm0-DVGYEAE/review" target="_blank" rel="noopener">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-      FSM — Yorum Yaz
-    </a>
-    <a class="review-btn" href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-      Podyumpark — Yorum Yaz
-    </a>
-  </div>
-  <div class="maps-grid">
-    <div>
-      <div class="map-col-label">
-        <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:2px;margin-bottom:4px;">FSM Şubesi</p>
-        <p style="font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;font-family:'Montserrat',sans-serif;">Fatih Sultan Mehmet Cad. · Nilüfer, Bursa</p>
-      </div>
-      <iframe src="https://maps.google.com/maps?q=Cactus+Coffee+FSM+Nilufer+Bursa&amp;output=embed&amp;hl=tr" width="100%" height="340" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div class="map-col-footer">
-        <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#b8965a;text-decoration:none;font-family:'Montserrat',sans-serif;">Google Maps'te Aç →</a>
-      </div>
-    </div>
-    <div>
-      <div class="map-col-label">
-        <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:2px;margin-bottom:4px;">Podyumpark</p>
-        <p style="font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;font-family:'Montserrat',sans-serif;">Podyumpark AVM · Nilüfer, Bursa</p>
-      </div>
-      <iframe src="https://maps.google.com/maps?q=Cactus+Coffee+Podyumpark+Nilufer+Bursa&amp;output=embed&amp;hl=tr" width="100%" height="340" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div class="map-col-footer">
-        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#b8965a;text-decoration:none;font-family:'Montserrat',sans-serif;">Google Maps'te Aç →</a>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- === INSTAGRAM === -->
 <section class="ig-section">
   <div style="text-align:center;margin-bottom:60px;">
-    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#b8965a;margin-bottom:16px;font-family:'Montserrat',sans-serif;">Instagram</p>
+    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:16px;font-family:'Montserrat',sans-serif;">Instagram</p>
     <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi <em style="font-style:italic;">Takip Edin</em></h2>
-    <div style="width:60px;height:1px;background:#b8965a;margin:20px auto 0;"></div>
+    <div style="width:60px;height:1px;background:#c8a86a;margin:20px auto 0;"></div>
   </div>
   <div class="ig-grid">
     <a class="ig-card" href="https://www.instagram.com/cactuscafe.fsm" target="_blank" rel="noopener">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b8965a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">FSM</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.fsm</p>
     </a>
     <a class="ig-card ig-center" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b8965a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Cactus Coffee</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.tr</p>
     </a>
     <a class="ig-card" href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b8965a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Waffle</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.waffle</p>
     </a>
@@ -659,7 +368,7 @@ footer{padding:60px 24px 30px;}
     <!-- Marka -->
     <div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;letter-spacing:7px;text-transform:uppercase;margin-bottom:10px;">CACTUS</div>
-      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;margin-bottom:22px;font-family:'Montserrat',sans-serif;">COFFEE · SNACK · DESSERT</div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;margin-bottom:22px;font-family:'Montserrat',sans-serif;">COFFEE · SNACK · DESSERT</div>
       <p style="font-size: 12px; line-height: 2; color: rgb(119, 119, 119); font-weight: 300; margin-bottom: 28px; position: relative;">Her yudumda bir hikaye.<br>Bursa'nın kalbinde iki şube.</p>
       <a href="https://wa.me/905380146600" target="_blank" rel="noopener" style="display:none!important;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
@@ -673,9 +382,9 @@ footer{padding:60px 24px 30px;}
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Fatih Sultan Mehmet Cad.<br>Nilüfer, Bursa</p>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 10:30 – 00:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
-        <a href="https://g.page/r/CQQuHm0-DVGYEAE/review" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
-        <a href="https://instagram.com/cactuscafe.fsm" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">@cactuscafe.fsm</a>
+        <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
+        <a href="https://g.page/r/CQQuHm0-DVGYEAE/review" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
+        <a href="https://instagram.com/cactuscafe.fsm" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.fsm</a>
       </div>
     </div>
 
@@ -685,9 +394,9 @@ footer{padding:60px 24px 30px;}
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Podyumpark AVM<br>Nilüfer, Bursa</p>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 15:00 – 03:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
-        <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
-        <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#b8965a'" onmouseout="this.style.color='#666'">@cactuscafe.tr</a>
+        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
+        <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
+        <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.tr</a>
       </div>
     </div>
 
@@ -745,30 +454,6 @@ function toggleMainNav(){
 
 
 
-/* ── INTRO JS ── */
-(function(){
-  var s=document.getElementById('introScreen');
-  if(!s)return;
-  if(sessionStorage.getItem('ci')){s.style.display='none';return;}
-  sessionStorage.setItem('ci','1');
-  s.style.cssText='position:fixed;inset:0;z-index:99999;overflow:hidden;cursor:pointer;';
-  document.body.style.overflow='hidden';
-  var slides=s.querySelectorAll('.intro-slide'), i=0, DUR=300;
-  var t=setInterval(function(){
-    slides[i].classList.remove('on');
-    i++;
-    if(i>=slides.length){clearInterval(t);setTimeout(introKapat,700);return;}
-    slides[i].classList.add('on');
-  },DUR);
-  s.addEventListener('click',function(){clearInterval(t);introKapat();});
-})();
-function introKapat(){
-  var s=document.getElementById('introScreen');
-  if(!s||s.classList.contains('out'))return;
-  s.classList.add('out');
-  document.body.style.overflow='';
-  setTimeout(function(){s.style.display='none';},950);
-}
 
 </script>
 
@@ -834,44 +519,6 @@ function introKapat(){
 })();
 </script>
 
-<!-- İŞ BAŞVURUSU POPUP -->
-<style>
-#isBasvuruPop{position:fixed;inset:0;z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 32px;pointer-events:none;opacity:0;transition:opacity .35s ease;}
-#isBasvuruPop.on{opacity:1;pointer-events:auto;}
-#isBasvuruKart{background:#0e0e0e;border:1px solid rgba(184,150,90,.25);max-width:480px;width:100%;padding:32px 28px 28px;position:relative;transform:translateY(24px);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 -4px 60px rgba(0,0,0,.45);}
-#isBasvuruPop.on #isBasvuruKart{transform:translateY(0);}
-#isBasvuruKapat{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.35);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
-#isBasvuruKapat:hover{color:#fff;}
-#isBasvuruPop .ib-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#b8965a;margin-bottom:14px;}
-#isBasvuruPop .ib-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5vw,30px);font-weight:300;color:#f4f1eb;line-height:1.15;margin-bottom:10px;}
-#isBasvuruPop .ib-title em{font-style:italic;color:#b8965a;}
-#isBasvuruPop .ib-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:24px;}
-#isBasvuruPop .ib-actions{display:flex;gap:10px;align-items:center;}
-#isBasvuruPop .ib-btn{padding:12px 26px;background:#b8965a;color:#0e0e0e;border:none;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s;flex-shrink:0;}
-#isBasvuruPop .ib-btn:hover{background:#d4ae72;}
-#isBasvuruPop .ib-skip{font-size:11px;color:rgba(255,255,255,.3);cursor:pointer;text-decoration:underline;transition:color .2s;}
-#isBasvuruPop .ib-skip:hover{color:rgba(255,255,255,.6);}
-</style>
-<div id="isBasvuruPop">
-  <div id="isBasvuruKart">
-    <button id="isBasvuruKapat" onclick="isBasvuruKapat()" aria-label="Kapat">×</button>
-    <div class="ib-eyebrow">Kariyer</div>
-    <div class="ib-title">Bizimle <em>çalışmak</em><br>ister misin?</div>
-    <div class="ib-sub">Cactus Coffee ekibine katılmak için açık pozisyonlarımıza başvurabilirsin.</div>
-    <div class="ib-actions">
-      <a href="iletisim.html#basvuru" class="ib-btn" onclick="isBasvuruKapat();window.location.href='iletisim.html#basvuru';return false;">Başvur →</a>
-      <span class="ib-skip" onclick="isBasvuruKapat()">Şimdi değil</span>
-    </div>
-  </div>
-</div>
-<script>
-function isBasvuruKapat(){ document.getElementById('isBasvuruPop').classList.remove('on'); sessionStorage.setItem('ibk','1'); }
-document.addEventListener('keydown',function(e){if(e.key==='Escape') isBasvuruKapat();});
-(function(){
-  if(sessionStorage.getItem('ibk')) return;
-  setTimeout(function(){ document.getElementById('isBasvuruPop').classList.add('on'); }, 3000);
-})();
-</script>
 
 <!-- WhatsApp Butonu -->
 <a href="https://wa.me/905380146600" target="_blank" rel="noopener" style="position:fixed;bottom:28px;right:28px;z-index:9999;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(37,211,102,0.55)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(37,211,102,0.4)'">

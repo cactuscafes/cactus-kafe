@@ -100,7 +100,7 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .ft-brand-tag{font-size:11px;color:#666;letter-spacing:2px;line-height:1.7;margin-bottom:28px;font-weight:300;}
 .ft-social{display:flex;gap:12px;}
 .ft-social a{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #333;color:#888;text-decoration:none;font-size:15px;transition:all .3s;}
-.ft-social a:hover{border-color:#b8965a;color:#b8965a;}
+.ft-social a:hover{border-color:#c8a86a;color:#c8a86a;}
 .ft-col-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#555;margin-bottom:22px;font-weight:600;}
 .ft-links{display:flex;flex-direction:column;gap:12px;}
 .ft-links a{text-decoration:none;color:#888;font-size:12px;letter-spacing:1px;transition:color .3s;font-weight:300;}
@@ -109,12 +109,12 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .ft-branch-name{font-size:12px;color:#ccc;font-weight:500;margin-bottom:6px;letter-spacing:1px;}
 .ft-branch-detail{font-size:11px;color:#666;line-height:1.8;font-weight:300;}
 .ft-branch-detail a{color:#666;text-decoration:none;transition:color .2s;}
-.ft-branch-detail a:hover{color:#b8965a;}
+.ft-branch-detail a:hover{color:#c8a86a;}
 .ft-contact-item{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .ft-contact-icon{font-size:14px;flex-shrink:0;}
 .ft-contact-text{font-size:11px;color:#888;line-height:1.5;font-weight:300;}
 .ft-contact-text a{color:#888;text-decoration:none;transition:color .2s;}
-.ft-contact-text a:hover{color:#b8965a;}
+.ft-contact-text a:hover{color:#c8a86a;}
 .ft-wa-btn{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:10px 18px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25d366;text-decoration:none;font-size:11px;letter-spacing:1px;transition:all .3s;}
 .ft-wa-btn:hover{background:rgba(37,211,102,0.2);border-color:rgba(37,211,102,0.5);}
 .ft-bottom{display:flex;justify-content:space-between;align-items:center;padding:20px 0;gap:16px;}
@@ -168,66 +168,20 @@ footer{padding:40px 20px 24px;}
 .footer-links{flex-wrap:wrap;gap:20px;}
 .footer-bottom{flex-direction:column;gap:8px;}
 }
-/* ── SADAKAT KARTI POPUP ── */
-#sadakatPop{position:fixed;inset:0;z-index:99998;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 32px;pointer-events:none;opacity:0;transition:opacity .35s ease;}
-#sadakatPop.on{opacity:1;pointer-events:auto;}
-#sadakatKart{background:#0e0e0e;border:1px solid rgba(184,150,90,.25);max-width:480px;width:100%;padding:32px 28px 28px;position:relative;transform:translateY(24px);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 -4px 60px rgba(0,0,0,.5);}
-#sadakatPop.on #sadakatKart{transform:translateY(0);}
-#sadakatKapat{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.35);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
-#sadakatKapat:hover{color:#fff;}
-#sadakatPop .sk-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#b8965a;margin-bottom:14px;}
-#sadakatPop .sk-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,32px);font-weight:300;color:#f4f1eb;line-height:1.15;margin-bottom:8px;}
-#sadakatPop .sk-title em{font-style:italic;color:#b8965a;}
-#sadakatPop .sk-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:20px;}
-#sadakatPop .sk-pullar{display:flex;gap:6px;align-items:center;margin-bottom:22px;flex-wrap:wrap;}
-#sadakatPop .sk-pul{width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(184,150,90,.4);display:flex;align-items:center;justify-content:center;font-size:16px;}
-#sadakatPop .sk-pul.dolu{background:rgba(184,150,90,.15);border-color:#b8965a;}
-#sadakatPop .sk-hediye{width:40px;height:40px;border-radius:50%;background:#b8965a;display:flex;align-items:center;justify-content:center;font-size:18px;margin-left:4px;}
-#sadakatPop .sk-actions{display:flex;gap:10px;align-items:center;}
-#sadakatPop .sk-btn{padding:12px 26px;background:#b8965a;color:#0e0e0e;border:none;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s;flex-shrink:0;}
-#sadakatPop .sk-btn:hover{background:#d4ae72;}
-#sadakatPop .sk-skip{font-size:11px;color:rgba(255,255,255,.3);cursor:pointer;text-decoration:underline;transition:color .2s;}
-#sadakatPop .sk-skip:hover{color:rgba(255,255,255,.6);}
 </style>
 </head>
 <body>
 
-<!-- SADAKAT KARTI POPUP -->
-<div id="sadakatPop">
-  <div id="sadakatKart">
-    <button id="sadakatKapat" onclick="sadakatPopKapat()" aria-label="Kapat">×</button>
-    <div class="sk-eyebrow">Dijital Sadakat Kartı</div>
-    <div class="sk-title">10 Kahve, <em>1 Bedava</em></div>
-    <div class="sk-sub">Her içecek alışverişinde yıldız kazan. 10 yıldız dolunca bir içecek senden.</div>
-    <div class="sk-pullar">
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul dolu">⭐</div>
-      <div class="sk-pul"></div>
-      <div class="sk-pul"></div>
-      <div class="sk-pul"></div>
-      <div class="sk-hediye">🎁</div>
-    </div>
-    <div class="sk-actions">
-      <a href="kart.html" class="sk-btn">Kartımı Oluştur →</a>
-      <span class="sk-skip" onclick="sadakatPopKapat()">Şimdi değil</span>
-    </div>
-  </div>
-</div>
 
 
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
   <a href="index.html" style="text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
-    <a href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">Menü</a>
+    <a href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#b8965a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
     <span id="bs1" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
@@ -239,8 +193,8 @@ footer{padding:40px 20px 24px;}
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Ana Sayfa</a>
   <a href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#b8965a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
 @media(max-width:768px){
@@ -416,14 +370,7 @@ function upopKapat() {
   document.getElementById('upopBg').classList.remove('on');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapat(); sadakatPopKapat(); } });
-
-// Sadakat kartı popup
-function sadakatPopKapat(){ var p=document.getElementById('sadakatPop'); p.classList.remove('on'); sessionStorage.setItem('skp','1'); }
-(function(){
-  if(sessionStorage.getItem('skp')) return;
-  setTimeout(function(){ document.getElementById('sadakatPop').classList.add('on'); }, 2200);
-})();
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapat(); } });
 
 window.addEventListener('load', init);
 function toggleMainNav(){

@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menü — Cactus Coffee</title>
+<meta name="description" content="Cactus Coffee menüsü — sıcak & soğuk içecekler, kahvaltı ve özel lezzetler. FSM ve Podyumpark şubeleri.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cactus Coffee">
+<meta property="og:title" content="Menü — Cactus Coffee">
+<meta property="og:description" content="Cactus Coffee menüsü — sıcak & soğuk içecekler, kahvaltı ve özel lezzetler.">
+<meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
+<meta property="og:url" content="https://cactuscafes.com/menu.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Menü — Cactus Coffee">
+<meta name="twitter:image" content="https://cactuscafes.com/og-image.jpg">
+<meta name="theme-color" content="#0e1f08">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -491,6 +504,31 @@ function toggleMainNav(){
   document.getElementById('bs3').style.transform=isOpen?'':'rotate(-45deg) translateY(-6.5px)';
   document.body.style.overflow=isOpen?'':'hidden';
 }
+</script>
+
+<!-- ── SAYFA GEÇİŞİ ── -->
+<div id="pt-veil"><span id="pt-word">CACTUS</span></div>
+<style>
+#pt-veil{position:fixed;inset:0;z-index:99999;background:#0b1a07;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .55s cubic-bezier(.4,0,.2,1);}
+#pt-veil.pt-out{opacity:0;pointer-events:none;}
+#pt-word{font-family:'Cormorant Garamond',serif;font-size:30px;letter-spacing:14px;color:#c8a86a;text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
+#pt-veil.pt-out #pt-word{opacity:0;transform:scale(.94);}
+</style>
+<script>
+(function(){
+  var v=document.getElementById('pt-veil');
+  function reveal(){if(v)setTimeout(function(){v.classList.add('pt-out');},80);}
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',reveal):reveal();
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href]');if(!a)return;
+    var h=a.getAttribute('href')||'';
+    if(!h||h[0]==='#'||/^(tel:|mailto:|javascript:)/i.test(h)||a.target==='_blank')return;
+    try{var u=new URL(h,location.href);if(u.origin!==location.origin)return;if(u.pathname===location.pathname&&u.hash)return;}catch(x){return;}
+    e.preventDefault();
+    if(v){v.style.transition='opacity .3s cubic-bezier(.4,0,.2,1)';v.classList.remove('pt-out');setTimeout(function(){location.href=h;},330);}
+    else{location.href=h;}
+  });
+})();
 </script>
 </body>
 </html>

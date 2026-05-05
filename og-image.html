@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:#0e1f08;}
+body{width:1200px;height:630px;overflow:hidden;font-family:'Montserrat',sans-serif;background:#0e1f08;}
+.card{
+  width:1200px;height:630px;
+  background:linear-gradient(135deg,#0b1a07 0%,#142809 40%,#0e1f08 70%,#1a3310 100%);
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+/* Radial glow top-left */
+.card::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 50% 60% at 15% 20%,rgba(200,168,106,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 50% at 85% 80%,rgba(44,74,30,.6) 0%,transparent 70%);
+}
+/* Subtle grain texture via repeating gradient */
+.card::after{
+  content:'';position:absolute;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+/* Thin gold border frame */
+.frame{
+  position:absolute;inset:28px;
+  border:1px solid rgba(200,168,106,.18);
+  pointer-events:none;z-index:1;
+}
+.frame::before{content:'';position:absolute;inset:6px;border:1px solid rgba(200,168,106,.07);}
+
+.content{position:relative;z-index:2;text-align:center;padding:0 80px;}
+
+.eyebrow{
+  font-size:11px;letter-spacing:6px;text-transform:uppercase;
+  color:rgba(200,168,106,.6);margin-bottom:24px;
+  font-weight:400;
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:90px;font-weight:300;letter-spacing:18px;
+  color:#f0ece4;text-transform:uppercase;line-height:1;
+  margin-bottom:6px;
+}
+.logo em{font-style:italic;color:#c8a86a;}
+.tagline{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  color:rgba(240,225,195,.55);
+  letter-spacing:2px;margin-bottom:48px;
+}
+.divider{
+  width:48px;height:1px;background:rgba(200,168,106,.4);
+  margin:0 auto 48px;
+}
+.pills{display:flex;gap:20px;justify-content:center;align-items:center;}
+.pill{
+  padding:10px 24px;
+  border:1px solid rgba(200,168,106,.3);
+  color:rgba(240,225,195,.65);
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:400;
+}
+
+/* Corner accents */
+.corner{position:absolute;width:20px;height:20px;z-index:3;}
+.corner::before,.corner::after{content:'';position:absolute;background:#c8a86a;opacity:.4;}
+.corner::before{width:100%;height:1px;}
+.corner::after{width:1px;height:100%;}
+.c-tl{top:28px;left:28px;}
+.c-tr{top:28px;right:28px;transform:scaleX(-1);}
+.c-bl{bottom:28px;left:28px;transform:scaleY(-1);}
+.c-br{bottom:28px;right:28px;transform:scale(-1);}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="frame"></div>
+  <div class="corner c-tl"></div>
+  <div class="corner c-tr"></div>
+  <div class="corner c-bl"></div>
+  <div class="corner c-br"></div>
+  <div class="content">
+    <div class="eyebrow">İstanbul · FSM & Podyumpark</div>
+    <div class="logo">C<em>actu</em>s</div>
+    <div class="tagline">Her kahve seni bedavaya götürür</div>
+    <div class="divider"></div>
+    <div class="pills">
+      <div class="pill">Dijital Sadakat Kartı</div>
+      <div class="pill">Özel Kahveler</div>
+      <div class="pill">cactuscafes.com</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

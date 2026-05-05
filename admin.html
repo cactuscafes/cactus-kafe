@@ -1854,7 +1854,7 @@ function kartListeRender(){
   }
   listEl.innerHTML = '<table><thead><tr>'
     + '<th>Telefon</th><th>Ad</th><th style="text-align:center">Pul</th>'
-    + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th></th>'
+    + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'
     + '</tr></thead><tbody>'
     + data.map(function(m){
         var bedava = m.pul >= 10;
@@ -1863,6 +1863,7 @@ function kartListeRender(){
         for(var i=0;i<10;i++){
           pulBar += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:1px;background:'+(i<(m.pul%10)?'var(--gold)':'#e0dbd3')+';"></span>';
         }
+        var mJson = encodeURIComponent(JSON.stringify(m));
         return '<tr style="'+(bedava?'background:rgba(184,150,90,.06);':'')+'">'
           + '<td style="font-weight:600;">' + m.telefon + '</td>'
           + '<td style="color:var(--mist);">' + (m.ad||'—') + '</td>'
@@ -1873,10 +1874,12 @@ function kartListeRender(){
           + '<td style="text-align:center;color:var(--mist);">' + (m.toplam_kazanilan||0) + '</td>'
           + '<td style="color:var(--mist);font-size:12px;">' + sonIslem + '</td>'
           + '<td style="color:var(--mist);font-size:11px;">' + (m.sube||'—') + '</td>'
-          + '<td>'
+          + '<td style="white-space:nowrap;text-align:center;">'
             + (bedava
-              ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="padding:6px 14px;background:var(--gold);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;border-radius:4px;white-space:nowrap;">✓ Bedavayı Kullandı</button>'
-              : '<span style="font-size:11px;color:#ccc;">' + (10 - m.pul) + ' pul kaldı</span>')
+              ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="padding:5px 10px;background:var(--gold);color:#fff;border:none;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;white-space:nowrap;">✓ Bedava</button> '
+              : '<span style="font-size:10px;color:#ccc;margin-right:6px;">' + (10 - m.pul) + ' pul kaldı</span>')
+            + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:5px 10px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✎ Düzenle</button> '
+            + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:5px 10px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✕ Sil</button>'
           + '</td>'
           + '</tr>';
       }).join('')
@@ -1902,7 +1905,95 @@ async function kartSifirla(telefon){
     toast('Bağlantı hatası.');
   }
 }
+
+async function kartSil(telefon, adEncoded){
+  var ad = decodeURIComponent(adEncoded);
+  var label = ad ? (ad + ' (' + telefon + ')') : telefon;
+  if(!confirm('⚠️ ' + label + ' müşteriyi ve tüm pul geçmişini silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz.')) return;
+  try {
+    var r = await fetch(KART_API + '/kart/musteri-sil', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({telefon: telefon})
+    });
+    var d = await r.json();
+    if(d.ok){
+      toast('✓ Müşteri silindi.');
+      await kartListeYukle();
+    } else {
+      toast('Hata: ' + (d.error || 'Bilinmeyen hata'));
+    }
+  } catch(e){
+    toast('Bağlantı hatası.');
+  }
+}
+
+function kartDuzenle(mJson){
+  var m;
+  try { m = JSON.parse(mJson); } catch(e){ toast('Veri hatası.'); return; }
+  document.getElementById('kdOrijTel').value = m.telefon || '';
+  document.getElementById('kdAd').value = m.ad || '';
+  document.getElementById('kdTel').value = m.telefon || '';
+  document.getElementById('kdModal').style.display = 'flex';
+}
+
+function kartDuzenleKapat(){
+  document.getElementById('kdModal').style.display = 'none';
+}
+
+async function kartDuzenleKaydet(){
+  var orijTel = document.getElementById('kdOrijTel').value;
+  var yeniAd  = document.getElementById('kdAd').value.trim();
+  var yeniTel = document.getElementById('kdTel').value.replace(/\D/g,'');
+  if(!yeniTel){ toast('Telefon numarası gerekli.'); return; }
+  var payload = {telefon: orijTel};
+  payload.yeni_ad = yeniAd;
+  if(yeniTel !== orijTel.replace(/\D/g,'')) payload.yeni_telefon = yeniTel;
+  var btn = document.getElementById('kdKaydetBtn');
+  btn.disabled = true; btn.textContent = 'Kaydediliyor…';
+  try {
+    var r = await fetch(KART_API + '/kart/musteri-guncelle', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    var d = await r.json();
+    if(d.ok){
+      toast('✓ Bilgiler güncellendi.');
+      kartDuzenleKapat();
+      await kartListeYukle();
+    } else {
+      toast('Hata: ' + (d.error || 'Bilinmeyen hata'));
+    }
+  } catch(e){
+    toast('Bağlantı hatası.');
+  }
+  btn.disabled = false; btn.textContent = 'Kaydet';
+}
 </script>
+
+<!-- Müşteri Düzenleme Modal -->
+<div id="kdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.2);font-family:'Montserrat',sans-serif;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <div style="font-size:15px;font-weight:600;color:#1a1a1a;letter-spacing:.5px;">Müşteriyi Düzenle</div>
+      <button onclick="kartDuzenleKapat()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;line-height:1;">×</button>
+    </div>
+    <input type="hidden" id="kdOrijTel">
+    <div style="margin-bottom:18px;">
+      <label style="display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px;">Ad Soyad</label>
+      <input id="kdAd" type="text" placeholder="Ad Soyad" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;">
+    </div>
+    <div style="margin-bottom:28px;">
+      <label style="display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px;">Telefon</label>
+      <input id="kdTel" type="tel" placeholder="05XXXXXXXXX" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;">
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button onclick="kartDuzenleKapat()" style="flex:1;padding:11px;background:#f5f5f5;color:#666;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;">İptal</button>
+      <button id="kdKaydetBtn" onclick="kartDuzenleKaydet()" style="flex:2;padding:11px;background:var(--gold);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Kaydet</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

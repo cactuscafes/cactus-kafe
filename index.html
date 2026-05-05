@@ -820,6 +820,45 @@ function introKapat(){
 })();
 </script>
 
+<!-- İŞ BAŞVURUSU POPUP -->
+<style>
+#isBasvuruPop{position:fixed;inset:0;z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 32px;pointer-events:none;opacity:0;transition:opacity .35s ease;}
+#isBasvuruPop.on{opacity:1;pointer-events:auto;}
+#isBasvuruKart{background:#0e0e0e;border:1px solid rgba(184,150,90,.25);max-width:480px;width:100%;padding:32px 28px 28px;position:relative;transform:translateY(24px);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 -4px 60px rgba(0,0,0,.45);}
+#isBasvuruPop.on #isBasvuruKart{transform:translateY(0);}
+#isBasvuruKapat{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.35);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
+#isBasvuruKapat:hover{color:#fff;}
+#isBasvuruPop .ib-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#b8965a;margin-bottom:14px;}
+#isBasvuruPop .ib-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5vw,30px);font-weight:300;color:#f4f1eb;line-height:1.15;margin-bottom:10px;}
+#isBasvuruPop .ib-title em{font-style:italic;color:#b8965a;}
+#isBasvuruPop .ib-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:24px;}
+#isBasvuruPop .ib-actions{display:flex;gap:10px;align-items:center;}
+#isBasvuruPop .ib-btn{padding:12px 26px;background:#b8965a;color:#0e0e0e;border:none;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s;flex-shrink:0;}
+#isBasvuruPop .ib-btn:hover{background:#d4ae72;}
+#isBasvuruPop .ib-skip{font-size:11px;color:rgba(255,255,255,.3);cursor:pointer;text-decoration:underline;transition:color .2s;}
+#isBasvuruPop .ib-skip:hover{color:rgba(255,255,255,.6);}
+</style>
+<div id="isBasvuruPop">
+  <div id="isBasvuruKart">
+    <button id="isBasvuruKapat" onclick="isBasvuruKapat()" aria-label="Kapat">×</button>
+    <div class="ib-eyebrow">Kariyer</div>
+    <div class="ib-title">Bizimle <em>çalışmak</em><br>ister misin?</div>
+    <div class="ib-sub">Cactus Coffee ekibine katılmak için açık pozisyonlarımıza başvurabilirsin.</div>
+    <div class="ib-actions">
+      <a href="iletisim.html#basvuru" class="ib-btn">Başvur →</a>
+      <span class="ib-skip" onclick="isBasvuruKapat()">Şimdi değil</span>
+    </div>
+  </div>
+</div>
+<script>
+function isBasvuruKapat(){ document.getElementById('isBasvuruPop').classList.remove('on'); sessionStorage.setItem('ibk','1'); }
+document.addEventListener('keydown',function(e){if(e.key==='Escape') isBasvuruKapat();});
+(function(){
+  if(sessionStorage.getItem('ibk')) return;
+  setTimeout(function(){ document.getElementById('isBasvuruPop').classList.add('on'); }, 3000);
+})();
+</script>
+
 <!-- WhatsApp Butonu -->
 <a href="https://wa.me/905380146600" target="_blank" rel="noopener" style="position:fixed;bottom:28px;right:28px;z-index:9999;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(37,211,102,0.55)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(37,211,102,0.4)'">
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">

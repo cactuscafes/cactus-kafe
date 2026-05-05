@@ -11,13 +11,8 @@
 :root{--gold:#b8965a;--dark:#0e0e0e;--cream:#f7f4ef;--border:#e8e2d9;}
 body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
 
-/* HEADER */
-.hdr{background:var(--dark);padding:24px 20px;text-align:center;}
-.hdr-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:8px;color:#fff;text-transform:uppercase;}
-.hdr-sub{font-size:9px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-top:3px;}
-
 /* GİRİŞ EKRANI */
-.giris{max-width:420px;margin:0 auto;padding:48px 20px;}
+.giris{max-width:420px;margin:0 auto;padding:80px 20px 48px;}
 .giris-baslik{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;text-align:center;margin-bottom:8px;line-height:1.15;}
 .giris-baslik em{font-style:italic;color:var(--gold);}
 .giris-alt{font-size:11px;color:#888;text-align:center;letter-spacing:1px;margin-bottom:36px;line-height:1.7;}
@@ -30,7 +25,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dar
 .giris-hata{font-size:12px;color:#c0392b;text-align:center;padding:8px;}
 
 /* KART EKRANI */
-.kart-wrap{max-width:420px;margin:0 auto;padding:24px 16px 60px;}
+.kart-wrap{max-width:420px;margin:0 auto;padding:80px 16px 60px;}
 
 /* Dijital kart */
 .dijital-kart{background:linear-gradient(135deg,#0e0e0e 0%,#2a2a2a 100%);border-radius:18px;padding:28px 24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.18);position:relative;overflow:hidden;}
@@ -94,10 +89,41 @@ body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dar
 </head>
 <body>
 
-<div class="hdr">
-  <div class="hdr-logo">CACTUS</div>
-  <div class="hdr-sub">Sadakat Kartı</div>
+<nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
+  <a href="index.html" style="text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
+  <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
+    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
+    <a href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Menü</a>
+    <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">İletişim</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#b8965a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
+  </div>
+  <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
+    <span style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
+    <span style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
+    <span style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
+  </button>
+</nav>
+<div id="mainMobMenu" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;">
+  <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Ana Sayfa</a>
+  <a href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Menü</a>
+  <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">İletişim</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#b8965a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#b8965a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
 </div>
+<style>
+@media(max-width:768px){
+  #mainNav{padding:16px 20px!important;}
+  #mainNavLinks{display:none!important;}
+  #mainBurger{display:flex!important;}
+}
+</style>
+<script>
+function toggleMainNav(){
+  var m=document.getElementById('mainMobMenu');
+  m.style.display=m.style.display==='flex'?'none':'flex';
+}
+</script>
 
 <!-- GİRİŞ SAYFASI -->
 <div class="sayfa on" id="sayfaGiris">

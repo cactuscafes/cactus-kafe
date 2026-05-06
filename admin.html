@@ -426,12 +426,17 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <div class="panel" id="panel-rapor">
         <div class="pttl">📊 Raporlar</div>
         <div class="psub">Adisyon sisteminden satış verileri.</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end;">
-          <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:150px;"></div>
-          <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:150px;"></div>
-          <div><label class="lbl">Ödeme</label><select id="rOd" class="yi" style="width:130px;"><option value="">Tümü</option><option value="Nakit">Nakit</option><option value="Kredi Kartı">Kredi Kartı</option></select></div>
-          <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">Filtrele</button>
-          <button onclick="rapTemizle()" style="padding:9px 16px;background:#fff;border:1.5px solid var(--stone);font-size:12px;cursor:pointer;color:var(--rd);font-family:inherit;">🗑 Temizle</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
+          <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:148px;"></div>
+          <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:148px;"></div>
+          <div><label class="lbl">Şube</label><select id="rSube" class="yi" style="width:148px;"><option value="">Tüm Şubeler</option><option value="podyum">Podyumpark</option><option value="fsm">FSM</option></select></div>
+          <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">📊 Getir</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <button onclick="rapHizliFiltre('buay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Bu Ay</button>
+          <button onclick="rapHizliFiltre('gecenay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Geçen Ay</button>
+          <button onclick="rapHizliFiltre('7gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 7 Gün</button>
+          <button onclick="rapHizliFiltre('30gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 30 Gün</button>
         </div>
         <div class="rap-grid" id="rOzet"></div>
         <div style="font-size:12px;font-weight:600;margin-bottom:10px;">En Çok Satanlar</div>
@@ -1050,50 +1055,130 @@ function renderOncuGrid(){
 }
 
 /* RAPOR */
-function rapGoster(){
-  const s=JSON.parse(localStorage.getItem('cactus_satislar')||'[]');
-  const bas=document.getElementById('rBas')?.value||'';
-  const bit=document.getElementById('rBit')?.value||'';
-  const od=document.getElementById('rOd')?.value||'';
-  const f=s.filter(x=>{
-    if(bas&&x.tarihISO&&x.tarihISO<bas) return false;
-    if(bit&&x.tarihISO&&x.tarihISO>bit) return false;
-    if(od&&x.odeme_tipi!==od) return false;
-    return true;
-  });
-  const tC=f.reduce((a,x)=>a+(x.toplam||0),0);
-  const tI=f.reduce((a,x)=>a+(x.icecek_toplam||0),0);
-  const tY=f.reduce((a,x)=>a+(x.yiyecek_toplam||0),0);
-  const tN=f.reduce((a,x)=>a+(x.odeme_tipi==='Nakit'?x.toplam:(x.nakit_tutar||0)),0);
-  const tK=f.reduce((a,x)=>a+(x.odeme_tipi==='Kredi Kartı'?x.toplam:(x.kart_tutar||0)),0);
-  document.getElementById('rOzet').innerHTML=[
-    ['TOPLAM SATIŞ',f.length+' işlem',''],
-    ['TOPLAM CİRO','₺'+tC.toLocaleString('tr-TR'),'gelir'],
-    ['İÇECEK','₺'+tI.toLocaleString('tr-TR'),(tC?Math.round(tI/tC*100):0)+'%'],
-    ['YİYECEK','₺'+tY.toLocaleString('tr-TR'),(tC?Math.round(tY/tC*100):0)+'%'],
-    ['NAKİT','₺'+tN.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Nakit'||(x.nakit_tutar||0)>0).length+' işlem'],
-    ['KREDİ KARTI','₺'+tK.toLocaleString('tr-TR'),f.filter(x=>x.odeme_tipi==='Kredi Kartı'||(x.kart_tutar||0)>0).length+' işlem'],
-  ].map(([l,v,s])=>`<div class="rap-krt"><div class="rap-lbl">${l}</div><div class="rap-val">${v}</div><div class="rap-sub">${s}</div></div>`).join('');
-  if(!f.length){
-    document.getElementById('rTablo').innerHTML='<div style="padding:30px;text-align:center;color:var(--mist);">Satış verisi yok.</div>';
-    document.getElementById('rUrun').innerHTML=''; return;
-  }
-  const um={};
-  f.forEach(s=>(s.urunDetay||[]).forEach(u=>{
-    if(!um[u.ad]) um[u.ad]={ad:u.ad,adet:0,ciro:0};
-    um[u.ad].adet+=u.adet||1; um[u.ad].ciro+=(u.fiyat||0)*(u.adet||1);
-  }));
-  const su=Object.values(um).sort((a,b)=>b.adet-a.adet).slice(0,10);
-  document.getElementById('rUrun').innerHTML=su.length?'<table><thead><tr><th>Ürün</th><th style="text-align:right">Adet</th><th style="text-align:right">Ciro</th></tr></thead><tbody>'+
-    su.map(u=>`<tr><td>${u.ad}</td><td style="text-align:right">${u.adet}</td><td style="text-align:right">₺${u.ciro.toLocaleString('tr-TR')}</td></tr>`).join('')+'</tbody></table>':
-    '<div style="color:var(--mist);font-size:13px;">Ürün detayı yok.</div>';
-  document.getElementById('rTablo').innerHTML='<table><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ödeme</th><th>Ürünler</th><th style="text-align:right">Toplam</th></tr></thead><tbody>'+
-    [...f].sort((a,b)=>(b.tarihISO||'').localeCompare(a.tarihISO||'')).map(s=>`<tr><td>${s.tarih||'-'}</td><td>${s.saat||'-'}</td><td>${s.masa||'-'}</td><td>${s.odeme_tipi||'-'}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.urunler||'-'}</td><td style="text-align:right;font-weight:600">₺${(s.toplam||0).toLocaleString('tr-TR')}</td></tr>`).join('')+
-    '</tbody></table>';
+var _RAP_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+
+function rapTarihAyarla(bas, bit) {
+  document.getElementById('rBas').value = bas;
+  document.getElementById('rBit').value = bit;
 }
+
+function rapHizliFiltre(tip) {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var fmt = function(dt){ return dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate()); };
+  if(tip === 'buay') {
+    rapTarihAyarla(y+'-'+pad(m+1)+'-01', fmt(now));
+  } else if(tip === 'gecenay') {
+    var ilk = new Date(y, m-1, 1), son = new Date(y, m, 0);
+    rapTarihAyarla(fmt(ilk), fmt(son));
+  } else if(tip === '7gun') {
+    var baslangic = new Date(y, m, d-6);
+    rapTarihAyarla(fmt(baslangic), fmt(now));
+  } else if(tip === '30gun') {
+    var baslangic30 = new Date(y, m, d-29);
+    rapTarihAyarla(fmt(baslangic30), fmt(now));
+  }
+  rapGoster();
+}
+
+async function rapGoster() {
+  var now = new Date();
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  // Varsayılan tarih: bu ay
+  var rBas = document.getElementById('rBas');
+  var rBit = document.getElementById('rBit');
+  if (!rBas.value) rBas.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-01';
+  if (!rBit.value) rBit.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+
+  var bas = rBas.value, bit = rBit.value;
+  var sube = document.getElementById('rSube')?.value || '';
+  var fmt = function(v){ return Number(v||0).toLocaleString('tr-TR'); };
+
+  document.getElementById('rOzet').innerHTML = '<div style="color:var(--mist);font-size:13px;padding:16px 0;">⏳ Yükleniyor…</div>';
+  document.getElementById('rUrun').innerHTML = '';
+  document.getElementById('rTablo').innerHTML = '';
+
+  try {
+    var params = 'baslangic='+bas+'&bitis='+bit+(sube?'&sube='+sube:'');
+    var [ozet, detay] = await Promise.all([
+      fetch(_RAP_API+'/rapor/ozet?'+params).then(function(r){ return r.json(); }),
+      fetch(_RAP_API+'/rapor/listele?'+params).then(function(r){ return r.json(); })
+    ]);
+
+    var toplamCiro = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.ciro||0); }, 0);
+    var toplamAdet = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.adet||0); }, 0);
+    var aktifGun   = (ozet.gunler||[]).length;
+    var nakit = 0, kredi = 0;
+    (ozet.odeme||[]).forEach(function(o){
+      var t = (o.odeme_tipi||'').toLowerCase();
+      if(t==='nakit') nakit = o.ciro||0;
+      else if(t==='kredi') kredi = o.ciro||0;
+    });
+
+    document.getElementById('rOzet').innerHTML = [
+      ['TOPLAM CİRO',    '₺'+fmt(toplamCiro), ''],
+      ['TOPLAM SATIŞ',   fmt(toplamAdet)+' kalem', ''],
+      ['AKTİF GÜN',      aktifGun+' gün', aktifGun ? 'ort. ₺'+fmt(Math.round(toplamCiro/aktifGun)) : ''],
+      ['NAKİT',          '₺'+fmt(nakit), toplamCiro ? Math.round(nakit/toplamCiro*100)+'%' : ''],
+      ['KREDİ KARTI',    '₺'+fmt(kredi), toplamCiro ? Math.round(kredi/toplamCiro*100)+'%' : ''],
+    ].map(function(k){
+      return '<div class="rap-krt"><div class="rap-lbl">'+k[0]+'</div><div class="rap-val">'+k[1]+'</div><div class="rap-sub">'+(k[2]||'&nbsp;')+'</div></div>';
+    }).join('');
+
+    // En çok satanlar
+    if(ozet.en_cok && ozet.en_cok.length) {
+      document.getElementById('rUrun').innerHTML =
+        '<table><thead><tr><th>#</th><th>Ürün</th><th style="text-align:right">Adet</th><th style="text-align:right">Ciro</th></tr></thead><tbody>'+
+        ozet.en_cok.map(function(u,i){
+          return '<tr><td style="color:var(--mist);font-size:11px;">'+(i+1)+'</td><td>'+u.urun_adi+'</td>'+
+            '<td style="text-align:right">'+u.toplam_adet+'</td>'+
+            '<td style="text-align:right;font-weight:600">₺'+fmt(u.ciro)+'</td></tr>';
+        }).join('')+'</tbody></table>';
+    } else {
+      document.getElementById('rUrun').innerHTML = '<div style="color:var(--mist);font-size:13px;padding:8px 0;">Ürün verisi yok.</div>';
+    }
+
+    // İşlem detayları
+    if(!detay || !detay.length) {
+      document.getElementById('rTablo').innerHTML = '<div style="padding:30px;text-align:center;color:var(--mist);">Bu tarih aralığında satış verisi yok.</div>';
+    } else {
+      var badge = function(tip){
+        var t=(tip||'').toLowerCase();
+        var bg=t==='nakit'?'#e8f5e9;color:#1a6b3c':'#e3f2fd;color:#1a4b8c';
+        return '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+bg+'">'+tip+'</span>';
+      };
+      document.getElementById('rTablo').innerHTML =
+        '<table><thead><tr>'+
+        '<th>Tarih</th><th>Şube</th><th>Ürün</th><th>Kategori</th>'+
+        '<th style="text-align:right">Adet</th><th style="text-align:right">Birim</th>'+
+        '<th style="text-align:right">Toplam</th><th>Ödeme</th>'+
+        '</tr></thead><tbody>'+
+        detay.map(function(s){
+          return '<tr>'+
+            '<td>'+( s.tarih||'-')+'</td>'+
+            '<td style="font-size:11px;color:var(--mist)">'+(s.sube||'-')+'</td>'+
+            '<td>'+(s.urun_adi||'-')+'</td>'+
+            '<td style="font-size:11px;color:var(--mist)">'+(s.kategori||'-')+'</td>'+
+            '<td style="text-align:right">'+(s.adet||1)+'</td>'+
+            '<td style="text-align:right">₺'+fmt(s.birim_fiyat)+'</td>'+
+            '<td style="text-align:right;font-weight:600">₺'+fmt(s.toplam)+'</td>'+
+            '<td>'+badge(s.odeme_tipi)+'</td>'+
+          '</tr>';
+        }).join('')+'</tbody></table>';
+    }
+  } catch(e) {
+    document.getElementById('rOzet').innerHTML = '<div style="color:var(--rd);font-size:13px;padding:16px 0;">⚠️ Yüklenemedi: '+e.message+'</div>';
+  }
+}
+
 function rapTemizle(){
-  if(!confirm('Tüm satış verileri silinsin mi?')) return;
-  localStorage.removeItem('cactus_satislar'); rapGoster(); toast('🗑 Temizlendi');
+  var now = new Date();
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  document.getElementById('rBas').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-01';
+  document.getElementById('rBit').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  if(document.getElementById('rSube')) document.getElementById('rSube').value = '';
+  rapGoster();
 }
 
 /* YAYINLA */

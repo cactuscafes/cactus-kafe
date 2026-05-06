@@ -74,6 +74,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .rap-lbl{font-size:10px;color:var(--mist);letter-spacing:1px;margin-bottom:4px;}
 .rap-val{font-size:22px;font-weight:600;}
 .rap-sub{font-size:11px;color:var(--mist);margin-top:2px;}
+/* Rapor şube sekmeleri */
+.rap-tabs{display:flex;border-bottom:2px solid var(--stone);margin-bottom:20px;}
+.rap-tab{flex:1;padding:10px 0;text-align:center;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist);}
+.rap-tab.on-p{color:#2d7a4f;border-color:#2d7a4f;}
+.rap-tab.on-f{color:#c67000;border-color:#c67000;}
+.rap-sek{display:none;}.rap-sek.on{display:block;}
+.rap-sek-ttl{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin:0 0 10px;color:var(--mist);}
+.rap-nakit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.rap-nakit-krt{background:#fff;border:1.5px solid var(--stone);padding:14px;text-align:center;}
+.rap-nakit-krt.nakit .rap-val{color:#1a6b3c;}
+.rap-nakit-krt.kredi .rap-val{color:#1a4b8c;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{text-align:left;padding:8px;border-bottom:2px solid var(--stone);font-weight:500;}
 td{padding:8px;border-bottom:1px solid var(--paper);}
@@ -132,7 +143,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
   #kartOzet{grid-template-columns:1fr 1fr 1fr!important;}
 
   /* Table overflow */
-  #rUrun,#rTablo{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .rap-sek-tablo{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
   /* Report date filters */
   #rBas,#rBit,#rOd{width:100%!important;}
@@ -425,11 +436,12 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <!-- RAPOR -->
       <div class="panel" id="panel-rapor">
         <div class="pttl">📊 Raporlar</div>
-        <div class="psub">Adisyon sisteminden satış verileri.</div>
+        <div class="psub">Şubelere göre satış verileri.</div>
+
+        <!-- Tarih Filtresi (ortaklaşılan) -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
           <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:148px;"></div>
           <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:148px;"></div>
-          <div><label class="lbl">Şube</label><select id="rSube" class="yi" style="width:148px;"><option value="">Tüm Şubeler</option><option value="podyum">Podyumpark</option><option value="fsm">FSM</option></select></div>
           <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">📊 Getir</button>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
@@ -438,16 +450,44 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
           <button onclick="rapHizliFiltre('7gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 7 Gün</button>
           <button onclick="rapHizliFiltre('30gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 30 Gün</button>
         </div>
-        <div class="rap-grid" id="rOzet"></div>
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px;">En Çok Satanlar</div>
-        <div id="rUrun" style="margin-bottom:24px;overflow-x:auto;"></div>
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px;">İşlem Detayları</div>
-        <div id="rTablo" style="overflow-x:auto;"></div>
+
+        <!-- Şube Sekmeleri -->
+        <div class="rap-tabs">
+          <button id="rtab-p" class="rap-tab on-p" onclick="rapSekme('p')">🟢 Podyumpark</button>
+          <button id="rtab-f" class="rap-tab" onclick="rapSekme('f')">🟠 FSM</button>
+        </div>
+
+        <!-- Podyumpark Sekmesi -->
+        <div class="rap-sek on" id="rsek-p">
+          <div class="rap-grid" id="rOzet-p">
+            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
+          </div>
+          <div class="rap-nakit-grid" id="rNakit-p"></div>
+          <div class="rap-sek-ttl" id="rUrunTtl-p" style="display:none;">En Çok Satanlar</div>
+          <div class="rap-sek-tablo" id="rUrun-p" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">Günlük Özet</div>
+          <div class="rap-sek-tablo" id="rGunluk-p" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">İşlem Detayları</div>
+          <div class="rap-sek-tablo" id="rTablo-p"></div>
+        </div>
+
+        <!-- FSM Sekmesi -->
+        <div class="rap-sek" id="rsek-f">
+          <div class="rap-grid" id="rOzet-f">
+            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
+          </div>
+          <div class="rap-nakit-grid" id="rNakit-f"></div>
+          <div class="rap-sek-ttl" id="rUrunTtl-f" style="display:none;">En Çok Satanlar</div>
+          <div class="rap-sek-tablo" id="rUrun-f" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">Günlük Özet</div>
+          <div class="rap-sek-tablo" id="rGunluk-f" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">İşlem Detayları</div>
+          <div class="rap-sek-tablo" id="rTablo-f"></div>
+        </div>
 
         <!-- E-POSTA RAPORU -->
         <div style="margin-top:32px;border-top:1.5px solid var(--stone);padding-top:24px;">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Haftalık Raporu E-Posta ile Gönder</div>
-          <!-- Aktif durum -->
           <div style="display:flex;align-items:center;gap:10px;background:#f0faf4;border:1px solid #b7dfc5;padding:10px 14px;border-radius:6px;margin-bottom:16px;">
             <span style="font-size:18px;">✅</span>
             <div>
@@ -470,9 +510,6 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
             <button onclick="emailGonder()" id="emailBtn" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Şimdi Gönder</button>
           </div>
           <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
-          <div style="background:var(--paper);border:1px solid var(--stone);padding:10px 14px;font-size:11px;color:var(--mist);line-height:1.8;margin-top:4px;">
-            💡 Farklı bir adrese göndermek için <strong style="color:var(--ink);">resend.com/domains</strong> üzerinden <strong style="color:var(--ink);">cactuscafes.com</strong> domainini doğrulamanız gerekir.
-          </div>
         </div>
       </div>
 
@@ -1061,6 +1098,21 @@ function renderOncuGrid(){
 
 /* RAPOR */
 var _RAP_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _rapAktifSek = 'p'; // p = Podyumpark, f = FSM
+
+function rapSekme(k) {
+  _rapAktifSek = k;
+  ['p','f'].forEach(function(x){
+    var tab = document.getElementById('rtab-'+x);
+    var sek = document.getElementById('rsek-'+x);
+    if(tab){ tab.classList.remove('on-p','on-f'); }
+    if(sek){ sek.classList.remove('on'); }
+  });
+  var tab = document.getElementById('rtab-'+k);
+  var sek = document.getElementById('rsek-'+k);
+  if(tab){ tab.classList.add('on-'+k); }
+  if(sek){ sek.classList.add('on'); }
+}
 
 function rapTarihAyarla(bas, bit) {
   document.getElementById('rBas').value = bas;
@@ -1078,102 +1130,151 @@ function rapHizliFiltre(tip) {
     var ilk = new Date(y, m-1, 1), son = new Date(y, m, 0);
     rapTarihAyarla(fmt(ilk), fmt(son));
   } else if(tip === '7gun') {
-    var baslangic = new Date(y, m, d-6);
-    rapTarihAyarla(fmt(baslangic), fmt(now));
+    rapTarihAyarla(fmt(new Date(y, m, d-6)), fmt(now));
   } else if(tip === '30gun') {
-    var baslangic30 = new Date(y, m, d-29);
-    rapTarihAyarla(fmt(baslangic30), fmt(now));
+    rapTarihAyarla(fmt(new Date(y, m, d-29)), fmt(now));
   }
   rapGoster();
+}
+
+function rapSubeRender(k, ozet, detay) {
+  var fmt = function(v){ return Number(v||0).toLocaleString('tr-TR'); };
+  var subeAd = k==='p' ? 'podyum' : 'fsm';
+  var renkVal = k==='p' ? '#2d7a4f' : '#c67000';
+
+  var toplamCiro = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.ciro||0); }, 0);
+  var toplamAdet = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.adet||0); }, 0);
+  var aktifGun   = (ozet.gunler||[]).length;
+  var nakit = 0, kredi = 0;
+  (ozet.odeme||[]).forEach(function(o){
+    var t = (o.odeme_tipi||'').toLowerCase();
+    if(t==='nakit') nakit = o.ciro||0;
+    else if(t==='kredi') kredi = o.ciro||0;
+  });
+
+  // Özet kartlar
+  document.getElementById('rOzet-'+k).innerHTML = [
+    ['TOPLAM CİRO',  '₺'+fmt(toplamCiro), ''],
+    ['TOPLAM SATIŞ', fmt(toplamAdet)+' kalem', ''],
+    ['AKTİF GÜN',   aktifGun+' gün', aktifGun ? 'ort. ₺'+fmt(Math.round(toplamCiro/aktifGun)) : ''],
+  ].map(function(c){
+    return '<div class="rap-krt"><div class="rap-lbl">'+c[0]+'</div>'+
+      '<div class="rap-val" style="color:'+renkVal+'">'+c[1]+'</div>'+
+      '<div class="rap-sub">'+(c[2]||'&nbsp;')+'</div></div>';
+  }).join('');
+
+  // Nakit / Kredi kartları
+  document.getElementById('rNakit-'+k).innerHTML =
+    '<div class="rap-nakit-krt nakit">'+
+      '<div class="rap-lbl">💵 Nakit</div>'+
+      '<div class="rap-val">₺'+fmt(nakit)+'</div>'+
+      (toplamCiro ? '<div class="rap-sub">'+Math.round(nakit/toplamCiro*100)+'%</div>' : '')+
+    '</div>'+
+    '<div class="rap-nakit-krt kredi">'+
+      '<div class="rap-lbl">💳 Kredi Kartı</div>'+
+      '<div class="rap-val">₺'+fmt(kredi)+'</div>'+
+      (toplamCiro ? '<div class="rap-sub">'+Math.round(kredi/toplamCiro*100)+'%</div>' : '')+
+    '</div>';
+
+  // En çok satanlar
+  var ttlEl = document.getElementById('rUrunTtl-'+k);
+  if(ozet.en_cok && ozet.en_cok.length) {
+    if(ttlEl) ttlEl.style.display='block';
+    document.getElementById('rUrun-'+k).innerHTML =
+      '<table><thead><tr><th>#</th><th>Ürün</th><th style="text-align:right">Adet</th><th style="text-align:right">Ciro</th></tr></thead><tbody>'+
+      ozet.en_cok.map(function(u,i){
+        return '<tr><td style="color:var(--mist);font-size:11px;">'+(i+1)+'</td><td>'+u.urun_adi+'</td>'+
+          '<td style="text-align:right">'+u.toplam_adet+'</td>'+
+          '<td style="text-align:right;font-weight:600">₺'+fmt(u.ciro||0)+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  } else {
+    if(ttlEl) ttlEl.style.display='none';
+    document.getElementById('rUrun-'+k).innerHTML = '';
+  }
+
+  // Günlük özet
+  if(ozet.gunler && ozet.gunler.length) {
+    document.getElementById('rGunluk-'+k).innerHTML =
+      '<table><thead><tr><th>Tarih</th><th style="text-align:right">Ciro</th><th style="text-align:right">Satış</th></tr></thead><tbody>'+
+      ozet.gunler.map(function(g){
+        return '<tr><td>'+g.tarih+'</td>'+
+          '<td style="text-align:right;font-weight:600">₺'+fmt(g.ciro)+'</td>'+
+          '<td style="text-align:right;color:var(--mist)">'+g.adet+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  } else {
+    document.getElementById('rGunluk-'+k).innerHTML =
+      '<div style="padding:20px;text-align:center;color:var(--mist);font-size:13px;">Bu dönemde kayıt yok.</div>';
+  }
+
+  // İşlem detayları
+  var badge = function(tip){
+    var t=(tip||'').toLowerCase();
+    var bg=t==='nakit'?'#e8f5e9;color:#1a6b3c':'#e3f2fd;color:#1a4b8c';
+    return '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+bg+'">'+tip+'</span>';
+  };
+  var subeDetay = (detay||[]).filter(function(s){ return !subeAd || (s.sube||'').toLowerCase()===subeAd; });
+  if(!subeDetay.length) {
+    document.getElementById('rTablo-'+k).innerHTML =
+      '<div style="padding:20px;text-align:center;color:var(--mist);font-size:13px;">İşlem detayı yok.</div>';
+  } else {
+    document.getElementById('rTablo-'+k).innerHTML =
+      '<table><thead><tr>'+
+      '<th>Tarih</th><th>Ürün</th><th>Kategori</th>'+
+      '<th style="text-align:right">Adet</th><th style="text-align:right">Birim</th>'+
+      '<th style="text-align:right">Toplam</th><th>Ödeme</th>'+
+      '</tr></thead><tbody>'+
+      subeDetay.map(function(s){
+        return '<tr>'+
+          '<td>'+(s.tarih||'-')+'</td>'+
+          '<td>'+(s.urun_adi||'-')+'</td>'+
+          '<td style="font-size:11px;color:var(--mist)">'+(s.kategori||'-')+'</td>'+
+          '<td style="text-align:right">'+(s.adet||1)+'</td>'+
+          '<td style="text-align:right">₺'+fmt(s.birim_fiyat)+'</td>'+
+          '<td style="text-align:right;font-weight:600">₺'+fmt(s.toplam)+'</td>'+
+          '<td>'+badge(s.odeme_tipi)+'</td>'+
+        '</tr>';
+      }).join('')+'</tbody></table>';
+  }
 }
 
 async function rapGoster() {
   var now = new Date();
   var pad = function(n){ return String(n).padStart(2,'0'); };
-  // Varsayılan tarih: bu ay
   var rBas = document.getElementById('rBas');
   var rBit = document.getElementById('rBit');
   if (!rBas.value) rBas.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-01';
   if (!rBit.value) rBit.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
-
   var bas = rBas.value, bit = rBit.value;
-  var sube = document.getElementById('rSube')?.value || '';
-  var fmt = function(v){ return Number(v||0).toLocaleString('tr-TR'); };
 
-  document.getElementById('rOzet').innerHTML = '<div style="color:var(--mist);font-size:13px;padding:16px 0;">⏳ Yükleniyor…</div>';
-  document.getElementById('rUrun').innerHTML = '';
-  document.getElementById('rTablo').innerHTML = '';
+  // Yükleniyor göster
+  ['p','f'].forEach(function(k){
+    document.getElementById('rOzet-'+k).innerHTML =
+      '<div style="color:var(--mist);font-size:13px;padding:16px 0;">⏳ Yükleniyor…</div>';
+    document.getElementById('rNakit-'+k).innerHTML = '';
+    document.getElementById('rUrun-'+k).innerHTML = '';
+    document.getElementById('rGunluk-'+k).innerHTML = '';
+    document.getElementById('rTablo-'+k).innerHTML = '';
+  });
 
   try {
-    var params = 'baslangic='+bas+'&bitis='+bit+(sube?'&sube='+sube:'');
-    var [ozet, detay] = await Promise.all([
-      fetch(_RAP_API+'/rapor/ozet?'+params).then(function(r){ return r.json(); }),
-      fetch(_RAP_API+'/rapor/listele?'+params).then(function(r){ return r.json(); })
+    var paramP = 'baslangic='+bas+'&bitis='+bit+'&sube=podyum';
+    var paramF = 'baslangic='+bas+'&bitis='+bit+'&sube=fsm';
+
+    var [ozetP, detayP, ozetF, detayF] = await Promise.all([
+      fetch(_RAP_API+'/rapor/ozet?'+paramP).then(function(r){ return r.json(); }),
+      fetch(_RAP_API+'/rapor/listele?'+paramP).then(function(r){ return r.json(); }),
+      fetch(_RAP_API+'/rapor/ozet?'+paramF).then(function(r){ return r.json(); }),
+      fetch(_RAP_API+'/rapor/listele?'+paramF).then(function(r){ return r.json(); })
     ]);
 
-    var toplamCiro = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.ciro||0); }, 0);
-    var toplamAdet = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.adet||0); }, 0);
-    var aktifGun   = (ozet.gunler||[]).length;
-    var nakit = 0, kredi = 0;
-    (ozet.odeme||[]).forEach(function(o){
-      var t = (o.odeme_tipi||'').toLowerCase();
-      if(t==='nakit') nakit = o.ciro||0;
-      else if(t==='kredi') kredi = o.ciro||0;
-    });
+    rapSubeRender('p', ozetP, detayP);
+    rapSubeRender('f', ozetF, detayF);
 
-    document.getElementById('rOzet').innerHTML = [
-      ['TOPLAM CİRO',    '₺'+fmt(toplamCiro), ''],
-      ['TOPLAM SATIŞ',   fmt(toplamAdet)+' kalem', ''],
-      ['AKTİF GÜN',      aktifGun+' gün', aktifGun ? 'ort. ₺'+fmt(Math.round(toplamCiro/aktifGun)) : ''],
-      ['NAKİT',          '₺'+fmt(nakit), toplamCiro ? Math.round(nakit/toplamCiro*100)+'%' : ''],
-      ['KREDİ KARTI',    '₺'+fmt(kredi), toplamCiro ? Math.round(kredi/toplamCiro*100)+'%' : ''],
-    ].map(function(k){
-      return '<div class="rap-krt"><div class="rap-lbl">'+k[0]+'</div><div class="rap-val">'+k[1]+'</div><div class="rap-sub">'+(k[2]||'&nbsp;')+'</div></div>';
-    }).join('');
-
-    // En çok satanlar
-    if(ozet.en_cok && ozet.en_cok.length) {
-      document.getElementById('rUrun').innerHTML =
-        '<table><thead><tr><th>#</th><th>Ürün</th><th style="text-align:right">Adet</th><th style="text-align:right">Ciro</th></tr></thead><tbody>'+
-        ozet.en_cok.map(function(u,i){
-          return '<tr><td style="color:var(--mist);font-size:11px;">'+(i+1)+'</td><td>'+u.urun_adi+'</td>'+
-            '<td style="text-align:right">'+u.toplam_adet+'</td>'+
-            '<td style="text-align:right;font-weight:600">₺'+fmt(u.ciro)+'</td></tr>';
-        }).join('')+'</tbody></table>';
-    } else {
-      document.getElementById('rUrun').innerHTML = '<div style="color:var(--mist);font-size:13px;padding:8px 0;">Ürün verisi yok.</div>';
-    }
-
-    // İşlem detayları
-    if(!detay || !detay.length) {
-      document.getElementById('rTablo').innerHTML = '<div style="padding:30px;text-align:center;color:var(--mist);">Bu tarih aralığında satış verisi yok.</div>';
-    } else {
-      var badge = function(tip){
-        var t=(tip||'').toLowerCase();
-        var bg=t==='nakit'?'#e8f5e9;color:#1a6b3c':'#e3f2fd;color:#1a4b8c';
-        return '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+bg+'">'+tip+'</span>';
-      };
-      document.getElementById('rTablo').innerHTML =
-        '<table><thead><tr>'+
-        '<th>Tarih</th><th>Şube</th><th>Ürün</th><th>Kategori</th>'+
-        '<th style="text-align:right">Adet</th><th style="text-align:right">Birim</th>'+
-        '<th style="text-align:right">Toplam</th><th>Ödeme</th>'+
-        '</tr></thead><tbody>'+
-        detay.map(function(s){
-          return '<tr>'+
-            '<td>'+( s.tarih||'-')+'</td>'+
-            '<td style="font-size:11px;color:var(--mist)">'+(s.sube||'-')+'</td>'+
-            '<td>'+(s.urun_adi||'-')+'</td>'+
-            '<td style="font-size:11px;color:var(--mist)">'+(s.kategori||'-')+'</td>'+
-            '<td style="text-align:right">'+(s.adet||1)+'</td>'+
-            '<td style="text-align:right">₺'+fmt(s.birim_fiyat)+'</td>'+
-            '<td style="text-align:right;font-weight:600">₺'+fmt(s.toplam)+'</td>'+
-            '<td>'+badge(s.odeme_tipi)+'</td>'+
-          '</tr>';
-        }).join('')+'</tbody></table>';
-    }
   } catch(e) {
-    document.getElementById('rOzet').innerHTML = '<div style="color:var(--rd);font-size:13px;padding:16px 0;">⚠️ Yüklenemedi: '+e.message+'</div>';
+    ['p','f'].forEach(function(k){
+      document.getElementById('rOzet-'+k).innerHTML =
+        '<div style="color:var(--rd);font-size:13px;padding:16px 0;">⚠️ Yüklenemedi: '+e.message+'</div>';
+    });
   }
 }
 
@@ -1182,7 +1283,6 @@ function rapTemizle(){
   var pad = function(n){ return String(n).padStart(2,'0'); };
   document.getElementById('rBas').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-01';
   document.getElementById('rBit').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
-  if(document.getElementById('rSube')) document.getElementById('rSube').value = '';
   rapGoster();
 }
 

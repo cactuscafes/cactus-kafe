@@ -447,11 +447,18 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
         <!-- E-POSTA RAPORU -->
         <div style="margin-top:32px;border-top:1.5px solid var(--stone);padding-top:24px;">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Haftalık Raporu E-Posta ile Gönder</div>
-          <div style="font-size:12px;color:var(--mist);margin-bottom:16px;">Resend API ile şimdi gönderin veya her Pazartesi 08:00'de otomatik gönderilir.</div>
+          <!-- Aktif durum -->
+          <div style="display:flex;align-items:center;gap:10px;background:#f0faf4;border:1px solid #b7dfc5;padding:10px 14px;border-radius:6px;margin-bottom:16px;">
+            <span style="font-size:18px;">✅</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#1a6b3c;">Otomatik E-posta Aktif</div>
+              <div style="font-size:11px;color:#2d7a4f;margin-top:1px;">Her Pazartesi 08:00'de (TR saati) <strong>batuhanbulut@cactuscafes.com</strong> adresine gönderilir</div>
+            </div>
+          </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
             <div style="flex:1;min-width:220px;">
               <label class="lbl">Alıcı E-posta</label>
-              <input id="emailAlici" class="yi" type="email" placeholder="ornek@mail.com" style="width:100%;">
+              <input id="emailAlici" class="yi" type="email" value="batuhanbulut@cactuscafes.com" style="width:100%;">
             </div>
             <div style="min-width:150px;">
               <label class="lbl">Dönem</label>
@@ -460,13 +467,11 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
                 <option value="bu-hafta">Bu Hafta</option>
               </select>
             </div>
-            <button onclick="emailGonder()" id="emailBtn" style="padding:9px 20px;background:#b8965a;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Şimdi Gönder</button>
+            <button onclick="emailGonder()" id="emailBtn" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Şimdi Gönder</button>
           </div>
           <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
-          <div style="background:var(--paper);border:1px solid var(--stone);padding:12px 16px;font-size:11px;color:var(--mist);line-height:1.8;margin-top:8px;">
-            <strong style="color:var(--ink);">Kurulum (tek seferlik) — Terminalde çalıştırın:</strong><br>
-            <code style="background:#eee;padding:2px 8px;display:inline-block;margin-top:4px;color:var(--ink);font-size:11px;">bash /tmp/setup-email.sh</code><br>
-            <span style="display:block;margin-top:6px;">Script Resend.com'u açar, API key'i sorar ve her şeyi otomatik kurar.</span>
+          <div style="background:var(--paper);border:1px solid var(--stone);padding:10px 14px;font-size:11px;color:var(--mist);line-height:1.8;margin-top:4px;">
+            💡 Farklı bir adrese göndermek için <strong style="color:var(--ink);">resend.com/domains</strong> üzerinden <strong style="color:var(--ink);">cactuscafes.com</strong> domainini doğrulamanız gerekir.
           </div>
         </div>
       </div>

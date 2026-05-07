@@ -218,6 +218,12 @@
           "ad": "servis ücreti",
           "fiyat": 40,
           "emoji": "☕"
+        },
+        {
+          "id": "sicak_1778160411106",
+          "ad": "doğum günü paketi",
+          "fiyat": 250,
+          "emoji": "☕"
         }
       ]
     },

@@ -1974,11 +1974,41 @@ setInterval(function(){gunCiroYukle();},60000);
 
   window.cactusAra = function(q) {
     q = q.toLowerCase().trim();
-    document.querySelectorAll('.ukrt').forEach(function(kart) {
-      var ad = kart.querySelector('.ua, [class*="ad"], [class*="name"]');
-      var adText = ad ? ad.textContent.toLowerCase() : kart.textContent.toLowerCase();
-      kart.style.display = (!q || adText.includes(q)) ? '' : 'none';
-    });
+    var grid = document.getElementById('urun-grid');
+    var katBar = document.getElementById('kat-bar');
+    if (!grid) return;
+    if (!q) {
+      // Temizlendi — normal kategori görünümüne dön
+      if (katBar) katBar.style.display = '';
+      if (typeof renderUrunler === 'function') renderUrunler();
+      return;
+    }
+    // Arama modunda kategori barını gizle
+    if (katBar) katBar.style.display = 'none';
+    grid.innerHTML = '';
+    if (typeof MENU !== 'undefined') {
+      Object.entries(MENU).forEach(function(entry) {
+        var kat = entry[1];
+        if (!kat || !Array.isArray(kat.urunler)) return;
+        kat.urunler.forEach(function(u) {
+          if (!u || u.gizli) return;
+          if (!(u.ad || '').toLowerCase().includes(q)) return;
+          var tipRaw = u.tip || kat.tip || 'yi';
+          var ic = (tipRaw === 'ic' || tipRaw === 'icecek');
+          var tipNorm = ic ? 'icecek' : 'yiyecek';
+          var d = document.createElement('button');
+          d.className = 'ukrt ' + (ic ? 'ic' : 'yi');
+          d.innerHTML = '<span class="ue">' + (u.emoji || '') + '</span><div class="ua">' + u.ad + '</div><div class="uf">₺' + u.fiyat + '</div>';
+          (function(uu, btn) {
+            btn.onclick = function() { urunEkle({id:uu.id,ad:uu.ad,fiyat:uu.fiyat,emoji:uu.emoji,tip:tipNorm}, btn); };
+          })(u, d);
+          grid.appendChild(d);
+        });
+      });
+    }
+    if (!grid.children.length) {
+      grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--kr3,#888);font-size:13px;">🔍 Ürün bulunamadı</div>';
+    }
   };
 
   /* ===== 5. MASA RENGI ===== */
@@ -2088,10 +2118,12 @@ setInterval(function(){gunCiroYukle();},60000);
         window.renderAdisyon._patched = true;
       }
 
-      /* masaSec wrap — arama kutusunu güncelle */
+      /* masaSec wrap — arama temizle + kutuyu güncelle */
       var origMasaSec = window.masaSec;
       if (origMasaSec && !origMasaSec._patched) {
         window.masaSec = function() {
+          var si = document.getElementById('cactus-arama');
+          if (si && si.value) { si.value = ''; window.cactusAra(''); }
           var r = origMasaSec.apply(this, arguments);
           setTimeout(aramaKutusuEkle, 100);
           return r;

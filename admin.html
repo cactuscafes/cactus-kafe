@@ -680,28 +680,40 @@ function basla(){
   aktifKat=KAT[0]?.id||'sicak';
   renderKatTabs(); renderUrunler();
   setTimeout(katSeciciDoldur, 500);
-  // Worker API'den güncel menüyü yükle (CDN yok, anlık)
-  var _adminSube=localStorage.getItem('cactus_admin_sube')||'fsm';
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube='+_adminSube)
+  // Menü yükle: önce Worker (anlık), boşsa GitHub'dan fallback
+  function _adminMenuUygula(data, kaynak){
+    var kat=[]; var menu={};
+    // {catId:{label,urunler}} veya {fsm:{...}} formatını destekle
+    var src=data;
+    if(data.fsm||data.podyum) src=data.fsm||data.podyum;
+    Object.keys(src).forEach(function(catId){
+      var cat=src[catId];
+      if(!cat) return;
+      var urunler=Array.isArray(cat)?cat:(cat.urunler||[]);
+      var catTip=(urunler.length)?urunler[0].tip:'ic';
+      kat.push({id:catId,label:(cat.label||catId),tip:catTip});
+      menu[catId]=urunler;
+    });
+    if(!kat.length) return;
+    KAT=kat; MENU=menu;
+    localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+    localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+    aktifKat=KAT[0]?.id||'sicak';
+    renderKatTabs(); renderUrunler();
+    setTimeout(katSeciciDoldur,500);
+    toast('✅ Menü yüklendi — '+kaynak+' ('+kat.length+' kategori)');
+  }
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=fsm')
     .then(function(r){return r.ok?r.json():null;})
     .then(function(data){
-      if(!data||!Object.keys(data).length) return;
-      var kat=[]; var menu={};
-      Object.keys(data).forEach(function(catId){
-        var cat=data[catId];
-        if(!cat||!cat.urunler) return;
-        var catTip=(cat.urunler&&cat.urunler.length)?cat.urunler[0].tip:'ic';
-        kat.push({id:catId,label:cat.label||catId,tip:catTip});
-        menu[catId]=cat.urunler||[];
-      });
-      if(!kat.length) return;
-      KAT=kat; MENU=menu;
-      localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
-      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
-      aktifKat=KAT[0]?.id||'sicak';
-      renderKatTabs(); renderUrunler();
-      setTimeout(katSeciciDoldur,500);
-      toast('✅ Menü yüklendi ('+KAT.length+' kategori)');
+      if(data&&Object.keys(data).length){
+        _adminMenuUygula(data,'worker');
+      } else {
+        // Worker boş — GitHub'dan yükle
+        return fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t='+Date.now())
+          .then(function(r){return r.json();})
+          .then(function(ghData){if(ghData)_adminMenuUygula(ghData,'GitHub');});
+      }
     })
     .catch(function(e){console.warn('Menü yükleme hatası:',e);});
 }

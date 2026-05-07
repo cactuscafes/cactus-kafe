@@ -1661,18 +1661,16 @@ setInterval(function(){gunCiroYukle();},60000);
 /* MENU SYNC v4 — Cloudflare Worker, CDN yok, anlık */
 (function(){
   var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
-  var _sube = typeof SUBE !== 'undefined' ? SUBE : 'podyum';
+  // Adisyon ürünleri website menüsünden ayrı anahtarda tutulur
+  var _sube = 'adisyon_' + (typeof SUBE !== 'undefined' ? SUBE : 'podyum');
 
   function menuUygula(data){
     if(!data||typeof data!=='object'||!Object.keys(data).length) return;
-    var pick=(typeof isBranchFormat==='function'&&isBranchFormat(data))
-      ?(typeof pickBranch==='function'?pickBranch(data):(data[_sube]||data.podyum||data.fsm))
-      :data;
-    if(!pick||!Object.keys(pick).length) return;
-    localStorage.setItem(LK.menu, JSON.stringify(pick));
+    // Adisyon anahtarı (adisyon_podyum) düz format döner — branch seçimine gerek yok
+    localStorage.setItem(LK.menu, JSON.stringify(data));
     if(typeof MENU!=='undefined'&&MENU){
       Object.keys(MENU).forEach(function(k){delete MENU[k];});
-      Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
+      Object.keys(data).forEach(function(k){MENU[k]=data[k];});
       if(typeof aktifKat!=='undefined'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
       if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
     }
@@ -1684,7 +1682,7 @@ setInterval(function(){gunCiroYukle();},60000);
   function menuGuncelle(){
     fetch(API+'/menu/cek?sube='+_sube)
       .then(function(r){return r.ok?r.json():null;})
-      .then(function(data){if(data)menuUygula(data);})
+      .then(function(data){if(data&&Object.keys(data).length)menuUygula(data);})
       .catch(function(){});
   }
 

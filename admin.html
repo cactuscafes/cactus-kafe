@@ -487,27 +487,45 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 
         <!-- E-POSTA RAPORU -->
         <div style="margin-top:32px;border-top:1.5px solid var(--stone);padding-top:24px;">
-          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Haftalık Raporu E-Posta ile Gönder</div>
-          <div style="display:flex;align-items:center;gap:10px;background:#f0faf4;border:1px solid #b7dfc5;padding:10px 14px;border-radius:6px;margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Otomatik E-posta Raporları</div>
+          <div style="display:flex;align-items:center;gap:10px;background:#f0faf4;border:1px solid #b7dfc5;padding:10px 14px;border-radius:6px;margin-bottom:12px;">
             <span style="font-size:18px;">✅</span>
             <div>
-              <div style="font-size:12px;font-weight:600;color:#1a6b3c;">Otomatik E-posta Aktif</div>
-              <div style="font-size:11px;color:#2d7a4f;margin-top:1px;">Her Pazartesi 08:00'de (TR saati) <strong>batuhanbulut@cactuscafes.com</strong> adresine gönderilir</div>
+              <div style="font-size:12px;font-weight:600;color:#1a6b3c;">2 otomatik gönderim aktif</div>
+              <div style="font-size:11px;color:#2d7a4f;margin-top:2px;">🌙 Her gece <strong>23:00</strong> → Günlük rapor</div>
+              <div style="font-size:11px;color:#2d7a4f;margin-top:1px;">📅 Her <strong>Pazartesi 08:00</strong> → Haftalık rapor</div>
             </div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
-            <div style="flex:1;min-width:220px;">
+
+          <!-- Haftalık gönder -->
+          <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px;">Haftalık Rapor — Manuel Gönder</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px;">
+            <div style="flex:1;min-width:200px;">
               <label class="lbl">Alıcı E-posta</label>
               <input id="emailAlici" class="yi" type="email" value="batuhanbulut@cactuscafes.com" style="width:100%;">
             </div>
-            <div style="min-width:150px;">
+            <div style="min-width:140px;">
               <label class="lbl">Dönem</label>
               <select id="emailDonem" class="yi" style="width:100%;">
                 <option value="gecen-hafta">Geçen Hafta</option>
                 <option value="bu-hafta">Bu Hafta</option>
               </select>
             </div>
-            <button onclick="emailGonder()" id="emailBtn" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Şimdi Gönder</button>
+            <button onclick="emailGonder()" id="emailBtn" style="padding:9px 18px;background:var(--gold);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">📨 Gönder</button>
+          </div>
+
+          <!-- Günlük gönder -->
+          <div style="font-size:12px;font-weight:600;color:#555;margin:14px 0 8px;">Günlük Rapor — Manuel Gönder</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px;">
+            <div style="flex:1;min-width:200px;">
+              <label class="lbl">Alıcı E-posta</label>
+              <input id="gunlukAlici" class="yi" type="email" value="batuhanbulut@cactuscafes.com" style="width:100%;">
+            </div>
+            <div style="min-width:140px;">
+              <label class="lbl">Tarih</label>
+              <input id="gunlukTarih" class="yi" type="date" style="width:100%;">
+            </div>
+            <button onclick="gunlukEmailGonder()" id="gunlukBtn" style="padding:9px 18px;background:#2d7a4f;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">🌙 Gönder</button>
           </div>
           <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
         </div>
@@ -2092,12 +2110,46 @@ async function emailGonder(){
     sonuc.style.color = 'var(--rd)';
     sonuc.textContent = '✗ Bağlantı hatası: ' + e.message;
   }
-  btn.disabled = false; btn.textContent = '📨 Şimdi Gönder';
+  btn.disabled = false; btn.textContent = '📨 Gönder';
 }
-// Önceden kaydedilmiş e-postayı yükle
+
+/* ══════════ GÜNLÜK E-POSTA ══════════ */
+async function gunlukEmailGonder(){
+  var alici  = document.getElementById('gunlukAlici').value.trim();
+  var tarih  = document.getElementById('gunlukTarih').value;
+  var sonuc  = document.getElementById('emailSonuc');
+  var btn    = document.getElementById('gunlukBtn');
+  if(!alici){ sonuc.style.color='var(--rd)'; sonuc.textContent='⚠️ Alıcı e-posta adresi girin.'; return; }
+  if(!tarih){ tarih = new Date().toISOString().slice(0,10); }
+  btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
+  sonuc.style.color = 'var(--mist)'; sonuc.textContent = '';
+  try {
+    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/gunluk-gonder', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email: alici, tarih: tarih})
+    });
+    var d = await r.json();
+    if(d.ok){
+      sonuc.style.color = '#2d7a4f';
+      sonuc.textContent = '✓ Günlük rapor gönderildi → ' + d.alici + ' (' + d.tarih + ')';
+    } else {
+      sonuc.style.color = 'var(--rd)';
+      sonuc.textContent = '✗ ' + (d.error || 'Hata oluştu');
+    }
+  } catch(e){
+    sonuc.style.color = 'var(--rd)';
+    sonuc.textContent = '✗ Bağlantı hatası: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '🌙 Gönder';
+}
+
+// Önceden kaydedilmiş e-postayı yükle + günlük tarih alanını bugüne ayarla
 document.addEventListener('DOMContentLoaded', function(){
   var saved = localStorage.getItem('cactus_rapor_email');
-  if(saved){ var el=document.getElementById('emailAlici'); if(el) el.value=saved; }
+  if(saved){ var el=document.getElementById('emailAlici'); if(el) el.value=saved; var el2=document.getElementById('gunlukAlici'); if(el2) el2.value=saved; }
+  var td = document.getElementById('gunlukTarih');
+  if(td) td.value = new Date().toISOString().slice(0,10);
 });
 
 /* ══════════ SADAKAT KARTI ══════════ */

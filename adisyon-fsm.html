@@ -632,10 +632,10 @@ input,select{font-family:'Lato',sans-serif;}
     <div class="ks-list" id="ks-list"></div>
     <!-- İskonto -->
     <div class="iskonto-satir">
-      <label>% İskonto</label>
+      <label>₺ İskonto</label>
       <div class="iskonto-girdi">
-        <input type="number" id="iskonto-pct" min="0" max="100" step="1" placeholder="0" oninput="iskontoGuncelle()">
-        <span>%</span>
+        <input type="number" id="iskonto-tl" min="0" step="1" placeholder="0" oninput="iskontoGuncelle()">
+        <span>₺</span>
         <span class="iskonto-indirim" id="iskonto-indirim-txt"></span>
       </div>
     </div>
@@ -992,8 +992,7 @@ function renderKalemSecim(){
 }
 function _iskontoHesapla(){
   const ham=_secKalemler.reduce((s,k)=>s+k.fiyat*k.sec,0);
-  const pct=Math.min(100,Math.max(0,parseFloat(document.getElementById('iskonto-pct')?.value)||0));
-  const indirim=pct>0?Math.round(ham*pct/100):0;
+  const indirim=Math.min(ham,Math.max(0,parseFloat(document.getElementById('iskonto-tl')?.value)||0));
   return {ham,indirim,net:ham-indirim};
 }
 function iskontoGuncelle(){
@@ -1067,8 +1066,8 @@ function bolmeHesapla(degisen){
 function odemeAl(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
   // İskonto sıfırla
-  const ipct=document.getElementById('iskonto-pct');
-  if(ipct){ipct.value='';}
+  const itl=document.getElementById('iskonto-tl');
+  if(itl){itl.value='';}
   const hs=document.getElementById('ks-ham-satir');if(hs)hs.style.display='none';
   const it=document.getElementById('iskonto-indirim-txt');if(it)it.textContent='';
   seciliOdemeTipi='nakit';odemeSecim('nakit');
@@ -1080,14 +1079,14 @@ function odemeOnayla(){
   const secilen=_secKalemler.filter(k=>k.sec>0);
   if(!secilen.length){toast('⚠️ En az bir ürün seçin');return;}
   const hamTop=secilen.reduce((s,k)=>s+k.fiyat*k.sec,0);
-  // İskonto uygula
-  const pct=Math.min(100,Math.max(0,parseFloat(document.getElementById('iskonto-pct')?.value)||0));
-  const indirim=pct>0?Math.round(hamTop*pct/100):0;
+  // İskonto uygula (TL)
+  const indirim=Math.min(hamTop,Math.max(0,parseFloat(document.getElementById('iskonto-tl')?.value)||0));
   const top=hamTop-indirim;
   const icHam=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   const yiHam=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
-  const ic=pct>0?Math.round(icHam*(1-pct/100)):icHam;
-  const yi=pct>0?Math.round(yiHam*(1-pct/100)):yiHam;
+  const ratio=hamTop>0?indirim/hamTop:0;
+  const ic=ratio>0?Math.round(icHam*(1-ratio)):icHam;
+  const yi=ratio>0?Math.round(yiHam*(1-ratio)):yiHam;
   const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
   const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
   let nakitTutar=0,kartTutar=0;
@@ -1112,7 +1111,7 @@ function odemeOnayla(){
     const now=new Date();
     fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+oncekiMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:secilen.map(k=>k.ad+' x'+k.sec).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
   }
-  const tipLabel=indirim>0?' (%'+pct+' indirim)':'';
+  const tipLabel=indirim>0?' (-₺'+indirim+' indirim)':'';
   const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
   odemeyiKaydet(oncekiMasa,top,ic,yi,seciliOdemeTipi,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
   saveMasalar();
@@ -2087,7 +2086,7 @@ setInterval(function(){gunCiroYukle();},60000);
         var iskontoRow = document.createElement('div');
         iskontoRow.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;';
         iskontoRow.innerHTML =
-          '<button id="btn-iskonto" onclick="iskontoUygula()" style="flex:1;padding:7px;background:rgba(255,200,0,0.15);border:1px solid rgba(255,200,0,0.3);border-radius:8px;color:#ffc107;font-size:12px;cursor:pointer;">% İskonto</button>' +
+          '<button id="btn-iskonto" onclick="iskontoUygula()" style="flex:1;padding:7px;background:rgba(255,200,0,0.15);border:1px solid rgba(255,200,0,0.3);border-radius:8px;color:#ffc107;font-size:12px;cursor:pointer;">₺ İskonto</button>' +
           '<button onclick="masaTasi()" style="flex:1;padding:7px;background:rgba(100,150,255,0.15);border:1px solid rgba(100,150,255,0.3);border-radius:8px;color:#7eb3ff;font-size:12px;cursor:pointer;">↔ Taşı</button>' +
           '<button onclick="gunSonuGoster()" style="flex:1;padding:7px;background:rgba(100,255,150,0.1);border:1px solid rgba(100,255,150,0.2);border-radius:8px;color:#7fffaa;font-size:12px;cursor:pointer;">📊 Gün</button>';
         ozet.insertBefore(iskontoRow, ozet.firstChild);

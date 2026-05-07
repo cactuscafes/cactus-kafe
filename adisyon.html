@@ -801,7 +801,7 @@ function goTo(id,el){
   el.classList.add('on');
   if(id==='bar'){barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');renderBar();}
   if(id==='mut'){mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');renderMut();}
-  if(id==='yon'){renderYon();}
+  if(id==='yon'){menuGuncelleAnlik();renderYon();}
   if(id==='rap'){renderCanliCiro();gunCiroYukle();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
 }
 
@@ -1678,6 +1678,7 @@ setInterval(function(){gunCiroYukle();},60000);
     }
     if(typeof renderKatBar==='function') renderKatBar();
     if(typeof renderUrunler==='function') renderUrunler();
+    if(typeof renderYon==='function') renderYon();
   }
 
   function menuGuncelle(){
@@ -1686,6 +1687,9 @@ setInterval(function(){gunCiroYukle();},60000);
       .then(function(data){if(data)menuUygula(data);})
       .catch(function(){});
   }
+
+  // Yönet tabı açılınca çağrılır — worker'dan anlık çeker
+  window.menuGuncelleAnlik = menuGuncelle;
 
   window.addEventListener('load',function(){
     setTimeout(function(){
@@ -1699,7 +1703,11 @@ setInterval(function(){gunCiroYukle();},60000);
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({sube:_sube,menu:window.MENU})
-        }).catch(function(){});
+        }).then(function(res){
+          if(res.ok&&typeof toast==='function') toast('☁️ Menü sunucuya kaydedildi');
+        }).catch(function(){
+          if(typeof toast==='function') toast('⚠️ Sunucu kaydı başarısız');
+        });
         return r;
       };
       window.menuKaydet._apiSync=true;

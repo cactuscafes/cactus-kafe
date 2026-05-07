@@ -225,6 +225,15 @@ input,select{font-family:'Lato',sans-serif;}
 .bolme-row input{flex:1;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:8px;font-size:15px;font-weight:700;color:var(--k1);background:#fff;outline:none;text-align:right;}
 .bolme-row input:focus{border-color:var(--al);}
 .bolme-kalan{font-size:12px;font-weight:700;text-align:right;margin-top:2px;}
+/* iskonto */
+.iskonto-satir{display:flex;align-items:center;justify-content:space-between;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:9px;padding:8px 12px;margin-bottom:8px;}
+.iskonto-satir label{font-size:12px;font-weight:700;color:var(--k2);}
+.iskonto-girdi{display:flex;align-items:center;gap:5px;}
+.iskonto-girdi input{width:58px;padding:6px 8px;border:1.5px solid rgba(255,180,0,.4);border-radius:7px;font-size:15px;font-weight:700;color:var(--k1);background:#fff;outline:none;text-align:center;}
+.iskonto-girdi input:focus{border-color:#e67e22;}
+.iskonto-girdi span{font-size:14px;font-weight:700;color:var(--k2);}
+.iskonto-indirim{font-size:12px;font-weight:700;color:#e67e22;margin-left:6px;}
+.ks-ham-satir{display:flex;justify-content:space-between;font-size:12px;color:var(--kr3);padding:0 2px;margin-bottom:4px;text-decoration:line-through;}
 /* kalem seçim */
 .ks-ttl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--k2);margin-bottom:7px;}
 .ks-list{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto;margin-bottom:10px;}
@@ -621,7 +630,17 @@ input,select{font-family:'Lato',sans-serif;}
     <div class="mdl-ttl">💳 Ödeme Al — <span id="odeme-masa-no" style="color:var(--al)"></span></div>
     <div class="ks-ttl">Ödenecek ürünler</div>
     <div class="ks-list" id="ks-list"></div>
-    <div class="ks-toplam"><span>Seçilen Toplam</span><span id="ks-toplam-val">₺0</span></div>
+    <!-- İskonto -->
+    <div class="iskonto-satir">
+      <label>% İskonto</label>
+      <div class="iskonto-girdi">
+        <input type="number" id="iskonto-pct" min="0" max="100" step="1" placeholder="0" oninput="iskontoGuncelle()">
+        <span>%</span>
+        <span class="iskonto-indirim" id="iskonto-indirim-txt"></span>
+      </div>
+    </div>
+    <div class="ks-ham-satir" id="ks-ham-satir" style="display:none"><span>Ara Toplam</span><span id="ks-ham-val"></span></div>
+    <div class="ks-toplam"><span>Ödenecek</span><span id="ks-toplam-val">₺0</span></div>
     <div class="odeme-secim">
       <button class="odeme-opt on" id="opt-nakit" onclick="odemeSecim('nakit')"><span class="oi">💵</span>Nakit</button>
       <button class="odeme-opt" id="opt-kart" onclick="odemeSecim('kart')"><span class="oi">💳</span>Kredi Kartı</button>
@@ -971,12 +990,42 @@ function renderKalemSecim(){
   document.getElementById('odeme-masa-no').textContent='Masa '+aktifMasa;
   kalemGuncelle();
 }
+function _iskontoHesapla(){
+  const ham=_secKalemler.reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const pct=Math.min(100,Math.max(0,parseFloat(document.getElementById('iskonto-pct')?.value)||0));
+  const indirim=pct>0?Math.round(ham*pct/100):0;
+  return {ham,indirim,net:ham-indirim};
+}
+function iskontoGuncelle(){
+  const {ham,indirim,net}=_iskontoHesapla();
+  const hamSatir=document.getElementById('ks-ham-satir');
+  const indirimTxt=document.getElementById('iskonto-indirim-txt');
+  if(indirim>0){
+    hamSatir.style.display='flex';
+    document.getElementById('ks-ham-val').textContent='₺'+ham;
+    indirimTxt.textContent='-₺'+indirim;
+  } else {
+    hamSatir.style.display='none';
+    indirimTxt.textContent='';
+  }
+  document.getElementById('ks-toplam-val').textContent='₺'+net;
+  _bolmeTop=net;
+  if(seciliOdemeTipi==='bolunmus'){
+    document.getElementById('bolme-kalan').textContent='Kalan: ₺'+net;
+    document.getElementById('bolme-nakit').value='';
+    document.getElementById('bolme-kart').value='';
+  }
+}
 function kalemGuncelle(){
-  const top=_secKalemler.reduce((s,k)=>s+k.fiyat*k.sec,0);
-  _bolmeTop=top;
-  document.getElementById('ks-toplam-val').textContent='₺'+top;
+  const {ham,indirim,net}=_iskontoHesapla();
+  _bolmeTop=net;
+  // Ham toplam üstü çizgili
+  const hamSatir=document.getElementById('ks-ham-satir');
+  if(indirim>0){hamSatir.style.display='flex';document.getElementById('ks-ham-val').textContent='₺'+ham;document.getElementById('iskonto-indirim-txt').textContent='-₺'+indirim;}
+  else{hamSatir.style.display='none';document.getElementById('iskonto-indirim-txt').textContent='';}
+  document.getElementById('ks-toplam-val').textContent='₺'+net;
   document.getElementById('ks-list').innerHTML=_secKalemler.map((k,i)=>`<div class="ks-row${k.sec===0?' sifir':''}"><span class="ks-emoji">${k.emoji||'🍽️'}</span><div style="flex:1"><div class="ks-ad">${k.ad}</div><div class="ks-birim">₺${k.fiyat} birim</div></div><div class="ks-step"><button onclick="kalemDeg(${i},-1)">−</button><span>${k.sec}/${k.max}</span><button onclick="kalemDeg(${i},+1)">+</button></div><div class="ks-sub">₺${k.fiyat*k.sec}</div></div>`).join('');
-  if(seciliOdemeTipi==='bolunmus'){document.getElementById('bolme-kalan').textContent='Kalan: ₺'+top;document.getElementById('bolme-nakit').value='';document.getElementById('bolme-kart').value='';}
+  if(seciliOdemeTipi==='bolunmus'){document.getElementById('bolme-kalan').textContent='Kalan: ₺'+net;document.getElementById('bolme-nakit').value='';document.getElementById('bolme-kart').value='';}
 }
 function kalemDeg(i,d){_secKalemler[i].sec=Math.min(_secKalemler[i].max,Math.max(0,_secKalemler[i].sec+d));kalemGuncelle();}
 
@@ -1017,6 +1066,11 @@ function bolmeHesapla(degisen){
 }
 function odemeAl(){
   if(!aktifMasa||!masalar[aktifMasa].length)return;
+  // İskonto sıfırla
+  const ipct=document.getElementById('iskonto-pct');
+  if(ipct){ipct.value='';}
+  const hs=document.getElementById('ks-ham-satir');if(hs)hs.style.display='none';
+  const it=document.getElementById('iskonto-indirim-txt');if(it)it.textContent='';
   seciliOdemeTipi='nakit';odemeSecim('nakit');
   renderKalemSecim();
   document.getElementById('odeme-modal').classList.add('on');
@@ -1025,9 +1079,15 @@ function odemeOnayla(){
   if(!aktifMasa)return;
   const secilen=_secKalemler.filter(k=>k.sec>0);
   if(!secilen.length){toast('⚠️ En az bir ürün seçin');return;}
-  const top=secilen.reduce((s,k)=>s+k.fiyat*k.sec,0);
-  const ic=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
-  const yi=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const hamTop=secilen.reduce((s,k)=>s+k.fiyat*k.sec,0);
+  // İskonto uygula
+  const pct=Math.min(100,Math.max(0,parseFloat(document.getElementById('iskonto-pct')?.value)||0));
+  const indirim=pct>0?Math.round(hamTop*pct/100):0;
+  const top=hamTop-indirim;
+  const icHam=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const yiHam=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
+  const ic=pct>0?Math.round(icHam*(1-pct/100)):icHam;
+  const yi=pct>0?Math.round(yiHam*(1-pct/100)):yiHam;
   const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
   const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
   let nakitTutar=0,kartTutar=0;
@@ -1052,6 +1112,7 @@ function odemeOnayla(){
     const now=new Date();
     fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+oncekiMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:secilen.map(k=>k.ad+' x'+k.sec).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
   }
+  const tipLabel=indirim>0?' (%'+pct+' indirim)':'';
   const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
   odemeyiKaydet(oncekiMasa,top,ic,yi,seciliOdemeTipi,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
   saveMasalar();
@@ -1062,7 +1123,25 @@ function odemeOnayla(){
     document.getElementById('adis-masa-mob').textContent='Seçilmedi';
   }
   renderAdisyon();renderMasalar();
-  toast(tip+' — Masa '+oncekiMasa+' ₺'+top+' ödeme alındı');
+  toast(tip+tipLabel+' — ₺'+top+' alındı');
+  // Günlük ciro: anlık güncelle + 4sn sonra API'den çek
+  if(typeof _gunKapandiCiro!=='undefined'){
+    _gunKapandiCiro+=top;
+    _gunKapandiAdet+=1;
+    if(seciliOdemeTipi==='nakit') _gunNakit+=top;
+    else if(seciliOdemeTipi==='kart') _gunKart+=top;
+    else { _gunNakit+=nakitTutar; _gunKart+=kartTutar; }
+    var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
+    document.getElementById('gun-kapandi-ciro').textContent='₺'+fmt(_gunKapandiCiro);
+    document.getElementById('gun-kapandi-alt').textContent=_gunKapandiAdet+' işlem';
+    document.getElementById('gun-nakit-ciro').textContent='₺'+fmt(_gunNakit);
+    document.getElementById('gun-kart-ciro').textContent='₺'+fmt(_gunKart);
+    var acikTop=0,acikMasa=0;
+    for(var _gi=1;_gi<=30;_gi++){if(masalar[_gi]&&masalar[_gi].length){acikMasa++;acikTop+=masalar[_gi].reduce(function(s,x){return s+x.fiyat*x.adet;},0);}}
+    gunAcikGuncelle(acikTop,acikMasa);
+    setTimeout(function(){if(typeof gunCiroYukle==='function')gunCiroYukle();},4000);
+  }
+  // Sadakat kartı pul paneli — opsiyonel
   setTimeout(function(){ kartPanelAc(oncekiMasa, icSayisi, icUrunler); }, 600);
 }
 
@@ -1847,28 +1926,10 @@ setInterval(function(){gunCiroYukle();},60000);
 <script id="cactus-patch">
 /* CACTUS PATCH v2 — iskonto, not, masa tasima, arama, renkler, sure sayaci */
 (function() {
-  /* ===== 1. ISKONTO ===== */
-  var _iskonto = 0;
-
+  /* ===== 1. ISKONTO — modal içinde yönetiliyor ===== */
   function iskontoUygula() {
-    var val = prompt('İskonto miktarı (₺) veya yüzde (% ile): ', '0');
-    if (val === null) return;
-    val = val.trim();
-    if (val.endsWith('%')) {
-      var pct = parseFloat(val);
-      var top = hesaplaToplamHam();
-      _iskonto = Math.round(top * pct / 100);
-    } else {
-      _iskonto = parseFloat(val) || 0;
-    }
-    renderAdisyon();
-    toast('İskonto uygulandı: ₺' + _iskonto);
-  }
-
-  function hesaplaToplamHam() {
-    if (!window.aktifMasa) return 0;
-    var masalar = JSON.parse(localStorage.getItem((typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar')) || '{}');
-    return (masalar[window.aktifMasa] || []).reduce(function(a, u) { return a + (u.fiyat * u.adet); }, 0);
+    // İskonto artık ödeme modalinde — ödeme al butonuna yönlendir
+    if (typeof odemeAl === 'function') odemeAl();
   }
 
   /* ===== 2. SIPARIS NOTU ===== */
@@ -1893,7 +1954,6 @@ setInterval(function(){gunCiroYukle();},60000);
     var kaynak = masalar[window.aktifMasa] || [];
     masalar[hedef] = (masalar[hedef] || []).concat(kaynak);
     masalar[window.aktifMasa] = [];
-    _iskonto = 0;
     localStorage.setItem((typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar'), JSON.stringify(masalar));
     if (typeof saveMasalar === 'function') saveMasalar();
     window.aktifMasa = hedef;
@@ -2006,30 +2066,11 @@ setInterval(function(){gunCiroYukle();},60000);
       /* Arama kutusu */
       aramaKutusuEkle();
 
-      /* renderAdisyon'u wrap et — iskonto + not göster */
+      /* renderAdisyon'u wrap et — not göster */
       var origRender = window.renderAdisyon;
       if (origRender && !origRender._patched) {
         window.renderAdisyon = function() {
           origRender.apply(this, arguments);
-          /* İskonto satırı güncelle */
-          var topRow = document.querySelector('.oz-top');
-          if (topRow && _iskonto > 0) {
-            var existing = document.getElementById('iskonto-row');
-            if (!existing) {
-              existing = document.createElement('div');
-              existing.id = 'iskonto-row';
-              existing.className = 'oz-row';
-              existing.style.color = '#ffc107';
-              topRow.parentNode.insertBefore(existing, topRow);
-            }
-            existing.textContent = 'İskonto: -₺' + _iskonto;
-            /* Toplam metnini güncelle */
-            var toplam = hesaplaToplamHam();
-            if (topRow) topRow.querySelector('span:last-child,b,[class*="tutar"]') && (topRow.lastElementChild ? topRow.lastElementChild.textContent = '₺' + (toplam - _iskonto) : null);
-          } else {
-            var ex = document.getElementById('iskonto-row');
-            if (ex) ex.remove();
-          }
           /* Not ikonları ekle */
           if (window.aktifMasa) {
             document.querySelectorAll('.adis-item, [class*="adis-item"]').forEach(function(item, idx) {
@@ -2047,24 +2088,10 @@ setInterval(function(){gunCiroYukle();},60000);
         window.renderAdisyon._patched = true;
       }
 
-      /* odemeyiKaydet wrap — iskonto düş */
-      var origOdeme = window.odemeyiKaydet;
-      if (origOdeme && !origOdeme._iskontoPatched) {
-        window.odemeyiKaydet = function(masa, toplam, ic, yi, tip, urunler) {
-          var gercekToplam = toplam - _iskonto;
-          var gercekIc = ic > 0 ? Math.max(0, ic - Math.round(_iskonto * ic / toplam)) : 0;
-          var gercekYi = yi > 0 ? Math.max(0, gercekToplam - gercekIc) : 0;
-          _iskonto = 0;
-          return origOdeme.call(this, masa, gercekToplam, gercekIc, gercekYi, tip, urunler);
-        };
-        window.odemeyiKaydet._iskontoPatched = true;
-      }
-
-      /* masaSec wrap — iskonto sıfırla */
+      /* masaSec wrap — arama kutusunu güncelle */
       var origMasaSec = window.masaSec;
       if (origMasaSec && !origMasaSec._patched) {
         window.masaSec = function() {
-          _iskonto = 0;
           var r = origMasaSec.apply(this, arguments);
           setTimeout(aramaKutusuEkle, 100);
           return r;

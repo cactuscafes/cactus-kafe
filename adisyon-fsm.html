@@ -1618,73 +1618,53 @@ setInterval(function(){gunCiroYukle();},60000);
 
 
 <script id="menu-sync">
-/* MENU SYNC v3 — kalıcı yerel menü */
+/* MENU SYNC v4 — Cloudflare Worker, CDN yok, anlık */
 (function(){
-  var GH_MENU_URL = 'https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json';
-  var GH_API_URL  = 'https://api.github.com/repos/cactuscafes/cactus-kafe/contents/menu-data.json';
-  var LWT_KEY = 'cactus_menu_lwt'; // localStorage'da saklanan yerel kayıt zamanı
-  // Sayfa yenilemesine dayanıklı: localStorage'dan oku
-  var _lwt = parseInt(localStorage.getItem(LWT_KEY)||'0');
+  var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+  var _sube = typeof SUBE !== 'undefined' ? SUBE : 'fsm';
+
+  function menuUygula(data){
+    if(!data||typeof data!=='object'||!Object.keys(data).length) return;
+    var pick=(typeof isBranchFormat==='function'&&isBranchFormat(data))
+      ?(typeof pickBranch==='function'?pickBranch(data):(data[_sube]||data.fsm||data.podyum))
+      :data;
+    if(!pick||!Object.keys(pick).length) return;
+    localStorage.setItem(LK.menu, JSON.stringify(pick));
+    if(typeof MENU!=='undefined'&&MENU){
+      Object.keys(MENU).forEach(function(k){delete MENU[k];});
+      Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
+      if(typeof aktifKat!=='undefined'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
+      if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
+    }
+    if(typeof renderKatBar==='function') renderKatBar();
+    if(typeof renderUrunler==='function') renderUrunler();
+  }
 
   function menuGuncelle(){
-    // Bekleyen yerel değişiklik varsa GitHub'dan üzerine yazma
-    if(_lwt) return;
-    fetch(GH_MENU_URL+'?nc='+Date.now())
-      .then(function(r){return r.json();})
-      .then(function(data){
-        if(!data||typeof data!=='object'||!Object.keys(data).length) return;
-        var pick = (typeof isBranchFormat==='function'&&isBranchFormat(data))
-          ? (typeof pickBranch==='function'?pickBranch(data):(data[SUBE]||data.fsm||data.podyum))
-          : data;
-        if(!pick||!Object.keys(pick).length) return;
-        localStorage.setItem(LK.menu, JSON.stringify(pick));
-        if(typeof MENU!=='undefined'&&MENU){
-          Object.keys(MENU).forEach(function(k){delete MENU[k];});
-          Object.keys(pick).forEach(function(k){MENU[k]=pick[k];});
-          if(typeof aktifKat!=='undefined'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
-          if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
-        }
-        if(typeof renderKatBar==='function') renderKatBar();
-        if(typeof renderUrunler==='function') renderUrunler();
-      }).catch(function(){});
+    fetch(API+'/menu/cek?sube='+_sube)
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(data){if(data)menuUygula(data);})
+      .catch(function(){});
   }
 
   window.addEventListener('load',function(){
     setTimeout(function(){
       menuGuncelle();
       var origKaydet=window.menuKaydet;
-      if(!origKaydet||origKaydet._ghSync) return;
+      if(!origKaydet||origKaydet._apiSync) return;
       window.menuKaydet=function(){
         var r=origKaydet.apply(this,arguments);
-        // Yerel değişikliği kalıcı olarak işaretle — sayfa yenilemesinden sonra da geçerli
-        _lwt=Date.now();
-        localStorage.setItem(LWT_KEY, String(_lwt));
-        var token=localStorage.getItem('cactus_gh_token');
-        if(!token) return r;
-        // menu-data.json'ı çek → ilgili şubeyi güncelle → geri yaz
-        fetch(GH_API_URL,{headers:{'Authorization':'token '+token}})
-          .then(function(res){return res.json();})
-          .then(function(d){
-            var cur={};
-            if(d.content){try{cur=JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,'')))));}catch(e){}}
-            cur[SUBE]=MENU;
-            if(!cur.fsm)    cur.fsm   =JSON.parse(JSON.stringify(MENU));
-            if(!cur.podyum) cur.podyum=JSON.parse(JSON.stringify(MENU));
-            var b64=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,2))));
-            return fetch(GH_API_URL,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-              body:JSON.stringify({message:'Adisyon menü güncellendi ('+SUBE+')',content:b64,sha:d.sha})});
-          })
-          .then(function(){
-            // GitHub push başarılı → koruma kaldır, sonraki sync normal çalışır
-            localStorage.removeItem(LWT_KEY);
-            _lwt=0;
-          })
-          .catch(function(e){console.log('Menu push hatası:',e);});
+        // Worker API'ye kaydet — token gerekmez, anında
+        fetch(API+'/menu/kaydet',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({sube:_sube,menu:window.MENU})
+        }).catch(function(){});
         return r;
       };
-      window.menuKaydet._ghSync=true;
+      window.menuKaydet._apiSync=true;
     },1500);
-    setInterval(menuGuncelle,30000);
+    setInterval(menuGuncelle,10000);
   });
 })();
 </script>

@@ -528,6 +528,18 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
             <button onclick="gunlukEmailGonder()" id="gunlukBtn" style="padding:9px 18px;background:#2d7a4f;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">🌙 Gönder</button>
           </div>
           <div id="emailSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
+
+          <!-- WhatsApp -->
+          <div style="font-size:12px;font-weight:600;color:#555;margin:14px 0 8px;">📱 WhatsApp Test (CallMeBot)</div>
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:11px;color:#166534;line-height:1.7;">
+            <b>Kurulum (tek seferlik):</b><br>
+            1. <b>+34 644 91 44 88</b> numarasını telefonuna kaydet (isim: CallMeBot)<br>
+            2. O numaraya WhatsApp'tan yaz: <code style="background:#dcfce7;padding:1px 5px;border-radius:3px;">I allow callmebot to send me messages</code><br>
+            3. Gelen API key'i ve telefon numaranı (905XXXXXXXXX) terminale gir:<br>
+            <code style="background:#dcfce7;padding:2px 6px;border-radius:3px;display:block;margin-top:4px;">npx wrangler secret put WA_PHONE<br>npx wrangler secret put WA_APIKEY</code>
+          </div>
+          <button onclick="waTest()" id="waTestBtn" style="padding:9px 18px;background:#25d366;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">💬 WhatsApp Test Gönder</button>
+          <div id="waSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
         </div>
       </div>
 
@@ -2142,6 +2154,31 @@ async function gunlukEmailGonder(){
     sonuc.textContent = '✗ Bağlantı hatası: ' + e.message;
   }
   btn.disabled = false; btn.textContent = '🌙 Gönder';
+}
+
+/* ══════════ WHATSAPP TEST ══════════ */
+async function waTest(){
+  var sonuc = document.getElementById('waSonuc');
+  var btn   = document.getElementById('waTestBtn');
+  btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
+  sonuc.textContent = '';
+  try {
+    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/wa-test', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
+    });
+    var d = await r.json();
+    if(d.ok){
+      sonuc.style.color = '#166534';
+      sonuc.textContent = '✓ WhatsApp gönderildi → ' + d.phone + ' (' + d.tarih + ')';
+    } else {
+      sonuc.style.color = 'var(--rd)';
+      sonuc.textContent = '✗ ' + (d.error || 'Hata');
+    }
+  } catch(e){
+    sonuc.style.color = 'var(--rd)';
+    sonuc.textContent = '✗ ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '💬 WhatsApp Test Gönder';
 }
 
 // Önceden kaydedilmiş e-postayı yükle + günlük tarih alanını bugüne ayarla

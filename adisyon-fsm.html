@@ -351,6 +351,31 @@ input,select{font-family:'Lato',sans-serif;}
 .c-masa-items{font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:8px;}
 .c-masa-top{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#f4f1eb;border-top:1px solid rgba(255,255,255,.1);padding-top:6px;}
 .canli-bos{text-align:center;padding:20px;color:rgba(255,255,255,.3);font-size:13px;}
+
+/* ── Günün Cirosu ── */
+.gun-ciro-wrap{background:linear-gradient(135deg,#0d2b1a 0%,#142b10 50%,#0a1f22 100%);border-radius:14px;padding:16px;margin-bottom:12px;}
+.gun-ciro-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.gun-ciro-ttl{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f4f1eb;}
+.gun-ciro-tarih{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.5px;}
+.gun-krt-satir{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.gun-krt{border-radius:10px;padding:10px 10px;text-align:center;}
+.gun-krt .gkl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;}
+.gun-krt .gkv{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;line-height:1;}
+.gun-krt .gks{font-size:10px;margin-top:4px;opacity:.6;}
+.gun-krt.kapandi{background:rgba(46,138,82,.18);border:1px solid rgba(46,138,82,.35);}
+.gun-krt.kapandi .gkl{color:#6fcf97;}
+.gun-krt.kapandi .gkv{color:#4ade80;}
+.gun-krt.acik-krt{background:rgba(200,168,106,.13);border:1px solid rgba(200,168,106,.28);}
+.gun-krt.acik-krt .gkl{color:#e8c56a;}
+.gun-krt.acik-krt .gkv{color:#b8965a;}
+.gun-krt.gun-toplam-krt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);}
+.gun-krt.gun-toplam-krt .gkl{color:rgba(255,255,255,.5);}
+.gun-krt.gun-toplam-krt .gkv{color:#f4f1eb;}
+.gun-odeme-bar{display:flex;gap:8px;}
+.gun-odeme-pill{flex:1;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;text-align:center;}
+.gun-odeme-pill .gopl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;}
+.gun-odeme-pill .gopv{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#f4f1eb;}
+.gun-acik-baslik{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin:14px 0 10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
 </style>
 </head>
 <body>
@@ -447,17 +472,36 @@ input,select{font-family:'Lato',sans-serif;}
 <div class="scr" id="scr-rap">
   <div class="rap-wrap">
 
-    <!-- Canlı Ciro -->
-    <div class="canli-bolum">
-      <div class="canli-header">
-        <div class="canli-baslik"><span class="canli-pulse"></span>Canlı Ciro</div>
+    <!-- Günün Cirosu -->
+    <div class="gun-ciro-wrap">
+      <div class="gun-ciro-hdr">
+        <div class="gun-ciro-ttl"><span class="canli-pulse"></span>Günün Cirosu</div>
+        <div class="gun-ciro-tarih" id="gun-tarih-lbl"></div>
       </div>
-      <div class="canli-ozet">
-        <div class="canli-ozet-krt"><div class="cok-lbl">Açık Masa</div><div class="cok-val" id="c-masa-say">0</div></div>
-        <div class="canli-ozet-krt gold"><div class="cok-lbl">Toplam Açık</div><div class="cok-val" id="c-toplam">₺0</div></div>
-        <div class="canli-ozet-krt"><div class="cok-lbl">Açık Ürün</div><div class="cok-val" id="c-urun-say">0</div></div>
+      <div class="gun-krt-satir">
+        <div class="gun-krt kapandi">
+          <div class="gkl">✅ Kapanan</div>
+          <div class="gkv" id="gun-kapandi-ciro">₺0</div>
+          <div class="gks" id="gun-kapandi-alt">0 işlem</div>
+        </div>
+        <div class="gun-krt acik-krt">
+          <div class="gkl">🔓 Açık</div>
+          <div class="gkv" id="gun-acik-ciro">₺0</div>
+          <div class="gks" id="gun-acik-alt">0 masa</div>
+        </div>
+        <div class="gun-krt gun-toplam-krt">
+          <div class="gkl">Toplam</div>
+          <div class="gkv" id="gun-toplam-ciro">₺0</div>
+          <div class="gks" id="gun-toplam-alt">&nbsp;</div>
+        </div>
       </div>
-      <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Açık masa yok</div></div>
+      <div class="gun-odeme-bar" id="gun-odeme-bar">
+        <div class="gun-odeme-pill"><div class="gopl">💵 Nakit</div><div class="gopv" id="gun-nakit-ciro">₺0</div></div>
+        <div class="gun-odeme-pill"><div class="gopl">💳 Kart</div><div class="gopv" id="gun-kart-ciro">₺0</div></div>
+      </div>
+      <!-- Açık masalar listesi -->
+      <div class="gun-acik-baslik">Açık Masalar</div>
+      <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Şu an açık masa yok</div></div>
     </div>
 
     <!-- Periyot tabs -->
@@ -737,7 +781,7 @@ function goTo(id,el){
   if(id==='bar'){barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');renderBar();}
   if(id==='mut'){mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');renderMut();}
   if(id==='yon'){renderYon();}
-  if(id==='rap'){renderCanliCiro();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
+  if(id==='rap'){renderCanliCiro();gunCiroYukle();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
 }
 
 function renderMasalar(){
@@ -1318,14 +1362,54 @@ function rapGoster(){
   });
 }
 
+/* Günün kapanan masalar verisi (API'den) */
+var _gunKapandiCiro=0,_gunKapandiAdet=0,_gunNakit=0,_gunKart=0;
+
+function gunCiroTarihGoster(){
+  var el=document.getElementById('gun-tarih-lbl');
+  if(el){var now=new Date();el.textContent=now.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});}
+}
+
+function gunAcikGuncelle(acikTop,acikMasa){
+  var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
+  document.getElementById('gun-acik-ciro').textContent='₺'+fmt(acikTop);
+  document.getElementById('gun-acik-alt').textContent=acikMasa+' masa';
+  var toplam=_gunKapandiCiro+acikTop;
+  document.getElementById('gun-toplam-ciro').textContent='₺'+fmt(toplam);
+  var altTxt='';
+  if(_gunKapandiAdet>0) altTxt=_gunKapandiAdet+' işlem kapandı';
+  document.getElementById('gun-toplam-alt').textContent=altTxt||' ';
+}
+
+function gunCiroYukle(){
+  var bugun=new Date().toISOString().split('T')[0];
+  var url='https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/ozet?sube='+SUBE+'&baslangic='+bugun+'&bitis='+bugun;
+  fetch(url).then(function(r){return r.json();}).then(function(oz){
+    var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
+    _gunKapandiCiro=(oz.gunler||[]).reduce(function(a,g){return a+(g.ciro||0);},0);
+    _gunKapandiAdet=(oz.gunler||[]).reduce(function(a,g){return a+(g.adet||0);},0);
+    _gunNakit=0;_gunKart=0;
+    (oz.odeme||[]).forEach(function(o){
+      var t=(o.odeme_tipi||'').toLowerCase();
+      if(t==='nakit') _gunNakit=o.ciro||0;
+      else _gunKart=o.ciro||0;
+    });
+    document.getElementById('gun-kapandi-ciro').textContent='₺'+fmt(_gunKapandiCiro);
+    document.getElementById('gun-kapandi-alt').textContent=_gunKapandiAdet+' işlem';
+    document.getElementById('gun-nakit-ciro').textContent='₺'+fmt(_gunNakit);
+    document.getElementById('gun-kart-ciro').textContent='₺'+fmt(_gunKart);
+    var acikTop=0,acikMasa=0;
+    for(var i=1;i<=30;i++){if(masalar[i]&&masalar[i].length){acikMasa++;acikTop+=masalar[i].reduce(function(s,x){return s+x.fiyat*x.adet;},0);}}
+    gunAcikGuncelle(acikTop,acikMasa);
+  }).catch(function(){});
+  gunCiroTarihGoster();
+}
+
 function renderCanliCiro(){
   var acik=[];
   for(var i=1;i<=30;i++){if(masalar[i]&&masalar[i].length){var top=masalar[i].reduce(function(s,x){return s+x.fiyat*x.adet;},0);acik.push({masa:i,items:masalar[i],top:top});}}
   var genelTop=acik.reduce(function(s,m){return s+m.top;},0);
-  var genelUrun=acik.reduce(function(s,m){return s+m.items.reduce(function(ss,x){return ss+x.adet;},0);},0);
-  document.getElementById('c-masa-say').textContent=acik.length;
-  document.getElementById('c-toplam').textContent='₺'+genelTop.toLocaleString('tr-TR');
-  document.getElementById('c-urun-say').textContent=genelUrun;
+  gunAcikGuncelle(genelTop,acik.length);
   if(!acik.length){document.getElementById('c-masalar').innerHTML='<div class="canli-bos">Şu an açık masa yok</div>';return;}
   document.getElementById('c-masalar').innerHTML=acik.map(function(m){
     return '<div class="c-masa-kart" onclick="masaSec('+m.masa+');goTo(\'kas\',document.querySelector(\'.htab\'))">'+
@@ -1336,12 +1420,13 @@ function renderCanliCiro(){
   }).join('');
 }
 
-var _rapAutoRef=null,_canliRef=null;
+var _rapAutoRef=null,_canliRef=null,_gunCiroRef=null;
 function rapOtomatikYenile(aktif){
-  clearInterval(_rapAutoRef);clearInterval(_canliRef);
+  clearInterval(_rapAutoRef);clearInterval(_canliRef);clearInterval(_gunCiroRef);
   if(aktif){
     _rapAutoRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))rapGoster();},30000);
     _canliRef=setInterval(function(){if(document.getElementById('scr-rap').classList.contains('on'))renderCanliCiro();},5000);
+    _gunCiroRef=setInterval(function(){gunCiroYukle();},30000);
   }
 }
 
@@ -1443,6 +1528,8 @@ if(window.innerWidth<=640){
 }
 renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
+gunCiroTarihGoster();renderCanliCiro();
+setInterval(function(){gunCiroYukle();},60000);
 </script>
 <script src="rapor-hook-fsm.js"></script>
 

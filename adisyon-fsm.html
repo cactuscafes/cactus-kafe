@@ -86,8 +86,6 @@ input,select{font-family:'Lato',sans-serif;}
 .mbtn .mf{font-size:8px;color:var(--al);display:block;font-weight:700;}
 .mbtn.on .mf{color:var(--k1);}
 .mbdg{position:absolute;top:-4px;right:-4px;background:var(--rd2);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
-/* Hızlı ödeme — masaüstünde gizli, mobilde dolu masalarda görünür */
-.mbtn-odeme{display:none;}
 
 /* --- ÜRÜN PANEL --- */
 .urun-pnl{flex:1;background:var(--wh);display:flex;flex-direction:column;overflow:hidden;}
@@ -309,9 +307,6 @@ input,select{font-family:'Lato',sans-serif;}
   .ktab.on .ktab-cnt{background:rgba(247,237,216,.3);}
   .ara-kutu{padding:7px 8px 5px;}
   #cactus-arama{font-size:15px;}
-  /* Hızlı ödeme butonu — sadece dolu masalarda */
-  .mbtn-odeme{display:flex;align-items:center;justify-content:center;gap:2px;background:var(--gr);color:#fff;border-radius:4px;padding:3px 2px;font-size:10px;font-weight:700;margin-top:3px;width:100%;cursor:pointer;position:relative;z-index:2;}
-  .mbtn.on .mbtn-odeme{background:rgba(31,92,56,0.9);}
 }
 @media(max-width:480px){
   .masa-pnl{width:120px;min-width:120px;}
@@ -846,19 +841,12 @@ function renderMasalar(){
     b.onclick=()=>masaSec(i);
     b.innerHTML=(adet>0?`<div class="mbdg">${adet}</div>`:'')+
       `<span class="mn">${i}</span><span class="ml">Masa</span>`+
-      (top>0?`<span class="mf">₺${top}</span>`:'') +
-      (adet>0?`<div class="mbtn-odeme" onclick="hizliOdeme(${i},event)">💳 Öde</div>`:'');
+      (top>0?`<span class="mf">₺${top}</span>`:'');
     g.appendChild(b);
   }
   updateMobBadge();
 }
 
-function hizliOdeme(no,e){
-  e.stopPropagation();
-  aktifMasa=no;
-  renderMasalar();renderAdisyon();
-  odemeAl();
-}
 function masaSec(no){
   aktifMasa=no;
   renderMasalar();renderAdisyon();

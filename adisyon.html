@@ -443,6 +443,13 @@ input,select{font-family:'Lato',sans-serif;}
     </div>
     <div class="urun-pnl">
       <div class="uyari" id="uyari">⚠️ Önce masa seçin</div>
+      <div class="ara-kutu">
+        <div class="ara-ic">
+          <span class="ara-icon">🔍</span>
+          <input id="cactus-arama" type="search" placeholder="Ürün ara..." autocomplete="off" inputmode="search" oninput="cactusAra(this.value)">
+          <button class="ara-temizle" id="ara-temizle" onclick="document.getElementById('cactus-arama').value='';cactusAra('');" tabindex="-1">✕</button>
+        </div>
+      </div>
       <div class="kat-bar" id="kat-bar"></div>
       <div class="urun-grid" id="urun-grid"></div>
     </div>

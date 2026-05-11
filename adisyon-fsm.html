@@ -777,6 +777,7 @@ const MENU_DEFAULT = {
 };
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar_fsm',mut:'cactus_mut_fsm',menu:'cactus_menu_fsm'};
+var _menuYazmaZamani=0; // menuKaydet'in son çalışma zamanı — polling'in üzerine yazmasını engeller
 const SUBE='fsm';
 // Bu sayfa FSM şubesi için. menu-data.json branch-keyed format'a geçtiğinde otomatik 'fsm' dalını seç.
 function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
@@ -1311,7 +1312,18 @@ function urunEkleMenu(){
   document.getElementById('yeni-fiyat').value='';
   menuKaydet();renderYon();toast('✓ '+ad+' eklendi');
 }
-function menuKaydet(){localStorage.setItem(LK.menu,JSON.stringify(MENU));renderKatBar();renderUrunler();toast('💾 Menü kaydedildi!');}
+function menuKaydet(){
+  _menuYazmaZamani=Date.now();
+  localStorage.setItem(LK.menu,JSON.stringify(MENU));
+  renderKatBar();renderUrunler();
+  toast('💾 Menü kaydedildi!');
+  // Anlık sunucuya kaydet — tüm cihazlar 10 saniye içinde görecek
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:'adisyon_'+SUBE,menu:MENU})
+  }).then(function(r){if(r.ok&&typeof toast==='function')toast('☁️ Tüm cihazlara yayıldı');}).catch(function(){});
+}
 function masaAktar(){
   const k=parseInt(document.getElementById('aktar-kaynak').value);
   const h=parseInt(document.getElementById('aktar-hedef').value);
@@ -1652,6 +1664,8 @@ setInterval(function(){gunCiroYukle();},60000);
 
   function menuUygula(data){
     if(!data||typeof data!=='object'||!Object.keys(data).length) return;
+    // Kendi yazdığımızın 5 saniye içinde sunucu verisini geri alma
+    if(typeof _menuYazmaZamani!=='undefined' && Date.now()-_menuYazmaZamani < 5000) return;
     // Adisyon anahtarı (adisyon_fsm) düz format döner — branch seçimine gerek yok
     localStorage.setItem(LK.menu, JSON.stringify(data));
     if(typeof MENU!=='undefined'&&MENU){
@@ -1677,27 +1691,8 @@ setInterval(function(){gunCiroYukle();},60000);
   window.menuGuncelleAnlik = menuGuncelle;
 
   window.addEventListener('load',function(){
-    setTimeout(function(){
-      menuGuncelle();
-      var origKaydet=window.menuKaydet;
-      if(!origKaydet||origKaydet._apiSync) return;
-      window.menuKaydet=function(){
-        var r=origKaydet.apply(this,arguments);
-        // Worker API'ye kaydet — token gerekmez, anında
-        fetch(API+'/menu/kaydet',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({sube:_sube,menu:window.MENU})
-        }).then(function(res){
-          if(res.ok&&typeof toast==='function') toast('☁️ Menü sunucuya kaydedildi');
-        }).catch(function(){
-          if(typeof toast==='function') toast('⚠️ Sunucu kaydı başarısız');
-        });
-        return r;
-      };
-      window.menuKaydet._apiSync=true;
-    },1500);
-    setInterval(menuGuncelle,10000);
+    menuGuncelle(); // sayfa açılışında hemen çek
+    setInterval(menuGuncelle,10000); // her 10 saniyede diğer cihazların değişikliklerini al
   });
 })();
 </script>

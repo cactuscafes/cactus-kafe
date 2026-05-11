@@ -751,7 +751,7 @@ const MENU_DEFAULT = {
   ]},
 };
 
-const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar',mut:'cactus_mut',menu:'cactus_menu'};
+const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar_fsm',mut:'cactus_mut_fsm',menu:'cactus_menu_fsm'};
 const SUBE='fsm';
 // Bu sayfa FSM şubesi için. menu-data.json branch-keyed format'a geçtiğinde otomatik 'fsm' dalını seç.
 function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) && !d.urunler;}
@@ -1201,7 +1201,7 @@ function hazirlandiMark(id,tip){
   updateBadges();toast('✓ Hazırlandı olarak işaretlendi');
 }
 function siparisSil(id, tip) {
-  var lk = tip === 'bar' ? 'cactus_bar' : 'cactus_mut';
+  var lk = tip === 'bar' ? LK.bar : LK.mut;
   var siparisler = JSON.parse(localStorage.getItem(lk) || '[]');
   siparisler = siparisler.filter(function(s){ return s.id !== id; });
   localStorage.setItem(lk, JSON.stringify(siparisler));
@@ -1755,11 +1755,11 @@ setInterval(function(){gunCiroYukle();},60000);
   function getLkMut(){
     // LK.mut değerini runtime'dan al
     if(typeof LK!=='undefined'&&LK.mut) return LK.mut;
-    return 'cactus_mut';
+    return 'cactus_mut_fsm';
   }
   function getLkBar(){
     if(typeof LK!=='undefined'&&LK.bar) return LK.bar;
-    return 'cactus_bar';
+    return 'cactus_bar_fsm';
   }
 
   function pushMasalar(){
@@ -1998,9 +1998,9 @@ setInterval(function(){gunCiroYukle();},60000);
 
   /* ===== 5. MASA RENGI ===== */
   function masaRenkGuncelle() {
-    var masalar = JSON.parse(localStorage.getItem((typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar')) || '{}');
-    var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
-    var mut = JSON.parse(localStorage.getItem('cactus_mut') || '[]');
+    var masalar = JSON.parse(localStorage.getItem(LK.mas) || '{}');
+    var bar = JSON.parse(localStorage.getItem(LK.bar) || '[]');
+    var mut = JSON.parse(localStorage.getItem(LK.mut) || '[]');
     var bekleyenMasalar = {};
     bar.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
     mut.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
@@ -2023,8 +2023,8 @@ setInterval(function(){gunCiroYukle();},60000);
 
   /* ===== 6. BEKLEME SURESI ===== */
   function sureGuncelle() {
-    var bar = JSON.parse(localStorage.getItem('cactus_bar') || '[]');
-    var mut = JSON.parse(localStorage.getItem('cactus_mut') || '[]');
+    var bar = JSON.parse(localStorage.getItem(LK.bar) || '[]');
+    var mut = JSON.parse(localStorage.getItem(LK.mut) || '[]');
     var simdi = Date.now();
     var bekleyenler = {};
     bar.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){

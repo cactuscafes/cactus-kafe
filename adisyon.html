@@ -94,6 +94,18 @@ input,select{font-family:'Lato',sans-serif;}
 .ktab{flex-shrink:0;padding:10px 14px;border:none;background:transparent;font-family:'Playfair Display',serif;font-size:13px;color:var(--kr3);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s;}
 .ktab:hover{color:var(--k2);}
 .ktab.on{color:var(--k1);border-bottom-color:var(--al);font-weight:700;}
+.ktab-cnt{font-size:9px;font-weight:700;background:rgba(44,21,3,.1);border-radius:10px;padding:1px 5px;margin-left:4px;vertical-align:middle;display:inline-block;}
+.ktab.on .ktab-cnt{background:rgba(201,168,76,.35);}
+/* ── ARAMA KUTUSU ── */
+.ara-kutu{padding:7px 10px 6px;background:var(--wh);border-bottom:1px solid var(--kr2);flex-shrink:0;}
+.ara-ic{position:relative;display:flex;align-items:center;}
+.ara-icon{position:absolute;left:10px;color:var(--kr3);font-size:15px;pointer-events:none;}
+#cactus-arama{width:100%;padding:9px 34px 9px 33px;border-radius:9px;border:1.5px solid var(--kr2);background:#fff;color:var(--k1);font-size:14px;font-family:'Lato',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s;}
+#cactus-arama::placeholder{color:var(--kr3);font-style:italic;}
+#cactus-arama:focus{border-color:var(--al);box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+.ara-temizle{position:absolute;right:4px;background:none;border:none;color:var(--kr3);font-size:15px;padding:5px 8px;line-height:1;cursor:pointer;display:none;border-radius:6px;transition:color .15s;}
+.ara-temizle.on{display:block;}
+.ara-temizle:hover{color:var(--k1);}
 .urun-grid{flex:1;overflow-y:auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-content:start;}
 .ukrt{background:#fff;border:1.5px solid var(--kr2);border-radius:11px;padding:12px 8px;text-align:center;transition:all .18s;position:relative;overflow:hidden;}
 .ukrt::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:.2s;}
@@ -287,14 +299,20 @@ input,select{font-family:'Lato',sans-serif;}
   .urun-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
   .htab{font-size:10px;min-width:70px;}
   .bm-wrap,.yon-wrap{padding:12px;}
+  /* Mobil kategori pill stili */
+  .kat-bar{padding:7px 8px;gap:5px;border-bottom:1px solid var(--kr2);background:var(--kr);}
+  .ktab{padding:7px 11px;border-radius:20px;border:1.5px solid var(--kr2) !important;margin-bottom:0 !important;font-size:12px;background:#fff;color:var(--k2);font-family:'Lato',sans-serif;font-weight:700;}
+  .ktab:hover{background:var(--kr2);}
+  .ktab.on{background:var(--k1) !important;border-color:var(--k1) !important;color:var(--kr) !important;}
+  .ktab.on .ktab-cnt{background:rgba(247,237,216,.3);}
+  .ara-kutu{padding:7px 8px 5px;}
+  #cactus-arama{font-size:15px;}
 }
 @media(max-width:480px){
   .masa-pnl{width:120px;min-width:120px;}
   .masa-pnl.kapali{width:42px !important;min-width:42px !important;}
   .masa-grid{grid-template-columns:repeat(2,1fr);}
   .urun-grid{grid-template-columns:repeat(2,1fr);}
-  .kat-bar{gap:0;}
-  .ktab{padding:8px 10px;font-size:12px;}
 }
 
 /* ══════════ RAPORLAR ══════════ */
@@ -840,7 +858,8 @@ function renderKatBar(){
     if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
     b.className='ktab'+(aktifKat===k?' on':'');
-    b.textContent=v.label||k;
+    const gorunen=v.urunler.filter(u=>u&&!u.gizli).length;
+    b.innerHTML=(v.label||k)+(gorunen>0?'<span class="ktab-cnt">'+gorunen+'</span>':'');
     b.onclick=()=>{aktifKat=k;renderKatBar();renderUrunler();};
     bar.appendChild(b);
   });
@@ -1993,26 +2012,30 @@ setInterval(function(){gunCiroYukle();},60000);
 
   /* ===== 4. ARAMA KUTUSU ===== */
   function aramaKutusuEkle() {
-    var katBar = document.querySelector('.kat-bar, .kategori-bar, [class*="kat-bar"]');
+    var katBar = document.getElementById('kat-bar');
     if (!katBar || document.getElementById('cactus-arama')) return;
     var arama = document.createElement('div');
-    arama.style.cssText = 'padding:6px 12px;background:var(--kr,#1a1411);position:sticky;top:0;z-index:10;';
-    arama.innerHTML = '<input id="cactus-arama" placeholder="🔍 Ürün ara..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;outline:none;" oninput="cactusAra(this.value)">';
-    katBar.parentNode.insertBefore(arama, katBar.nextSibling);
+    arama.className = 'ara-kutu';
+    arama.innerHTML = '<div class="ara-ic">'
+      + '<span class="ara-icon">🔍</span>'
+      + '<input id="cactus-arama" type="search" placeholder="Ürün ara..." autocomplete="off" inputmode="search" oninput="cactusAra(this.value)">'
+      + '<button class="ara-temizle" id="ara-temizle" onclick="document.getElementById(\'cactus-arama\').value=\'\';cactusAra(\'\');" tabindex="-1">✕</button>'
+      + '</div>';
+    katBar.parentNode.insertBefore(arama, katBar);
   }
 
   window.cactusAra = function(q) {
-    q = q.toLowerCase().trim();
+    q = (q||'').toLowerCase().trim();
     var grid = document.getElementById('urun-grid');
     var katBar = document.getElementById('kat-bar');
+    var btnX = document.getElementById('ara-temizle');
+    if (btnX) btnX.className = 'ara-temizle' + (q ? ' on' : '');
     if (!grid) return;
     if (!q) {
-      // Temizlendi — normal kategori görünümüne dön
       if (katBar) katBar.style.display = '';
       if (typeof renderUrunler === 'function') renderUrunler();
       return;
     }
-    // Arama modunda kategori barını gizle
     if (katBar) katBar.style.display = 'none';
     grid.innerHTML = '';
     if (typeof MENU !== 'undefined') {
@@ -2036,7 +2059,10 @@ setInterval(function(){gunCiroYukle();},60000);
       });
     }
     if (!grid.children.length) {
-      grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--kr3,#888);font-size:13px;">🔍 Ürün bulunamadı</div>';
+      grid.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--kr3);font-size:13px;line-height:1.8;">'
+        + '<div style="font-size:28px;margin-bottom:6px;">🔍</div>'
+        + '"<strong style="color:var(--k2);">' + q + '</strong>" bulunamadı'
+        + '</div>';
     }
   };
 

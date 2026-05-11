@@ -1921,8 +1921,8 @@ setInterval(function(){gunCiroYukle();},60000);
             }
           });
 
-          if(bc){localStorage.setItem(lkBar,JSON.stringify(bar));if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
-          if(mc){localStorage.setItem(lkMut,JSON.stringify(mut));if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
+          if(bc){localStorage.setItem(lkBar,JSON.stringify(bar));if(typeof barSip!=='undefined')barSip.splice(0,barSip.length,...bar);if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
+          if(mc){localStorage.setItem(lkMut,JSON.stringify(mut));if(typeof mutSip!=='undefined')mutSip.splice(0,mutSip.length,...mut);if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
         }
 
         _lastSync=data.zaman||Date.now();

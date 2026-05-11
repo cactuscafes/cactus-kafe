@@ -202,6 +202,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
+      <button class="sb-btn" onclick="panelAc('ziyaret',this);ziyaretYukle()">📈 Ziyaretçiler</button>
       <div class="sb-ttl">Sayfalar</div>
       <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:#2d7a4f;color:#fff;">📊 Raporlar</button>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
@@ -559,6 +560,25 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
         <div id="kartOzet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
         <!-- Müşteri listesi -->
         <div id="kartListesi"></div>
+      </div>
+
+      <div class="panel" id="panel-ziyaret">
+        <div class="pttl">📈 Ziyaretçi İstatistikleri</div>
+        <div class="psub">cactuscafes.com'a kaç kez giriliyor — günlük ve sayfa bazlı.</div>
+        <div id="ziyaretOzet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px;">
+          <div style="color:var(--mist);font-size:13px;">Yükleniyor…</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:var(--ink);">Son 30 Gün</div>
+            <div id="ziyaretGunluk" style="font-size:12px;"></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:var(--ink);">Sayfa Bazlı (Son 30 Gün)</div>
+            <div id="ziyaretSayfalar" style="font-size:12px;"></div>
+          </div>
+        </div>
+        <button onclick="ziyaretYukle()" style="margin-top:16px;padding:8px 18px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">🔄 Yenile</button>
       </div>
 
     </div>
@@ -2391,6 +2411,38 @@ async function kartDuzenleKaydet(){
     toast('Bağlantı hatası.');
   }
   btn.disabled = false; btn.textContent = 'Kaydet';
+}
+
+// ───── ZİYARET İSTATİSTİKLERİ ─────
+async function ziyaretYukle(){
+  const ozet=document.getElementById('ziyaretOzet');
+  const gunluk=document.getElementById('ziyaretGunluk');
+  const sayfalar=document.getElementById('ziyaretSayfalar');
+  if(!ozet) return;
+  ozet.innerHTML='<div style="color:var(--mist);font-size:13px;">Yükleniyor…</div>';
+  try {
+    const r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/sayac');
+    const d=await r.json();
+    function kart(baslik,deger,alt,renk){
+      return '<div style="background:#fff;border:1px solid var(--stone);padding:14px 16px;border-radius:6px;"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:'+renk+';margin-bottom:6px;font-weight:700;">'+baslik+'</div><div style="font-size:26px;font-weight:300;color:var(--ink);">'+(deger||0).toLocaleString('tr-TR')+'</div><div style="font-size:11px;color:var(--mist);margin-top:2px;">'+alt+'</div></div>';
+    }
+    ozet.innerHTML=
+      kart('Bugün',d.bugun,(d.bugunTekil||0)+' tekil ziyaretçi','#2d7a4f')+
+      kart('Son 7 Gün',d.hafta,(d.haftaTekil||0)+' tekil','#c67000')+
+      kart('Son 30 Gün',d.ay,(d.ayTekil||0)+' tekil','#1a4b8c')+
+      kart('Tüm Zamanlar',d.toplam,(d.tekilToplam||0)+' tekil','#5a2d8c');
+    // Günlük tablo
+    gunluk.innerHTML=(d.gunluk||[]).map(function(g){
+      return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;"><span style="color:var(--ink);">'+g.gun+'</span><span><b>'+g.toplam+'</b> <span style="color:var(--mist);font-size:11px;">('+g.tekil+' tekil)</span></span></div>';
+    }).join('')||'<div style="color:var(--mist);">Henüz veri yok.</div>';
+    // Sayfa bazlı
+    sayfalar.innerHTML=(d.sayfalar||[]).map(function(s){
+      const ad=s.sayfa==='/'||s.sayfa==='/index.html'?'🏠 Ana Sayfa':s.sayfa;
+      return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;"><span style="color:var(--ink);">'+ad+'</span><span><b>'+s.toplam+'</b> <span style="color:var(--mist);font-size:11px;">('+s.tekil+' tekil)</span></span></div>';
+    }).join('')||'<div style="color:var(--mist);">Henüz veri yok.</div>';
+  } catch(e){
+    ozet.innerHTML='<div style="color:#e74c3c;">Yüklenemedi: '+e.message+'</div>';
+  }
 }
 </script>
 

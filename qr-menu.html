@@ -73,6 +73,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dar
 /* ── FOOTER ── */
 .qr-footer{text-align:center;padding:16px;font-size:10px;color:#ccc;letter-spacing:2px;text-transform:uppercase;background:#fff;border-top:1px solid var(--border);}
 </style>
+<script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 

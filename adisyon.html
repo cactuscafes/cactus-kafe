@@ -996,8 +996,24 @@ function siparisiGonder(){
   const saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
   const ic=yeniler.filter(x=>x.tip==='icecek');
   const yi=yeniler.filter(x=>x.tip==='yiyecek');
-  if(ic.length){barSip.push({id:'i_'+Date.now(),masa:aktifMasa,saat,items:ic,hazirlandi:false});localStorage.setItem(LK.bar,JSON.stringify(barSip));}
-  if(yi.length){mutSip.push({id:'y_'+Date.now(),masa:aktifMasa,saat,items:yi,hazirlandi:false});localStorage.setItem(LK.mut,JSON.stringify(mutSip));}
+  const _API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+  const now=Date.now();
+  const d1Sip=[];
+  if(ic.length){
+    const s={id:'i_'+now,masa:aktifMasa,saat,items:ic,hazirlandi:false,_d1:true};
+    barSip.push(s);localStorage.setItem(LK.bar,JSON.stringify(barSip));
+    d1Sip.push({id:s.id,masa:aktifMasa,tip:'bar',items:ic,zaman:now});
+  }
+  if(yi.length){
+    const s={id:'y_'+now,masa:aktifMasa,saat,items:yi,hazirlandi:false,_d1:true};
+    mutSip.push(s);localStorage.setItem(LK.mut,JSON.stringify(mutSip));
+    d1Sip.push({id:s.id,masa:aktifMasa,tip:'mutfak',items:yi,zaman:now});
+  }
+  // Anlık D1'e gönder — tüm cihazlar ~1.5 saniyede görür
+  if(d1Sip.length){
+    fetch(_API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sube:SUBE,siparisler:d1Sip})}).catch(function(){});
+  }
   // Tüm item'ları "tamamı gönderildi" olarak işaretle — masada kalmaya devam etsinler
   a.forEach(x=>{x.gonderilenAdet=x.adet;});
   saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();renderMasalar();
@@ -1809,7 +1825,6 @@ setInterval(function(){gunCiroYukle();},60000);
 
   function init(){
     hookSaveMasalar();
-    hookSiparisiGonder();
     hookHazirlandiButtons();
     setInterval(syncFromD1,1500);
     syncFromD1();
@@ -1843,33 +1858,7 @@ setInterval(function(){gunCiroYukle();},60000);
     window.saveMasalar._sv8=true;
   }
 
-  function hookSiparisiGonder(){
-    var orig=window.siparisiGonder;
-    if(!orig||orig._sv8)return;
-    window.siparisiGonder=function(){
-      _localWriteTime=Date.now();
-      var r=orig.apply(this,arguments);
-      setTimeout(function(){
-        var lkBar=getLkBar();
-        var lkMut=getLkMut();
-        var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
-        var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
-        var sip=[],now=Date.now();
-        bar.forEach(function(s){if(!s._d1){sip.push({id:s.id,masa:s.masa,tip:'bar',items:s.items,zaman:now});s._d1=true;}});
-        mut.forEach(function(s){if(!s._d1){sip.push({id:s.id,masa:s.masa,tip:'mutfak',items:s.items,zaman:now});s._d1=true;}});
-        localStorage.setItem(lkBar,JSON.stringify(bar));
-        localStorage.setItem(lkMut,JSON.stringify(mut));
-        if(sip.length){
-          fetch(API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,siparisler:sip})}).catch(function(){});
-        }
-        pushMasalar();
-        // lastSync güncelle — yeni gönderilen siparişleri geri alma
-        _lastSync=now;
-      },500);
-      return r;
-    };
-    window.siparisiGonder._sv8=true;
-  }
+  // hookSiparisiGonder kaldırıldı — D1 push artık siparisiGonder() içinde direkt yapılıyor
 
   function hookHazirlandiButtons(){
     document.addEventListener('click',function(e){

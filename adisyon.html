@@ -857,7 +857,20 @@ function masaSec(no){
   document.getElementById('adis-masa-mob').textContent='Masa '+no;
 }
 
-function saveMasalar(){localStorage.setItem(LK.mas,JSON.stringify(masalar));}
+var _pushMasalarTimer=null;
+var _masaLocalWriteTime=0; // CACTUS SYNC polling'in kendi yazdığımızın üzerine yazmaması için
+function saveMasalar(){
+  localStorage.setItem(LK.mas,JSON.stringify(masalar));
+  _masaLocalWriteTime=Date.now();
+  // Anlık D1'e push — debounce 200ms (hızlı art arda çağrılarda tek push)
+  clearTimeout(_pushMasalarTimer);
+  _pushMasalarTimer=setTimeout(function(){
+    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sube:SUBE,masalar:masalar})
+    }).catch(function(){});
+  },200);
+}
 
 function renderKatBar(){
   const bar=document.getElementById('kat-bar');
@@ -1824,7 +1837,6 @@ setInterval(function(){gunCiroYukle();},60000);
   }
 
   function init(){
-    hookSaveMasalar();
     hookHazirlandiButtons();
     setInterval(syncFromD1,1500);
     syncFromD1();
@@ -1840,25 +1852,7 @@ setInterval(function(){gunCiroYukle();},60000);
     return 'cactus_bar_podyum';
   }
 
-  function pushMasalar(){
-    _localWriteTime=Date.now();
-    var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-    fetch(API+'/sync/masalar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:m})}).catch(function(){});
-  }
-
-  function hookSaveMasalar(){
-    var orig=window.saveMasalar;
-    if(!orig||orig._sv8)return;
-    window.saveMasalar=function(){
-      _localWriteTime=Date.now();
-      var r=orig.apply(this,arguments);
-      pushMasalar();
-      return r;
-    };
-    window.saveMasalar._sv8=true;
-  }
-
-  // hookSiparisiGonder kaldırıldı — D1 push artık siparisiGonder() içinde direkt yapılıyor
+  // pushMasalar, hookSaveMasalar, hookSiparisiGonder kaldırıldı — push artık ilgili fonksiyonlar içinde direkt yapılıyor
 
   function hookHazirlandiButtons(){
     document.addEventListener('click',function(e){
@@ -1868,9 +1862,7 @@ setInterval(function(){gunCiroYukle();},60000);
       if(btn.classList.contains('tmz-btn'))return;
       var id=btn.dataset.id||(btn.closest('[data-id]')&&btn.closest('[data-id]').dataset.id);
       if(id){
-        _localWriteTime=Date.now();
         fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
-        setTimeout(pushMasalar,300);
       }
     });
   }
@@ -1902,7 +1894,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
   function syncFromD1(){
     geceKontrolu();
-    var masaKorumaAktif=(Date.now()-_localWriteTime)<LOKAL_KORUMA_MS;
+    var masaKorumaAktif=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:_localWriteTime))<LOKAL_KORUMA_MS;
     var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since)
       .then(function(r){return r.json();})

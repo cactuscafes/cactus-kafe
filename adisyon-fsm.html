@@ -1662,7 +1662,8 @@ setInterval(function(){gunCiroYukle();},60000);
     }
     if(typeof renderKatBar==='function') renderKatBar();
     if(typeof renderUrunler==='function') renderUrunler();
-    if(typeof renderYon==='function') renderYon();
+    // renderYon burada çağrılmıyor — polling fiyat inputlarını sıfırlıyor
+    // Yönet sekmesine geçilince zaten menuGuncelleAnlik+renderYon çalışıyor
   }
 
   function menuGuncelle(){

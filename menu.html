@@ -219,12 +219,6 @@ footer{padding:40px 20px 24px;}
 .cat-products{transition:max-height .55s cubic-bezier(.34,1.4,.64,1) !important;}
 .cat-arrow{transition:transform .45s cubic-bezier(.34,1.4,.64,1) !important;}
 
-/* 3. Kategori başlığı aktif rozet (sticky breadcrumb) */
-#cat-aktif-bant{position:fixed;left:50%;transform:translateX(-50%) translateY(-30px);top:130px;z-index:80;background:rgba(255,255,255,.92);backdrop-filter:blur(14px) saturate(150%);border:1px solid var(--border);border-radius:24px;padding:9px 22px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dark);font-weight:600;opacity:0;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.2,1);pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.08);font-family:'Montserrat',sans-serif;white-space:nowrap;max-width:80vw;overflow:hidden;text-overflow:ellipsis;}
-#cat-aktif-bant.on{opacity:1;transform:translateX(-50%) translateY(0);}
-#cat-aktif-bant span{display:inline-block;animation:bantSlide .4s cubic-bezier(.2,.7,.2,1);}
-@keyframes bantSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-
 /* 4. Header parallax + shrink */
 .menu-header{transition:padding .35s ease,opacity .35s ease;}
 .menu-header.shrunk{padding:36px 40px 28px;}
@@ -281,17 +275,8 @@ footer{padding:40px 20px 24px;}
 .sk-line.short{width:60%;margin-top:6px;height:12px;}
 .sk-line.price{width:35%;margin-top:8px;height:11px;}
 
-/* 12. Spotlight carousel — mobil */
-@media(max-width:768px){
-  .spotlight-grid{display:flex!important;grid-template-columns:none!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 4px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-  .spotlight-grid::-webkit-scrollbar{display:none;}
-  .spotlight-card{flex-shrink:0;width:62%;scroll-snap-align:start;}
-  .spotlight-card img{aspect-ratio:3/4!important;}
-  .spotlight-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
-  .sp-dot{width:6px;height:6px;border-radius:50%;background:#ddd;transition:all .25s;cursor:pointer;}
-  .sp-dot.on{background:var(--dark);width:18px;border-radius:3px;}
-}
-@media(min-width:769px){.spotlight-dots{display:none;}}
+/* 12. Spotlight — mobilde varsayılan 2x2 grid (carousel kaldırıldı) */
+.spotlight-dots{display:none;}
 
 /* 16. Resim pinch / double-tap zoom */
 .upop-img img{transition:transform .35s cubic-bezier(.2,.7,.2,1);transform-origin:center;}
@@ -394,9 +379,6 @@ footer{padding:40px 20px 24px;}
 </div>
 
 
-<!-- ⓘ Aktif kategori bandı (sticky breadcrumb) -->
-<div id="cat-aktif-bant"><span id="cat-aktif-isim"></span></div>
-
 <!-- ⓘ Pull-to-refresh göstergesi -->
 <div id="ptr-ind">↓</div>
 
@@ -454,8 +436,6 @@ async function init() {
     altKatBarGuncelle();
     gozlemUrunler();
     altKatBarOto();
-    spotlightDots();
-    bantSyncIlk();
   },50);
 }
 
@@ -481,14 +461,6 @@ function renderMenu(sube) {
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
       return c;
     }).join('');
-    // 12. Spotlight dots (sadece mobil)
-    if (!spotGridEl.parentNode.querySelector('.spotlight-dots')){
-      var dots=document.createElement('div');
-      dots.className='spotlight-dots';
-      dots.id='sp-dots-'+sube;
-      for(var i=0;i<spotItems.length;i++) dots.innerHTML+='<div class="sp-dot'+(i===0?' on':'')+'" data-i="'+i+'"></div>';
-      spotGridEl.parentNode.appendChild(dots);
-    }
   } else if (spotlightEl) { spotlightEl.style.display='none'; }
   catListEl.innerHTML = katData.map(function(kat) {
     var urunler=(kat.urunler||[]).filter(function(u){ return !u.gizli; });
@@ -647,40 +619,6 @@ function altKatPillAktifGuncelle(){
 }
 
 // 3. Sticky breadcrumb — aktif kategori bandı
-function bantSyncIlk(){
-  var bant=document.getElementById('cat-aktif-bant');
-  if(!bant) return;
-  var sonAd='';
-  function tick(){
-    var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
-    if(!liste){bant.classList.remove('on');return;}
-    var katlar=liste.querySelectorAll('.cat-section');
-    var aktif=null,topRef=160;
-    katlar.forEach(function(k){
-      var r=k.getBoundingClientRect();
-      if(r.top<=topRef && r.bottom>topRef) aktif=k;
-    });
-    if(aktif && window.scrollY>500){
-      var ad=aktif.dataset.kat||'';
-      if(ad!==sonAd){
-        document.getElementById('cat-aktif-isim').textContent=ad;
-        document.getElementById('cat-aktif-isim').style.animation='none';
-        setTimeout(function(){document.getElementById('cat-aktif-isim').style.animation='';},10);
-        sonAd=ad;
-      }
-      bant.classList.add('on');
-    } else {
-      bant.classList.remove('on');
-      sonAd='';
-    }
-  }
-  var ticking=false;
-  window.addEventListener('scroll',function(){
-    if(!ticking){requestAnimationFrame(function(){tick();ticking=false;});ticking=true;}
-  },{passive:true});
-  tick();
-}
-
 // 4. Header parallax/shrink + sube-tabs shadow
 (function(){
   var hdr=document.querySelector('.menu-header');
@@ -698,32 +636,6 @@ function bantSyncIlk(){
   },{passive:true});
 })();
 
-// 12. Spotlight dots — scroll ile aktif değiştir
-function spotlightDots(){
-  ['fsm','podyum'].forEach(function(sube){
-    var grid=document.getElementById('spotlight-grid-'+sube);
-    var dotsEl=document.getElementById('sp-dots-'+sube);
-    if(!grid||!dotsEl) return;
-    function syncDots(){
-      var cards=grid.querySelectorAll('.spotlight-card');
-      if(!cards.length) return;
-      var w=cards[0].offsetWidth+12;
-      var idx=Math.round(grid.scrollLeft/w);
-      idx=Math.max(0,Math.min(idx,cards.length-1));
-      dotsEl.querySelectorAll('.sp-dot').forEach(function(d,i){
-        d.classList.toggle('on',i===idx);
-      });
-    }
-    grid.addEventListener('scroll',syncDots,{passive:true});
-    dotsEl.querySelectorAll('.sp-dot').forEach(function(d){
-      d.onclick=function(){
-        var i=parseInt(d.dataset.i,10)||0;
-        var cards=grid.querySelectorAll('.spotlight-card');
-        if(cards[i]) cards[i].scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'});
-      };
-    });
-  });
-}
 
 // 7. + 16. Popup — swipe-down kapatma + double-tap zoom
 function upopAc(idx) {

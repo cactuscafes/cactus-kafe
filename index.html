@@ -135,6 +135,144 @@ footer{padding:60px 24px 30px;}
 
 
 </style>
+<!-- ════════ ANİMASYON KATMANI ════════ -->
+<style>
+/* Performans: GPU katmanı */
+.hero-bg,.hero-title,.hero-tagline,.hero-subtitle,.hero-btn,.menu-card,.branch-card,.ig-card,.fade-up,.section-divider{will-change:transform,opacity;}
+
+/* 1. HERO BG — Ken Burns yavaş zoom+pan */
+@keyframes kenBurns{
+  0%{transform:scale(1) translate(0,0);}
+  50%{transform:scale(1.08) translate(-1.5%,-1%);}
+  100%{transform:scale(1.04) translate(1%,1%);}
+}
+.hero-bg{animation:kenBurns 28s ease-in-out infinite alternate;}
+
+/* 2. HERO TITLE — harf harf belirir */
+.hero-title{display:inline-flex;gap:0;overflow:visible;}
+.hero-letter{display:inline-block;opacity:0;transform:translateY(40px);animation:letterIn .9s cubic-bezier(.2,.7,.2,1) forwards;}
+.hero-letter:nth-child(1){animation-delay:.25s;}
+.hero-letter:nth-child(2){animation-delay:.35s;}
+.hero-letter:nth-child(3){animation-delay:.45s;}
+.hero-letter:nth-child(4){animation-delay:.55s;}
+.hero-letter:nth-child(5){animation-delay:.65s;}
+.hero-letter:nth-child(6){animation-delay:.75s;}
+@keyframes letterIn{
+  0%{opacity:0;transform:translateY(40px) rotate(-6deg);filter:blur(8px);}
+  60%{opacity:1;transform:translateY(-4px) rotate(0);filter:blur(0);}
+  100%{opacity:1;transform:translateY(0) rotate(0);filter:blur(0);}
+}
+
+/* 3. HERO TAGLINE — typewriter */
+.hero-tagline{display:inline-block;opacity:0;animation:fadeInDown .8s ease-out forwards;animation-delay:.05s;}
+.hero-subtitle{opacity:0;animation:fadeInDown .8s ease-out forwards;animation-delay:1.1s;}
+.hero-btn{opacity:0;transform:translateY(20px);animation:fadeInUp .8s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:1.3s;position:relative;overflow:hidden;}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-12px);}to{opacity:.85;transform:translateY(0);}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* 4. HERO BTN — shimmer parıltısı */
+.hero-btn::after{content:"";position:absolute;top:0;left:-150%;width:80%;height:100%;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%);transform:skewX(-25deg);pointer-events:none;animation:shimmer 5s ease-in-out infinite;animation-delay:2s;}
+@keyframes shimmer{0%,15%{left:-150%;}30%,100%{left:150%;}}
+
+/* 5. HERO BTN — magnetic + transition */
+.hero-btn{transition:transform .25s cubic-bezier(.2,.9,.3,1),background .3s,letter-spacing .3s;}
+.hero-btn:hover{letter-spacing:5px;background:rgba(255,255,255,.18);}
+
+/* 6. STEAM — buhar */
+.steam-wrap{position:absolute;top:30%;left:50%;transform:translateX(-50%);width:200px;height:200px;pointer-events:none;z-index:0;opacity:.45;}
+.steam-blob{position:absolute;bottom:0;left:50%;width:40px;height:40px;background:radial-gradient(circle,rgba(255,255,255,.6) 0%,transparent 70%);border-radius:50%;filter:blur(8px);animation:steamRise 4s ease-in infinite;}
+.steam-blob:nth-child(1){animation-delay:0s;left:40%;}
+.steam-blob:nth-child(2){animation-delay:1.3s;left:55%;}
+.steam-blob:nth-child(3){animation-delay:2.6s;left:48%;}
+@keyframes steamRise{0%{transform:translate(-50%,0) scale(.6);opacity:0;}30%{opacity:.8;}100%{transform:translate(-50%,-180px) scale(1.4);opacity:0;}}
+
+/* 7. SCROLL INDICATOR — nabız */
+.hero-scroll{animation:scrollBob 2s ease-in-out infinite;opacity:0;animation-delay:1.6s,0s;animation-fill-mode:forwards;animation-name:fadeIn,scrollBob;animation-duration:.8s,2s;animation-iteration-count:1,infinite;}
+.hero-scroll-line{transform-origin:top;animation:scrollLine 2s ease-in-out infinite;}
+@keyframes fadeIn{to{opacity:.6;}}
+@keyframes scrollBob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
+@keyframes scrollLine{0%,100%{transform:scaleY(.4);opacity:.4;}50%{transform:scaleY(1);opacity:1;}}
+
+/* 8. REVEAL ON SCROLL — IntersectionObserver tetikler */
+.fade-up{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1);}
+.fade-up.in{opacity:1;transform:translateY(0);}
+.fade-up-d1{transition-delay:.1s;}
+.fade-up-d2{transition-delay:.2s;}
+.fade-up-d3{transition-delay:.3s;}
+.fade-up-d4{transition-delay:.4s;}
+
+/* 9. SECTION DIVIDER — soldan açılır */
+.section-divider{transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.7,.2,1) .3s;}
+.section-divider.in{transform:scaleX(1);}
+
+/* 10. MENU CARD — premium hover */
+.menu-card{transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s;border-radius:2px;}
+.menu-card:hover{transform:translateY(-8px);box-shadow:0 30px 60px -20px rgba(0,0,0,.35);}
+.menu-card img{transition:transform .8s cubic-bezier(.2,.7,.2,1);}
+.menu-card:hover img{transform:scale(1.08);}
+.menu-card-overlay{transition:background .4s;}
+.menu-card:hover .menu-card-overlay{background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 60%);}
+.menu-card-link{position:relative;}
+.menu-card-link::after{content:"→";display:inline-block;margin-left:8px;transition:transform .3s;}
+.menu-card:hover .menu-card-link::after{transform:translateX(6px);}
+
+/* 11. BRANCH CARD — yumuşak zoom */
+.branch-card{transition:transform .5s;}
+.branch-card:hover{transform:scale(1.01);}
+.branch-card img{transition:transform 1s cubic-bezier(.2,.7,.2,1),filter .5s;}
+.branch-card:hover img{transform:scale(1.07);filter:brightness(.85);}
+.branch-overlay{transition:background .4s;}
+.branch-card:hover .branch-overlay{background:rgba(0,0,0,.45);}
+
+/* 12. IG CARD — ikon dönüşü + lift */
+.ig-card{transition:transform .4s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .4s;}
+.ig-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -15px rgba(0,0,0,.15);}
+.ig-card svg{transition:transform .7s cubic-bezier(.34,1.56,.64,1);}
+.ig-card:hover svg{transform:rotate(360deg) scale(1.08);}
+
+/* 13. NAV — scroll'da blur + küçülme */
+#mainNav{transition:padding .35s ease,background .35s ease,box-shadow .35s ease,backdrop-filter .35s;}
+#mainNav.scrolled{padding:12px 60px!important;background:rgba(255,255,255,.88)!important;backdrop-filter:blur(14px) saturate(140%);box-shadow:0 4px 24px rgba(0,0,0,.06);}
+#mainNavLinks a{position:relative;transition:color .25s;}
+#mainNavLinks a:not([style*="background"])::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;background:#c8a86a;transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1);}
+#mainNavLinks a:not([style*="background"]):hover::after{transform:scaleX(1);}
+#mainNavLinks a:not([style*="background"]):hover{color:#c8a86a!important;}
+
+/* 14. ABOUT/HERO BTN — letter-spacing on hover */
+.about-btn{transition:background .3s,color .3s,letter-spacing .3s,transform .3s;}
+.about-btn:hover{letter-spacing:5px;transform:translateY(-2px);}
+
+/* 15. SAYFA İÇİ DEKOR — hafif gradient drift */
+@keyframes ambientShift{0%,100%{filter:hue-rotate(0deg) brightness(1);}50%{filter:hue-rotate(8deg) brightness(1.03);}}
+#sadakat-section{animation:ambientShift 30s ease-in-out infinite;}
+
+/* 16. SADAKAT KARTI 3D TİLT */
+#sadakat-kart-gorsel > div{transform-style:preserve-3d;transition:transform .25s ease-out;}
+
+/* 17. FOOTER yıldız taneleri (CSS-only) */
+footer{position:relative;}
+footer::before{content:"";position:absolute;inset:0;background-image:
+  radial-gradient(1px 1px at 20% 30%,rgba(200,168,106,.5) 50%,transparent),
+  radial-gradient(1px 1px at 65% 60%,rgba(200,168,106,.35) 50%,transparent),
+  radial-gradient(1px 1px at 80% 20%,rgba(200,168,106,.4) 50%,transparent),
+  radial-gradient(1px 1px at 35% 75%,rgba(200,168,106,.3) 50%,transparent),
+  radial-gradient(1px 1px at 50% 50%,rgba(200,168,106,.35) 50%,transparent);
+background-size:600px 600px;opacity:.5;animation:starsTwinkle 8s ease-in-out infinite;pointer-events:none;}
+@keyframes starsTwinkle{0%,100%{opacity:.25;}50%{opacity:.7;}}
+
+/* 18. HERO scroll parallax (JS atayacak) */
+.hero-content{transition:transform .15s ease-out;}
+
+/* 19. Erişilebilirlik — hareket istemeyenler */
+@media (prefers-reduced-motion: reduce){
+  .hero-bg{animation:none;}
+  .hero-letter{animation:none;opacity:1;transform:none;}
+  .hero-tagline,.hero-subtitle,.hero-btn,.hero-scroll{animation:none;opacity:1;transform:none;}
+  .hero-btn::after,.steam-blob,#sadakat-section,footer::before{animation:none;}
+  .fade-up{opacity:1;transform:none;transition:none;}
+  .section-divider{transform:scaleX(1);transition:none;}
+}
+</style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
@@ -176,9 +314,14 @@ footer{padding:60px 24px 30px;}
 <section class="hero">
   <img class="hero-bg" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&q=80" alt="Cactus Coffee">
   <div class="hero-overlay"></div>
+  <div class="steam-wrap" aria-hidden="true">
+    <div class="steam-blob"></div>
+    <div class="steam-blob"></div>
+    <div class="steam-blob"></div>
+  </div>
   <div class="hero-content">
     <p class="hero-tagline">Bursa'nın Kalbinde İki Şube</p>
-    <h1 class="hero-title">Cactus</h1>
+    <h1 class="hero-title" aria-label="Cactus"><span class="hero-letter">C</span><span class="hero-letter">a</span><span class="hero-letter">c</span><span class="hero-letter">t</span><span class="hero-letter">u</span><span class="hero-letter">s</span></h1>
     <p class="hero-subtitle">· COFFEE, SNACK &amp; DESSERT · HER YUDUMDA BİR HİKAYE</p>
     <a href="menu.html" class="hero-btn">Menüyü Gör</a>
   </div>
@@ -328,12 +471,12 @@ footer{padding:60px 24px 30px;}
 
 <section class="section-menu">
   <div class="section-header">
-    <p class="section-eyebrow">Menümüz</p>
-    <h2 class="section-title">C | <span>Menü</span></h2>
+    <p class="section-eyebrow fade-up">Menümüz</p>
+    <h2 class="section-title fade-up fade-up-d1">C | <span>Menü</span></h2>
     <div class="section-divider"></div>
   </div>
   <div class="menu-grid">
-    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
+    <div class="menu-card fade-up" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776773087363-0npcn5nbrzsb.jpg" alt="FSM Şubesi" data-as-key="img_1">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Şube</span>
@@ -341,7 +484,7 @@ footer{padding:60px 24px 30px;}
         <a href="menu.html" class="menu-card-link">Menü</a>
       </div>
     </div>
-    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
+    <div class="menu-card fade-up fade-up-d1" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_2">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Şube</span>
@@ -349,7 +492,7 @@ footer{padding:60px 24px 30px;}
         <a href="menu.html" class="menu-card-link">Menü</a>
       </div>
     </div>
-    <div class="menu-card" onclick="location.href='menu.html'" style="cursor:pointer;">
+    <div class="menu-card fade-up fade-up-d2" onclick="location.href='menu.html'" style="cursor:pointer;">
       <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&amp;q=80" alt="Özel Menü" data-as-key="img_3">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Koleksiyon</span>
@@ -362,34 +505,34 @@ footer{padding:60px 24px 30px;}
 
 <section class="section-about">
   <div class="about-inner">
-    <p class="about-eyebrow">Hikayemiz</p>
-    <h2 class="about-title">Bizimle <em>Tanışın</em></h2>
-    <p class="about-text">
+    <p class="about-eyebrow fade-up">Hikayemiz</p>
+    <h2 class="about-title fade-up fade-up-d1">Bizimle <em>Tanışın</em></h2>
+    <p class="about-text fade-up fade-up-d2">
       Her bir yudumun arkasında bir özen, her bir dilimin ardında bir tutku var.
       Cactus Coffee olarak, misafirlerimize yalnızca lezzetli içecekler ve atıştırmalıklar değil;
       huzur dolu, kaliteli anlar sunmayı hedefliyoruz.<br><br>
       Bursa'nın kalbinde iki şubemizle, şehrin temposuna ayak uydururken
       kendinizi özel hissettireceğiniz bir alan yaratıyoruz.
     </p>
-    <a href="iletisim.html" class="about-btn">Bize Ulaşın</a>
+    <a href="iletisim.html" class="about-btn fade-up fade-up-d3">Bize Ulaşın</a>
   </div>
 </section>
 
 <section class="section-branches">
   <div class="section-header">
-    <p class="section-eyebrow">Şubelerimiz</p>
-    <h2 class="section-title">C | <span>Lokasyonlar</span></h2>
+    <p class="section-eyebrow fade-up">Şubelerimiz</p>
+    <h2 class="section-title fade-up fade-up-d1">C | <span>Lokasyonlar</span></h2>
     <div class="section-divider"></div>
   </div>
   <div class="branches-grid">
-    <a class="branch-card" href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" style="text-decoration:none;">
+    <a class="branch-card fade-up" href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" style="text-decoration:none;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776784970135-0fqpyb1p1lnj.jpg" alt="FSM Şubesi" data-as-key="img_4">
       <div class="branch-overlay">
         <div class="branch-name">FSM Şubesi</div>
         <div class="branch-sub">Fatih Sultan Mehmet Caddesi</div>
       </div>
     </a>
-    <a class="branch-card" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" style="text-decoration:none;">
+    <a class="branch-card fade-up fade-up-d1" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" style="text-decoration:none;">
       <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_5">
       <div class="branch-overlay">
         <div class="branch-name">Podyumpark</div>
@@ -403,23 +546,23 @@ footer{padding:60px 24px 30px;}
 
 <!-- === INSTAGRAM === -->
 <section class="ig-section">
-  <div style="text-align:center;margin-bottom:60px;">
+  <div style="text-align:center;margin-bottom:60px;" class="fade-up">
     <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:16px;font-family:'Montserrat',sans-serif;">Instagram</p>
     <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi <em style="font-style:italic;">Takip Edin</em></h2>
     <div style="width:60px;height:1px;background:#c8a86a;margin:20px auto 0;"></div>
   </div>
   <div class="ig-grid">
-    <a class="ig-card" href="https://www.instagram.com/cactuscafe.fsm" target="_blank" rel="noopener">
+    <a class="ig-card fade-up" href="https://www.instagram.com/cactuscafe.fsm" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">FSM</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.fsm</p>
     </a>
-    <a class="ig-card ig-center" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
+    <a class="ig-card ig-center fade-up fade-up-d1" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Cactus Coffee</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.tr</p>
     </a>
-    <a class="ig-card" href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">
+    <a class="ig-card fade-up fade-up-d2" href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Waffle</p>
       <p style="font-size:10px;color:#888;letter-spacing:2px;font-family:'Montserrat',sans-serif;">@cactuscafe.waffle</p>
@@ -431,10 +574,10 @@ footer{padding:60px 24px 30px;}
 <section class="section-about" style="background:linear-gradient(135deg,#7a2020 0%,#4a1010 40%,#2a0808 100%);position:relative;overflow:hidden;">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 80% 30%,rgba(200,120,80,.18) 0%,transparent 70%);pointer-events:none;"></div>
   <div class="about-inner" style="position:relative;z-index:1;">
-    <p class="about-eyebrow" style="color:#e8a87a;">Kariyer</p>
-    <h2 class="about-title" style="color:#f7f2ea;">Ekibimize <em>Katıl</em></h2>
-    <p class="about-text" style="color:rgba(240,225,195,.65);">Cactus Coffee olarak enerjik, güler yüzlü ve işine tutkuyla bağlı insanları arıyoruz. Barista, servis veya mutfak ekibimizde yer almak istiyorsan başvurunu bırak.</p>
-    <a href="iletisim.html#basvuru" class="about-btn" style="background:#c8a86a;color:#2a0808;">Hemen Başvur</a>
+    <p class="about-eyebrow fade-up" style="color:#e8a87a;">Kariyer</p>
+    <h2 class="about-title fade-up fade-up-d1" style="color:#f7f2ea;">Ekibimize <em>Katıl</em></h2>
+    <p class="about-text fade-up fade-up-d2" style="color:rgba(240,225,195,.65);">Cactus Coffee olarak enerjik, güler yüzlü ve işine tutkuyla bağlı insanları arıyoruz. Barista, servis veya mutfak ekibimizde yer almak istiyorsan başvurunu bırak.</p>
+    <a href="iletisim.html#basvuru" class="about-btn fade-up fade-up-d3" style="background:#c8a86a;color:#2a0808;">Hemen Başvur</a>
   </div>
 </section>
 <footer style="background:#111;color:#fff;padding:80px 60px 0;">
@@ -626,6 +769,138 @@ function toggleMainNav(){
     if(v){v.style.transition='opacity .3s cubic-bezier(.4,0,.2,1)';v.classList.remove('pt-out');setTimeout(function(){location.href=h;},330);}
     else{location.href=h;}
   });
+})();
+</script>
+
+<!-- ════════ ANİMASYON KONTROL KATMANI ════════ -->
+<script>
+(function(){
+  // Erişilebilirlik — hareket istemeyenler
+  var azHareket=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── 1. REVEAL ON SCROLL (IntersectionObserver) ───
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(ents){
+      ents.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('in');
+          // Eşlik eden divider varsa onu da tetikle
+          var sec=e.target.closest('section');
+          if(sec){var dv=sec.querySelector('.section-divider');if(dv)dv.classList.add('in');}
+          io.unobserve(e.target);
+        }
+      });
+    },{threshold:0.15,rootMargin:'0px 0px -60px 0px'});
+    document.querySelectorAll('.fade-up').forEach(function(el){io.observe(el);});
+    document.querySelectorAll('.section-divider').forEach(function(el){io.observe(el);});
+  } else {
+    document.querySelectorAll('.fade-up,.section-divider').forEach(function(el){el.classList.add('in');});
+  }
+
+  // ─── 2. NAV — scroll'da blur ve küçülme ───
+  var nav=document.getElementById('mainNav');
+  function navTick(){
+    if(!nav) return;
+    if(window.scrollY>40) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll',navTick,{passive:true});
+  navTick();
+
+  // ─── 3. HERO — cursor parallax (sadece içerik; .hero-bg Ken Burns çalıştırdığı için ona dokunma) ───
+  if(!azHareket && matchMedia('(hover:hover)').matches){
+    var hero=document.querySelector('.hero');
+    var heroContent=document.querySelector('.hero-content');
+    var steamWrap=document.querySelector('.steam-wrap');
+    if(hero&&heroContent){
+      var rafId=null,lastX=0,lastY=0;
+      hero.addEventListener('mousemove',function(e){
+        var r=hero.getBoundingClientRect();
+        lastX=(e.clientX-r.left)/r.width-0.5;
+        lastY=(e.clientY-r.top)/r.height-0.5;
+        if(rafId) return;
+        rafId=requestAnimationFrame(function(){
+          heroContent.style.transform='translate('+(lastX*-12)+'px,'+(lastY*-8)+'px)';
+          if(steamWrap) steamWrap.style.transform='translateX(calc(-50% + '+(lastX*20)+'px)) translateY('+(lastY*10)+'px)';
+          rafId=null;
+        });
+      });
+      hero.addEventListener('mouseleave',function(){
+        heroContent.style.transform='';
+        if(steamWrap) steamWrap.style.transform='translateX(-50%)';
+      });
+    }
+  }
+
+  // ─── 4. HERO BTN — magnetic ───
+  if(!azHareket && matchMedia('(hover:hover)').matches){
+    var btn=document.querySelector('.hero-btn');
+    if(btn){
+      btn.addEventListener('mousemove',function(e){
+        var r=btn.getBoundingClientRect();
+        var dx=(e.clientX-r.left-r.width/2)*.25;
+        var dy=(e.clientY-r.top-r.height/2)*.25;
+        btn.style.transform='translate('+dx+'px,'+dy+'px)';
+      });
+      btn.addEventListener('mouseleave',function(){btn.style.transform='';});
+    }
+  }
+
+  // ─── 5. HERO scroll parallax (sadece content opaklığı; .hero-bg Ken Burns'e dokunma) ───
+  if(!azHareket){
+    var heroContentEl=document.querySelector('.hero-content');
+    var heroScrollEl=document.querySelector('.hero-scroll');
+    var heroEl=document.querySelector('.hero');
+    var ticking=false;
+    function parallax(){
+      if(!heroEl) return;
+      var y=window.scrollY;
+      var max=heroEl.offsetHeight;
+      // y=0 ise CSS entrance animasyonlarına dokunma
+      if(y===0){
+        if(heroContentEl) heroContentEl.style.opacity='';
+        if(heroScrollEl) heroScrollEl.style.opacity='';
+        ticking=false;return;
+      }
+      if(y>max){ticking=false;return;}
+      if(heroContentEl) heroContentEl.style.opacity=Math.max(0,1-y/(max*0.7));
+      if(heroScrollEl) heroScrollEl.style.opacity=Math.max(0,1-y/(max*0.4));
+      ticking=false;
+    }
+    window.addEventListener('scroll',function(){
+      if(!ticking){requestAnimationFrame(parallax);ticking=true;}
+    },{passive:true});
+  }
+
+  // ─── 6. SADAKAT KARTI — 3D tilt on mouse ───
+  if(!azHareket && matchMedia('(hover:hover)').matches){
+    var sk=document.querySelector('#sadakat-kart-gorsel > div');
+    if(sk){
+      var skWrap=document.getElementById('sadakat-kart-gorsel');
+      skWrap.addEventListener('mousemove',function(e){
+        var r=sk.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width-0.5;
+        var py=(e.clientY-r.top)/r.height-0.5;
+        sk.style.transform='perspective(900px) rotateY('+(px*8)+'deg) rotateX('+(py*-8)+'deg) translateZ(10px)';
+      });
+      skWrap.addEventListener('mouseleave',function(){
+        sk.style.transform='';
+      });
+    }
+  }
+
+  // ─── 7. Smooth scroll (CSS yetmiyorsa) ───
+  document.documentElement.style.scrollBehavior='smooth';
+
+  // ─── 8. "Keşfet" tıklayınca aşağı kaydır ───
+  var sc=document.querySelector('.hero-scroll');
+  if(sc){
+    sc.style.cursor='pointer';
+    sc.addEventListener('click',function(){
+      var next=document.querySelector('#sadakat-section')||document.querySelector('.section-menu');
+      if(next) next.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
 })();
 </script>
 </body></html>

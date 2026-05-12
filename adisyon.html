@@ -1890,12 +1890,13 @@ setInterval(function(){gunCiroYukle();},60000);
     });
   }
 
-  // Gece 03:00 sıfırlaması — bar ve mutfak ekranlarını temizler (TR saati UTC+3)
+  // Gece 04:00 sıfırlaması — bar, mutfak ve masalar temizlenir (TR saati UTC+3)
+  // Worker'daki cron da 04:00'te D1'i sıfırlıyor; bu lokal sıfırlama açık duran cihazlar için.
   function geceKontrolu(){
     var now=new Date();
     var trSaat=(now.getUTCHours()+3)%24;
     var trDak=now.getUTCMinutes();
-    if(trSaat!==3||trDak>=30) return; // sadece 03:00-03:29 arası
+    if(trSaat!==4||trDak>=30) return; // sadece 04:00-04:29 arası
     var trTarih=new Date(now.getTime()+3*3600000).toISOString().split('T')[0];
     if(localStorage.getItem('cactus_gece_sifir')===trTarih) return; // zaten yapıldı
     localStorage.setItem('cactus_gece_sifir',trTarih);
@@ -1905,14 +1906,24 @@ setInterval(function(){gunCiroYukle();},60000);
     // D1'deki bekleyen siparişleri hazırlandı olarak işaretle
     bar.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
     mut.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
-    // Lokal temizle
+    // Lokal temizle — bar, mutfak ve masalar
     localStorage.setItem(lkBar,'[]'); localStorage.setItem(lkMut,'[]');
     if(typeof barSip!=='undefined') barSip.splice(0,barSip.length);
     if(typeof mutSip!=='undefined') mutSip.splice(0,mutSip.length);
+    // Masaları da sıfırla (worker D1'i 04:00'te sildi, lokali de senkronize et)
+    var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
+    if(typeof masalar!=='undefined'){
+      for(var mi=1;mi<=34;mi++) if(masalar[mi]) masalar[mi]=[];
+      localStorage.setItem(lkMas,JSON.stringify(masalar));
+    } else {
+      localStorage.setItem(lkMas,'{}');
+    }
     if(typeof renderBar==='function') renderBar();
     if(typeof renderMut==='function') renderMut();
+    if(typeof renderMasalar==='function') renderMasalar();
+    if(typeof renderAdisyon==='function') renderAdisyon();
     if(typeof updateBadges==='function') updateBadges();
-    if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Bar & Mutfak temizlendi');
+    if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Bar, Mutfak ve Masalar temizlendi');
   }
 
   function syncFromD1(){

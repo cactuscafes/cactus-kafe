@@ -168,6 +168,142 @@ footer{padding:40px 20px 24px;}
 .footer-links{flex-wrap:wrap;gap:20px;}
 .footer-bottom{flex-direction:column;gap:8px;}
 }
+
+/* ════════ MOBİL ANİMASYON KATMANI ════════ */
+/* Touch ve gestures için */
+.product-card,.spotlight-card,.sube-tab,.cat-header,.sk-banner-cta{touch-action:manipulation;}
+
+/* 5. Tap feedback — kart, buton vb. */
+@media(hover:none){
+  .product-card{transition:transform .15s ease,opacity .15s;}
+  .product-card:active{transform:scale(.96);opacity:.85;}
+  .spotlight-card{transition:transform .15s ease;}
+  .spotlight-card:active{transform:scale(.96);}
+  .sube-tab:active{opacity:.6;}
+  .cat-header:active{opacity:.5;}
+  .sk-banner-cta:active{transform:scale(.96);}
+}
+
+/* 6. Görsel lazy fade-in */
+.product-card img,.spotlight-card img{opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1),transform .4s;background:#f8f6f2;}
+.product-card img.loaded,.spotlight-card img.loaded{opacity:1;}
+
+/* 1. Ürün kartları stagger reveal */
+.product-card{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1);}
+.product-card.in{opacity:1;transform:translateY(0);}
+.cat-section.open .product-card:nth-child(1){transition-delay:.04s;}
+.cat-section.open .product-card:nth-child(2){transition-delay:.10s;}
+.cat-section.open .product-card:nth-child(3){transition-delay:.16s;}
+.cat-section.open .product-card:nth-child(4){transition-delay:.22s;}
+.cat-section.open .product-card:nth-child(5){transition-delay:.28s;}
+.cat-section.open .product-card:nth-child(6){transition-delay:.32s;}
+.cat-section.open .product-card:nth-child(7){transition-delay:.36s;}
+.cat-section.open .product-card:nth-child(8){transition-delay:.40s;}
+.cat-section.open .product-card:nth-child(n+9){transition-delay:.44s;}
+.spotlight-card{opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s;}
+.spotlight-card.in{opacity:1;transform:translateY(0);}
+.spotlight-card:nth-child(2){transition-delay:.08s;}
+.spotlight-card:nth-child(3){transition-delay:.16s;}
+.spotlight-card:nth-child(4){transition-delay:.24s;}
+
+/* 2. Şube sekme geçişi — cross-fade + slide */
+#menu-fsm,#menu-podyum{transition:opacity .35s ease,transform .35s cubic-bezier(.2,.7,.2,1);}
+.menu-pane-out{opacity:0;transform:translateX(-12px);pointer-events:none;}
+.menu-pane-in{opacity:0;transform:translateX(12px);}
+/* Animated underline for active tab */
+.sube-tabs{position:relative;}
+.sube-tab-indicator{position:absolute;bottom:0;height:2px;background:var(--dark);transition:transform .35s cubic-bezier(.2,.7,.2,1),width .35s cubic-bezier(.2,.7,.2,1);pointer-events:none;}
+.sube-tab.on{border-bottom-color:transparent!important;}
+
+/* 13. Kategori "spring" open */
+.cat-products{transition:max-height .55s cubic-bezier(.34,1.4,.64,1) !important;}
+.cat-arrow{transition:transform .45s cubic-bezier(.34,1.4,.64,1) !important;}
+
+/* 3. Kategori başlığı aktif rozet (sticky breadcrumb) */
+#cat-aktif-bant{position:fixed;left:50%;transform:translateX(-50%) translateY(-30px);top:130px;z-index:80;background:rgba(255,255,255,.92);backdrop-filter:blur(14px) saturate(150%);border:1px solid var(--border);border-radius:24px;padding:9px 22px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dark);font-weight:600;opacity:0;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.2,1);pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.08);font-family:'Montserrat',sans-serif;white-space:nowrap;max-width:80vw;overflow:hidden;text-overflow:ellipsis;}
+#cat-aktif-bant.on{opacity:1;transform:translateX(-50%) translateY(0);}
+#cat-aktif-bant span{display:inline-block;animation:bantSlide .4s cubic-bezier(.2,.7,.2,1);}
+@keyframes bantSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* 4. Header parallax + shrink */
+.menu-header{transition:padding .35s ease,opacity .35s ease;}
+.menu-header.shrunk{padding:36px 40px 28px;}
+.menu-header.shrunk .menu-header-title{font-size:clamp(36px,5vw,60px);transition:font-size .35s ease;}
+.menu-header-title{transition:font-size .35s ease;}
+.sube-tabs{transition:padding .25s ease,box-shadow .25s ease;}
+.sube-tabs.scrolled{box-shadow:0 4px 14px rgba(0,0,0,.06);background:rgba(255,255,255,.97);backdrop-filter:blur(12px) saturate(140%);}
+
+/* 7. Popup geliştirmesi — blur + spring-up + swipe handle */
+.upop-bg{transition:backdrop-filter .35s,background .35s;}
+.upop-bg.on{backdrop-filter:blur(8px) saturate(120%);background:rgba(0,0,0,.55)!important;}
+.upop{animation:upopSpring .45s cubic-bezier(.34,1.4,.64,1) !important;transform-origin:bottom;will-change:transform;border-radius:18px 18px 4px 4px;}
+@keyframes upopSpring{
+  0%{opacity:0;transform:translateY(60px) scale(.96);}
+  60%{opacity:1;transform:translateY(-6px) scale(1.01);}
+  100%{opacity:1;transform:translateY(0) scale(1);}
+}
+.upop-swipe-handle{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:42px;height:4px;background:rgba(0,0,0,.18);border-radius:2px;display:none;z-index:3;}
+@media(max-width:768px){
+  .upop-bg{align-items:flex-end!important;padding:0!important;}
+  .upop{max-width:none!important;width:100%!important;border-radius:18px 18px 0 0!important;max-height:88vh!important;}
+  .upop-swipe-handle{display:block;}
+}
+
+/* 8. Sadakat damga animasyonu (banner) */
+.sk-stamp{transition:transform .35s cubic-bezier(.34,1.4,.64,1),background .35s,border-color .35s,box-shadow .35s;}
+@keyframes skPop{0%{transform:scale(.3) rotate(-90deg);opacity:0;}60%{transform:scale(1.15) rotate(10deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
+.sk-stamp.anim-fill{animation:skPop .5s cubic-bezier(.34,1.4,.64,1);}
+
+/* 10. Yukarı çık butonu */
+#yukari-btn{position:fixed;bottom:90px;right:18px;width:46px;height:46px;border-radius:50%;background:rgba(45,90,39,.92);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:90;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;transform:translateY(20px) scale(.8);transition:opacity .3s,transform .3s cubic-bezier(.2,.7,.2,1);pointer-events:none;backdrop-filter:blur(8px);}
+#yukari-btn.on{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+#yukari-btn:active{transform:scale(.9);}
+
+/* 9. Sticky alt kategori navi */
+#alt-kat-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px) saturate(150%);border-top:1px solid var(--border);z-index:85;padding:10px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.7,.2,1);box-shadow:0 -6px 22px rgba(0,0,0,.06);-webkit-overflow-scrolling:touch;}
+#alt-kat-bar::-webkit-scrollbar{display:none;}
+#alt-kat-bar.on{transform:translateY(0);}
+.akb-pill{flex-shrink:0;padding:8px 14px;border:1.5px solid var(--border);border-radius:18px;background:#fff;color:#666;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s;white-space:nowrap;}
+.akb-pill.aktif{background:var(--dark);color:#fff;border-color:var(--dark);}
+@media(min-width:769px){#alt-kat-bar{display:none;}}
+
+/* 11. Pull-to-refresh */
+#ptr-ind{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-60px) scale(.85);width:40px;height:40px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:95;box-shadow:0 4px 14px rgba(0,0,0,.08);transition:transform .25s,opacity .25s;opacity:0;font-size:18px;}
+#ptr-ind.show{opacity:1;}
+#ptr-ind.spin{animation:ptrSpin 1s linear infinite;}
+@keyframes ptrSpin{to{transform:translateX(-50%) translateY(0) rotate(360deg);}}
+
+/* 15. Skeleton loading */
+@keyframes skShimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.sk-card{padding:4px 0;}
+.sk-img{aspect-ratio:1;background:linear-gradient(110deg,#f3f3f3 8%,#fafafa 18%,#f3f3f3 33%);background-size:200% 100%;animation:skShimmer 1.4s ease-in-out infinite;margin-bottom:12px;}
+.sk-line{height:14px;background:linear-gradient(110deg,#f3f3f3 8%,#fafafa 18%,#f3f3f3 33%);background-size:200% 100%;animation:skShimmer 1.4s ease-in-out infinite;border-radius:3px;}
+.sk-line.short{width:60%;margin-top:6px;height:12px;}
+.sk-line.price{width:35%;margin-top:8px;height:11px;}
+
+/* 12. Spotlight carousel — mobil */
+@media(max-width:768px){
+  .spotlight-grid{display:flex!important;grid-template-columns:none!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 4px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .spotlight-grid::-webkit-scrollbar{display:none;}
+  .spotlight-card{flex-shrink:0;width:62%;scroll-snap-align:start;}
+  .spotlight-card img{aspect-ratio:3/4!important;}
+  .spotlight-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
+  .sp-dot{width:6px;height:6px;border-radius:50%;background:#ddd;transition:all .25s;cursor:pointer;}
+  .sp-dot.on{background:var(--dark);width:18px;border-radius:3px;}
+}
+@media(min-width:769px){.spotlight-dots{display:none;}}
+
+/* 16. Resim pinch / double-tap zoom */
+.upop-img img{transition:transform .35s cubic-bezier(.2,.7,.2,1);transform-origin:center;}
+.upop-img.zoomed img{transform:scale(2);cursor:zoom-out;}
+.upop-img{cursor:zoom-in;overflow:hidden;}
+
+/* Erişilebilirlik — hareket istemeyenler */
+@media (prefers-reduced-motion: reduce){
+  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn,#alt-kat-bar{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
+  .product-card img,.spotlight-card img{opacity:1!important;}
+  .sk-img,.sk-line{animation:none!important;}
+}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
@@ -258,9 +394,22 @@ footer{padding:40px 20px 24px;}
 </div>
 
 
+<!-- ⓘ Aktif kategori bandı (sticky breadcrumb) -->
+<div id="cat-aktif-bant"><span id="cat-aktif-isim"></span></div>
+
+<!-- ⓘ Pull-to-refresh göstergesi -->
+<div id="ptr-ind">↓</div>
+
+<!-- ⓘ Alt sticky kategori bar (mobil) -->
+<div id="alt-kat-bar"></div>
+
+<!-- ⓘ Yukarı çık butonu -->
+<button id="yukari-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Yukarı çık">↑</button>
+
 <!-- Ürün Popup -->
 <div class="upop-bg" id="upopBg" onclick="if(event.target===this)upopKapat()">
   <div class="upop" id="upop">
+    <div class="upop-swipe-handle"></div>
     <button class="upop-close" onclick="upopKapat()">×</button>
     <div id="upopImg"></div>
     <div class="upop-body">
@@ -275,15 +424,39 @@ footer{padding:40px 20px 24px;}
 var menuData = {};
 var oncuData = [];
 var POPUP_DATA = [];
+var AKTIF_SUBE='fsm';
+
+// 15. Skeleton — sayfa açılır açılmaz placeholder göster
+function skeletonGoster(){
+  var sk='';
+  for(var i=0;i<6;i++) sk+='<div class="sk-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line price"></div></div>';
+  ['cat-list-fsm','cat-list-podyum'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.innerHTML='<div class="cat-section open"><div class="cat-header"><div class="cat-header-left"><span class="cat-name">Yükleniyor…</span></div></div><div class="cat-products">'+sk+'</div></div>';
+  });
+  ['spotlight-grid-fsm','spotlight-grid-podyum'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.innerHTML='<div class="sk-card"><div class="sk-img" style="aspect-ratio:3/4;"></div><div class="sk-line short"></div></div><div class="sk-card"><div class="sk-img" style="aspect-ratio:3/4;"></div><div class="sk-line short"></div></div>';
+  });
+}
 
 async function init() {
+  skeletonGoster();
   try {
     var r = await fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t=' + Date.now());
     var data = await r.json();
     Object.keys(data).forEach(function(k){ menuData[k] = data[k]; });
   } catch(e) { console.error('Menu yuklenemedi', e); }
+  POPUP_DATA=[]; // reset on reload
   renderMenu('fsm');
   renderMenu('podyum');
+  setTimeout(function(){
+    altKatBarGuncelle();
+    gozlemUrunler();
+    altKatBarOto();
+    spotlightDots();
+    bantSyncIlk();
+  },50);
 }
 
 function renderMenu(sube) {
@@ -303,11 +476,19 @@ function renderMenu(sube) {
       var pidx = POPUP_DATA.length;
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
-      c+='<img src="'+u.foto+'" alt="'+u.ad+'" onerror="this.style.display=\'none\'">';
+      c+='<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
       return c;
     }).join('');
+    // 12. Spotlight dots (sadece mobil)
+    if (!spotGridEl.parentNode.querySelector('.spotlight-dots')){
+      var dots=document.createElement('div');
+      dots.className='spotlight-dots';
+      dots.id='sp-dots-'+sube;
+      for(var i=0;i<spotItems.length;i++) dots.innerHTML+='<div class="sp-dot'+(i===0?' on':'')+'" data-i="'+i+'"></div>';
+      spotGridEl.parentNode.appendChild(dots);
+    }
   } else if (spotlightEl) { spotlightEl.style.display='none'; }
   catListEl.innerHTML = katData.map(function(kat) {
     var urunler=(kat.urunler||[]).filter(function(u){ return !u.gizli; });
@@ -315,7 +496,7 @@ function renderMenu(sube) {
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
-      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
+      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
       var h='<div class="product-card" onclick="upopAc('+pidx+')">';
       h+='<div class="product-img-wrap">'+img+'</div>';
       h+='<div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>';
@@ -323,7 +504,7 @@ function renderMenu(sube) {
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
       return h;
     }).join('');
-    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'">';
+    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'" data-kat="'+(kat.label||kat.id)+'">';
     ch+='<div class="cat-header" onclick="toggleCat(\'cat-'+kat.id+'-'+sube+'\')">';
     ch+='<div class="cat-header-left"><span class="cat-name">'+kat.label+'</span>';
     ch+='<span class="cat-count">'+urunler.length+' cesit</span></div>';
@@ -333,29 +514,225 @@ function renderMenu(sube) {
   }).join('');
 }
 
+// 1. Ürün stagger — açılan kategoride product-card'lara .in topluca ekle, CSS nth-child ile gecikir
+function staggerKategori(catEl){
+  if(!catEl) return;
+  // RAF ile bir frame bekle (max-height transition başlasın), sonra hepsine .in ekle
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      catEl.querySelectorAll('.product-card').forEach(function(c){c.classList.add('in');});
+    });
+  });
+}
+function gozlemUrunler(){
+  if(!('IntersectionObserver' in window)) return;
+  // Spotlight cards reveal
+  document.querySelectorAll('.spotlight-card').forEach(function(c){
+    new IntersectionObserver(function(ents,obs){
+      ents.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');obs.disconnect();}});
+    },{threshold:.15}).observe(c);
+  });
+}
+
 function toggleCat(id) {
   var el=document.getElementById(id);
   if(!el) return;
+  var willOpen=!el.classList.contains('open');
   el.classList.toggle('open');
+  if(willOpen){
+    staggerKategori(el);
+  } else {
+    el.querySelectorAll('.product-card.in').forEach(function(c){c.classList.remove('in');});
+  }
 }
 
+// 2. Şube sekme — cross-fade
 function subeGoster(sube,btn) {
+  if(sube===AKTIF_SUBE) return;
   document.querySelectorAll('.sube-tab').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   var fsm=document.getElementById('menu-fsm');
   var pod=document.getElementById('menu-podyum');
-  if(fsm) fsm.style.display=sube==='fsm'?'':'none';
-  if(pod) pod.style.display=sube==='podyum'?'':'none';
+  var gosterEl=sube==='fsm'?fsm:pod;
+  var gizleEl=sube==='fsm'?pod:fsm;
+  if(gizleEl){
+    gizleEl.classList.add('menu-pane-out');
+    setTimeout(function(){gizleEl.style.display='none';gizleEl.classList.remove('menu-pane-out');},350);
+  }
+  if(gosterEl){
+    gosterEl.style.display='';
+    gosterEl.classList.add('menu-pane-in');
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){gosterEl.classList.remove('menu-pane-in');});
+    });
+  }
+  AKTIF_SUBE=sube;
+  setTimeout(function(){altKatBarGuncelle();subeIndicatorGuncelle();},20);
 }
 
+function subeIndicatorGuncelle(){
+  var ind=document.querySelector('.sube-tab-indicator');
+  if(!ind) return;
+  var aktif=document.querySelector('.sube-tab.on');
+  if(!aktif) return;
+  var r=aktif.getBoundingClientRect();
+  var p=ind.parentNode.getBoundingClientRect();
+  ind.style.width=r.width+'px';
+  ind.style.transform='translateX('+(r.left-p.left)+'px)';
+}
+
+// 9. Alt kategori barını besle (aktif şubeye göre)
+function altKatBarGuncelle(){
+  var bar=document.getElementById('alt-kat-bar');
+  if(!bar) return;
+  var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
+  if(!liste) return;
+  var katlar=liste.querySelectorAll('.cat-section');
+  if(!katlar.length){bar.classList.remove('on');return;}
+  bar.innerHTML='';
+  katlar.forEach(function(k){
+    var ad=k.dataset.kat||'?';
+    var pill=document.createElement('div');
+    pill.className='akb-pill';
+    pill.textContent=ad;
+    pill.onclick=function(){
+      if(!k.classList.contains('open')) toggleCat(k.id);
+      setTimeout(function(){k.scrollIntoView({behavior:'smooth',block:'start'});},120);
+    };
+    pill.dataset.target=k.id;
+    bar.appendChild(pill);
+  });
+}
+function altKatBarOto(){
+  // Sayfa scroll edildiğinde alt bar görünür / kaybolur
+  var bar=document.getElementById('alt-kat-bar');
+  if(!bar) return;
+  var lastY=0,ticking=false;
+  function tick(){
+    var y=window.scrollY;
+    var winH=window.innerHeight;
+    // Sayfa başında gizli, ortadayken görünür, en altta gizli
+    var max=document.body.scrollHeight-winH;
+    if(y>320 && y<max-160) bar.classList.add('on');
+    else bar.classList.remove('on');
+    // Aktif pill
+    altKatPillAktifGuncelle();
+    ticking=false;
+  }
+  window.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(tick);ticking=true;}
+  },{passive:true});
+}
+function altKatPillAktifGuncelle(){
+  var bar=document.getElementById('alt-kat-bar');
+  if(!bar||!bar.classList.contains('on')) return;
+  var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
+  if(!liste) return;
+  var katlar=liste.querySelectorAll('.cat-section');
+  var aktifId=null;
+  var topRef=140;
+  katlar.forEach(function(k){
+    var r=k.getBoundingClientRect();
+    if(r.top<=topRef && r.bottom>topRef) aktifId=k.id;
+  });
+  bar.querySelectorAll('.akb-pill').forEach(function(p){
+    if(p.dataset.target===aktifId){
+      if(!p.classList.contains('aktif')){
+        p.classList.add('aktif');
+        // Scroll the pill into view in the bar
+        p.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+      }
+    } else p.classList.remove('aktif');
+  });
+}
+
+// 3. Sticky breadcrumb — aktif kategori bandı
+function bantSyncIlk(){
+  var bant=document.getElementById('cat-aktif-bant');
+  if(!bant) return;
+  var sonAd='';
+  function tick(){
+    var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
+    if(!liste){bant.classList.remove('on');return;}
+    var katlar=liste.querySelectorAll('.cat-section');
+    var aktif=null,topRef=160;
+    katlar.forEach(function(k){
+      var r=k.getBoundingClientRect();
+      if(r.top<=topRef && r.bottom>topRef) aktif=k;
+    });
+    if(aktif && window.scrollY>500){
+      var ad=aktif.dataset.kat||'';
+      if(ad!==sonAd){
+        document.getElementById('cat-aktif-isim').textContent=ad;
+        document.getElementById('cat-aktif-isim').style.animation='none';
+        setTimeout(function(){document.getElementById('cat-aktif-isim').style.animation='';},10);
+        sonAd=ad;
+      }
+      bant.classList.add('on');
+    } else {
+      bant.classList.remove('on');
+      sonAd='';
+    }
+  }
+  var ticking=false;
+  window.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(function(){tick();ticking=false;});ticking=true;}
+  },{passive:true});
+  tick();
+}
+
+// 4. Header parallax/shrink + sube-tabs shadow
+(function(){
+  var hdr=document.querySelector('.menu-header');
+  var tabs=document.querySelector('.sube-tabs');
+  var btn=document.getElementById('yukari-btn');
+  function tick(){
+    var y=window.scrollY;
+    if(hdr){ if(y>40) hdr.classList.add('shrunk'); else hdr.classList.remove('shrunk'); }
+    if(tabs){ if(y>120) tabs.classList.add('scrolled'); else tabs.classList.remove('scrolled'); }
+    if(btn){ if(y>500) btn.classList.add('on'); else btn.classList.remove('on'); }
+  }
+  var ticking=false;
+  window.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(function(){tick();ticking=false;});ticking=true;}
+  },{passive:true});
+})();
+
+// 12. Spotlight dots — scroll ile aktif değiştir
+function spotlightDots(){
+  ['fsm','podyum'].forEach(function(sube){
+    var grid=document.getElementById('spotlight-grid-'+sube);
+    var dotsEl=document.getElementById('sp-dots-'+sube);
+    if(!grid||!dotsEl) return;
+    function syncDots(){
+      var cards=grid.querySelectorAll('.spotlight-card');
+      if(!cards.length) return;
+      var w=cards[0].offsetWidth+12;
+      var idx=Math.round(grid.scrollLeft/w);
+      idx=Math.max(0,Math.min(idx,cards.length-1));
+      dotsEl.querySelectorAll('.sp-dot').forEach(function(d,i){
+        d.classList.toggle('on',i===idx);
+      });
+    }
+    grid.addEventListener('scroll',syncDots,{passive:true});
+    dotsEl.querySelectorAll('.sp-dot').forEach(function(d){
+      d.onclick=function(){
+        var i=parseInt(d.dataset.i,10)||0;
+        var cards=grid.querySelectorAll('.spotlight-card');
+        if(cards[i]) cards[i].scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'});
+      };
+    });
+  });
+}
+
+// 7. + 16. Popup — swipe-down kapatma + double-tap zoom
 function upopAc(idx) {
   var u = POPUP_DATA[idx];
   if (!u) return;
-  // Image or emoji
   var imgDiv = document.getElementById('upopImg');
   if (u.foto) {
     imgDiv.className = 'upop-img';
-    imgDiv.innerHTML = '<img src="'+u.foto+'" alt="'+u.ad+'">';
+    imgDiv.innerHTML = '<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')">';
   } else {
     imgDiv.className = '';
     imgDiv.innerHTML = '<div class="upop-emoji">'+(u.emoji||'☕')+'</div>';
@@ -366,12 +743,162 @@ function upopAc(idx) {
   document.getElementById('upopFiyat').textContent = u.fiyat ? u.fiyat+' TL' : '';
   document.getElementById('upopBg').classList.add('on');
   document.body.style.overflow = 'hidden';
+  imgDivZoomKur(imgDiv);
 }
 function upopKapat() {
   document.getElementById('upopBg').classList.remove('on');
   document.body.style.overflow = '';
+  var img=document.querySelector('#upopImg.upop-img');
+  if(img) img.classList.remove('zoomed');
 }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapat(); } });
+
+// 16. Görsel double-tap zoom
+function imgDivZoomKur(imgDiv){
+  if(!imgDiv||imgDiv._zk) return; imgDiv._zk=true;
+  var sonTap=0;
+  imgDiv.addEventListener('click',function(e){
+    if(!imgDiv.classList.contains('upop-img')) return;
+    var n=Date.now();
+    if(n-sonTap<340){ // double tap
+      imgDiv.classList.toggle('zoomed');
+      e.stopPropagation();
+    }
+    sonTap=n;
+  });
+  imgDiv.addEventListener('dblclick',function(e){
+    if(!imgDiv.classList.contains('upop-img')) return;
+    imgDiv.classList.toggle('zoomed');
+    e.stopPropagation();
+  });
+}
+
+// 7. Popup swipe-down kapama (mobil)
+(function(){
+  var pop=null,startY=0,curY=0,dragging=false;
+  document.addEventListener('touchstart',function(e){
+    pop=document.getElementById('upop');
+    var bg=document.getElementById('upopBg');
+    if(!bg||!bg.classList.contains('on')) return;
+    var t=e.target;
+    // Yalnız üst kısım (handle veya başlık) tetiklesin — içeriğin scrollunu bozma
+    if(!t.closest('.upop-swipe-handle')&&!t.closest('.upop-name')&&!t.closest('.upop-close')) return;
+    startY=e.touches[0].clientY;
+    curY=startY;
+    dragging=true;
+    pop.style.transition='none';
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!dragging||!pop) return;
+    curY=e.touches[0].clientY;
+    var dy=Math.max(0,curY-startY);
+    pop.style.transform='translateY('+dy+'px)';
+  },{passive:true});
+  document.addEventListener('touchend',function(){
+    if(!dragging||!pop) return;
+    dragging=false;
+    pop.style.transition='';
+    var dy=curY-startY;
+    if(dy>120){
+      pop.style.transform='translateY(100%)';
+      setTimeout(function(){pop.style.transform='';upopKapat();},250);
+    } else {
+      pop.style.transform='';
+    }
+  });
+})();
+
+// 11. Pull-to-refresh
+(function(){
+  var ind=document.getElementById('ptr-ind');
+  if(!ind) return;
+  var startY=0,curY=0,active=false,refreshing=false;
+  document.addEventListener('touchstart',function(e){
+    if(refreshing) return;
+    if(window.scrollY>4) return;
+    if(document.getElementById('upopBg').classList.contains('on')) return;
+    startY=e.touches[0].clientY;
+    active=true;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!active||refreshing) return;
+    curY=e.touches[0].clientY;
+    var dy=curY-startY;
+    if(dy<=0){ind.classList.remove('show');ind.style.transform='';return;}
+    if(dy>0&&window.scrollY===0){
+      var d=Math.min(dy,140);
+      ind.classList.add('show');
+      ind.style.transform='translateX(-50%) translateY('+(d*0.6)+'px) scale('+(0.85+d/200)+') rotate('+(d*2)+'deg)';
+    }
+  },{passive:true});
+  document.addEventListener('touchend',function(){
+    if(!active||refreshing) return;
+    active=false;
+    var dy=curY-startY;
+    if(dy>90){
+      refreshing=true;
+      ind.classList.add('spin');
+      ind.innerHTML='⟳';
+      init().finally(function(){
+        setTimeout(function(){
+          ind.classList.remove('show','spin');
+          ind.innerHTML='↓';
+          ind.style.transform='';
+          refreshing=false;
+        },600);
+      });
+    } else {
+      ind.classList.remove('show');
+      ind.style.transform='';
+    }
+  });
+})();
+
+// 8. Sadakat damga animasyonu — banner görünür olunca
+(function(){
+  if(!('IntersectionObserver' in window)) return;
+  var banner=document.querySelector('.sk-banner');
+  if(!banner) return;
+  var stamps=banner.querySelectorAll('.sk-stamp');
+  if(!stamps.length) return;
+  // Tüm "dolu" damgalar için orijinal class'ı sakla, sonra animasyon ile geri yükle
+  var DOLU=7;
+  function reset(){
+    stamps.forEach(function(s,i){
+      s.className='sk-stamp '+(i<DOLU?'bos':(i===DOLU?'bos':'bos'));
+      s.textContent='';
+      s.style.animation='none';
+    });
+  }
+  function play(){
+    reset();
+    stamps.forEach(function(s,i){
+      setTimeout(function(){
+        if(i<DOLU){
+          s.className='sk-stamp dolu anim-fill';
+          s.textContent='⭐';
+        } else if(i===DOLU){
+          s.className='sk-stamp next anim-fill';
+        }
+      },200+i*180);
+    });
+  }
+  var obs=new IntersectionObserver(function(ents){
+    ents.forEach(function(e){if(e.isIntersecting)play();});
+  },{threshold:.5});
+  obs.observe(banner);
+})();
+
+// 2. Sube-tab indicator div'i ekle
+(function(){
+  var tabs=document.querySelector('.sube-tabs');
+  if(!tabs||tabs.querySelector('.sube-tab-indicator')) return;
+  var ind=document.createElement('div');
+  ind.className='sube-tab-indicator';
+  tabs.appendChild(ind);
+  setTimeout(function(){subeIndicatorGuncelle();},120);
+  window.addEventListener('resize',subeIndicatorGuncelle);
+})();
 
 window.addEventListener('load', init);
 function toggleMainNav(){

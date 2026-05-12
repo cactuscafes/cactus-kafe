@@ -541,7 +541,7 @@ input,select{font-family:'Lato',sans-serif;}
     <!-- Periyot tabs -->
     <div class="rap-periyot-tabs">
       <button class="rptab" onclick="rapPeriyot('gun',this)">Bugün</button>
-      <button class="rptab on" onclick="rapPeriyot('hafta',this)">Bu Hafta</button>
+      <button class="rptab on" onclick="rapPeriyot('hafta',this)">Son 7 Gün</button>
       <button class="rptab" onclick="rapPeriyot('ay',this)">Bu Ay</button>
       <button class="rptab" onclick="rapPeriyot('ozel',this)">Özel Aralık</button>
     </div>
@@ -1424,14 +1424,16 @@ function rapPeriyot(p,el){
   rapGoster();
 }
 
+// Türkiye saati (UTC+3) için tarih — cihaz saat diliminden bağımsız
+function trTarih(offsetDays){
+  offsetDays=offsetDays||0;
+  return new Date(Date.now()+3*3600000+offsetDays*86400000).toISOString().split('T')[0];
+}
 function rapTarihAraligi(){
-  const now=new Date();
-  const bugun=now.toISOString().split('T')[0];
+  const bugun=trTarih(0);
   if(rapPeriyotAktif==='gun') return {bas:bugun,bit:bugun};
   if(rapPeriyotAktif==='hafta'){
-    const d=new Date(now);
-    d.setDate(d.getDate()-7);
-    return {bas:d.toISOString().split('T')[0],bit:bugun};
+    return {bas:trTarih(-6),bit:bugun};
   }
   if(rapPeriyotAktif==='ay'){
     return {bas:bugun.substring(0,7)+'-01',bit:bugun};
@@ -1453,9 +1455,9 @@ function rapGoster(){
   document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⏳</div><p>Veriler yükleniyor...</p></div>';
   document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">⏳</div><p>Yükleniyor...</p></div>';
 
-  function renderOzet(ciro,ic,yi,nakit,kredi,satisAdet){
+  function renderOzet(islemAdet,ciro,ic,yi,nakit,kredi){
     document.getElementById('rap-ozet').innerHTML=`
-      <div class="rap-krt"><div class="rap-krt-lbl">Toplam Satış</div><div class="rap-krt-val">${satisAdet}</div><div class="rap-krt-sub">işlem</div></div>
+      <div class="rap-krt"><div class="rap-krt-lbl">Toplam İşlem</div><div class="rap-krt-val">${islemAdet}</div><div class="rap-krt-sub">ödeme</div></div>
       <div class="rap-krt"><div class="rap-krt-lbl">Toplam Ciro</div><div class="rap-krt-val">₺${ciro.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">gelir</div></div>
       <div class="rap-krt ic"><div class="rap-krt-lbl">İçecek Ciro</div><div class="rap-krt-val">₺${ic.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${ciro?Math.round(ic/ciro*100):0}% pay</div></div>
       <div class="rap-krt yi"><div class="rap-krt-lbl">Yiyecek Ciro</div><div class="rap-krt-val">₺${yi.toLocaleString('tr-TR')}</div><div class="rap-krt-sub">${ciro?Math.round(yi/ciro*100):0}% pay</div></div>
@@ -1465,39 +1467,49 @@ function rapGoster(){
 
   const d1Api='https://cactus-rapor-api.batuhanbulut.workers.dev';
   Promise.all([
-    fetch(d1Api+'/rapor/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}),
+    fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}),
     fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();})
   ]).then(function(results){
-    var satirlar=(results[0]||[]).filter(function(s){
+    var islemler=(results[0]||[]).filter(function(s){
       if(!odemeFil) return true;
-      var tip=(s.odeme_tipi||'').toLowerCase();
-      if(odemeFil==='Nakit') return tip==='nakit';
-      if(odemeFil==='Kredi Kartı') return tip==='kredi';
+      var t=(s.odeme_tipi||'').toLowerCase();
+      if(odemeFil==='Nakit') return t==='nakit';
+      if(odemeFil==='Kredi Kartı') return t.includes('kredi')||t.includes('kart');
       return true;
     });
-    var oz=results[1]||{};
+    function nakitTut(s){
+      if(s.nakit_tutar||s.kart_tutar) return s.nakit_tutar||0;
+      return (s.odeme_tipi||'').toLowerCase()==='nakit'?(s.toplam||0):0;
+    }
+    function kartTut(s){
+      if(s.nakit_tutar||s.kart_tutar) return s.kart_tutar||0;
+      var t=(s.odeme_tipi||'').toLowerCase();
+      return (t.indexOf('kart')>=0||t.indexOf('kredi')>=0)?(s.toplam||0):0;
+    }
+    var ciro=islemler.reduce(function(a,s){return a+(s.toplam||0);},0);
+    var ic=islemler.reduce(function(a,s){return a+(s.icecek_toplam||0);},0);
+    var yi=islemler.reduce(function(a,s){return a+(s.yiyecek_toplam||0);},0);
+    var nakit=islemler.reduce(function(a,s){return a+nakitTut(s);},0);
+    var kredi=islemler.reduce(function(a,s){return a+kartTut(s);},0);
+    renderOzet(islemler.length,ciro,ic,yi,nakit,kredi);
 
-    var ciro=oz.gunler&&oz.gunler.length?oz.gunler.reduce(function(a,g){return a+(g.ciro||0);},0):satirlar.reduce(function(a,s){return a+(s.toplam||0);},0);
-    var satisAdet=oz.gunler&&oz.gunler.length?oz.gunler.reduce(function(a,g){return a+(g.adet||0);},0):satirlar.reduce(function(a,s){return a+(s.adet||0);},0);
-    var nakit=0,kredi=0;
-    (oz.odeme||[]).forEach(function(o){if((o.odeme_tipi||'').toLowerCase().includes('nakit')) nakit+=o.ciro||0;else kredi+=o.ciro||0;});
-    var apiIc=satirlar.reduce(function(a,s){return a+((s.kategori||'')==='icecek'?(s.toplam||0):0);},0);
-    var apiYi=satirlar.reduce(function(a,s){return a+((s.kategori||'')==='yiyecek'?(s.toplam||0):0);},0);
-    renderOzet(ciro,apiIc,apiYi,nakit,kredi,satisAdet);
-
-    if(satirlar.length){
-      document.getElementById('rap-tablo-ici').innerHTML='<table class="rap-tablo"><thead><tr><th>Tarih</th><th>Ürün</th><th>Kat.</th><th>Adet</th><th>Birim</th><th>Toplam</th><th>Ödeme</th></tr></thead><tbody>'+
-        satirlar.map(function(s){
-          var tip=(s.odeme_tipi||'nakit').toLowerCase().includes('nakit')?'nakit':'kart';
-          return '<tr><td>'+s.tarih+'</td><td>'+s.urun_adi+'</td><td style="color:var(--mist);font-size:11px;">'+(s.kategori||'-')+'</td><td style="text-align:center;">'+s.adet+'</td><td style="text-align:right;">₺'+s.birim_fiyat+'</td><td class="toplam-cell">₺'+s.toplam+'</td><td><span class="odeme-'+tip+'">'+s.odeme_tipi+'</span></td></tr>';
+    if(islemler.length){
+      document.getElementById('rap-tablo-ici').innerHTML='<table class="rap-tablo"><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ürünler</th><th>İçecek</th><th>Yiyecek</th><th>Toplam</th><th>Ödeme</th></tr></thead><tbody>'+
+        islemler.map(function(s){
+          var t=(s.odeme_tipi||'').toLowerCase();
+          var cssTip=t.includes('nakit')&&!t.includes('kart')&&!t.includes('+')?'nakit':'kart';
+          var urunOzet=(s.urunler||'').length>50?(s.urunler||'').slice(0,50)+'…':(s.urunler||'');
+          return '<tr><td>'+(s.tarih||'')+'</td><td>'+(s.saat||'')+'</td><td>'+(s.masa||'')+'</td><td style="font-size:11px;color:var(--k2);max-width:240px;" title="'+(s.urunler||'').replace(/"/g,'&quot;')+'">'+urunOzet+'</td><td style="text-align:right;">'+((s.icecek_toplam||0)?('₺'+s.icecek_toplam):'-')+'</td><td style="text-align:right;">'+((s.yiyecek_toplam||0)?('₺'+s.yiyecek_toplam):'-')+'</td><td class="toplam-cell">₺'+(s.toplam||0)+'</td><td><span class="odeme-'+cssTip+'">'+(s.odeme_tipi||'')+'</span></td></tr>';
         }).join('')+'</tbody></table>';
     } else {
       document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">📋</div><p>Bu dönemde kayıt yok.</p></div>';
     }
 
-    if(oz.en_cok&&oz.en_cok.length){
-      var mx=oz.en_cok[0].toplam_adet||1;
-      document.getElementById('rap-urun-ici').innerHTML=oz.en_cok.slice(0,10).map(function(u,i){return '<div class="urun-sira"><div class="urun-sira-no">'+(i+1)+'</div><div class="urun-sira-ad">'+u.urun_adi+'</div><div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:'+Math.round((u.toplam_adet||0)/mx*100)+'%"></div></div><div class="urun-sira-adet">'+u.toplam_adet+' adet</div></div>';}).join('');
+    var oz=results[1]||{};
+    var enCok=(oz.en_cok||[]).filter(function(u){return u.urun_adi&&u.urun_adi!=='Satış';});
+    if(enCok.length){
+      var mx=enCok[0].toplam_adet||1;
+      document.getElementById('rap-urun-ici').innerHTML=enCok.slice(0,10).map(function(u,i){return '<div class="urun-sira"><div class="urun-sira-no">'+(i+1)+'</div><div class="urun-sira-ad">'+u.urun_adi+'</div><div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:'+Math.round((u.toplam_adet||0)/mx*100)+'%"></div></div><div class="urun-sira-adet">'+u.toplam_adet+' adet</div></div>';}).join('');
     } else {
       document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Veri yok.</p></div>';
     }
@@ -1526,18 +1538,22 @@ function gunAcikGuncelle(acikTop,acikMasa){
 }
 
 function gunCiroYukle(){
-  var bugun=new Date().toISOString().split('T')[0];
-  var url='https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/ozet?sube='+SUBE+'&baslangic='+bugun+'&bitis='+bugun;
-  fetch(url).then(function(r){return r.json();}).then(function(oz){
+  var bugun=(typeof trTarih==='function')?trTarih(0):new Date().toISOString().split('T')[0];
+  var url='https://cactus-rapor-api.batuhanbulut.workers.dev/islem/listele?sube='+SUBE+'&baslangic='+bugun+'&bitis='+bugun;
+  fetch(url).then(function(r){return r.json();}).then(function(islemler){
     var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
-    _gunKapandiCiro=(oz.gunler||[]).reduce(function(a,g){return a+(g.ciro||0);},0);
-    _gunKapandiAdet=(oz.gunler||[]).reduce(function(a,g){return a+(g.adet||0);},0);
-    _gunNakit=0;_gunKart=0;
-    (oz.odeme||[]).forEach(function(o){
-      var t=(o.odeme_tipi||'').toLowerCase();
-      if(t==='nakit') _gunNakit=o.ciro||0;
-      else _gunKart=o.ciro||0;
-    });
+    islemler=islemler||[];
+    _gunKapandiCiro=islemler.reduce(function(a,s){return a+(s.toplam||0);},0);
+    _gunKapandiAdet=islemler.length;
+    _gunNakit=islemler.reduce(function(a,s){
+      if(s.nakit_tutar||s.kart_tutar) return a+(s.nakit_tutar||0);
+      return a+((s.odeme_tipi||'').toLowerCase()==='nakit'?(s.toplam||0):0);
+    },0);
+    _gunKart=islemler.reduce(function(a,s){
+      if(s.nakit_tutar||s.kart_tutar) return a+(s.kart_tutar||0);
+      var t=(s.odeme_tipi||'').toLowerCase();
+      return a+((t.indexOf('kart')>=0||t.indexOf('kredi')>=0)?(s.toplam||0):0);
+    },0);
     document.getElementById('gun-kapandi-ciro').textContent='₺'+fmt(_gunKapandiCiro);
     document.getElementById('gun-kapandi-alt').textContent=_gunKapandiAdet+' işlem';
     document.getElementById('gun-nakit-ciro').textContent='₺'+fmt(_gunNakit);

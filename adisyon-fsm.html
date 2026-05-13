@@ -1031,9 +1031,9 @@ function saveMasalar(){
   },200);
 }
 
-// ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı) ───
-const LK_FAV='cactus_favs_'+SUBE;
-const FAV_SUBE_KEY='adisyonfavs_'+SUBE;
+// ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
+const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu
+const FAV_SUBE_KEY='cactus_adisyon_fav_'+SUBE; // unique namespaced cloud key
 const FAV_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
 let _favWriteTime=0;
 function getFavs(){try{return JSON.parse(localStorage.getItem(LK_FAV)||'[]');}catch(e){return [];}}
@@ -1044,7 +1044,7 @@ function syncFavsToCloud(){
   fetch(FAV_API+'/menu/kaydet',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({sube:FAV_SUBE_KEY,menu:{ids:fs,ts:Date.now()}})
+    body:JSON.stringify({sube:FAV_SUBE_KEY,menu:{branch:SUBE,ids:fs,ts:Date.now()}})
   }).catch(function(){});
 }
 function syncFavsFromCloud(){
@@ -1053,6 +1053,11 @@ function syncFavsFromCloud(){
     .then(function(r){return r.ok?r.json():null;})
     .then(function(data){
       if(!data||!Array.isArray(data.ids))return;
+      // ÇİFT KONTROL: backend yanlış şubeyi dönerse uygulamayız.
+      if(data.branch&&data.branch!==SUBE){
+        console.warn('[fav] branch uyumsuz — atlanıyor:',data.branch,'vs',SUBE);
+        return;
+      }
       const cur=JSON.stringify(getFavs());
       const inc=JSON.stringify(data.ids);
       if(cur!==inc){

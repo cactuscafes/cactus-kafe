@@ -446,12 +446,12 @@ input,select{font-family:'Lato',sans-serif;}
 .gun-odeme-pill .gopv{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#f4f1eb;}
 .gun-acik-baslik{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin:14px 0 10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
 </style>
-<!-- PWA -->
-<link rel="manifest" href="/manifest.json">
+<!-- PWA — FSM şubesi (kendi manifesti ile Podyum'dan ayrı) -->
+<link rel="manifest" href="/manifest-fsm.json">
 <meta name="theme-color" content="#2C1503">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cactus POS">
+<meta name="apple-mobile-web-app-title" content="FSM POS">
 <link rel="apple-touch-icon" href="/favicon.svg">
 <script>
 if('serviceWorker' in navigator){
@@ -1053,15 +1053,30 @@ function masaSec(no){
 
 var _pushMasalarTimer=null;
 var _masaLocalWriteTime=0;
+var _masaPushRetry=0;
 function saveMasalar(){
   localStorage.setItem(LK.mas,JSON.stringify(masalar));
   _masaLocalWriteTime=Date.now();
   clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(function(){
+  _pushMasalarTimer=setTimeout(function pushMasalar(){
+    var snapshot=JSON.parse(JSON.stringify(masalar));
     fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:SUBE,masalar:masalar})
-    }).catch(function(){});
+      body:JSON.stringify({sube:SUBE,masalar:snapshot})
+    }).then(function(r){
+      if(r&&r.ok){
+        _masaLocalWriteTime=Date.now();
+        _masaPushRetry=0;
+      } else if(_masaPushRetry<3){
+        _masaPushRetry++;
+        setTimeout(pushMasalar,1000*_masaPushRetry);
+      }
+    }).catch(function(){
+      if(_masaPushRetry<3){
+        _masaPushRetry++;
+        setTimeout(pushMasalar,1000*_masaPushRetry);
+      }
+    });
   },200);
 }
 
@@ -2064,7 +2079,7 @@ setInterval(function(){gunCiroYukle();},60000);
   var SUBE='';
   var _lastSync=0;
   var _localWriteTime=0;
-  var LOKAL_KORUMA_MS=2000;
+  var LOKAL_KORUMA_MS=5000; // 2sn → 5sn: yavaş ağda server'a yazımız varmadan polling stale data çekmesin
 
   window.addEventListener('load',function(){
     SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';

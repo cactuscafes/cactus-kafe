@@ -1,0 +1,17 @@
+{
+  "name": "Cactus FSM Adisyon",
+  "short_name": "FSM POS",
+  "description": "Cactus FSM şubesi adisyon ve kasiyer sistemi",
+  "start_url": "/adisyon-fsm.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7EDD8",
+  "theme_color": "#2C1503",
+  "lang": "tr",
+  "id": "/adisyon-fsm.html",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

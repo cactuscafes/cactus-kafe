@@ -1,7 +1,7 @@
 {
-  "name": "Cactus Adisyon",
-  "short_name": "Cactus POS",
-  "description": "Cactus Cafe adisyon ve kasiyer sistemi — offline destekli",
+  "name": "Cactus Podyum Adisyon",
+  "short_name": "Podyum POS",
+  "description": "Cactus Podyumpark şubesi adisyon ve kasiyer sistemi",
   "start_url": "/adisyon.html",
   "scope": "/",
   "display": "standalone",
@@ -9,6 +9,7 @@
   "background_color": "#F7EDD8",
   "theme_color": "#2C1503",
   "lang": "tr",
+  "id": "/adisyon.html",
   "categories": ["business", "productivity"],
   "icons": [
     { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }

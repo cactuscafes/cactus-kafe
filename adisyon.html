@@ -452,7 +452,7 @@ input,select{font-family:'Lato',sans-serif;}
 <meta name="theme-color" content="#2C1503">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cactus POS">
+<meta name="apple-mobile-web-app-title" content="Podyum POS">
 <link rel="apple-touch-icon" href="/favicon.svg">
 <script>
 if('serviceWorker' in navigator){
@@ -1067,16 +1067,33 @@ function masaSec(no){
 
 var _pushMasalarTimer=null;
 var _masaLocalWriteTime=0; // CACTUS SYNC polling'in kendi yazdığımızın üzerine yazmaması için
+var _masaPushRetry=0; // POST başarısız olursa yeniden dene
 function saveMasalar(){
   localStorage.setItem(LK.mas,JSON.stringify(masalar));
   _masaLocalWriteTime=Date.now();
   // Anlık D1'e push — debounce 200ms (hızlı art arda çağrılarda tek push)
   clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(function(){
+  _pushMasalarTimer=setTimeout(function pushMasalar(){
+    var snapshot=JSON.parse(JSON.stringify(masalar));
     fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:SUBE,masalar:masalar})
-    }).catch(function(){});
+      body:JSON.stringify({sube:SUBE,masalar:snapshot})
+    }).then(function(r){
+      if(r&&r.ok){
+        // Server kabul etti — korumayı yenile (artık server'a güvenebiliriz)
+        _masaLocalWriteTime=Date.now();
+        _masaPushRetry=0;
+      } else if(_masaPushRetry<3){
+        _masaPushRetry++;
+        setTimeout(pushMasalar,1000*_masaPushRetry);
+      }
+    }).catch(function(){
+      // Ağ hatası — yeniden dene
+      if(_masaPushRetry<3){
+        _masaPushRetry++;
+        setTimeout(pushMasalar,1000*_masaPushRetry);
+      }
+    });
   },200);
 }
 
@@ -2129,7 +2146,7 @@ setInterval(function(){gunCiroYukle();},60000);
   var SUBE='';
   var _lastSync=0;
   var _localWriteTime=0;
-  var LOKAL_KORUMA_MS=2000;
+  var LOKAL_KORUMA_MS=5000; // 2sn → 5sn: yavaş ağda server'a yazımız varmadan polling stale data çekiyor, masalar boş gözüküyor
 
   window.addEventListener('load',function(){
     SUBE=document.title.toLowerCase().includes('fsm')?'fsm':'podyum';

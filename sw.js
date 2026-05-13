@@ -1,16 +1,18 @@
 /* Cactus Adisyon — Service Worker
  * Strateji:
- *  - HTML (adisyon, adisyon-fsm): network-first → cache fallback (her zaman güncel kalır)
+ *  - HTML: network-first → istenen URL'in cache'i (asla başka HTML'e fallback YOK)
  *  - Statik (favicon, manifest): cache-first
- *  - API çağrıları (rapor-api.workers.dev): sadece network — offline'da sessizce başarısız
+ *  - API çağrıları (rapor-api.workers.dev): sadece network
+ *
+ * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
+ * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v1';
+const VERSION = 'cactus-v3'; // v1/v2 cache'lerini temizler
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
-  '/adisyon.html',
-  '/adisyon-fsm.html',
   '/favicon.svg',
-  '/manifest.json'
+  '/manifest.json',
+  '/manifest-fsm.json'
 ];
 
 self.addEventListener('install', (e) => {
@@ -37,18 +39,17 @@ self.addEventListener('fetch', (e) => {
   // Same origin değilse atla
   if (url.origin !== location.origin) return;
 
-  // HTML — network-first (her açılışta güncel sürümü dene, offline'da cache)
+  // HTML — network-first; offline fallback SADECE istenen URL'in cache'i (asla başka HTML değil)
   const isHTML = req.mode === 'navigate' || req.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/';
   if (isHTML) {
     e.respondWith(
       fetch(req).then((res) => {
-        // Başarılı yanıtı cache'le
         if (res && res.ok) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy).catch(() => {}));
         }
         return res;
-      }).catch(() => caches.match(req).then((r) => r || caches.match('/adisyon.html')))
+      }).catch(() => caches.match(req)) // SADECE istenen URL — başka HTML'e fallback YASAK
     );
     return;
   }

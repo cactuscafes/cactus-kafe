@@ -128,7 +128,19 @@ input,select{font-family:'Lato',sans-serif;}
 .ara-temizle.on{display:block;}
 .ara-temizle:hover{color:var(--k1);}
 .urun-grid{flex:1;overflow-y:auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-content:start;}
-.ukrt{background:#fff;border:1.5px solid var(--kr2);border-radius:11px;padding:12px 8px;text-align:center;transition:all .18s;position:relative;overflow:hidden;}
+.ukrt{background:#fff;border:1.5px solid var(--kr2);border-radius:11px;padding:12px 8px;text-align:center;transition:all .18s;position:relative;overflow:visible;}
+/* ── FAVORİ YILDIZ ── */
+.fav-btn{position:absolute;top:4px;right:4px;width:24px;height:24px;border:none;background:rgba(255,255,255,.92);border-radius:50%;font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#c8c4bd;transition:all .18s;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.12);padding:0;font-family:'Lato',sans-serif;}
+.fav-btn:hover{background:#fff;transform:scale(1.12);color:var(--al);}
+.fav-btn.on{color:var(--al);background:#fff;text-shadow:0 0 4px rgba(201,168,76,.45);}
+.fav-btn:active{transform:scale(.88);}
+.ktab.fav-tab{color:var(--al);font-weight:700;}
+.ktab.fav-tab.on{color:var(--al);border-bottom-color:var(--al);}
+.ktab.fav-tab .ktab-cnt{background:rgba(201,168,76,.2);color:var(--al);}
+.fav-bos{grid-column:1/-1;padding:40px 20px;text-align:center;color:var(--kr3);font-family:'Lato',sans-serif;}
+.fav-bos .fav-bos-i{font-size:42px;margin-bottom:12px;opacity:.5;}
+.fav-bos .fav-bos-t{font-size:14px;font-weight:700;color:var(--k1);margin-bottom:6px;}
+.fav-bos .fav-bos-d{font-size:12px;line-height:1.5;}
 .ukrt::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:.2s;}
 .ukrt:hover{transform:translateY(-2px);box-shadow:var(--sh);}
 .ukrt:hover::after{opacity:1;}
@@ -301,10 +313,13 @@ input,select{font-family:'Lato',sans-serif;}
 
 @media(max-width:480px){
   .urun-grid{grid-template-columns:1fr;gap:4px;padding:8px;}
-  .ukrt{display:flex;flex-direction:row;align-items:center;text-align:left;padding:9px 12px;gap:10px;}
+  .ukrt{display:flex;flex-direction:row;align-items:center;text-align:left;padding:9px 12px 9px 36px;gap:10px;}
   .ukrt .ue{font-size:22px;flex-shrink:0;margin:0;display:block;}
   .ukrt .ua{font-size:12px;flex:1;line-height:1.3;word-break:break-word;margin:0;}
   .ukrt .uf{font-size:12px;font-weight:700;flex-shrink:0;margin:0;}
+  .fav-btn{top:50%;right:auto;left:6px;transform:translateY(-50%);width:26px;height:26px;font-size:15px;background:transparent;box-shadow:none;}
+  .fav-btn:hover{background:rgba(201,168,76,.1);}
+  .fav-btn:active{transform:translateY(-50%) scale(.88);}
 }
 @media(max-width:900px){
   .masa-pnl{width:170px;min-width:170px;}
@@ -1030,9 +1045,52 @@ function saveMasalar(){
   },200);
 }
 
+// ─── FAVORİLER ───
+const LK_FAV='cactus_favs_'+SUBE;
+function getFavs(){try{return JSON.parse(localStorage.getItem(LK_FAV)||'[]');}catch(e){return [];}}
+function saveFavs(arr){try{localStorage.setItem(LK_FAV,JSON.stringify(arr));}catch(e){}}
+function toggleFav(id,ev){
+  if(ev){ev.stopPropagation();ev.preventDefault();}
+  if(!id) return;
+  const fs=getFavs();
+  const idx=fs.indexOf(id);
+  if(idx>-1){fs.splice(idx,1);toast('☆ Favorilerden çıkarıldı');}
+  else{fs.push(id);toast('⭐ Favorilere eklendi');}
+  saveFavs(fs);
+  renderKatBar();renderUrunler();
+}
+function getFavItems(){
+  const fs=getFavs();
+  if(!fs.length) return [];
+  const out=[];const seen=new Set();
+  // Favori sırasını koru
+  fs.forEach(id=>{
+    Object.entries(MENU).forEach(([k,v])=>{
+      if(!v||!Array.isArray(v.urunler))return;
+      v.urunler.forEach(u=>{
+        if(u&&!u.gizli&&u.id===id&&!seen.has(id)){
+          const tipRaw=u.tip||v.tip||'yi';
+          const ic=(tipRaw==='ic'||tipRaw==='icecek');
+          out.push(Object.assign({},u,{tip:ic?'icecek':'yiyecek'}));
+          seen.add(id);
+        }
+      });
+    });
+  });
+  return out;
+}
+window.toggleFav=toggleFav;
+
 function renderKatBar(){
   const bar=document.getElementById('kat-bar');
   bar.innerHTML='';
+  // Favoriler sekmesi — her zaman ilk
+  const favs=getFavs();
+  const favBtn=document.createElement('button');
+  favBtn.className='ktab fav-tab'+(aktifKat==='__fav__'?' on':'');
+  favBtn.innerHTML='⭐ Favoriler'+(favs.length?'<span class="ktab-cnt">'+favs.length+'</span>':'');
+  favBtn.onclick=()=>{aktifKat='__fav__';renderKatBar();renderUrunler();};
+  bar.appendChild(favBtn);
   Object.entries(MENU).forEach(([k,v])=>{
     if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
@@ -1047,17 +1105,33 @@ function renderKatBar(){
 function renderUrunler(){
   const g=document.getElementById('urun-grid');
   g.innerHTML='';
-  const kat=MENU[aktifKat];
-  if(!kat||!Array.isArray(kat.urunler))return;
-  kat.urunler.forEach(u=>{
-    if(u&&u.gizli)return;
-    const tipRaw=(u&&u.tip)||kat.tip||'yi';
-    const ic=(tipRaw==='ic'||tipRaw==='icecek');
-    const tipNorm=ic?'icecek':'yiyecek';
+  let urunler;
+  if(aktifKat==='__fav__'){
+    urunler=getFavItems();
+    if(!urunler.length){
+      g.innerHTML='<div class="fav-bos"><div class="fav-bos-i">⭐</div><div class="fav-bos-t">Henüz favori yok</div><div class="fav-bos-d">Bir ürünün üzerindeki ☆ simgesine basarak<br>favorilere ekleyebilirsin.</div></div>';
+      return;
+    }
+  } else {
+    const kat=MENU[aktifKat];
+    if(!kat||!Array.isArray(kat.urunler))return;
+    urunler=kat.urunler.filter(u=>u&&!u.gizli).map(u=>{
+      const tipRaw=u.tip||kat.tip||'yi';
+      const ic=(tipRaw==='ic'||tipRaw==='icecek');
+      return Object.assign({},u,{tip:ic?'icecek':'yiyecek'});
+    });
+  }
+  const favSet=new Set(getFavs());
+  urunler.forEach(u=>{
+    const ic=u.tip==='icecek';
     const d=document.createElement('button');
     d.className='ukrt '+(ic?'ic':'yi');
-    d.innerHTML=`<span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
-    d.onclick=()=>urunEkle({...u,tip:tipNorm},d);
+    const favOn=favSet.has(u.id);
+    d.innerHTML=`<button class="fav-btn${favOn?' on':''}" onclick="toggleFav('${u.id}',event)" title="${favOn?'Favoriden çıkar':'Favorilere ekle'}" aria-label="Favori">${favOn?'★':'☆'}</button><span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
+    d.onclick=(e)=>{
+      if(e.target&&e.target.classList&&e.target.classList.contains('fav-btn'))return;
+      urunEkle(u,d);
+    };
     g.appendChild(d);
   });
 }

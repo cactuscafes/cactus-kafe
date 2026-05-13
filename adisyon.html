@@ -1067,33 +1067,21 @@ function masaSec(no){
 
 var _pushMasalarTimer=null;
 var _masaLocalWriteTime=0; // CACTUS SYNC polling'in kendi yazdığımızın üzerine yazmaması için
-var _masaPushRetry=0; // POST başarısız olursa yeniden dene
 function saveMasalar(){
+  // SAVUNMA: masalar tamamen boşsa (script init edilmemiş olabilir) — push yapma
+  if(!masalar||typeof masalar!=='object'){return;}
   localStorage.setItem(LK.mas,JSON.stringify(masalar));
   _masaLocalWriteTime=Date.now();
-  // Anlık D1'e push — debounce 200ms (hızlı art arda çağrılarda tek push)
+  // Anlık D1'e push — debounce 200ms
   clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(function pushMasalar(){
-    var snapshot=JSON.parse(JSON.stringify(masalar));
+  _pushMasalarTimer=setTimeout(function(){
     fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:SUBE,masalar:snapshot})
+      body:JSON.stringify({sube:SUBE,masalar:masalar})
     }).then(function(r){
-      if(r&&r.ok){
-        // Server kabul etti — korumayı yenile (artık server'a güvenebiliriz)
-        _masaLocalWriteTime=Date.now();
-        _masaPushRetry=0;
-      } else if(_masaPushRetry<3){
-        _masaPushRetry++;
-        setTimeout(pushMasalar,1000*_masaPushRetry);
-      }
-    }).catch(function(){
-      // Ağ hatası — yeniden dene
-      if(_masaPushRetry<3){
-        _masaPushRetry++;
-        setTimeout(pushMasalar,1000*_masaPushRetry);
-      }
-    });
+      // Server kabul ettiğinde korumayı yenile — polling stale data getirip overwrite etmesin
+      if(r&&r.ok) _masaLocalWriteTime=Date.now();
+    }).catch(function(){});
   },200);
 }
 
@@ -2168,14 +2156,26 @@ setInterval(function(){gunCiroYukle();},60000);
         if(data.masalar&&data.masalar.length){
           var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
           var changed=false;
+          // İlk yükleme: lokalde dolu masa var + server boş → KORU (kendi yazımız henüz server'a varmamış olabilir)
+          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var mv=JSON.stringify(mevcut[m.masa]||[]);
-            var yv=JSON.stringify(m.items||[]);
-            if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
+            var srv=m.items||[];
+            var loc=mevcut[m.masa]||[];
+            if(lokalDolurum && loc.length>0 && srv.length===0) return;
+            var mv=JSON.stringify(loc);
+            var yv=JSON.stringify(srv);
+            if(mv!==yv){mevcut[m.masa]=srv;changed=true;}
           });
           if(changed){
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined') data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
+            if(typeof masalar!=='undefined'){
+              data.masalar.forEach(function(m){
+                var srv=m.items||[];
+                var loc=(masalar[m.masa]||[]);
+                if(lokalDolurum && loc.length>0 && srv.length===0) return;
+                masalar[m.masa]=srv;
+              });
+            }
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
           }
@@ -2286,16 +2286,31 @@ setInterval(function(){gunCiroYukle();},60000);
       .then(function(data){
         // MASALAR
         if(!masaKorumaAktif&&data.masalar&&data.masalar.length){
-          var mevcut=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
+          var lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar';
+          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
           var changed=false;
+          // SON YEREL YAZIMDAN İTİBAREN 30sn — server "boş" diyorsa lokal dolu masaları KORU.
+          // Bu, yavaş ağda kendi push'umuz server'a varmadan stale data ile overwrite olmasını engeller.
+          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var mv=JSON.stringify(mevcut[m.masa]||[]);
-            var yv=JSON.stringify(m.items||[]);
-            if(mv!==yv){mevcut[m.masa]=m.items||[];changed=true;}
+            var srv=m.items||[];
+            var loc=mevcut[m.masa]||[];
+            // Lokal dolu + server boş + yakın zamanda yerel yazım → atla (data loss koruma)
+            if(lokalDolurum && loc.length>0 && srv.length===0) return;
+            var mv=JSON.stringify(loc);
+            var yv=JSON.stringify(srv);
+            if(mv!==yv){mevcut[m.masa]=srv;changed=true;}
           });
           if(changed){
-            localStorage.setItem('cactus_masalar',JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined') data.masalar.forEach(function(m){masalar[m.masa]=m.items||[];});
+            localStorage.setItem(lkMas,JSON.stringify(mevcut));
+            if(typeof masalar!=='undefined'){
+              data.masalar.forEach(function(m){
+                var srv=m.items||[];
+                var loc=(masalar[m.masa]||[]);
+                if(lokalDolurum && loc.length>0 && srv.length===0) return;
+                masalar[m.masa]=srv;
+              });
+            }
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
           }

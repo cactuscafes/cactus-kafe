@@ -903,4 +903,244 @@ function toggleMainNav(){
   }
 })();
 </script>
+
+<!-- ════════ MOBİL ANİMASYONLAR ════════ -->
+<style>
+/* 1. SCROLL PROGRESS BAR */
+#scroll-prog{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,#c8a86a 0%,#f0d890 60%,#c8a86a 100%);z-index:99999;pointer-events:none;will-change:width;box-shadow:0 0 8px rgba(200,168,106,.4);}
+
+/* 2. MOBİL NAV SLİDE ANİMASYON */
+@media(max-width:768px){
+  #mainMobMenu{
+    display:flex!important;
+    pointer-events:none;
+    visibility:hidden;
+    transform:translateY(-24px);
+    opacity:0;
+    transition:transform .42s cubic-bezier(.4,0,.2,1),opacity .32s ease,visibility 0s .42s;
+  }
+  #mainMobMenu.mob-open{
+    pointer-events:auto;
+    visibility:visible;
+    transform:translateY(0);
+    opacity:1;
+    transition:transform .42s cubic-bezier(.4,0,.2,1),opacity .32s ease,visibility 0s 0s;
+  }
+  #mainMobMenu > a{
+    opacity:0;
+    transform:translateX(-22px);
+    transition:opacity .28s ease,transform .32s cubic-bezier(.2,.7,.2,1);
+  }
+  #mainMobMenu.mob-open > a:nth-child(1){opacity:1;transform:none;transition-delay:.08s;}
+  #mainMobMenu.mob-open > a:nth-child(2){opacity:1;transform:none;transition-delay:.14s;}
+  #mainMobMenu.mob-open > a:nth-child(3){opacity:1;transform:none;transition-delay:.20s;}
+  #mainMobMenu.mob-open > a:nth-child(4){opacity:1;transform:none;transition-delay:.26s;}
+  #mainMobMenu.mob-open > a:nth-child(5){opacity:1;transform:none;transition-delay:.32s;}
+}
+
+/* 3. HERO BOKEH (Yüzen altın taneler — sadece mobil) */
+@media(max-width:768px){
+  .hero-bokeh{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.5) 0%,rgba(200,168,106,.15) 40%,transparent 70%);pointer-events:none;z-index:1;animation:bokehFloat linear infinite;filter:blur(.5px);}
+  @keyframes bokehFloat{
+    0%{transform:translateY(0) scale(.8);opacity:0;}
+    12%{opacity:.7;}
+    80%{opacity:.25;}
+    100%{transform:translateY(-95vh) scale(.4);opacity:0;}
+  }
+}
+
+/* 4. DOKUNMATIK GERİ BİLDİRİM (tap feedback) */
+@media(max-width:768px){
+  a,button,.menu-card,.branch-card,.ig-card,.hero-btn,.about-btn{-webkit-tap-highlight-color:transparent;}
+  .menu-card:active{transform:scale(.955)!important;box-shadow:none!important;transition:transform .1s ease!important;}
+  .branch-card:active{transform:scale(.975)!important;transition:transform .1s ease!important;}
+  .hero-btn:active{transform:scale(.94)!important;opacity:.82!important;transition:transform .1s,opacity .1s!important;}
+  .about-btn:active{transform:scale(.95)!important;transition:transform .1s!important;}
+  .ig-card:active{transform:scale(.96)!important;transition:transform .12s!important;}
+}
+
+/* 5. MENÜ KARTLARI YATAY KAYDIRMA + SNAP (mobil) */
+@media(max-width:768px){
+  .section-menu{overflow:hidden;}
+  .menu-grid{
+    display:flex!important;
+    flex-direction:row!important;
+    overflow-x:auto!important;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:10px!important;
+    margin:0 -24px!important;
+    padding:4px 24px 14px!important;
+  }
+  .menu-grid::-webkit-scrollbar{display:none;}
+  .menu-card{
+    flex:0 0 72vw!important;
+    min-width:200px!important;
+    aspect-ratio:3/4!important;
+    scroll-snap-align:start;
+    border-radius:4px;
+  }
+  /* Swipe hint — ilk göründüğünde hafif şımarık sallanma */
+  .menu-grid.swipe-hint > .menu-card:first-child{animation:swipeHint 1s ease-out;}
+  @keyframes swipeHint{
+    0%{transform:translateX(0);}
+    40%{transform:translateX(-22px);}
+    100%{transform:translateX(0);}
+  }
+}
+
+/* 6. SADAKAT KARTI YÜZME (mobil görünürken) */
+@media(max-width:768px){
+  @keyframes mobCardFloat{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-8px) rotate(.4deg);}
+  }
+  #sadakat-kart-gorsel.mob-float > div{animation:mobCardFloat 4s ease-in-out infinite;}
+}
+
+/* 7. SECTION EYEBROW IŞIMA (mobil giriş) */
+@media(max-width:768px){
+  .section-eyebrow.in,.about-eyebrow.in{animation:eyebrowGlow .7s ease-out;}
+  @keyframes eyebrowGlow{
+    0%{opacity:0;filter:brightness(2.8) blur(1px);}
+    60%{filter:brightness(1.4);}
+    100%{opacity:1;filter:none;}
+  }
+}
+
+/* 8. BRANCH KARTI MOBİL GİRİŞ (paralax slide) */
+@media(max-width:768px){
+  .branch-card.fade-up{transform:translateY(40px) scale(.96);}
+  .branch-card.fade-up.in{transform:translateY(0) scale(1);}
+  .branch-card.in img{animation:branchImgIn 1.2s cubic-bezier(.2,.7,.2,1);}
+  @keyframes branchImgIn{0%{transform:scale(1.15);}100%{transform:scale(1);}}
+}
+
+/* 9. NAV BURGER PULSE (ilk dikkat çekme) */
+@media(max-width:768px){
+  #mainBurger{position:relative;}
+  #mainBurger::after{
+    content:"";position:absolute;inset:-6px;border-radius:50%;
+    border:1.5px solid rgba(200,168,106,.5);
+    opacity:0;animation:burgerPulse 4s ease-out 2s 2;
+    pointer-events:none;
+  }
+  @keyframes burgerPulse{
+    0%{opacity:.7;transform:scale(.7);}
+    100%{opacity:0;transform:scale(1.6);}
+  }
+}
+
+/* Erişilebilirlik */
+@media (prefers-reduced-motion: reduce){
+  .hero-bokeh,#sadakat-kart-gorsel.mob-float > div,.menu-grid.swipe-hint > .menu-card:first-child,#mainBurger::after{animation:none!important;}
+  #scroll-prog{transition:none;}
+}
+</style>
+
+<div id="scroll-prog" aria-hidden="true"></div>
+
+<script>
+(function(){
+  var isMob=function(){return window.innerWidth<=768;};
+  var noMot=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ── 1. SCROLL PROGRESS BAR ── */
+  var prog=document.getElementById('scroll-prog');
+  if(prog){
+    var lastPct=-1;
+    window.addEventListener('scroll',function(){
+      var h=document.documentElement.scrollHeight-window.innerHeight;
+      var pct=h>0?Math.min(window.scrollY/h*100,100):0;
+      if(Math.abs(pct-lastPct)>.5){
+        prog.style.width=pct+'%';
+        lastPct=pct;
+      }
+    },{passive:true});
+  }
+
+  /* ── 2. MOBİL NAV TOGGLE OVERRIDE ── */
+  window.toggleMainNav=function(){
+    var menu=document.getElementById('mainMobMenu');
+    var b1=document.getElementById('bs1'),b2=document.getElementById('bs2'),b3=document.getElementById('bs3');
+    if(!menu) return;
+    if(isMob()){
+      var isOpen=menu.classList.contains('mob-open');
+      menu.classList.toggle('mob-open',!isOpen);
+      if(b1) b1.style.transform=isOpen?'':'rotate(45deg) translateY(6.5px)';
+      if(b2) b2.style.opacity=isOpen?'1':'0';
+      if(b3) b3.style.transform=isOpen?'':'rotate(-45deg) translateY(-6.5px)';
+      document.body.style.overflow=isOpen?'':'hidden';
+    } else {
+      var wasOpen=menu.style.display==='flex';
+      menu.style.display=wasOpen?'none':'flex';
+      if(b1) b1.style.transform=wasOpen?'':'rotate(45deg) translateY(6.5px)';
+      if(b2) b2.style.opacity=wasOpen?'1':'0';
+      if(b3) b3.style.transform=wasOpen?'':'rotate(-45deg) translateY(-6.5px)';
+      document.body.style.overflow=wasOpen?'':'hidden';
+    }
+  };
+
+  /* ── 3. HERO BOKEH PARTİKÜLLER (mobil) ── */
+  if(isMob()&&!noMot){
+    var hero=document.querySelector('.hero');
+    if(hero){
+      for(var i=0;i<7;i++){
+        var b=document.createElement('div');
+        b.className='hero-bokeh';
+        var s=(Math.random()*16+6)+'px';
+        b.style.cssText='width:'+s+';height:'+s+';left:'+(Math.random()*85+5)+'%;bottom:-20px;animation-duration:'+(Math.random()*8+8)+'s;animation-delay:-'+(Math.random()*14)+'s;';
+        hero.appendChild(b);
+      }
+    }
+  }
+
+  /* ── 4. MENÜ GRID SWİPE HİNT ── */
+  if(isMob()){
+    var grid=document.querySelector('.menu-grid');
+    if(grid&&'IntersectionObserver' in window){
+      var done=false;
+      var gObs=new IntersectionObserver(function(ents){
+        ents.forEach(function(e){
+          if(e.isIntersecting && !done){
+            done=true;
+            setTimeout(function(){
+              grid.classList.add('swipe-hint');
+              setTimeout(function(){grid.classList.remove('swipe-hint');},1100);
+            },400);
+            gObs.disconnect();
+          }
+        });
+      },{threshold:0.4});
+      gObs.observe(grid);
+    }
+  }
+
+  /* ── 5. SADAKAT KARTI FLOAT (mobil) ── */
+  if(isMob()&&!noMot){
+    var sk=document.getElementById('sadakat-kart-gorsel');
+    if(sk&&'IntersectionObserver' in window){
+      new IntersectionObserver(function(ents,obs){
+        if(ents[0].isIntersecting){sk.classList.add('mob-float');obs.disconnect();}
+      },{threshold:0.4}).observe(sk);
+    }
+  }
+
+  /* ── 6. RESIZE: menü mobilden masaüstüne geçerken state temizle ── */
+  var lastIsMob=isMob();
+  window.addEventListener('resize',function(){
+    var nowMob=isMob();
+    if(nowMob!==lastIsMob){
+      var menu=document.getElementById('mainMobMenu');
+      if(menu){
+        menu.classList.remove('mob-open');
+        menu.style.display=nowMob?'':'none';
+      }
+      document.body.style.overflow='';
+      lastIsMob=nowMob;
+    }
+  },{passive:true});
+})();
+</script>
 </body></html>

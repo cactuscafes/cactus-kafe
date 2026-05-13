@@ -865,7 +865,7 @@ let masalar={};
 let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
 let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
 let aktifMasa=null;
-let aktifKat=Object.keys(MENU)[0];
+let aktifKat='__fav__'; // Açılışta Favoriler karşılasın
 let yonKat=Object.keys(MENU)[0];
 
 for(let i=1;i<=34;i++) masalar[i]=[];
@@ -1045,10 +1045,38 @@ function saveMasalar(){
   },200);
 }
 
-// ─── FAVORİLER ───
+// ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı) ───
 const LK_FAV='cactus_favs_'+SUBE;
+const FAV_SUBE_KEY='adisyonfavs_'+SUBE;
+const FAV_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+let _favWriteTime=0;
 function getFavs(){try{return JSON.parse(localStorage.getItem(LK_FAV)||'[]');}catch(e){return [];}}
 function saveFavs(arr){try{localStorage.setItem(LK_FAV,JSON.stringify(arr));}catch(e){}}
+function syncFavsToCloud(){
+  _favWriteTime=Date.now();
+  const fs=getFavs();
+  fetch(FAV_API+'/menu/kaydet',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:FAV_SUBE_KEY,menu:{ids:fs,ts:Date.now()}})
+  }).catch(function(){});
+}
+function syncFavsFromCloud(){
+  // Yerel yazıma korunma — son 3 saniye içinde değişiklik yapıldıysa atla
+  if(Date.now()-_favWriteTime<3000)return;
+  fetch(FAV_API+'/menu/cek?sube='+FAV_SUBE_KEY)
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(data){
+      if(!data||!Array.isArray(data.ids))return;
+      const cur=JSON.stringify(getFavs());
+      const inc=JSON.stringify(data.ids);
+      if(cur!==inc){
+        saveFavs(data.ids);
+        if(typeof renderKatBar==='function')renderKatBar();
+        if(typeof renderUrunler==='function')renderUrunler();
+      }
+    }).catch(function(){});
+}
 function toggleFav(id,ev){
   if(ev){ev.stopPropagation();ev.preventDefault();}
   if(!id) return;
@@ -1057,8 +1085,14 @@ function toggleFav(id,ev){
   if(idx>-1){fs.splice(idx,1);toast('☆ Favorilerden çıkarıldı');}
   else{fs.push(id);toast('⭐ Favorilere eklendi');}
   saveFavs(fs);
+  syncFavsToCloud();
   renderKatBar();renderUrunler();
 }
+// Açılışta + her 10 saniyede bir buluttan favorileri çek
+window.addEventListener('load',function(){
+  setTimeout(syncFavsFromCloud,800);
+  setInterval(syncFavsFromCloud,10000);
+});
 function getFavItems(){
   const fs=getFavs();
   if(!fs.length) return [];
@@ -2020,7 +2054,7 @@ setInterval(function(){gunCiroYukle();},60000);
     if(typeof MENU!=='undefined'&&MENU){
       Object.keys(MENU).forEach(function(k){delete MENU[k];});
       Object.keys(data).forEach(function(k){MENU[k]=data[k];});
-      if(typeof aktifKat!=='undefined'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
+      if(typeof aktifKat!=='undefined'&&aktifKat!=='__fav__'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
       if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
     }
     if(typeof renderKatBar==='function') renderKatBar();

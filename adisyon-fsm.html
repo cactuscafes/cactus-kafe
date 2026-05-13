@@ -1038,14 +1038,30 @@ function renderMasalar(){
   updateMobBadge();
 }
 const LK_MASA_BAS='cactus_masa_baslangic_'+SUBE;
+// Cloud-source masa süresi: item.ts'ten al, lokal damga sadece geriye uyumluluk için fallback.
 function masaBaslangiclariniGuncelle(){
   const map=JSON.parse(localStorage.getItem(LK_MASA_BAS)||'{}');
   const now=Date.now();
   let degisti=false;
   for(let i=1;i<=30;i++){
-    const dolu=masalar[i]&&masalar[i].length>0;
-    if(dolu&&!map[i]){map[i]=now;degisti=true;}
-    if(!dolu&&map[i]){delete map[i];degisti=true;}
+    const items=masalar[i]||[];
+    const dolu=items.length>0;
+    if(dolu){
+      let itemTs=null;
+      for(let j=0;j<items.length;j++){
+        const t=items[j]&&items[j].ts;
+        if(typeof t==='number'&&t>0){
+          if(itemTs===null||t<itemTs) itemTs=t;
+        }
+      }
+      if(itemTs){
+        if(map[i]!==itemTs){map[i]=itemTs;degisti=true;}
+      } else if(!map[i]){
+        map[i]=now;degisti=true;
+      }
+    } else if(map[i]){
+      delete map[i];degisti=true;
+    }
   }
   if(degisti) localStorage.setItem(LK_MASA_BAS,JSON.stringify(map));
   return map;
@@ -1277,7 +1293,7 @@ function urunEkle(u,el){
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
   if(ex) ex.adet++;
-  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})});
+  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),ts:Date.now()});
   saveMasalar();renderAdisyon();renderMasalar();
   toast('✓ '+u.ad+' eklendi');
 }

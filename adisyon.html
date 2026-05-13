@@ -1025,15 +1025,35 @@ function goTo(id,el){
 }
 
 // Masa açılış zamanı takibi
+// ÖNCE: her cihaz kendi LOKAL "şu an"ını damgalıyordu → cihazlar arası süre uyuşmazlığı.
+// ŞİMDİ: ürün item'ının ts (milliseconds) field'ını kullan; masalar cloud'dan sync olduğu için
+// tüm cihazlarda aynı kaynak. Eski ürünlerde ts yoksa local map fallback (geriye uyumluluk).
 const LK_MASA_BAS='cactus_masa_baslangic_'+SUBE;
 function masaBaslangiclariniGuncelle(){
   const map=JSON.parse(localStorage.getItem(LK_MASA_BAS)||'{}');
   const now=Date.now();
   let degisti=false;
   for(let i=1;i<=34;i++){
-    const dolu=masalar[i]&&masalar[i].length>0;
-    if(dolu&&!map[i]){map[i]=now;degisti=true;}
-    if(!dolu&&map[i]){delete map[i];degisti=true;}
+    const items=masalar[i]||[];
+    const dolu=items.length>0;
+    if(dolu){
+      // Cloud-source: ürün item'larının en küçük ts'i = masanın açılış zamanı
+      let itemTs=null;
+      for(let j=0;j<items.length;j++){
+        const t=items[j]&&items[j].ts;
+        if(typeof t==='number'&&t>0){
+          if(itemTs===null||t<itemTs) itemTs=t;
+        }
+      }
+      if(itemTs){
+        if(map[i]!==itemTs){map[i]=itemTs;degisti=true;}
+      } else if(!map[i]){
+        // Geriye uyumluluk: eski ürünlerde ts yok → lokal şimdi damgala
+        map[i]=now;degisti=true;
+      }
+    } else if(map[i]){
+      delete map[i];degisti=true;
+    }
   }
   if(degisti) localStorage.setItem(LK_MASA_BAS,JSON.stringify(map));
   return map;
@@ -1317,7 +1337,7 @@ function urunEkle(u,el){
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
   if(ex) ex.adet++;
-  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})});
+  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),ts:Date.now()});
   saveMasalar();renderAdisyon();renderMasalar();
   toast('✓ '+u.ad+' eklendi');
 }

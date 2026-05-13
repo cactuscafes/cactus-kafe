@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Cactus Kafe — FSM Adisyon</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -847,6 +849,11 @@ const MENU_DEFAULT = {
     {id:'t3',ad:'Karışık Sosyete',fiyat:170,emoji:'🥪'},{id:'t4',ad:'Kaşarlı Sanayi',fiyat:220,emoji:'🧀'},
     {id:'t5',ad:'Sucuklu Sanayi',fiyat:220,emoji:'🥩'},{id:'t6',ad:'Karışık Sanayi',fiyat:250,emoji:'🥪'},
   ]},
+  tatlilar:{label:'🍰 Tatlılar',tip:'yiyecek',urunler:[
+    {id:'tat1',ad:'Brownie',fiyat:280,emoji:'🍫'},
+    {id:'tat2',ad:'San Sebastian',fiyat:280,emoji:'🍮'},
+    {id:'tat3',ad:'Spoonful',fiyat:280,emoji:'🥄'},
+  ]},
 };
 
 const LK={mas:'cactus_masa_fsmlar',bar:'cactus_bar_fsm',mut:'cactus_mut_fsm',menu:'cactus_menu_fsm'};
@@ -857,6 +864,28 @@ function isBranchFormat(d){return d && typeof d==='object' && (d.fsm||d.podyum) 
 function pickBranch(branches){return branches['fsm']||branches['podyum']||branches[Object.keys(branches)[0]];}
 let _rawMENU=JSON.parse(localStorage.getItem(LK.menu)||'null')||JSON.parse(JSON.stringify(MENU_DEFAULT));
 let MENU=isBranchFormat(_rawMENU)?pickBranch(_rawMENU):_rawMENU;
+
+// Migrasyon: MENU_DEFAULT'ta olup MENU'de eksik kategorileri tamamla (örn. Tatlılar)
+window._menuMigrasyon=function(){
+  let degisti=false;
+  Object.keys(MENU_DEFAULT).forEach(function(k){
+    if(!MENU[k]||typeof MENU[k]!=='object'||!Array.isArray(MENU[k].urunler)){
+      MENU[k]=JSON.parse(JSON.stringify(MENU_DEFAULT[k]));
+      degisti=true;
+    }
+  });
+  if(degisti){
+    try{localStorage.setItem(LK.menu,JSON.stringify(MENU));}catch(e){}
+    setTimeout(function(){
+      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sube:'adisyon_'+SUBE,menu:MENU})
+      }).catch(function(){});
+    },2000);
+  }
+  return degisti;
+};
+window._menuMigrasyon();
 let masalar={};
 let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
 let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
@@ -2001,6 +2030,8 @@ setInterval(function(){gunCiroYukle();},60000);
     if(typeof MENU!=='undefined'&&MENU){
       Object.keys(MENU).forEach(function(k){delete MENU[k];});
       Object.keys(data).forEach(function(k){MENU[k]=data[k];});
+      // Cloud'dan eksik kategori geldiyse migration yap (idempotent)
+      if(typeof window._menuMigrasyon==='function') window._menuMigrasyon();
       if(typeof aktifKat!=='undefined'&&aktifKat!=='__fav__'&&!MENU[aktifKat]) aktifKat=Object.keys(MENU)[0];
       if(typeof yonKat!=='undefined'&&!MENU[yonKat])     yonKat=Object.keys(MENU)[0];
     }

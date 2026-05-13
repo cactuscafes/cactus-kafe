@@ -1,0 +1,32 @@
+# Cloudflare Pages — HTML her zaman taze, statik dosyalar uzun cache
+# Tarayıcı revalidate eder; sunucu 304 dönerse hızlı, değişmişse yeni içerik gelir.
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  Pragma: no-cache
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  Pragma: no-cache
+
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Resimler ve fontlar — uzun süreli cache (içerik değişmez)
+/*.jpg
+  Cache-Control: public, max-age=86400
+
+/*.png
+  Cache-Control: public, max-age=86400
+
+/*.svg
+  Cache-Control: public, max-age=86400
+
+/*.woff
+  Cache-Control: public, max-age=2592000
+
+/*.woff2
+  Cache-Control: public, max-age=2592000

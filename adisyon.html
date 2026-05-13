@@ -112,13 +112,19 @@ input,select{font-family:'Lato',sans-serif;}
 .hzbtn-emoji{font-size:18px;line-height:1;}
 .hzbtn-ad{font-size:10px;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--kr);}
 .hzbtn-fiyat{font-size:9px;color:var(--al);font-weight:700;}
-.kat-bar{display:flex;overflow-x:auto;border-bottom:2px solid var(--kr2);flex-shrink:0;scrollbar-width:none;background:var(--wh);}
+.kat-bar{display:flex;overflow-x:auto;gap:7px;padding:10px 14px;border-bottom:1px solid rgba(44,21,3,.06);flex-shrink:0;scrollbar-width:none;background:linear-gradient(180deg,var(--kr2) 0%,var(--wh) 100%);align-items:center;}
 .kat-bar::-webkit-scrollbar{display:none;}
-.ktab{flex-shrink:0;padding:10px 14px;border:none;background:transparent;font-family:'Playfair Display',serif;font-size:13px;color:var(--kr3);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s;}
-.ktab:hover{color:var(--k2);}
-.ktab.on{color:var(--k1);border-bottom-color:var(--al);font-weight:700;}
-.ktab-cnt{font-size:9px;font-weight:700;background:rgba(44,21,3,.1);border-radius:10px;padding:1px 5px;margin-left:4px;vertical-align:middle;display:inline-block;}
-.ktab.on .ktab-cnt{background:rgba(201,168,76,.35);}
+.ktab{flex-shrink:0;padding:8px 14px;border:1.5px solid rgba(201,168,76,.3);background:#fff;color:var(--k2);font-family:'Lato',sans-serif;font-size:13px;font-weight:700;border-radius:22px;white-space:nowrap;cursor:pointer;transition:transform .15s cubic-bezier(.2,.7,.2,1),background .2s,border-color .2s,box-shadow .2s,color .2s;display:inline-flex;align-items:center;gap:6px;letter-spacing:.2px;}
+.ktab:hover{background:var(--kr2);border-color:var(--al);transform:translateY(-1px);}
+.ktab.on{background:linear-gradient(135deg,var(--k1) 0%,var(--k2) 100%);border-color:var(--k1);color:#fff;box-shadow:0 3px 10px rgba(44,21,3,.28);transform:translateY(-1px);}
+.ktab:active{transform:scale(.96);}
+/* İçecek/Yiyecek tip ipucu — sol ince çubuk */
+.ktab.icecek-tab{border-left:3px solid #4a90c2;padding-left:11px;}
+.ktab.yiyecek-tab{border-left:3px solid #d68b3a;padding-left:11px;}
+.ktab.on.icecek-tab,.ktab.on.yiyecek-tab{border-left-color:rgba(255,255,255,.5);}
+/* Sayaç rozeti — daha okunaklı */
+.ktab-cnt{font-size:10px;font-weight:800;background:rgba(44,21,3,.1);color:inherit;border-radius:10px;padding:2px 7px;min-width:20px;text-align:center;display:inline-block;letter-spacing:0;line-height:1.2;}
+.ktab.on .ktab-cnt{background:rgba(255,255,255,.28);color:#fff;}
 /* ── ARAMA KUTUSU ── */
 .ara-kutu{padding:7px 10px 6px;background:var(--wh);border-bottom:1px solid var(--kr2);flex-shrink:0;}
 .ara-ic{position:relative;display:flex;align-items:center;}
@@ -136,9 +142,12 @@ input,select{font-family:'Lato',sans-serif;}
 .fav-btn:hover{background:#fff;transform:scale(1.12);color:var(--al);}
 .fav-btn.on{color:var(--al);background:#fff;text-shadow:0 0 4px rgba(201,168,76,.45);}
 .fav-btn:active{transform:scale(.88);}
-.ktab.fav-tab{color:var(--al);font-weight:700;}
-.ktab.fav-tab.on{color:var(--al);border-bottom-color:var(--al);}
-.ktab.fav-tab .ktab-cnt{background:rgba(201,168,76,.2);color:var(--al);}
+/* Favoriler sekmesi — altın gradient */
+.ktab.fav-tab{background:linear-gradient(135deg,#fff5da 0%,#ffe9b8 100%);border-color:var(--al);color:#7a5e1a;padding-left:14px;border-left-width:1.5px;}
+.ktab.fav-tab:hover{background:linear-gradient(135deg,#ffefc4 0%,#ffdf95 100%);}
+.ktab.fav-tab.on{background:linear-gradient(135deg,#e8c47a 0%,#c8a86a 100%);border-color:var(--al);color:#fff;box-shadow:0 3px 10px rgba(201,168,76,.4);}
+.ktab.fav-tab .ktab-cnt{background:rgba(122,94,26,.18);color:#7a5e1a;}
+.ktab.fav-tab.on .ktab-cnt{background:rgba(255,255,255,.32);color:#fff;}
 .fav-bos{grid-column:1/-1;padding:40px 20px;text-align:center;color:var(--kr3);font-family:'Lato',sans-serif;}
 .fav-bos .fav-bos-i{font-size:42px;margin-bottom:12px;opacity:.5;}
 .fav-bos .fav-bos-t{font-size:14px;font-weight:700;color:var(--k1);margin-bottom:6px;}
@@ -337,12 +346,11 @@ input,select{font-family:'Lato',sans-serif;}
   .urun-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
   .htab{font-size:10px;min-width:70px;}
   .bm-wrap,.yon-wrap{padding:12px;}
-  /* Mobil kategori pill stili */
-  .kat-bar{padding:7px 8px;gap:5px;border-bottom:1px solid var(--kr2);background:var(--kr);}
-  .ktab{padding:7px 11px;border-radius:20px;border:1.5px solid var(--kr2) !important;margin-bottom:0 !important;font-size:12px;background:#fff;color:var(--k2);font-family:'Lato',sans-serif;font-weight:700;}
-  .ktab:hover{background:var(--kr2);}
-  .ktab.on{background:var(--k1) !important;border-color:var(--k1) !important;color:var(--kr) !important;}
-  .ktab.on .ktab-cnt{background:rgba(247,237,216,.3);}
+  /* Mobil kategori bar — kompakt */
+  .kat-bar{padding:7px 10px;gap:6px;background:linear-gradient(180deg,var(--kr2),var(--wh));}
+  .ktab{padding:7px 12px;font-size:12px;letter-spacing:0;}
+  .ktab.icecek-tab,.ktab.yiyecek-tab{border-left-width:2px;padding-left:10px;}
+  .ktab-cnt{font-size:9px;padding:1px 6px;min-width:18px;}
   .ara-kutu{padding:7px 8px 5px;}
   #cactus-arama{font-size:15px;}
 }
@@ -1202,7 +1210,12 @@ function renderKatBar(){
   Object.entries(MENU).forEach(([k,v])=>{
     if(!v||typeof v!=='object'||!Array.isArray(v.urunler))return;
     const b=document.createElement('button');
-    b.className='ktab'+(aktifKat===k?' on':'');
+    // İçecek vs Yiyecek hint — renkli sol çubuk
+    const tipRaw=v.tip||'';
+    const ic=(tipRaw==='ic'||tipRaw==='icecek');
+    const yi=(tipRaw==='yi'||tipRaw==='yiyecek');
+    const tipCls=ic?' icecek-tab':(yi?' yiyecek-tab':'');
+    b.className='ktab'+tipCls+(aktifKat===k?' on':'');
     const gorunen=v.urunler.filter(u=>u&&!u.gizli).length;
     b.innerHTML=(v.label||k)+(gorunen>0?'<span class="ktab-cnt">'+gorunen+'</span>':'');
     b.onclick=()=>{aktifKat=k;renderKatBar();renderUrunler();};

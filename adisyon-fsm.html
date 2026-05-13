@@ -476,6 +476,22 @@ if('serviceWorker' in navigator){
       });
     }).catch(function(){});
   });
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(window._pwaUpdated) return;
+    window._pwaUpdated=true;
+    // Yeni SW devraldı — aktif masa yokken yenile (idle reload).
+    function ifIdleReload(tries){
+      if((tries||0)>60)return;
+      var idle=(typeof aktifMasa==='undefined'||aktifMasa===null);
+      var modalAcik=document.querySelector('.drawer.on,.modal-on,.modal.open');
+      if(idle && !modalAcik){
+        location.reload();
+      } else {
+        setTimeout(function(){ifIdleReload((tries||0)+1);},5000);
+      }
+    }
+    setTimeout(function(){ifIdleReload(0);},3000);
+  });
 }
 </script>
 </head>
@@ -1070,19 +1086,38 @@ var _pageLoadTime=Date.now();
     return;
   }
 })();
+// ─── ROBUST PUSH ENGİNİ ─── (Tek-uçuş + retry + timeout)
+var _postInFlight=false;
+var _pendingPush=false;
+var _retryCount=0;
+function _doPushMasalar(){
+  if(_postInFlight){_pendingPush=true;return;}
+  if(!masalar||typeof masalar!=='object')return;
+  _postInFlight=true;
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:SUBE,masalar:masalar}),
+    signal:ctrl?ctrl.signal:undefined
+  }).then(function(r){
+    if(toId)clearTimeout(toId);
+    if(r&&r.ok){_masaLocalWriteTime=Date.now();_retryCount=0;}
+    else if(_retryCount<1){_retryCount++;_pendingPush=true;setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);return;}
+  }).catch(function(){
+    if(toId)clearTimeout(toId);
+    if(_retryCount<1){_retryCount++;setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);return;}
+  }).finally(function(){
+    _postInFlight=false;
+    if(_pendingPush){_pendingPush=false;_doPushMasalar();}
+  });
+}
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
-  localStorage.setItem(LK.mas,JSON.stringify(masalar));
+  try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
   _masaLocalWriteTime=Date.now();
   clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(function(){
-    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:SUBE,masalar:masalar})
-    }).then(function(r){
-      if(r&&r.ok) _masaLocalWriteTime=Date.now();
-    }).catch(function(){});
-  },200);
+  _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
 // Sayfa yüklenince: lokalde dolu masa varsa server'a proaktif push (data loss recovery)
@@ -2244,12 +2279,18 @@ setInterval(function(){gunCiroYukle();},60000);
     if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Bar, Mutfak ve Masalar temizlendi');
   }
 
+  var _syncInFlight=false;
   function syncFromD1(){
+    // Yavaş ağda interval üst üste fire etmesin
+    if(_syncInFlight) return;
     geceKontrolu();
     var masaKorumaAktif=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:_localWriteTime))<LOKAL_KORUMA_MS;
     var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
-    fetch(API+'/sync/durum?sube='+SUBE+'&since='+since)
-      .then(function(r){return r.json();})
+    _syncInFlight=true;
+    var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+    var toId=ctrl?setTimeout(function(){ctrl.abort();},12000):null;
+    fetch(API+'/sync/durum?sube='+SUBE+'&since='+since,{signal:ctrl?ctrl.signal:undefined})
+      .then(function(r){if(toId)clearTimeout(toId);return r.json();})
       .then(function(data){
         // MASALAR
         if(!masaKorumaAktif&&data.masalar&&data.masalar.length){
@@ -2315,7 +2356,7 @@ setInterval(function(){gunCiroYukle();},60000);
         }
 
         _lastSync=data.zaman||Date.now();
-      }).catch(function(){});
+      }).catch(function(){if(toId)clearTimeout(toId);}).finally(function(){_syncInFlight=false;});
   }
 })();
 </script>

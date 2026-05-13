@@ -1053,6 +1053,15 @@ function masaSec(no){
 
 var _pushMasalarTimer=null;
 var _masaLocalWriteTime=0;
+var _pageLoadTime=Date.now();
+// Sayfa yüklenince localStorage'da DOLU masa varsa _masaLocalWriteTime'ı şimdi yap
+(function _initWriteTimeFromLocal(){
+  if(!masalar||typeof masalar!=='object')return;
+  for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){
+    _masaLocalWriteTime=Date.now();
+    return;
+  }
+})();
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
   localStorage.setItem(LK.mas,JSON.stringify(masalar));
@@ -1067,6 +1076,21 @@ function saveMasalar(){
     }).catch(function(){});
   },200);
 }
+
+// Sayfa yüklenince: lokalde dolu masa varsa server'a proaktif push (data loss recovery)
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    if(!masalar||typeof masalar!=='object')return;
+    var hasData=false;
+    for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){hasData=true;break;}
+    if(hasData){
+      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sube:SUBE,masalar:masalar})
+      }).then(function(r){if(r&&r.ok)_masaLocalWriteTime=Date.now();}).catch(function(){});
+    }
+  },150);
+});
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu

@@ -1067,6 +1067,16 @@ function masaSec(no){
 
 var _pushMasalarTimer=null;
 var _masaLocalWriteTime=0; // CACTUS SYNC polling'in kendi yazdığımızın üzerine yazmaması için
+var _pageLoadTime=Date.now(); // sayfa yükleme zamanı — sync data loss koruması için
+// Sayfa yüklenince localStorage'da DOLU masa varsa _masaLocalWriteTime'ı şimdi yap
+// → 30sn boyunca server boş diyorsa lokal masalar korunur (data loss önleme)
+(function _initWriteTimeFromLocal(){
+  if(!masalar||typeof masalar!=='object')return;
+  for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){
+    _masaLocalWriteTime=Date.now();
+    return;
+  }
+})();
 function saveMasalar(){
   // SAVUNMA: masalar tamamen boşsa (script init edilmemiş olabilir) — push yapma
   if(!masalar||typeof masalar!=='object'){return;}
@@ -1084,6 +1094,24 @@ function saveMasalar(){
     }).catch(function(){});
   },200);
 }
+
+// Sayfa yüklenince: lokalde dolu masa varsa server'a proaktif push (data loss recovery)
+// — Senaryo: server'da masalar silinmişse, lokaldeki state ile geri doldurur.
+// — Sync polling pull'undan ÖNCE çalışır (masalarTamCek 500ms'de tetikleniyor).
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    if(!masalar||typeof masalar!=='object')return;
+    var hasData=false;
+    for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){hasData=true;break;}
+    if(hasData){
+      // Direkt push — saveMasalar'ın debounce'ını atla
+      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sube:SUBE,masalar:masalar})
+      }).then(function(r){if(r&&r.ok)_masaLocalWriteTime=Date.now();}).catch(function(){});
+    }
+  },150); // 150ms — masalarTamCek 500ms'den önce
+});
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu (eski v1 verisini görmez)

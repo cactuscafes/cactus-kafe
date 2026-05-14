@@ -930,6 +930,79 @@ for(let i=1;i<=34;i++) masalar[i]=[];
 const saved=JSON.parse(localStorage.getItem(LK.mas)||'null');
 if(saved) for(let i=1;i<=30;i++) masalar[i]=saved[i]||[];
 
+// ─── GECE 04:00 RESET — STALE GÜN KONTROLÜ ───
+// Sorun: gece 04:00 worker cron D1'i sıfırlıyor AMA cihaz o saatte kapalıysa
+// localStorage'da dünkü dolu masalar kalıyor. Sayfa açılınca proaktif push
+// bu eski veriyi server'a geri yazıyor → "hiç girmediğim halde masalar dolu".
+// Çözüm: localStorage hangi reset döngüsüne ait? Geçmiş döngüden kalmaysa temizle.
+function _getResetCycleId(){
+  // TR saati (UTC+3). 04:00'ten önce isek hâlâ "dünkü" döngüdeyiz.
+  var trNow=new Date(Date.now()+3*3600000);
+  var d=new Date(trNow);
+  if(trNow.getUTCHours()<4) d.setUTCDate(d.getUTCDate()-1);
+  return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();
+}
+// En son geçmiş 04:00 TR reset noktası (gerçek ms) — stale veri filtrelemede kullanılır
+function _resetNoktasiMs(){
+  var trNow=new Date(Date.now()+3*3600000);
+  var rp=new Date(trNow); rp.setUTCHours(4,0,0,0);
+  if(trNow.getUTCHours()<4) rp.setUTCDate(rp.getUTCDate()-1);
+  return rp.getTime()-3*3600000;
+}
+// Buluttan/lokalden gelen masa item dizisinden STALE olanları at:
+//  - ts < son 04:00 reset noktası → stale
+//  - ts hiç yok → eski-format (ts alanı son sürümde eklendi, urunEkle her item'a ekler)
+//    = deploy öncesi = stale
+// SANITY GUARD: reset noktası mantıksızsa (gelecekte / 25 saatten eski) HİÇ filtreleme yapma
+// → tarih hesabı bozulsa bile taze veri yanlışlıkla silinmez.
+function _staleItemFiltrele(items){
+  if(!Array.isArray(items)) return [];
+  var resetMs=_resetNoktasiMs();
+  var now=Date.now();
+  if(!(resetMs>0 && resetMs<now && (now-resetMs)<25*3600000)){
+    return items; // güvenli taraf: dokunma
+  }
+  return items.filter(function(it){
+    if(!it) return false;
+    if(typeof it.ts!=='number') return false; // ts yok = eski format = stale
+    if(it.ts<resetMs) return false;           // reset noktası öncesi = stale
+    return true;
+  });
+}
+(function _staleGunKontrolu(){
+  try{
+    var currentCycle=_getResetCycleId();
+    var savedCycle=localStorage.getItem(LK.mas+'_cycle');
+    var resetMs=_resetNoktasiMs();
+    // En yeni item ts'i bul
+    var enYeniTs=0,doluVar=false;
+    for(var i=1;i<=34;i++){
+      var items=masalar[i]||[];
+      if(items.length) doluVar=true;
+      for(var j=0;j<items.length;j++){
+        var t=items[j]&&items[j].ts;
+        if(typeof t==='number'&&t>enYeniTs) enYeniTs=t;
+      }
+    }
+    var stale=false;
+    if(savedCycle&&savedCycle!==currentCycle) stale=true;        // farklı reset döngüsü
+    if(doluVar&&enYeniTs>0&&enYeniTs<resetMs) stale=true;        // en yeni item bile reset öncesi
+    var degisti=false;
+    if(stale){
+      for(var k=1;k<=34;k++){if(masalar[k]&&masalar[k].length){masalar[k]=[];degisti=true;}}
+    } else {
+      // Tam stale değil ama tek tek reset öncesi item olabilir → onları da temizle
+      for(var k2=1;k2<=34;k2++){
+        var once=(masalar[k2]||[]).length;
+        masalar[k2]=_staleItemFiltrele(masalar[k2]||[]);
+        if(masalar[k2].length!==once) degisti=true;
+      }
+    }
+    if(degisti){try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}}
+    try{localStorage.setItem(LK.mas+'_cycle',currentCycle);}catch(e){}
+  }catch(e){}
+})();
+
 // Migration: stale 'ic'/'yi' tip değerlerini 'icecek'/'yiyecek' olarak normalleştir
 function _normTip(t){return (t==='ic'||t==='icecek')?'icecek':'yiyecek';}
 let _migrated=false;
@@ -1168,7 +1241,10 @@ function _doPushMasalar(){
 }
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
-  try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
+  try{
+    localStorage.setItem(LK.mas,JSON.stringify(masalar));
+    localStorage.setItem(LK.mas+'_cycle',_getResetCycleId()); // güncel reset döngüsü damgası
+  }catch(e){}
   _masaLocalWriteTime=Date.now();
   // Debounce 200ms
   clearTimeout(_pushMasalarTimer);
@@ -2272,7 +2348,7 @@ setInterval(function(){gunCiroYukle();},60000);
           // İlk yükleme: lokalde dolu masa var + server boş → KORU (kendi yazımız henüz server'a varmamış olabilir)
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=m.items||[];
+            var srv=_staleItemFiltrele(m.items||[]); // reset noktası öncesi item'ları at
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
             var mv=JSON.stringify(loc);
@@ -2283,7 +2359,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
-                var srv=m.items||[];
+                var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
                 masalar[m.masa]=srv;
@@ -2413,7 +2489,7 @@ setInterval(function(){gunCiroYukle();},60000);
           // Bu, yavaş ağda kendi push'umuz server'a varmadan stale data ile overwrite olmasını engeller.
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=m.items||[];
+            var srv=_staleItemFiltrele(m.items||[]); // reset noktası öncesi item'ları at
             var loc=mevcut[m.masa]||[];
             // Lokal dolu + server boş + yakın zamanda yerel yazım → atla (data loss koruma)
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
@@ -2425,7 +2501,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
-                var srv=m.items||[];
+                var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
                 masalar[m.masa]=srv;

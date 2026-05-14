@@ -924,6 +924,71 @@ for(let i=1;i<=30;i++) masalar[i]=[];
 const saved=JSON.parse(localStorage.getItem(LK.mas)||'null');
 if(saved) for(let i=1;i<=30;i++) masalar[i]=saved[i]||[];
 
+// ─── GECE 04:00 RESET — STALE GÜN KONTROLÜ ───
+// Cihaz 04:00'te kapalıysa localStorage'da dünkü dolu masalar kalıyor; sayfa
+// açılınca proaktif push bunu server'a geri yazıyordu. Geçmiş döngüden kalmaysa temizle.
+function _getResetCycleId(){
+  var trNow=new Date(Date.now()+3*3600000);
+  var d=new Date(trNow);
+  if(trNow.getUTCHours()<4) d.setUTCDate(d.getUTCDate()-1);
+  return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();
+}
+function _resetNoktasiMs(){
+  var trNow=new Date(Date.now()+3*3600000);
+  var rp=new Date(trNow); rp.setUTCHours(4,0,0,0);
+  if(trNow.getUTCHours()<4) rp.setUTCDate(rp.getUTCDate()-1);
+  return rp.getTime()-3*3600000;
+}
+// STALE item filtresi:
+//  - ts < son 04:00 reset noktası → stale
+//  - ts hiç yok → eski-format = deploy öncesi = stale
+// SANITY GUARD: reset noktası mantıksızsa filtreleme yapma (taze veri korunsun).
+function _staleItemFiltrele(items){
+  if(!Array.isArray(items)) return [];
+  var resetMs=_resetNoktasiMs();
+  var now=Date.now();
+  if(!(resetMs>0 && resetMs<now && (now-resetMs)<25*3600000)){
+    return items;
+  }
+  return items.filter(function(it){
+    if(!it) return false;
+    if(typeof it.ts!=='number') return false;
+    if(it.ts<resetMs) return false;
+    return true;
+  });
+}
+(function _staleGunKontrolu(){
+  try{
+    var currentCycle=_getResetCycleId();
+    var savedCycle=localStorage.getItem(LK.mas+'_cycle');
+    var resetMs=_resetNoktasiMs();
+    var enYeniTs=0,doluVar=false;
+    for(var i=1;i<=34;i++){
+      var items=masalar[i]||[];
+      if(items.length) doluVar=true;
+      for(var j=0;j<items.length;j++){
+        var t=items[j]&&items[j].ts;
+        if(typeof t==='number'&&t>enYeniTs) enYeniTs=t;
+      }
+    }
+    var stale=false;
+    if(savedCycle&&savedCycle!==currentCycle) stale=true;
+    if(doluVar&&enYeniTs>0&&enYeniTs<resetMs) stale=true;
+    var degisti=false;
+    if(stale){
+      for(var k=1;k<=34;k++){if(masalar[k]&&masalar[k].length){masalar[k]=[];degisti=true;}}
+    } else {
+      for(var k2=1;k2<=34;k2++){
+        var once=(masalar[k2]||[]).length;
+        masalar[k2]=_staleItemFiltrele(masalar[k2]||[]);
+        if(masalar[k2].length!==once) degisti=true;
+      }
+    }
+    if(degisti){try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}}
+    try{localStorage.setItem(LK.mas+'_cycle',currentCycle);}catch(e){}
+  }catch(e){}
+})();
+
 // Migration: stale 'ic'/'yi' tip değerlerini 'icecek'/'yiyecek' olarak normalleştir
 function _normTip(t){return (t==='ic'||t==='icecek')?'icecek':'yiyecek';}
 let _migrated=false;
@@ -1133,7 +1198,10 @@ function _doPushMasalar(){
 }
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
-  try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
+  try{
+    localStorage.setItem(LK.mas,JSON.stringify(masalar));
+    localStorage.setItem(LK.mas+'_cycle',_getResetCycleId());
+  }catch(e){}
   _masaLocalWriteTime=Date.now();
   clearTimeout(_pushMasalarTimer);
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
@@ -2182,7 +2250,7 @@ setInterval(function(){gunCiroYukle();},60000);
           // İlk yüklemede de data loss koruma: lokal dolu + server boş + yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=m.items||[];
+            var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
             var mv=JSON.stringify(loc);
@@ -2193,7 +2261,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
-                var srv=m.items||[];
+                var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
                 masalar[m.masa]=srv;
@@ -2319,7 +2387,7 @@ setInterval(function(){gunCiroYukle();},60000);
           // 30sn data loss koruma — lokal dolu, server boş, yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=m.items||[];
+            var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
             var mv=JSON.stringify(loc);
@@ -2330,7 +2398,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
-                var srv=m.items||[];
+                var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
                 masalar[m.masa]=srv;

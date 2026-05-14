@@ -900,12 +900,15 @@ window._menuMigrasyon=function(){
   });
   if(degisti){
     try{localStorage.setItem(LK.menu,JSON.stringify(MENU));}catch(e){}
+    // KRİTİK: push öncesi _menuYazmaZamani set → polling stale data ile sonsuz döngü olmasın
+    _menuYazmaZamani=Date.now();
     setTimeout(function(){
+      _menuYazmaZamani=Date.now();
       fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({sube:'adisyon_'+SUBE,menu:MENU})
-      }).catch(function(){});
-    },2000);
+      }).then(function(r){if(r&&r.ok)_menuYazmaZamani=Date.now();}).catch(function(){});
+    },500);
   }
   return degisti;
 };

@@ -905,13 +905,16 @@ window._menuMigrasyon=function(){
   });
   if(degisti){
     try{localStorage.setItem(LK.menu,JSON.stringify(MENU));}catch(e){}
-    // Cloud'a push — diğer cihazlar 10 sn'de görür
+    // KRİTİK: push'tan ÖNCE _menuYazmaZamani set et → polling stale cloud data ile overwrite etmesin
+    // Aksi halde polling tatlılar'ı siliyor → migration tekrar push → SONSUZ DÖNGÜ
+    _menuYazmaZamani=Date.now();
     setTimeout(function(){
+      _menuYazmaZamani=Date.now(); // push fire ettiğinde de yenile
       fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({sube:'adisyon_'+SUBE,menu:MENU})
-      }).catch(function(){});
-    },2000);
+      }).then(function(r){if(r&&r.ok)_menuYazmaZamani=Date.now();}).catch(function(){});
+    },500); // 2000ms → 500ms (gecikme azaltıldı)
   }
   return degisti;
 };
@@ -2474,6 +2477,12 @@ setInterval(function(){gunCiroYukle();},60000);
 <script id="cactus-patch">
 /* CACTUS PATCH v2 — iskonto, not, masa tasima, arama, renkler, sure sayaci */
 (function() {
+  // KRİTİK FIX: _iskonto hiç var ile tanımlanmamıştı.
+  // renderAdisyon wrapper'ı (`if(topRow && _iskonto > 0)`) ReferenceError fırlatıyordu
+  // → masaSec → renderAdisyon → ÇÖKÜYOR → masa seçimi/sipariş işlevsiz.
+  // Implicit global yerine açık deklarasyon.
+  if(typeof window._iskonto==='undefined') window._iskonto=0;
+  var _iskonto=window._iskonto; // bu IIFE'de de eriş
   /* ===== 1. ISKONTO — modal içinde yönetiliyor ===== */
   function iskontoUygula() {
     // İskonto artık ödeme modalinde — ödeme al butonuna yönlendir

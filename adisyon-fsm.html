@@ -720,6 +720,11 @@ if('serviceWorker' in navigator){
       </div>
     </div>
     <div class="yon-sec">
+      <div class="yon-sec-ttl">🌙 Gün Sonu</div>
+      <p style="font-size:13px;color:var(--k2);margin-bottom:12px;line-height:1.5;">Gün biterken kapanmamış (ödeme alınmamış) açık masaları temizler. <b>Ciroya yansımaz</b> — ödenmediği için kazanç sayılmaz.</p>
+      <button onclick="gunSonuYap()" class="kaydet-btn" style="background:linear-gradient(135deg,#2d4a1e,#1a3310);">🌙 Günü Bitir & Açık Masaları Temizle</button>
+    </div>
+    <div class="yon-sec">
       <div class="yon-sec-ttl">⚠️ Tehlikeli Bölge</div>
       <button onclick="if(confirm('TÜM MASALAR SİLİNECEK!\n\nDevam etmek istediğinize emin misiniz?\n\nNot: Sistem zaten gece 04:00\\'te otomatik sıfırlanıyor.'))tumMasalariSifirla()" style="width:100%;padding:11px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
     </div>
@@ -1820,6 +1825,29 @@ function webhookKaydet(){
   const url=document.getElementById('webhook-input').value.trim();
   localStorage.setItem('cactus_webhook',url);
   toast(url?'✅ Webhook URL kaydedildi':'🗑 Webhook URL temizlendi');
+}
+function gunSonuYap(){
+  const acik=[];
+  for(let i=1;i<=34;i++){
+    if(masalar[i]&&masalar[i].length>0){
+      const top=masalar[i].reduce((s,x)=>s+x.fiyat*x.adet,0);
+      acik.push({masa:i,sayi:masalar[i].reduce((s,x)=>s+x.adet,0),top});
+    }
+  }
+  if(!acik.length){toast('✓ Tüm masalar zaten boş');return;}
+  const toplam=acik.reduce((s,m)=>s+m.top,0);
+  const detay=acik.map(m=>'Masa '+m.masa+': '+m.sayi+' ürün ₺'+m.top.toLocaleString('tr-TR')).join('\n');
+  const onay='🌙 GÜN SONU\n\n'+acik.length+' açık masa var (toplam ₺'+toplam.toLocaleString('tr-TR')+'):\n\n'+detay+'\n\n⚠ Bu masalar kapatılacak ama CİROYA YANSIMAYACAK (ödeme alınmadı).\n\nDevam edilsin mi?';
+  if(!confirm(onay)) return;
+  acik.forEach(m=>{masalar[m.masa]=[];});
+  aktifMasa=null;
+  saveMasalar();
+  renderMasalar();renderAdisyon();
+  const noEl=document.getElementById('adis-masa-no');if(noEl)noEl.textContent='Seçilmedi';
+  const moEl=document.getElementById('adis-masa-mob');if(moEl)moEl.textContent='Seçilmedi';
+  if(typeof renderCanliCiro==='function')renderCanliCiro();
+  if(typeof gunCiroYukle==='function')gunCiroYukle();
+  toast('🌙 Gün sonu yapıldı — '+acik.length+' masa temizlendi (ciroya yansımadı)');
 }
 function tumMasalariSifirla(){
   if(!confirm('TÜM masalar sıfırlansın mı? Bu işlem geri alınamaz!'))return;

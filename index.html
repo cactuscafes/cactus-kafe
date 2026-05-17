@@ -27,7 +27,7 @@
 body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.98);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.98);border-bottom:1px solid rgba(0,0,0,0.08);}
 .nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
 .nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
 .nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
@@ -139,8 +139,10 @@ footer{padding:60px 24px 30px;}
 </style>
 <!-- ════════ ANİMASYON KATMANI ════════ -->
 <style>
-/* Performans: GPU katmanı */
-.hero-bg,.hero-title,.hero-tagline,.hero-subtitle,.hero-btn,.menu-card,.branch-card,.ig-card,.fade-up,.section-divider{will-change:transform,opacity;}
+/* Performans: GPU katmanı — SADECE entrance animasyonu sırasında aktif olan elementler.
+   Çok geniş will-change listesi (menu-card, branch-card, ig-card, fade-up vb.) GPU compositing
+   patlamasına yol açıp sayfayı kasıyordu. Sadece sürekli/uzun animasyonu olanlar burada. */
+.hero-bg,.hero-title,.hero-tagline,.hero-subtitle,.hero-btn{will-change:transform,opacity;}
 
 /* 1. HERO BG — Ken Burns yavaş zoom+pan */
 @keyframes kenBurns{
@@ -182,7 +184,9 @@ footer{padding:60px 24px 30px;}
 
 /* 6. STEAM — buhar */
 .steam-wrap{position:absolute;top:30%;left:50%;transform:translateX(-50%);width:200px;height:200px;pointer-events:none;z-index:0;opacity:.45;}
-.steam-blob{position:absolute;bottom:0;left:50%;width:40px;height:40px;background:radial-gradient(circle,rgba(255,255,255,.6) 0%,transparent 70%);border-radius:50%;filter:blur(8px);animation:steamRise 4s ease-in infinite;}
+/* filter:blur(8px) infinite animation pahalı paint. Radial gradient zaten soft görünüm
+   veriyor, ekstra blur'a gerek yok — kaldırıldı. */
+.steam-blob{position:absolute;bottom:0;left:50%;width:40px;height:40px;background:radial-gradient(circle,rgba(255,255,255,.5) 0%,transparent 70%);border-radius:50%;animation:steamRise 4s ease-in infinite;}
 .steam-blob:nth-child(1){animation-delay:0s;left:40%;}
 .steam-blob:nth-child(2){animation-delay:1.3s;left:55%;}
 .steam-blob:nth-child(3){animation-delay:2.6s;left:48%;}
@@ -233,8 +237,10 @@ footer{padding:60px 24px 30px;}
 .ig-card:hover svg{transform:rotate(360deg) scale(1.08);}
 
 /* 13. NAV — scroll'da blur + küçülme */
-#mainNav{transition:padding .35s ease,background .35s ease,box-shadow .35s ease,backdrop-filter .35s;}
-#mainNav.scrolled{padding:12px 60px!important;background:rgba(255,255,255,.88)!important;backdrop-filter:blur(14px) saturate(140%);box-shadow:0 4px 24px rgba(0,0,0,.06);}
+#mainNav{transition:padding .35s ease,background .35s ease,box-shadow .35s ease;}
+/* backdrop-filter:blur scroll sırasında costly repaint yapıyordu — opaklığa yükselterek aynı
+   görsel sonucu blur olmadan veriyoruz. */
+#mainNav.scrolled{padding:12px 60px!important;background:rgba(255,255,255,.96)!important;box-shadow:0 4px 24px rgba(0,0,0,.06);}
 #mainNavLinks a{position:relative;transition:color .25s;}
 #mainNavLinks a:not([style*="background"])::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;background:#c8a86a;transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1);}
 #mainNavLinks a:not([style*="background"]):hover::after{transform:scaleX(1);}
@@ -245,8 +251,9 @@ footer{padding:60px 24px 30px;}
 .about-btn:hover{letter-spacing:5px;transform:translateY(-2px);}
 
 /* 15. SAYFA İÇİ DEKOR — hafif gradient drift */
-@keyframes ambientShift{0%,100%{filter:hue-rotate(0deg) brightness(1);}50%{filter:hue-rotate(8deg) brightness(1.03);}}
-#sadakat-section{animation:ambientShift 30s ease-in-out infinite;}
+/* ambientShift KALDIRILDI: filter:hue-rotate büyük section'da her frame full repaint
+   yapıyordu — en büyük tek performans sıkıştırıcısıydı. Bölgenin doğal gradient'i
+   zaten dinamik bir his veriyor, ekstra renk kayması gerekmiyor. */
 
 /* 16. SADAKAT KARTI 3D TİLT */
 #sadakat-kart-gorsel > div{transform-style:preserve-3d;transition:transform .25s ease-out;}
@@ -259,8 +266,8 @@ footer::before{content:"";position:absolute;inset:0;background-image:
   radial-gradient(1px 1px at 80% 20%,rgba(200,168,106,.4) 50%,transparent),
   radial-gradient(1px 1px at 35% 75%,rgba(200,168,106,.3) 50%,transparent),
   radial-gradient(1px 1px at 50% 50%,rgba(200,168,106,.35) 50%,transparent);
-background-size:600px 600px;opacity:.5;animation:starsTwinkle 8s ease-in-out infinite;pointer-events:none;}
-@keyframes starsTwinkle{0%,100%{opacity:.25;}50%{opacity:.7;}}
+background-size:600px 600px;opacity:.4;pointer-events:none;}
+/* starsTwinkle infinite opacity animation kaldırıldı — footer'da sürekli paint yapıyordu. */
 
 /* 18. HERO scroll parallax (JS atayacak) */
 .hero-content{transition:transform .15s ease-out;}
@@ -282,7 +289,7 @@ background-size:600px 600px;opacity:.5;animation:starsTwinkle 8s ease-in-out inf
 
 
 
-<nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
+<nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);border-bottom:1px solid rgba(0,0,0,0.08);">
   <a href="index.html" style="text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
@@ -909,7 +916,7 @@ function toggleMainNav(){
 <!-- ════════ MOBİL ANİMASYONLAR ════════ -->
 <style>
 /* 1. SCROLL PROGRESS BAR */
-#scroll-prog{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,#c8a86a 0%,#f0d890 60%,#c8a86a 100%);z-index:99999;pointer-events:none;will-change:width;box-shadow:0 0 8px rgba(200,168,106,.4);}
+#scroll-prog{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,#c8a86a 0%,#f0d890 60%,#c8a86a 100%);z-index:99999;pointer-events:none;will-change:width;}
 
 /* 2. MOBİL NAV SLİDE ANİMASYON */
 @media(max-width:768px){
@@ -942,7 +949,8 @@ function toggleMainNav(){
 
 /* 3. HERO BOKEH (Yüzen altın taneler — sadece mobil) */
 @media(max-width:768px){
-  .hero-bokeh{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.5) 0%,rgba(200,168,106,.15) 40%,transparent 70%);pointer-events:none;z-index:1;animation:bokehFloat linear infinite;filter:blur(.5px);}
+  /* filter:blur kaldırıldı — radial gradient zaten soft görünüm veriyor. Mobilde GPU yiyici. */
+  .hero-bokeh{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.45) 0%,rgba(200,168,106,.12) 45%,transparent 70%);pointer-events:none;z-index:1;animation:bokehFloat linear infinite;}
   @keyframes bokehFloat{
     0%{transform:translateY(0) scale(.8);opacity:0;}
     12%{opacity:.7;}
@@ -1084,11 +1092,11 @@ function toggleMainNav(){
     }
   };
 
-  /* ── 3. HERO BOKEH PARTİKÜLLER (mobil) ── */
+  /* ── 3. HERO BOKEH PARTİKÜLLER (mobil) — 7→4 azaltıldı, GPU yükü düşsün ── */
   if(isMob()&&!noMot){
     var hero=document.querySelector('.hero');
     if(hero){
-      for(var i=0;i<7;i++){
+      for(var i=0;i<4;i++){
         var b=document.createElement('div');
         b.className='hero-bokeh';
         var s=(Math.random()*16+6)+'px';

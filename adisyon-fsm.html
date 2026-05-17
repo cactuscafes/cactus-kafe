@@ -1213,15 +1213,34 @@ function _masaYerelDegisti(no){
   try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
   return JSON.stringify(masalar[no]||[])!==JSON.stringify(snap[no]||[]);
 }
+// CRDT-style per-item merge — add + remove cross-device propagation, race-window koruma
 function _itemBirlestir(local,server,snap){
+  var raceMs=30000;
+  var now=Date.now();
   var snapIds={};(snap||[]).forEach(function(it){if(it&&it.id)snapIds[it.id]=true;});
-  var localIds={};(local||[]).forEach(function(it){if(it&&it.id)localIds[it.id]=true;});
-  var silinen={};Object.keys(snapIds).forEach(function(id){if(!localIds[id])silinen[id]=true;});
-  var sonuc=(local||[]).slice();
+  var localById={};(local||[]).forEach(function(it){if(it&&it.id)localById[it.id]=it;});
+  var serverIds={};(server||[]).forEach(function(it){if(it&&it.id)serverIds[it.id]=true;});
+  var locallyDeleted={};
+  Object.keys(snapIds).forEach(function(id){if(!localById[id]) locallyDeleted[id]=true;});
+  var serverDeleted={};
+  Object.keys(snapIds).forEach(function(id){
+    if(serverIds[id]) return;
+    var lit=localById[id];
+    if(lit){
+      var ts=_parseTs(lit);
+      if(ts>0 && (now-ts)<raceMs) return; // race koruma
+    }
+    serverDeleted[id]=true;
+  });
+  var sonuc=(local||[]).filter(function(it){
+    if(!it||!it.id) return true;
+    return !serverDeleted[it.id];
+  });
+  var sonucIds={};sonuc.forEach(function(it){if(it&&it.id)sonucIds[it.id]=true;});
   (server||[]).forEach(function(srvIt){
-    if(!srvIt||!srvIt.id)return;
-    if(localIds[srvIt.id])return;
-    if(silinen[srvIt.id])return;
+    if(!srvIt||!srvIt.id) return;
+    if(sonucIds[srvIt.id]) return;
+    if(locallyDeleted[srvIt.id]) return;
     sonuc.push(srvIt);
   });
   return sonuc;
@@ -2354,15 +2373,17 @@ setInterval(function(){gunCiroYukle();},60000);
           var changed=false;
           // İlk yüklemede de data loss koruma: lokal dolu + server boş + yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
+          // SMART POLLING MERGE — CRDT merge, overwrite yok
+          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
           data.masalar.forEach(function(m){
-            // GÜVENLİK: Bu masada lokal değişiklik var ve henüz pushlanmadıysa SKIP.
             if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
             var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            var mv=JSON.stringify(loc);
-            var yv=JSON.stringify(srv);
-            if(mv!==yv){mevcut[m.masa]=srv;changed=true;}
+            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
+            if(JSON.stringify(loc)!==JSON.stringify(merged)){
+              mevcut[m.masa]=merged;changed=true;
+            }
           });
           if(changed){
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
@@ -2372,11 +2393,20 @@ setInterval(function(){gunCiroYukle();},60000);
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=srv;
+                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
               });
             }
-            // Smart push snap güncelle
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
+            // Snap = gerçek server state per masa
+            var yeniSnap={};try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
+            data.masalar.forEach(function(m){
+              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
+              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
+            });
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
+            // Diff varsa hemen push (cross-device propagation)
+            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
+              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
+            }
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
           }
@@ -2496,15 +2526,17 @@ setInterval(function(){gunCiroYukle();},60000);
           var changed=false;
           // 30sn data loss koruma — lokal dolu, server boş, yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
+          // SMART POLLING MERGE — CRDT
+          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
           data.masalar.forEach(function(m){
-            // GÜVENLİK: Lokal değişiklik varsa SKIP.
             if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
             var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            var mv=JSON.stringify(loc);
-            var yv=JSON.stringify(srv);
-            if(mv!==yv){mevcut[m.masa]=srv;changed=true;}
+            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
+            if(JSON.stringify(loc)!==JSON.stringify(merged)){
+              mevcut[m.masa]=merged;changed=true;
+            }
           });
           if(changed){
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
@@ -2514,11 +2546,18 @@ setInterval(function(){gunCiroYukle();},60000);
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=srv;
+                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
               });
             }
-            // Smart push snap güncelle
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
+            var yeniSnap={};try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
+            data.masalar.forEach(function(m){
+              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
+              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
+            });
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
+            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
+              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
+            }
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
           }

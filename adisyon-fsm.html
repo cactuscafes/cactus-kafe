@@ -1208,6 +1208,24 @@ function _degisenMasalar(){
   }
   return degisen;
 }
+function _masaYerelDegisti(no){
+  var snap={};
+  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
+  return JSON.stringify(masalar[no]||[])!==JSON.stringify(snap[no]||[]);
+}
+function _itemBirlestir(local,server,snap){
+  var snapIds={};(snap||[]).forEach(function(it){if(it&&it.id)snapIds[it.id]=true;});
+  var localIds={};(local||[]).forEach(function(it){if(it&&it.id)localIds[it.id]=true;});
+  var silinen={};Object.keys(snapIds).forEach(function(id){if(!localIds[id])silinen[id]=true;});
+  var sonuc=(local||[]).slice();
+  (server||[]).forEach(function(srvIt){
+    if(!srvIt||!srvIt.id)return;
+    if(localIds[srvIt.id])return;
+    if(silinen[srvIt.id])return;
+    sonuc.push(srvIt);
+  });
+  return sonuc;
+}
 
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
@@ -1224,11 +1242,17 @@ function _doPushMasalar(){
       if(serverData&&Array.isArray(serverData.masalar)){
         serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
       }
+      var snap={};
+      try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
       var merged={};
       var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
       for(var i=1;i<=34;i++){
-        if(degisenSet[i]){merged[i]=masalar[i]||[];}
-        else{merged[i]=_staleItemFiltrele(serverMap[i]||[]);}
+        if(degisenSet[i]){
+          // Per-item by-id birleştir: cross-device add korunur, kullanıcı silimi geri gelmez
+          merged[i]=_itemBirlestir(masalar[i]||[], _staleItemFiltrele(serverMap[i]||[]), snap[i]||[]);
+        } else {
+          merged[i]=_staleItemFiltrele(serverMap[i]||[]);
+        }
       }
       var ctrl2=(typeof AbortController!=='undefined')?new AbortController():null;
       var toId2=ctrl2?setTimeout(function(){ctrl2.abort();},10000):null;
@@ -2331,6 +2355,8 @@ setInterval(function(){gunCiroYukle();},60000);
           // İlk yüklemede de data loss koruma: lokal dolu + server boş + yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
+            // GÜVENLİK: Bu masada lokal değişiklik var ve henüz pushlanmadıysa SKIP.
+            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
             var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
@@ -2342,6 +2368,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
+                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
@@ -2470,6 +2497,8 @@ setInterval(function(){gunCiroYukle();},60000);
           // 30sn data loss koruma — lokal dolu, server boş, yakın yerel yazım → atla
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
+            // GÜVENLİK: Lokal değişiklik varsa SKIP.
+            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
             var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
@@ -2481,6 +2510,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
+                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;

@@ -1240,6 +1240,28 @@ function _degisenMasalar(){
   }
   return degisen;
 }
+// Belirli bir masada lokal değişiklik var mı (henüz pushlanmamış)?
+function _masaYerelDegisti(no){
+  var snap={};
+  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
+  return JSON.stringify(masalar[no]||[])!==JSON.stringify(snap[no]||[]);
+}
+// Per-item by-id merge: lokal değişiklikler + diğer cihazların eklediği yeni itemlar.
+// Kullanıcının sildiği (snap'te vardı, local'de yok) item'ları geri getirmez.
+function _itemBirlestir(local,server,snap){
+  var snapIds={};(snap||[]).forEach(function(it){if(it&&it.id)snapIds[it.id]=true;});
+  var localIds={};(local||[]).forEach(function(it){if(it&&it.id)localIds[it.id]=true;});
+  // Lokal kullanıcı sildi (snap'teydi, şimdi local'de yok) → geri getirme
+  var silinen={};Object.keys(snapIds).forEach(function(id){if(!localIds[id])silinen[id]=true;});
+  var sonuc=(local||[]).slice();
+  (server||[]).forEach(function(srvIt){
+    if(!srvIt||!srvIt.id)return;
+    if(localIds[srvIt.id])return;   // local zaten var (adet farkı olabilir, local kazanır)
+    if(silinen[srvIt.id])return;    // kullanıcı sildi, geri getirme
+    sonuc.push(srvIt);              // başka cihazın eklediği yeni item — KORU
+  });
+  return sonuc;
+}
 
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
@@ -1258,13 +1280,16 @@ function _doPushMasalar(){
       if(serverData&&Array.isArray(serverData.masalar)){
         serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
       }
+      var snap={};
+      try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
       var merged={};
       var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
       for(var i=1;i<=34;i++){
         if(degisenSet[i]){
-          merged[i]=masalar[i]||[]; // bizim değişikliğimiz
+          // Değişen masa için per-item by-id birleştir: lokal değişiklik +
+          // başka cihazın eklediği yeni itemlar korunur, kullanıcı sildiyse geri gelmez.
+          merged[i]=_itemBirlestir(masalar[i]||[], _staleItemFiltrele(serverMap[i]||[]), snap[i]||[]);
         } else {
-          // Server'dan al, ama stale item'ları filtrele (eski format koruma)
           merged[i]=_staleItemFiltrele(serverMap[i]||[]);
         }
       }
@@ -2439,7 +2464,10 @@ setInterval(function(){gunCiroYukle();},60000);
           // İlk yükleme: lokalde dolu masa var + server boş → KORU (kendi yazımız henüz server'a varmamış olabilir)
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=_staleItemFiltrele(m.items||[]); // reset noktası öncesi item'ları at
+            // GÜVENLİK: Bu masada lokal değişiklik var ve henüz pushlanmadıysa SKIP.
+            // Smart push tamamlandığında snap güncellenecek, sonraki sync uygulayacak.
+            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
+            var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
             var mv=JSON.stringify(loc);
@@ -2450,6 +2478,7 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
+                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
@@ -2582,9 +2611,10 @@ setInterval(function(){gunCiroYukle();},60000);
           // Bu, yavaş ağda kendi push'umuz server'a varmadan stale data ile overwrite olmasını engeller.
           var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
           data.masalar.forEach(function(m){
-            var srv=_staleItemFiltrele(m.items||[]); // reset noktası öncesi item'ları at
+            // GÜVENLİK: Bu masada lokal değişiklik var ve henüz pushlanmadıysa SKIP.
+            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
+            var srv=_staleItemFiltrele(m.items||[]);
             var loc=mevcut[m.masa]||[];
-            // Lokal dolu + server boş + yakın zamanda yerel yazım → atla (data loss koruma)
             if(lokalDolurum && loc.length>0 && srv.length===0) return;
             var mv=JSON.stringify(loc);
             var yv=JSON.stringify(srv);
@@ -2594,13 +2624,14 @@ setInterval(function(){gunCiroYukle();},60000);
             localStorage.setItem(lkMas,JSON.stringify(mevcut));
             if(typeof masalar!=='undefined'){
               data.masalar.forEach(function(m){
+                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
                 var srv=_staleItemFiltrele(m.items||[]);
                 var loc=(masalar[m.masa]||[]);
                 if(lokalDolurum && loc.length>0 && srv.length===0) return;
                 masalar[m.masa]=srv;
               });
             }
-            // Smart push snap'i güncelle — sync sonrası bu state "server ile eşit"
+            // Smart push snap'i güncelle
             if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();

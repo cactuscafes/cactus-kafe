@@ -1187,31 +1187,84 @@ var _pageLoadTime=Date.now();
     return;
   }
 })();
-// ─── ROBUST PUSH ENGİNİ ─── (Tek-uçuş + retry + timeout)
+// ─── SMART MERGE PUSH ─── (cross-device race fix)
+// Eski: tüm state push → last-writer-wins → cihaz A açılınca B'nin masaları silinirdi.
+// Yeni: push öncesi server'dan latest pull → sadece bu cihazın değiştirdikleri override.
 var _postInFlight=false;
 var _pendingPush=false;
 var _retryCount=0;
+var _sonPushSnap=JSON.stringify(masalar||{});
+var GET_DURUM='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/durum?sube='+SUBE+'&since=0';
+var POST_MASALAR='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar';
+
+function _degisenMasalar(){
+  var snap={};
+  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
+  var degisen=[];
+  for(var i=1;i<=34;i++){
+    var c=JSON.stringify(masalar[i]||[]);
+    var s=JSON.stringify(snap[i]||[]);
+    if(c!==s) degisen.push(i);
+  }
+  return degisen;
+}
+
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
   if(!masalar||typeof masalar!=='object')return;
+  var degisen=_degisenMasalar();
+  if(!degisen.length) return;
   _postInFlight=true;
-  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-  var toId=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({sube:SUBE,masalar:masalar}),
-    signal:ctrl?ctrl.signal:undefined
-  }).then(function(r){
-    if(toId)clearTimeout(toId);
-    if(r&&r.ok){_masaLocalWriteTime=Date.now();_retryCount=0;}
-    else if(_retryCount<1){_retryCount++;_pendingPush=true;setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);return;}
-  }).catch(function(){
-    if(toId)clearTimeout(toId);
-    if(_retryCount<1){_retryCount++;setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);return;}
-  }).finally(function(){
-    _postInFlight=false;
-    if(_pendingPush){_pendingPush=false;_doPushMasalar();}
-  });
+  var ctrl1=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId1=ctrl1?setTimeout(function(){ctrl1.abort();},8000):null;
+  fetch(GET_DURUM,{signal:ctrl1?ctrl1.signal:undefined})
+    .then(function(r){if(toId1)clearTimeout(toId1);return r.ok?r.json():null;})
+    .then(function(serverData){
+      var serverMap={};
+      if(serverData&&Array.isArray(serverData.masalar)){
+        serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
+      }
+      var merged={};
+      var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
+      for(var i=1;i<=34;i++){
+        if(degisenSet[i]){merged[i]=masalar[i]||[];}
+        else{merged[i]=_staleItemFiltrele(serverMap[i]||[]);}
+      }
+      var ctrl2=(typeof AbortController!=='undefined')?new AbortController():null;
+      var toId2=ctrl2?setTimeout(function(){ctrl2.abort();},10000):null;
+      return fetch(POST_MASALAR,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sube:SUBE,masalar:merged}),
+        signal:ctrl2?ctrl2.signal:undefined
+      }).then(function(r){if(toId2)clearTimeout(toId2);return {r:r,merged:merged};});
+    })
+    .then(function(res){
+      if(res&&res.r&&res.r.ok){
+        _masaLocalWriteTime=Date.now();
+        _retryCount=0;
+        _sonPushSnap=JSON.stringify(res.merged);
+        for(var i=1;i<=34;i++){
+          var srvItems=res.merged[i]||[];
+          if(degisen.indexOf(i)<0 && JSON.stringify(masalar[i]||[])!==JSON.stringify(srvItems)){
+            masalar[i]=srvItems;
+          }
+        }
+        try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
+        if(typeof renderMasalar==='function')renderMasalar();
+      } else if(_retryCount<1){
+        _retryCount++;_pendingPush=true;
+        setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);
+        return;
+      }
+    })
+    .catch(function(){
+      if(toId1)clearTimeout(toId1);
+      if(_retryCount<1){_retryCount++;setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);return;}
+    })
+    .finally(function(){
+      _postInFlight=false;
+      if(_pendingPush){_pendingPush=false;_doPushMasalar();}
+    });
 }
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
@@ -1224,20 +1277,8 @@ function saveMasalar(){
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
-// Sayfa yüklenince: lokalde dolu masa varsa server'a proaktif push (data loss recovery)
-window.addEventListener('load',function(){
-  setTimeout(function(){
-    if(!masalar||typeof masalar!=='object')return;
-    var hasData=false;
-    for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){hasData=true;break;}
-    if(hasData){
-      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:SUBE,masalar:masalar})
-      }).then(function(r){if(r&&r.ok)_masaLocalWriteTime=Date.now();}).catch(function(){});
-    }
-  },150);
-});
+// PROAKTİF PUSH KALDIRILDI — cross-device race'in baş sebebiydi.
+// Smart-merge push (_doPushMasalar) artık her save'de server ile merge ediyor.
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu
@@ -2307,6 +2348,8 @@ setInterval(function(){gunCiroYukle();},60000);
                 masalar[m.masa]=srv;
               });
             }
+            // Smart push snap güncelle
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
           }
@@ -2444,6 +2487,8 @@ setInterval(function(){gunCiroYukle();},60000);
                 masalar[m.masa]=srv;
               });
             }
+            // Smart push snap güncelle
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
           }

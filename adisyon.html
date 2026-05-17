@@ -1212,51 +1212,110 @@ var _pageLoadTime=Date.now(); // sayfa yükleme zamanı — sync data loss korum
     return;
   }
 })();
-// ─── ROBUST PUSH ENGİNİ ───
-// Tek-uçuş kuralı: aynı anda sadece BİR POST in-flight olabilir.
-// Yavaş ağda iki POST aynı anda uçup out-of-order tamamlanması race condition'a yol açıyordu.
-// Yeni saveMasalar gelirse: in-flight tamamlandığında EN GÜNCEL state ile bir push daha yapılır.
-// POST fail durumunda 1 retry (1sn sonra).
+// ─── SMART MERGE PUSH ENGİNİ ───
+// KRİTİK BUG'IN ÇÖZÜMÜ: Eski saveMasalar TÜM masalar state'ini push ediyordu.
+// Cihaz A masa 1'e ürün ekleyince, A'nın masa 5 boş state'i de push ediliyor,
+// B'nin masa 5'teki yeni eklediği itemlar SİLİNİYORDU (last-writer-wins).
+// Yeni mantık: Push öncesi server'dan latest pull → sadece BU CİHAZIN değiştirdiği
+// masaları lokalden, diğerlerini server'dan al → merge'i push et.
+// Bu sayede paralel cihazların farklı masalar üzerindeki değişiklikleri korunur.
 var _postInFlight=false;
 var _pendingPush=false;
 var _retryCount=0;
+// _sonPushSnap: son başarılı sync'e ait masalar JSON snapshot'ı.
+// Hangi masaların DEĞİŞTİĞİNİ bunun ile diff alarak buluruz.
+var _sonPushSnap=JSON.stringify(masalar||{});
+var GET_DURUM='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/durum?sube='+SUBE+'&since=0';
+var POST_MASALAR='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar';
+
+function _degisenMasalar(){
+  // Hangi masalar son sync'ten beri değişti?
+  var snap={};
+  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
+  var degisen=[];
+  for(var i=1;i<=34;i++){
+    var c=JSON.stringify(masalar[i]||[]);
+    var s=JSON.stringify(snap[i]||[]);
+    if(c!==s) degisen.push(i);
+  }
+  return degisen;
+}
+
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
   if(!masalar||typeof masalar!=='object')return;
+  var degisen=_degisenMasalar();
+  if(!degisen.length) return; // hiçbir lokal değişiklik yok — push'a gerek yok
   _postInFlight=true;
-  // 10 saniye timeout — yavaş ağda fetch sonsuza takılmasın
-  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-  var toId=ctrl?setTimeout(function(){ctrl.abort();},10000):null;
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({sube:SUBE,masalar:masalar}),
-    signal:ctrl?ctrl.signal:undefined
-  }).then(function(r){
-    if(toId)clearTimeout(toId);
-    if(r&&r.ok){
-      _masaLocalWriteTime=Date.now();
-      _retryCount=0;
-    } else if(_retryCount<1){
-      _retryCount++;
-      _pendingPush=true; // 1sn sonra retry
-      setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);
-      return;
-    }
-  }).catch(function(){
-    if(toId)clearTimeout(toId);
-    // Timeout veya ağ hatası — bir kez retry
-    if(_retryCount<1){
-      _retryCount++;
-      setTimeout(function(){_postInFlight=false;if(_pendingPush||true){_pendingPush=false;_doPushMasalar();}},1500);
-      return;
-    }
-  }).finally(function(){
-    _postInFlight=false;
-    if(_pendingPush){
-      _pendingPush=false;
-      _doPushMasalar(); // bekleyen güncel state'i pushla
-    }
-  });
+  // 1. ADIM: Server'dan latest pull (8sn timeout)
+  var ctrl1=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId1=ctrl1?setTimeout(function(){ctrl1.abort();},8000):null;
+  fetch(GET_DURUM,{signal:ctrl1?ctrl1.signal:undefined})
+    .then(function(r){if(toId1)clearTimeout(toId1);return r.ok?r.json():null;})
+    .then(function(serverData){
+      // 2. ADIM: Merge. Bizim değiştirdiklerimiz lokal, diğerleri server'dan.
+      var serverMap={};
+      if(serverData&&Array.isArray(serverData.masalar)){
+        serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
+      }
+      var merged={};
+      var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
+      for(var i=1;i<=34;i++){
+        if(degisenSet[i]){
+          merged[i]=masalar[i]||[]; // bizim değişikliğimiz
+        } else {
+          // Server'dan al, ama stale item'ları filtrele (eski format koruma)
+          merged[i]=_staleItemFiltrele(serverMap[i]||[]);
+        }
+      }
+      // 3. ADIM: Merged'i POST et (10sn timeout)
+      var ctrl2=(typeof AbortController!=='undefined')?new AbortController():null;
+      var toId2=ctrl2?setTimeout(function(){ctrl2.abort();},10000):null;
+      return fetch(POST_MASALAR,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sube:SUBE,masalar:merged}),
+        signal:ctrl2?ctrl2.signal:undefined
+      }).then(function(r){
+        if(toId2)clearTimeout(toId2);
+        return {r:r,merged:merged};
+      });
+    })
+    .then(function(res){
+      if(res&&res.r&&res.r.ok){
+        _masaLocalWriteTime=Date.now();
+        _retryCount=0;
+        // Snap'i merged state ile güncelle (sonraki diff için referans)
+        _sonPushSnap=JSON.stringify(res.merged);
+        // Lokal masalar'ı da merge ile sync et (server'dan gelen diğer masalalar yansısın)
+        for(var i=1;i<=34;i++){
+          var srvItems=res.merged[i]||[];
+          var locItems=masalar[i]||[];
+          // SADECE değişmemiş masalalar için lokal'i server-side ile güncelle
+          if(degisen.indexOf(i)<0 && JSON.stringify(locItems)!==JSON.stringify(srvItems)){
+            masalar[i]=srvItems;
+          }
+        }
+        try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
+        if(typeof renderMasalar==='function')renderMasalar();
+      } else if(_retryCount<1){
+        _retryCount++;
+        _pendingPush=true;
+        setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);
+        return;
+      }
+    })
+    .catch(function(){
+      if(toId1)clearTimeout(toId1);
+      if(_retryCount<1){
+        _retryCount++;
+        setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);
+        return;
+      }
+    })
+    .finally(function(){
+      _postInFlight=false;
+      if(_pendingPush){_pendingPush=false;_doPushMasalar();}
+    });
 }
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
@@ -1270,23 +1329,11 @@ function saveMasalar(){
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
-// Sayfa yüklenince: lokalde dolu masa varsa server'a proaktif push (data loss recovery)
-// — Senaryo: server'da masalar silinmişse, lokaldeki state ile geri doldurur.
-// — Sync polling pull'undan ÖNCE çalışır (masalarTamCek 500ms'de tetikleniyor).
-window.addEventListener('load',function(){
-  setTimeout(function(){
-    if(!masalar||typeof masalar!=='object')return;
-    var hasData=false;
-    for(var i=1;i<=34;i++) if(masalar[i]&&masalar[i].length>0){hasData=true;break;}
-    if(hasData){
-      // Direkt push — saveMasalar'ın debounce'ını atla
-      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:SUBE,masalar:masalar})
-      }).then(function(r){if(r&&r.ok)_masaLocalWriteTime=Date.now();}).catch(function(){});
-    }
-  },150); // 150ms — masalarTamCek 500ms'den önce
-});
+// PROAKTİF PUSH KALDIRILDI:
+// Eski mantık sayfa açılınca lokal masalar'ı TÜM state olarak push ediyordu;
+// cross-device race'in BAŞLICA sebebiydi (cihaz B'nin masa 5'i, A açılınca
+// A'nın eski state'i ile siliniyordu). Smart-merge push (_doPushMasalar) artık
+// her save'de server ile merge ediyor → proaktif push gereksiz ve zararlı.
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu (eski v1 verisini görmez)
@@ -2409,6 +2456,8 @@ setInterval(function(){gunCiroYukle();},60000);
                 masalar[m.masa]=srv;
               });
             }
+            // Smart push'un diff hesabı için snap'i güncelle — server'dan gelen state artık "synced"
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
           }
@@ -2551,6 +2600,8 @@ setInterval(function(){gunCiroYukle();},60000);
                 masalar[m.masa]=srv;
               });
             }
+            // Smart push snap'i güncelle — sync sonrası bu state "server ile eşit"
+            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(masalar);
             if(typeof renderMasalar==='function')renderMasalar();
             if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
           }

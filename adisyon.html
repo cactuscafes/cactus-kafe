@@ -1273,9 +1273,10 @@ function _itemBirlestir(local,server,snap){
     }
     serverDeleted[id]=true;
   });
-  // Sonuç: local item'larını al, server-deleted olanları çıkar
+  // Sonuç: local item'larını al, null/undefined at, server-deleted olanları çıkar
   var sonuc=(local||[]).filter(function(it){
-    if(!it||!it.id) return true;
+    if(!it) return false;          // null/undefined garbage → at
+    if(!it.id) return true;        // id'siz legitimate item → koru
     return !serverDeleted[it.id];
   });
   var sonucIds={};sonuc.forEach(function(it){if(it&&it.id)sonucIds[it.id]=true;});

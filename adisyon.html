@@ -954,23 +954,36 @@ function _resetNoktasiMs(){
   if(trNow.getUTCHours()<4) rp.setUTCDate(rp.getUTCDate()-1);
   return rp.getTime()-3*3600000;
 }
-// Buluttan/lokalden gelen masa item dizisinden STALE olanları at:
+// ts'i hem number (lokal) hem ISO string (worker JSON round-trip'te string'e dönüyor)
+// olarak destekle. Bu KRİTİK BUG idi: server'dan dönen tüm itemların ts'i string oluyor,
+// "typeof === 'number'" kontrolü tüm sync edilen itemları "ts yok" sayıp atıyordu →
+// sipariş eklenen masalar birkaç saniye sonra kayboluyordu.
+function _parseTs(it){
+  if(!it) return 0;
+  var t=it.ts;
+  if(typeof t==='number'&&isFinite(t)&&t>0) return t;
+  if(typeof t==='string'&&t){
+    var n=Date.parse(t);
+    return isNaN(n)?0:n;
+  }
+  return 0;
+}
+// STALE item filtresi:
 //  - ts < son 04:00 reset noktası → stale
-//  - ts hiç yok → eski-format (ts alanı son sürümde eklendi, urunEkle her item'a ekler)
-//    = deploy öncesi = stale
-// SANITY GUARD: reset noktası mantıksızsa (gelecekte / 25 saatten eski) HİÇ filtreleme yapma
-// → tarih hesabı bozulsa bile taze veri yanlışlıkla silinmez.
+//  - ts hiç yok / parse edilemiyor → eski-format = deploy öncesi = stale
+// SANITY GUARD: reset noktası mantıksızsa filtreleme yapma → taze veri korunsun.
 function _staleItemFiltrele(items){
   if(!Array.isArray(items)) return [];
   var resetMs=_resetNoktasiMs();
   var now=Date.now();
   if(!(resetMs>0 && resetMs<now && (now-resetMs)<25*3600000)){
-    return items; // güvenli taraf: dokunma
+    return items;
   }
   return items.filter(function(it){
     if(!it) return false;
-    if(typeof it.ts!=='number') return false; // ts yok = eski format = stale
-    if(it.ts<resetMs) return false;           // reset noktası öncesi = stale
+    var ts=_parseTs(it);
+    if(ts===0) return false;     // ts yok / parse hatası = stale
+    if(ts<resetMs) return false; // reset öncesi = stale
     return true;
   });
 }
@@ -985,8 +998,8 @@ function _staleItemFiltrele(items){
       var items=masalar[i]||[];
       if(items.length) doluVar=true;
       for(var j=0;j<items.length;j++){
-        var t=items[j]&&items[j].ts;
-        if(typeof t==='number'&&t>enYeniTs) enYeniTs=t;
+        var t=_parseTs(items[j]);
+        if(t>enYeniTs) enYeniTs=t;
       }
     }
     var stale=false;
@@ -1119,10 +1132,11 @@ function masaBaslangiclariniGuncelle(){
     const dolu=items.length>0;
     if(dolu){
       // Cloud-source: ürün item'larının en küçük ts'i = masanın açılış zamanı
+      // _parseTs hem sayısal hem ISO string ts'i destekler (worker round-trip için)
       let itemTs=null;
       for(let j=0;j<items.length;j++){
-        const t=items[j]&&items[j].ts;
-        if(typeof t==='number'&&t>0){
+        const t=_parseTs(items[j]);
+        if(t>0){
           if(itemTs===null||t<itemTs) itemTs=t;
         }
       }

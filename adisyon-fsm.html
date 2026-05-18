@@ -1028,13 +1028,45 @@ function tickTime(){
 }
 tickTime();setInterval(tickTime,1000);
 
-// ════ ŞİFRE KORUMASI (Yönet & Raporlar) ════
-const KORUMA_LK='cactus_admin_sifre';
+// ════ ŞİFRE KORUMASI (Yönet & Raporlar) — cihazlar arası cloud sync ════
+const KORUMA_LK='cactus_admin_sifre_'+SUBE;
 const KORUMA_SESS='cactus_admin_aktif';
 const KORUMA_VARSAYILAN='1234';
+const KORUMA_CLOUD_KEY='cactus_adisyon_sifre_'+SUBE;
+const KORUMA_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _sifreYazmaZamani=0;
+(function _sifreMigrate(){
+  try{
+    var eski=localStorage.getItem('cactus_admin_sifre');
+    if(eski && !localStorage.getItem(KORUMA_LK)) localStorage.setItem(KORUMA_LK,eski);
+  }catch(e){}
+})();
 function _sifreHash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return String(h>>>0);}
 function _sifreGetir(){return localStorage.getItem(KORUMA_LK)||_sifreHash(KORUMA_VARSAYILAN);}
-function _sifreKaydet(yeni){localStorage.setItem(KORUMA_LK,_sifreHash(yeni));}
+function _sifreKaydet(yeni){
+  var hash=_sifreHash(yeni);
+  localStorage.setItem(KORUMA_LK,hash);
+  _sifreYazmaZamani=Date.now();
+  fetch(KORUMA_API+'/menu/kaydet',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:KORUMA_CLOUD_KEY,menu:{branch:SUBE,hash:hash,ts:Date.now()}})
+  }).catch(function(){});
+}
+function _sifreCloudCek(){
+  if(Date.now()-_sifreYazmaZamani<3000) return;
+  fetch(KORUMA_API+'/menu/cek?sube='+KORUMA_CLOUD_KEY)
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(data){
+      if(!data||!data.hash) return;
+      if(data.branch&&data.branch!==SUBE) return;
+      var simdiki=localStorage.getItem(KORUMA_LK);
+      if(simdiki!==data.hash) localStorage.setItem(KORUMA_LK,data.hash);
+    }).catch(function(){});
+}
+window.addEventListener('load',function(){
+  setTimeout(_sifreCloudCek,1200);
+  setInterval(_sifreCloudCek,10000);
+});
 function _korumaAktif(){return sessionStorage.getItem(KORUMA_SESS)==='1';}
 function _korumaAc(){sessionStorage.setItem(KORUMA_SESS,'1');}
 function _korumaKapat(){sessionStorage.removeItem(KORUMA_SESS);}

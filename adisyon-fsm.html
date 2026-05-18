@@ -1950,11 +1950,37 @@ function masaAktar(){
   renderMasalar();renderAdisyon();renderYon();
   toast('⇄ Masa '+k+' → Masa '+h+' aktarıldı');
 }
+var _WEBHOOK_CLOUD_KEY='cactus_adisyon_webhook_'+SUBE;
+var _webhookYazmaZamani=0;
 function webhookKaydet(){
   const url=document.getElementById('webhook-input').value.trim();
   localStorage.setItem('cactus_webhook',url);
-  toast(url?'✅ Webhook URL kaydedildi':'🗑 Webhook URL temizlendi');
+  _webhookYazmaZamani=Date.now();
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:_WEBHOOK_CLOUD_KEY,menu:{branch:SUBE,url:url,ts:Date.now()}})
+  }).catch(function(){});
+  toast(url?'✅ Webhook URL kaydedildi (tüm cihazlara)':'🗑 Webhook URL temizlendi');
 }
+function _webhookCloudCek(){
+  if(Date.now()-_webhookYazmaZamani<3000) return;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube='+_WEBHOOK_CLOUD_KEY)
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){
+      if(!d||typeof d.url==='undefined') return;
+      if(d.branch&&d.branch!==SUBE) return;
+      var simdiki=localStorage.getItem('cactus_webhook')||'';
+      if(simdiki!==d.url){
+        localStorage.setItem('cactus_webhook',d.url);
+        var wi=document.getElementById('webhook-input');
+        if(wi) wi.value=d.url;
+      }
+    }).catch(function(){});
+}
+window.addEventListener('load',function(){
+  setTimeout(_webhookCloudCek,1600);
+  setInterval(_webhookCloudCek,15000);
+});
 function gunSonuYap(){
   const acik=[];
   for(let i=1;i<=34;i++){
@@ -2643,15 +2669,46 @@ setInterval(function(){gunCiroYukle();},60000);
     if (typeof odemeAl === 'function') odemeAl();
   }
 
-  /* ===== 2. SIPARIS NOTU ===== */
+  /* ===== 2. SIPARIS NOTU — cloud sync (cihazlar arası) ===== */
   var _notlar = JSON.parse(localStorage.getItem('cactus_notlar') || '{}');
+  var _NOT_CLOUD_KEY = 'cactus_adisyon_notlar_' + (typeof SUBE !== 'undefined' ? SUBE : 'fsm');
+  var _NOT_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+  var _notlarYazmaZamani = 0;
+  function _notlarKaydet(){
+    localStorage.setItem('cactus_notlar', JSON.stringify(_notlar));
+    _notlarYazmaZamani = Date.now();
+    fetch(_NOT_API+'/menu/kaydet',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sube:_NOT_CLOUD_KEY,menu:{branch:(typeof SUBE!=='undefined'?SUBE:'fsm'),notlar:_notlar,ts:Date.now()}})
+    }).catch(function(){});
+  }
+  function _notlarCloudCek(){
+    if(Date.now()-_notlarYazmaZamani<3000) return;
+    fetch(_NOT_API+'/menu/cek?sube='+_NOT_CLOUD_KEY)
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){
+        if(!d||!d.notlar) return;
+        if(d.branch && typeof SUBE!=='undefined' && d.branch!==SUBE) return;
+        var simdiki=JSON.stringify(_notlar);
+        var gelen=JSON.stringify(d.notlar);
+        if(simdiki!==gelen){
+          _notlar=d.notlar;
+          try{localStorage.setItem('cactus_notlar',JSON.stringify(_notlar));}catch(e){}
+          if(typeof renderAdisyon==='function') renderAdisyon();
+        }
+      }).catch(function(){});
+  }
+  window.addEventListener('load',function(){
+    setTimeout(_notlarCloudCek,1500);
+    setInterval(_notlarCloudCek,10000);
+  });
 
   function notEkle(masaId, urunIdx) {
     var not = prompt('Sipariş notu (şekersiz, az süt vb.):');
     if (not === null) return;
     var key = masaId + '_' + urunIdx;
-    _notlar[key] = not;
-    localStorage.setItem('cactus_notlar', JSON.stringify(_notlar));
+    if(not.trim()==='') delete _notlar[key]; else _notlar[key] = not;
+    _notlarKaydet();
     renderAdisyon();
   }
 

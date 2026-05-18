@@ -2135,7 +2135,7 @@ async function emailGonder(){
     if(d.ok){
       sonuc.style.color = '#2d7a4f';
       sonuc.textContent = '✓ E-posta gönderildi → ' + d.alici;
-      localStorage.setItem('cactus_rapor_email', alici);
+      if(typeof _emailKaydet==='function') _emailKaydet(alici); else localStorage.setItem('cactus_rapor_email', alici);
     } else {
       sonuc.style.color = 'var(--rd)';
       sonuc.textContent = '✗ ' + (d.error || 'Hata oluştu');
@@ -2203,12 +2203,43 @@ async function waTest(){
   btn.disabled = false; btn.textContent = '💬 WhatsApp Test Gönder';
 }
 
+// Rapor email cloud sync — admin paneli ortak ayar, tüm cihazlara yansır
+var _EMAIL_CLOUD_KEY='cactus_admin_rapor_email';
+var _EMAIL_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _emailYazmaZamani=0;
+function _emailKaydet(email){
+  localStorage.setItem('cactus_rapor_email', email);
+  _emailYazmaZamani=Date.now();
+  fetch(_EMAIL_API+'/menu/kaydet',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:_EMAIL_CLOUD_KEY,menu:{email:email,ts:Date.now()}})
+  }).catch(function(){});
+}
+function _emailCloudCek(){
+  if(Date.now()-_emailYazmaZamani<3000) return;
+  fetch(_EMAIL_API+'/menu/cek?sube='+_EMAIL_CLOUD_KEY)
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){
+      if(!d||typeof d.email==='undefined') return;
+      var simdiki=localStorage.getItem('cactus_rapor_email')||'';
+      if(simdiki!==d.email){
+        localStorage.setItem('cactus_rapor_email', d.email);
+        var el=document.getElementById('emailAlici'); if(el && !el.matches(':focus')) el.value=d.email;
+        var el2=document.getElementById('gunlukAlici'); if(el2 && !el2.matches(':focus')) el2.value=d.email;
+      }
+    }).catch(function(){});
+}
+window._emailKaydet=_emailKaydet; // setItem override için
+
 // Önceden kaydedilmiş e-postayı yükle + günlük tarih alanını bugüne ayarla
 document.addEventListener('DOMContentLoaded', function(){
   var saved = localStorage.getItem('cactus_rapor_email');
   if(saved){ var el=document.getElementById('emailAlici'); if(el) el.value=saved; var el2=document.getElementById('gunlukAlici'); if(el2) el2.value=saved; }
   var td = document.getElementById('gunlukTarih');
   if(td) td.value = new Date().toISOString().slice(0,10);
+  // Cloud sync: açılışta + her 15sn
+  setTimeout(_emailCloudCek,1500);
+  setInterval(_emailCloudCek,15000);
 });
 
 /* ══════════ SADAKAT KARTI ══════════ */

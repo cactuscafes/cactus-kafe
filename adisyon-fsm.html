@@ -2057,6 +2057,20 @@ function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler,nakitTutar,kartTutar){
   }).catch(function(){});
 }
 
+// Çift tıklama / race kalıntılarını ciroya saymamak için dedupe.
+// Kriter: AYNI masa + AYNI toplam + AYNI dakika + AYNI ödeme tipi → tek say.
+function _islemDeduplica(islemler){
+  if(!Array.isArray(islemler)) return [];
+  var gorulen={}, temiz=[];
+  islemler.forEach(function(s){
+    var key=(s.masa||'')+'|'+(s.toplam||0)+'|'+(s.saat||'')+'|'+(s.odeme_tipi||'');
+    if(gorulen[key]) return;
+    gorulen[key]=true;
+    temiz.push(s);
+  });
+  return temiz;
+}
+
 function rapPeriyot(p,el){
   rapPeriyotAktif=p;
   document.querySelectorAll('.rptab').forEach(t=>t.classList.remove('on'));
@@ -2114,7 +2128,8 @@ function rapGoster(){
     fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}),
     fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();})
   ]).then(function(results){
-    var islemler=(results[0]||[]).filter(function(s){
+    // Önce duplicate'leri at, sonra filtrele
+    var islemler=_islemDeduplica(results[0]||[]).filter(function(s){
       if(!odemeFil) return true;
       var t=(s.odeme_tipi||'').toLowerCase();
       if(odemeFil==='Nakit') return t==='nakit';
@@ -2188,6 +2203,8 @@ function gunCiroYukle(){
   fetch(url).then(function(r){return r.json();}).then(function(islemler){
     var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
     islemler=islemler||[];
+    // Duplicate'leri at (çift tıklama/race kalıntıları ciroya saymasın)
+    islemler=_islemDeduplica(islemler);
     _gunKapandiCiro=islemler.reduce(function(a,s){return a+(s.toplam||0);},0);
     _gunKapandiAdet=islemler.length;
     _gunNakit=islemler.reduce(function(a,s){

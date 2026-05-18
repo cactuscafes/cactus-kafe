@@ -1716,10 +1716,17 @@ function odemeAl(){
   renderKalemSecim();
   document.getElementById('odeme-modal').classList.add('on');
 }
+var _odemeIslemde=false;
 function odemeOnayla(){
+  // ÇİFT TIKLAMA KORUMA: hızlı double-click → 2 odemeyiKaydet → ciro 2x
+  if(_odemeIslemde){toast('⏳ Ödeme işleniyor...');return;}
   if(!aktifMasa)return;
   const secilen=_secKalemler.filter(k=>k.sec>0);
   if(!secilen.length){toast('⚠️ En az bir ürün seçin');return;}
+  _odemeIslemde=true;
+  var _odBtn=document.querySelector('#odeme-modal .mdl-ok');
+  if(_odBtn){_odBtn.disabled=true;_odBtn.style.opacity='.6';}
+  setTimeout(function(){_odemeIslemde=false;if(_odBtn){_odBtn.disabled=false;_odBtn.style.opacity='';}},1500);
   const hamTop=secilen.reduce((s,k)=>s+k.fiyat*k.sec,0);
   // İskonto uygula (TL)
   const indirim=Math.min(hamTop,Math.max(0,parseFloat(document.getElementById('iskonto-tl')?.value)||0));
@@ -2025,7 +2032,8 @@ function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler,nakitTutar,kartTutar){
   const satislar=JSON.parse(localStorage.getItem(LK_SATIS)||'[]');
   const now=new Date();
   const odTip=tip==='nakit'?'Nakit':tip==='kart'?'Kredi Kartı':'Nakit+Kart';
-  const islemId=SUBE+'-'+masa+'-'+now.getTime();
+  // DUPLICATE GUARD: aynı içerik 10sn pencerede → aynı id → server overwrite
+  const islemId=SUBE+'-'+masa+'-'+toplam+'-'+Math.floor(now.getTime()/10000);
   const islem={
     tarih:now.toLocaleDateString('tr-TR'),
     tarihISO:now.toISOString().split('T')[0],

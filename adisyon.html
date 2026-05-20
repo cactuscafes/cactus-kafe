@@ -281,6 +281,20 @@ input,select{font-family:'Lato',sans-serif;}
 .bolme-row input{flex:1;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:8px;font-size:15px;font-weight:700;color:var(--k1);background:#fff;outline:none;text-align:right;}
 .bolme-row input:focus{border-color:var(--al);}
 .bolme-kalan{font-size:12px;font-weight:700;text-align:right;margin-top:2px;}
+.kisi-wrap{background:#f9f5ee;border:1px solid var(--kr2);border-radius:10px;padding:14px;margin-bottom:14px;}
+.kisi-stepper{display:flex;align-items:center;justify-content:center;gap:18px;}
+.kisi-pm{width:44px;height:44px;border:2px solid var(--kr2);border-radius:10px;background:#fff;color:var(--k1);font-size:26px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;}
+.kisi-pm:active{background:var(--kr);}
+.kisi-mid{min-width:72px;text-align:center;}
+.kisi-mid span{font-size:30px;font-weight:800;color:var(--k1);line-height:1;}
+.kisi-mid small{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--k2);margin-top:2px;}
+.kisi-basi{text-align:center;font-size:14px;font-weight:700;color:var(--k1);margin-top:12px;}
+.kisi-basi b{color:var(--al);font-size:22px;}
+.kisi-basi small{display:block;font-size:12px;font-weight:600;color:var(--k2);margin-top:3px;}
+.kisi-tahsilat{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.kisi-tahsilat .kt-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--k2);}
+.kt-opt{flex:1;padding:9px;border:2px solid var(--kr2);border-radius:8px;background:#fff;color:var(--k2);font-size:13px;font-weight:700;}
+.kt-opt.on{border-color:var(--al);background:rgba(201,168,76,.08);color:var(--k1);}
 /* iskonto */
 .iskonto-satir{display:flex;align-items:center;justify-content:space-between;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:9px;padding:8px 12px;margin-bottom:8px;}
 .iskonto-satir label{font-size:12px;font-weight:700;color:var(--k2);}
@@ -777,8 +791,9 @@ if('serviceWorker' in navigator){
     <div class="ks-toplam"><span>Ödenecek</span><span id="ks-toplam-val">₺0</span></div>
     <div class="odeme-secim">
       <button class="odeme-opt on" id="opt-nakit" onclick="odemeSecim('nakit')"><span class="oi">💵</span>Nakit</button>
-      <button class="odeme-opt" id="opt-kart" onclick="odemeSecim('kart')"><span class="oi">💳</span>Kredi Kartı</button>
+      <button class="odeme-opt" id="opt-kart" onclick="odemeSecim('kart')"><span class="oi">💳</span>Kart</button>
       <button class="odeme-opt" id="opt-bol" onclick="odemeSecim('bolunmus')"><span class="oi">✂️</span>Böl</button>
+      <button class="odeme-opt" id="opt-kisi" onclick="odemeSecim('kisi')"><span class="oi">👥</span>Kişi</button>
     </div>
     <div class="bolme-wrap" id="bolme-wrap" style="display:none;">
       <div class="bolme-row">
@@ -790,6 +805,19 @@ if('serviceWorker' in navigator){
         <input type="number" id="bolme-kart" min="0" oninput="bolmeHesapla('kart')" placeholder="0">
       </div>
       <div class="bolme-kalan" id="bolme-kalan"></div>
+    </div>
+    <div class="kisi-wrap" id="kisi-wrap" style="display:none;">
+      <div class="kisi-stepper">
+        <button type="button" class="kisi-pm" onclick="kisiSay(-1)">−</button>
+        <div class="kisi-mid"><span id="kisi-adet">2</span><small>kişi</small></div>
+        <button type="button" class="kisi-pm" onclick="kisiSay(1)">+</button>
+      </div>
+      <div class="kisi-basi" id="kisi-basi"></div>
+      <div class="kisi-tahsilat">
+        <span class="kt-lbl">Tahsilat</span>
+        <button type="button" class="kt-opt on" id="kt-nakit" onclick="kisiTahsilat('nakit')">💵 Nakit</button>
+        <button type="button" class="kt-opt" id="kt-kart" onclick="kisiTahsilat('kart')">💳 Kart</button>
+      </div>
     </div>
     <div class="mdl-btns">
       <button class="mdl-iptal" onclick="closeModal('odeme-modal')">İptal</button>
@@ -1665,6 +1693,7 @@ function toggleMasa(){
 
 let seciliOdemeTipi='nakit';
 let _bolmeTop=0,_secKalemler=[];
+let _kisiAdet=2,_kisiTahsilat='nakit';
 
 function renderKalemSecim(){
   _secKalemler=(masalar[aktifMasa]||[]).map((x,i)=>({i,ad:x.ad,fiyat:x.fiyat,tip:x.tip,emoji:x.emoji||'',max:x.adet,sec:x.adet}));
@@ -1695,6 +1724,7 @@ function iskontoGuncelle(){
     document.getElementById('bolme-nakit').value='';
     document.getElementById('bolme-kart').value='';
   }
+  if(seciliOdemeTipi==='kisi')kisiGuncelle();
 }
 function kalemGuncelle(){
   const {ham,indirim,net}=_iskontoHesapla();
@@ -1706,6 +1736,7 @@ function kalemGuncelle(){
   document.getElementById('ks-toplam-val').textContent='₺'+net;
   document.getElementById('ks-list').innerHTML=_secKalemler.map((k,i)=>`<div class="ks-row${k.sec===0?' sifir':''}"><span class="ks-emoji">${k.emoji||'🍽️'}</span><div style="flex:1"><div class="ks-ad">${k.ad}</div><div class="ks-birim">₺${k.fiyat} birim</div></div><div class="ks-step"><button onclick="kalemDeg(${i},-1)">−</button><span>${k.sec}/${k.max}</span><button onclick="kalemDeg(${i},+1)">+</button></div><div class="ks-sub">₺${k.fiyat*k.sec}</div></div>`).join('');
   if(seciliOdemeTipi==='bolunmus'){document.getElementById('bolme-kalan').textContent='Kalan: ₺'+net;document.getElementById('bolme-nakit').value='';document.getElementById('bolme-kart').value='';}
+  if(seciliOdemeTipi==='kisi')kisiGuncelle();
 }
 function kalemDeg(i,d){_secKalemler[i].sec=Math.min(_secKalemler[i].max,Math.max(0,_secKalemler[i].sec+d));kalemGuncelle();}
 function odemeSecim(tip){
@@ -1713,6 +1744,7 @@ function odemeSecim(tip){
   document.getElementById('opt-nakit').classList.toggle('on',tip==='nakit');
   document.getElementById('opt-kart').classList.toggle('on',tip==='kart');
   document.getElementById('opt-bol').classList.toggle('on',tip==='bolunmus');
+  document.getElementById('opt-kisi').classList.toggle('on',tip==='kisi');
   const wrap=document.getElementById('bolme-wrap');
   if(tip==='bolunmus'){
     wrap.style.display='block';
@@ -1722,6 +1754,23 @@ function odemeSecim(tip){
     document.getElementById('bolme-kalan').textContent='Kalan: ₺'+_bolmeTop;
     setTimeout(()=>document.getElementById('bolme-nakit').focus(),50);
   } else { wrap.style.display='none'; }
+  const kwrap=document.getElementById('kisi-wrap');
+  if(tip==='kisi'){ kwrap.style.display='block'; kisiGuncelle(); }
+  else { kwrap.style.display='none'; }
+}
+function kisiSay(d){_kisiAdet=Math.max(2,_kisiAdet+d);kisiGuncelle();}
+function kisiTahsilat(t){_kisiTahsilat=t;document.getElementById('kt-nakit').classList.toggle('on',t==='nakit');document.getElementById('kt-kart').classList.toggle('on',t==='kart');}
+function kisiGuncelle(){
+  const net=_bolmeTop;
+  const adetEl=document.getElementById('kisi-adet');if(adetEl)adetEl.textContent=_kisiAdet;
+  const el=document.getElementById('kisi-basi');if(!el)return;
+  if(net%_kisiAdet===0){
+    const kb=net/_kisiAdet;
+    el.innerHTML='Kişi başı <b>₺'+kb+'</b><small>'+_kisiAdet+' kişi × ₺'+kb+' • Toplam ₺'+net+'</small>';
+  } else {
+    const taban=Math.floor(net/_kisiAdet), son=net-taban*(_kisiAdet-1);
+    el.innerHTML='Kişi başı <b>₺'+taban+'</b><small>'+(_kisiAdet-1)+' kişi ₺'+taban+' + son kişi ₺'+son+' • Toplam ₺'+net+'</small>';
+  }
 }
 function bolmeHesapla(degisen){
   const top=_bolmeTop;
@@ -1742,6 +1791,9 @@ function odemeAl(){
   if(itl){itl.value='';}
   const hs=document.getElementById('ks-ham-satir');if(hs)hs.style.display='none';
   const it=document.getElementById('iskonto-indirim-txt');if(it)it.textContent='';
+  _kisiAdet=2;_kisiTahsilat='nakit';
+  document.getElementById('kt-nakit').classList.add('on');
+  document.getElementById('kt-kart').classList.remove('on');
   seciliOdemeTipi='nakit';odemeSecim('nakit');
   renderKalemSecim();
   document.getElementById('odeme-modal').classList.add('on');
@@ -1769,11 +1821,14 @@ function odemeOnayla(){
   const yi=ratio>0?Math.round(yiHam*(1-ratio)):yiHam;
   const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
   const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
-  let nakitTutar=0,kartTutar=0;
+  let nakitTutar=0,kartTutar=0,efektifTip=seciliOdemeTipi;
   if(seciliOdemeTipi==='bolunmus'){
     nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
     kartTutar=parseFloat(document.getElementById('bolme-kart').value)||0;
     if(Math.abs(nakitTutar+kartTutar-top)>1){toast('⚠️ Nakit + Kart toplamı ₺'+top+' olmalı');return;}
+  } else if(seciliOdemeTipi==='kisi'){
+    efektifTip=_kisiTahsilat;
+    if(efektifTip==='nakit')nakitTutar=top;else kartTutar=top;
   } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}else{kartTutar=top;}
   // Seçilen ürünleri masadan düş
   _secKalemler.forEach(k=>{
@@ -1785,7 +1840,7 @@ function odemeOnayla(){
   });
   masalar[aktifMasa]=masalar[aktifMasa].filter(Boolean);
   const oncekiMasa=aktifMasa;
-  const odTipLabel=seciliOdemeTipi==='nakit'?'Nakit':seciliOdemeTipi==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
+  const odTipLabel=efektifTip==='nakit'?'Nakit':efektifTip==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';
   const webhookUrl=localStorage.getItem('cactus_webhook')||VARSAYILAN_WEBHOOK;
   if(webhookUrl){
@@ -1793,8 +1848,8 @@ function odemeOnayla(){
     fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+oncekiMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:secilen.map(k=>k.ad+' x'+k.sec).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
   }
   const tipLabel=indirim>0?' (-₺'+indirim+' indirim)':'';
-  const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
-  odemeyiKaydet(oncekiMasa,top,ic,yi,seciliOdemeTipi,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
+  const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':seciliOdemeTipi==='kisi'?('👥 '+_kisiAdet+' kişi '+(_kisiTahsilat==='nakit'?'💵':'💳')):'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
+  odemeyiKaydet(oncekiMasa,top,ic,yi,efektifTip,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
   saveMasalar();
   closeModal('odeme-modal');
   if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
@@ -1808,8 +1863,8 @@ function odemeOnayla(){
   if(typeof _gunKapandiCiro!=='undefined'){
     _gunKapandiCiro+=top;
     _gunKapandiAdet+=1;
-    if(seciliOdemeTipi==='nakit') _gunNakit+=top;
-    else if(seciliOdemeTipi==='kart') _gunKart+=top;
+    if(efektifTip==='nakit') _gunNakit+=top;
+    else if(efektifTip==='kart') _gunKart+=top;
     else { _gunNakit+=nakitTutar; _gunKart+=kartTutar; }
     var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
     document.getElementById('gun-kapandi-ciro').textContent='₺'+fmt(_gunKapandiCiro);

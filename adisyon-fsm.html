@@ -1613,14 +1613,16 @@ function siparisiGonder(){
   const yi=yeniler.filter(x=>x.tip==='yiyecek');
   const _API='https://cactus-rapor-api.batuhanbulut.workers.dev';
   const now=Date.now();
+  // Global benzersiz taban: aynı ms'de iki cihaz gönderse bile çakışmasın
+  const _uid=now+'_'+SUBE+'_'+aktifMasa+'_'+Math.random().toString(36).slice(2,7);
   const d1Sip=[];
   if(ic.length){
-    const s={id:'i_'+now,masa:aktifMasa,saat,items:ic,hazirlandi:false,_d1:true};
+    const s={id:'i_'+_uid,masa:aktifMasa,saat,items:ic,hazirlandi:false,_d1:true};
     barSip.push(s);localStorage.setItem(LK.bar,JSON.stringify(barSip));
     d1Sip.push({id:s.id,masa:aktifMasa,tip:'bar',items:ic,zaman:now});
   }
   if(yi.length){
-    const s={id:'y_'+now,masa:aktifMasa,saat,items:yi,hazirlandi:false,_d1:true};
+    const s={id:'y_'+_uid,masa:aktifMasa,saat,items:yi,hazirlandi:false,_d1:true};
     mutSip.push(s);localStorage.setItem(LK.mut,JSON.stringify(mutSip));
     d1Sip.push({id:s.id,masa:aktifMasa,tip:'mutfak',items:yi,zaman:now});
   }
@@ -1648,7 +1650,7 @@ let _bolmeTop=0,_secKalemler=[];
 let _kisiAdet=2,_kisiTahsilat='nakit';
 
 function renderKalemSecim(){
-  _secKalemler=(masalar[aktifMasa]||[]).map((x,i)=>({i,ad:x.ad,fiyat:x.fiyat,tip:x.tip,emoji:x.emoji||'',max:x.adet,sec:x.adet}));
+  _secKalemler=(masalar[aktifMasa]||[]).map((x,i)=>({i,id:x.id,ad:x.ad,fiyat:x.fiyat,tip:x.tip,emoji:x.emoji||'',max:x.adet,sec:x.adet}));
   document.getElementById('odeme-masa-no').textContent='Masa '+aktifMasa;
   kalemGuncelle();
 }
@@ -1777,27 +1779,31 @@ function odemeOnayla(){
   const icHam=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   const yiHam=secilen.filter(k=>k.tip==='yiyecek').reduce((s,k)=>s+k.fiyat*k.sec,0);
   const ratio=hamTop>0?indirim/hamTop:0;
-  const ic=ratio>0?Math.round(icHam*(1-ratio)):icHam;
-  const yi=ratio>0?Math.round(yiHam*(1-ratio)):yiHam;
+  let ic=ratio>0?Math.round(icHam*(1-ratio)):icHam;
+  let yi=ratio>0?Math.round(yiHam*(1-ratio)):yiHam;
+  // Yuvarlama farkını düzelt: indirimde ic+yi her zaman top'a eşit olsun (rapor tutarlılığı)
+  const _fark=top-(ic+yi);
+  if(_fark!==0){ if(yi>0) yi+=_fark; else ic+=_fark; }
   const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
   const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
   let nakitTutar=0,kartTutar=0,efektifTip=seciliOdemeTipi;
   if(seciliOdemeTipi==='bolunmus'){
     nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
     kartTutar=parseFloat(document.getElementById('bolme-kart').value)||0;
-    if(Math.abs(nakitTutar+kartTutar-top)>1){toast('⚠️ Nakit + Kart toplamı ₺'+top+' olmalı');return;}
+    if(Math.abs(nakitTutar+kartTutar-top)>1){toast('⚠️ Nakit + Kart toplamı ₺'+top+' olmalı');_odemeIslemde=false;if(_odBtn){_odBtn.disabled=false;_odBtn.style.opacity='';}return;}
   } else if(seciliOdemeTipi==='kisi'){
     efektifTip=_kisiTahsilat;
     if(efektifTip==='nakit')nakitTutar=top;else kartTutar=top;
   } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}else{kartTutar=top;}
+  // Seçilen ürünleri masadan düş — index DEĞİL id ile eşleştir.
+  // (Ödeme modalı açıkken poll masalar[aktifMasa]'yı değiştirebilir → eski index kayar)
   _secKalemler.forEach(k=>{
     if(k.sec<=0)return;
-    const item=masalar[aktifMasa][k.i];
+    const item=masalar[aktifMasa].find(x=>x&&x.id===k.id);
     if(!item)return;
     item.adet-=k.sec;
-    if(item.adet<=0)masalar[aktifMasa][k.i]=null;
   });
-  masalar[aktifMasa]=masalar[aktifMasa].filter(Boolean);
+  masalar[aktifMasa]=masalar[aktifMasa].filter(x=>x&&x.adet>0);
   const oncekiMasa=aktifMasa;
   const odTipLabel=efektifTip==='nakit'?'Nakit':efektifTip==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';

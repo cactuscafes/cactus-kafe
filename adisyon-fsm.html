@@ -1289,6 +1289,25 @@ function _effVer(items, mv){
   }
   return v;
 }
+function _maxItemTs(items){
+  var v=0;
+  if(Array.isArray(items)){ for(var i=0;i<items.length;i++){ var t=_parseTs(items[i]); if(t>v) v=t; } }
+  return v;
+}
+// ═══ YIKICI-OLMAYAN MERGE ("ekleme kazanır" — masa kaybolmasını engeller) ═══
+// Dönüş: 'L' (local kazanır) | 'S' (server kazanır)
+// KURAL: DOLU masa, BOŞ masaya karşı VARSAYILAN kazanır. Boş ancak GERÇEK temizleme/ödeme
+// ise kazanır = boş tarafın mv'si, dolu tarafın EN YENİ ürün ts'inden KESİNLİKLE büyükse.
+// Neden: ödeme masayı boşaltıp mv=now yapar (item ts'lerden büyük) → yayılır. Ama
+// senkronlanmamış/sıfır-ts/saat-kaymış boş cihaz (mv≤item ts) dolu masayı SİLEMEZ.
+function _masaKazanan(Litems, Lmv, Sitems, Smv){
+  var Le=!Litems||Litems.length===0, Se=!Sitems||Sitems.length===0;
+  Lmv=Lmv||0; Smv=Smv||0;
+  if(Le&&Se) return (Lmv>=Smv)?'L':'S';                 // ikisi boş → daha yeni temizleme
+  if(!Le&&!Se) return (_effVer(Litems,Lmv)>=_effVer(Sitems,Smv))?'L':'S'; // ikisi dolu → LWW
+  if(Le) return (Lmv>_maxItemTs(Sitems))?'L':'S';       // local boş: ancak gerçek temizlemeyse kazanır
+  return (Smv>_maxItemTs(Litems))?'S':'L';              // server boş: ancak gerçek temizlemeyse kazanır
+}
 
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
@@ -1305,9 +1324,9 @@ function _doPushMasalar(){
     var srvMv=(res[1]&&res[1].v)||{};
     var mergedMas={}, mergedMv={};
     for(var i=1;i<=34;i++){
-      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
-      if(lEff>=sEff){ mergedMas[i]=masalar[i]||[]; mergedMv[i]=lEff; }
-      else { mergedMas[i]=srvMas[i]||[]; mergedMv[i]=sEff; }
+      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
+      if(kaz==='L'){ mergedMas[i]=masalar[i]||[]; mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
+      else { mergedMas[i]=srvMas[i]||[]; mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
@@ -1340,12 +1359,13 @@ function _masalarSyncCek(){
     var srvMv=(res[1]&&res[1].v)||{};
     var degisti=false, pushGerek=false;
     for(var i=1;i<=34;i++){
-      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
-      if(sEff>lEff){
+      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
+      if(kaz==='S'){
         if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])){ masalar[i]=srvMas[i]||[]; degisti=true; }
-        _mv[i]=sEff;
-      } else if(lEff>sEff){
-        pushGerek=true;
+        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i]));
+      } else {
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])) pushGerek=true;
+        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i]));
       }
     }
     if(degisti){

@@ -199,6 +199,9 @@ input,select{font-family:'Lato',sans-serif;}
 .btn-gonder{width:100%;padding:11px;border:none;border-radius:9px;margin-bottom:6px;background:linear-gradient(135deg,var(--bl),var(--bl2));color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
 .btn-gonder:hover{opacity:.9;transform:translateY(-1px);}
 .btn-gonder:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+/* Bar/Mutfak (KDS) sekmeleri ve "Sipariş Gönder" gizlendi — akış: ürün ekle → ödeme al.
+   Geri açmak için aşağıdaki satırı sil. JS kodu yerinde, uykuda. */
+#tab-bar,#tab-mut,#d-gonder,#m-gonder{display:none!important;}
 .btn-odeme{width:100%;padding:11px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--k1),var(--k2));color:var(--kr);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
 .btn-odeme:hover{opacity:.9;transform:translateY(-1px);}
 .btn-odeme:disabled{opacity:.35;cursor:not-allowed;transform:none;}

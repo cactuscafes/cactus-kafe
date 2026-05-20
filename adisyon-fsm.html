@@ -993,6 +993,8 @@ function _staleItemFiltrele(items){
     var degisti=false;
     if(stale){
       for(var k=1;k<=34;k++){if(masalar[k]&&masalar[k].length){masalar[k]=[];degisti=true;}}
+      // Yeni gün döngüsü → per-masa versiyon haritasını da sıfırla
+      try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){}
     } else {
       for(var k2=1;k2<=34;k2++){
         var once=(masalar[k2]||[]).length;
@@ -1219,133 +1221,119 @@ var _pageLoadTime=Date.now();
     return;
   }
 })();
-// ─── SMART MERGE PUSH ─── (cross-device race fix)
-// Eski: tüm state push → last-writer-wins → cihaz A açılınca B'nin masaları silinirdi.
-// Yeni: push öncesi server'dan latest pull → sadece bu cihazın değiştirdikleri override.
+// ═══════════════════════════════════════════════════════════════════════
+// PER-MASA LAST-WRITE-WINS SYNC (v9) — adisyon.html ile aynı motor
+// Her masaya bir versiyon (son değişiklik zamanı) verilir; çakışmada yeni
+// versiyon kazanır. Item-level merge YOK. Eski CRDT/snap phantom-delete
+// bug'larını (masalar kaybolur + ödenen masalar geri açılır) tamamen çözer.
+// effVer = max(mv, item ts) → mv yokken bile (transition) doğru karşılaştırma.
+// ═══════════════════════════════════════════════════════════════════════
 var _postInFlight=false;
 var _pendingPush=false;
-var _retryCount=0;
-var _sonPushSnap=JSON.stringify(masalar||{});
 var GET_DURUM='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/durum?sube='+SUBE+'&since=0';
+var GET_MV='https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=cactus_masa_mv_'+SUBE;
 var POST_MASALAR='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar';
+var POST_MV='https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet';
+var MV_SUBE_KEY='cactus_masa_mv_'+SUBE;
 
-function _degisenMasalar(){
-  var snap={};
-  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-  var degisen=[];
-  for(var i=1;i<=34;i++){
-    var c=JSON.stringify(masalar[i]||[]);
-    var s=JSON.stringify(snap[i]||[]);
-    if(c!==s) degisen.push(i);
+var _mv={};
+try{_mv=JSON.parse(localStorage.getItem(LK.mas+'_mv')||'{}')||{};}catch(e){_mv={};}
+var _sonKayit=JSON.parse(JSON.stringify(masalar||{}));
+
+function _srvMasalarMap(durum){
+  var m={};
+  if(durum&&Array.isArray(durum.masalar)){
+    durum.masalar.forEach(function(x){m[x.masa]=_staleItemFiltrele(x.items||[]);});
   }
-  return degisen;
+  return m;
 }
-function _masaYerelDegisti(no){
-  var snap={};
-  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-  return JSON.stringify(masalar[no]||[])!==JSON.stringify(snap[no]||[]);
-}
-// CRDT-style per-item merge — add + remove cross-device propagation, race-window koruma
-function _itemBirlestir(local,server,snap){
-  var raceMs=30000;
-  var now=Date.now();
-  var snapIds={};(snap||[]).forEach(function(it){if(it&&it.id)snapIds[it.id]=true;});
-  var localById={};(local||[]).forEach(function(it){if(it&&it.id)localById[it.id]=it;});
-  var serverIds={};(server||[]).forEach(function(it){if(it&&it.id)serverIds[it.id]=true;});
-  var locallyDeleted={};
-  Object.keys(snapIds).forEach(function(id){if(!localById[id]) locallyDeleted[id]=true;});
-  var serverDeleted={};
-  Object.keys(snapIds).forEach(function(id){
-    if(serverIds[id]) return;
-    var lit=localById[id];
-    if(lit){
-      var ts=_parseTs(lit);
-      if(ts>0 && (now-ts)<raceMs) return; // race koruma
-    }
-    serverDeleted[id]=true;
-  });
-  var sonuc=(local||[]).filter(function(it){
-    if(!it) return false;
-    if(!it.id) return true;
-    return !serverDeleted[it.id];
-  });
-  var sonucIds={};sonuc.forEach(function(it){if(it&&it.id)sonucIds[it.id]=true;});
-  (server||[]).forEach(function(srvIt){
-    if(!srvIt||!srvIt.id) return;
-    if(sonucIds[srvIt.id]) return;
-    if(locallyDeleted[srvIt.id]) return;
-    sonuc.push(srvIt);
-  });
-  return sonuc;
+function _effVer(items, mv){
+  var v=mv||0;
+  if(Array.isArray(items)){
+    for(var i=0;i<items.length;i++){ var t=_parseTs(items[i]); if(t>v) v=t; }
+  }
+  return v;
 }
 
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
   if(!masalar||typeof masalar!=='object')return;
-  var degisen=_degisenMasalar();
-  if(!degisen.length) return;
   _postInFlight=true;
-  var ctrl1=(typeof AbortController!=='undefined')?new AbortController():null;
-  var toId1=ctrl1?setTimeout(function(){ctrl1.abort();},8000):null;
-  fetch(GET_DURUM,{signal:ctrl1?ctrl1.signal:undefined})
-    .then(function(r){if(toId1)clearTimeout(toId1);return r.ok?r.json():null;})
-    .then(function(serverData){
-      var serverMap={};
-      if(serverData&&Array.isArray(serverData.masalar)){
-        serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
-      }
-      var snap={};
-      try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-      var merged={};
-      var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
-      for(var i=1;i<=34;i++){
-        if(degisenSet[i]){
-          // Per-item by-id birleştir: cross-device add korunur, kullanıcı silimi geri gelmez
-          merged[i]=_itemBirlestir(masalar[i]||[], _staleItemFiltrele(serverMap[i]||[]), snap[i]||[]);
-        } else {
-          merged[i]=_staleItemFiltrele(serverMap[i]||[]);
-        }
-      }
-      var ctrl2=(typeof AbortController!=='undefined')?new AbortController():null;
-      var toId2=ctrl2?setTimeout(function(){ctrl2.abort();},10000):null;
-      return fetch(POST_MASALAR,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:SUBE,masalar:merged}),
-        signal:ctrl2?ctrl2.signal:undefined
-      }).then(function(r){if(toId2)clearTimeout(toId2);return {r:r,merged:merged};});
-    })
-    .then(function(res){
-      if(res&&res.r&&res.r.ok){
-        _masaLocalWriteTime=Date.now();
-        _retryCount=0;
-        _sonPushSnap=JSON.stringify(res.merged);
-        for(var i=1;i<=34;i++){
-          var srvItems=res.merged[i]||[];
-          if(degisen.indexOf(i)<0 && JSON.stringify(masalar[i]||[])!==JSON.stringify(srvItems)){
-            masalar[i]=srvItems;
-          }
-        }
-        try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
-        if(typeof renderMasalar==='function')renderMasalar();
-      } else if(_retryCount<1){
-        _retryCount++;_pendingPush=true;
-        setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);
-        return;
-      }
-    })
-    .catch(function(){
-      if(toId1)clearTimeout(toId1);
-      if(_retryCount<1){_retryCount++;setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);return;}
-    })
-    .finally(function(){
-      _postInFlight=false;
-      if(_pendingPush){_pendingPush=false;_doPushMasalar();}
-    });
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId=ctrl?setTimeout(function(){if(ctrl)ctrl.abort();},10000):null;
+  Promise.all([
+    fetch(GET_DURUM,{signal:ctrl?ctrl.signal:undefined}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    if(toId)clearTimeout(toId);
+    var srvMas=_srvMasalarMap(res[0]);
+    var srvMv=(res[1]&&res[1].v)||{};
+    var mergedMas={}, mergedMv={};
+    for(var i=1;i<=34;i++){
+      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
+      if(lEff>=sEff){ mergedMas[i]=masalar[i]||[]; mergedMv[i]=lEff; }
+      else { mergedMas[i]=srvMas[i]||[]; mergedMv[i]=sEff; }
+    }
+    return Promise.all([
+      fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
+      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,ts:Date.now()}})})
+    ]).then(function(){return {mas:mergedMas,mv:mergedMv};});
+  }).then(function(out){
+    if(!out) return;
+    var degisti=false;
+    for(var i=1;i<=34;i++){
+      if(JSON.stringify(masalar[i]||[])!==JSON.stringify(out.mas[i]||[])){ masalar[i]=out.mas[i]||[]; degisti=true; }
+      _mv[i]=out.mv[i]||0;
+    }
+    _sonKayit=JSON.parse(JSON.stringify(masalar));
+    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+    if(degisti){ if(typeof renderMasalar==='function')renderMasalar(); if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon(); }
+  }).catch(function(){}).finally(function(){
+    _postInFlight=false;
+    if(_pendingPush){_pendingPush=false;_doPushMasalar();}
+  });
 }
+
+function _masalarSyncCek(){
+  return Promise.all([
+    fetch(GET_DURUM).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    var durum=res[0];
+    if(!durum) return null;
+    var srvMas=_srvMasalarMap(durum);
+    var srvMv=(res[1]&&res[1].v)||{};
+    var degisti=false, pushGerek=false;
+    for(var i=1;i<=34;i++){
+      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
+      if(sEff>lEff){
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])){ masalar[i]=srvMas[i]||[]; degisti=true; }
+        _mv[i]=sEff;
+      } else if(lEff>sEff){
+        pushGerek=true;
+      }
+    }
+    if(degisti){
+      _sonKayit=JSON.parse(JSON.stringify(masalar));
+      try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+      if(typeof renderMasalar==='function')renderMasalar();
+      if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
+    }
+    if(pushGerek && typeof _doPushMasalar==='function') _doPushMasalar();
+    return durum;
+  }).catch(function(){return null;});
+}
+
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
+  var now=Date.now();
+  for(var i=1;i<=34;i++){
+    if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_sonKayit[i]||[])){ _mv[i]=now; }
+  }
+  _sonKayit=JSON.parse(JSON.stringify(masalar));
   try{
     localStorage.setItem(LK.mas,JSON.stringify(masalar));
+    localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));
     localStorage.setItem(LK.mas+'_cycle',_getResetCycleId());
   }catch(e){}
   _masaLocalWriteTime=Date.now();
@@ -1353,8 +1341,7 @@ function saveMasalar(){
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
-// PROAKTİF PUSH KALDIRILDI — cross-device race'in baş sebebiydi.
-// Smart-merge push (_doPushMasalar) artık her save'de server ile merge ediyor.
+function _mvSifirla(){ _mv={}; try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){} }
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu
@@ -2446,55 +2433,12 @@ setInterval(function(){gunCiroYukle();},60000);
   });
 
   function masalarTamCek(){
-    var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
+    // ── MASALAR — per-masa LWW (yeni motor) ──
+    if(typeof _masalarSyncCek==='function') _masalarSyncCek();
     var sipSince=Date.now()-(12*60*60*1000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since=0')
       .then(function(r){return r.json();})
       .then(function(data){
-        // ── MASALAR ──
-        if(data.masalar&&data.masalar.length){
-          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
-          var changed=false;
-          // İlk yüklemede de data loss koruma: lokal dolu + server boş + yakın yerel yazım → atla
-          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
-          // SMART POLLING MERGE — CRDT merge, overwrite yok
-          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-          data.masalar.forEach(function(m){
-            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-            var srv=_staleItemFiltrele(m.items||[]);
-            var loc=mevcut[m.masa]||[];
-            if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-            if(JSON.stringify(loc)!==JSON.stringify(merged)){
-              mevcut[m.masa]=merged;changed=true;
-            }
-          });
-          if(changed){
-            localStorage.setItem(lkMas,JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined'){
-              data.masalar.forEach(function(m){
-                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-                var srv=_staleItemFiltrele(m.items||[]);
-                var loc=(masalar[m.masa]||[]);
-                if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-              });
-            }
-            // Snap = gerçek server state per masa
-            var yeniSnap={};try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-            data.masalar.forEach(function(m){
-              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
-            });
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
-            // Diff varsa hemen push (cross-device propagation)
-            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
-              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
-            }
-            if(typeof renderMasalar==='function')renderMasalar();
-            if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
-          }
-        }
         // ── SİPARİŞLER (bar/mutfak) — son 12 saatteki bekleyenleri yükle ──
         if(data.siparisler&&data.siparisler.length){
           var lkBar=getLkBar(); var lkMut=getLkMut();
@@ -2582,6 +2526,8 @@ setInterval(function(){gunCiroYukle();},60000);
     } else {
       localStorage.setItem(lkMas,'{}');
     }
+    // Per-masa versiyon haritasını da sıfırla
+    if(typeof _mvSifirla==='function'){_mvSifirla();} else {try{localStorage.setItem(lkMas+'_mv','{}');}catch(e){}}
     if(typeof renderBar==='function') renderBar();
     if(typeof renderMut==='function') renderMut();
     if(typeof renderMasalar==='function') renderMasalar();
@@ -2595,7 +2541,8 @@ setInterval(function(){gunCiroYukle();},60000);
     // Yavaş ağda interval üst üste fire etmesin
     if(_syncInFlight) return;
     geceKontrolu();
-    var masaKorumaAktif=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:_localWriteTime))<LOKAL_KORUMA_MS;
+    // ── MASALAR — per-masa LWW (yeni motor) ──
+    if(typeof _masalarSyncCek==='function') _masalarSyncCek();
     var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
     _syncInFlight=true;
     var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
@@ -2603,50 +2550,6 @@ setInterval(function(){gunCiroYukle();},60000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since,{signal:ctrl?ctrl.signal:undefined})
       .then(function(r){if(toId)clearTimeout(toId);return r.json();})
       .then(function(data){
-        // MASALAR
-        if(!masaKorumaAktif&&data.masalar&&data.masalar.length){
-          var lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar';
-          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
-          var changed=false;
-          // 30sn data loss koruma — lokal dolu, server boş, yakın yerel yazım → atla
-          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
-          // SMART POLLING MERGE — CRDT
-          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-          data.masalar.forEach(function(m){
-            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-            var srv=_staleItemFiltrele(m.items||[]);
-            var loc=mevcut[m.masa]||[];
-            if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-            if(JSON.stringify(loc)!==JSON.stringify(merged)){
-              mevcut[m.masa]=merged;changed=true;
-            }
-          });
-          if(changed){
-            localStorage.setItem(lkMas,JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined'){
-              data.masalar.forEach(function(m){
-                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-                var srv=_staleItemFiltrele(m.items||[]);
-                var loc=(masalar[m.masa]||[]);
-                if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-              });
-            }
-            var yeniSnap={};try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-            data.masalar.forEach(function(m){
-              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
-            });
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
-            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
-              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
-            }
-            if(typeof renderMasalar==='function')renderMasalar();
-            if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
-          }
-        }
-
         // SİPARİŞLER — sadece yeni gelenleri ekle
         if(data.siparisler&&data.siparisler.length){
           var lkBar=getLkBar();

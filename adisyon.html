@@ -1008,6 +1008,8 @@ function _staleItemFiltrele(items){
     var degisti=false;
     if(stale){
       for(var k=1;k<=34;k++){if(masalar[k]&&masalar[k].length){masalar[k]=[];degisti=true;}}
+      // Yeni gün döngüsü → per-masa versiyon haritasını da sıfırla (eski versiyonlar bugünü etkilemesin)
+      try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){}
     } else {
       // Tam stale değil ama tek tek reset öncesi item olabilir → onları da temizle
       for(var k2=1;k2<=34;k2++){
@@ -1253,180 +1255,140 @@ var _pageLoadTime=Date.now(); // sayfa yükleme zamanı — sync data loss korum
     return;
   }
 })();
-// ─── SMART MERGE PUSH ENGİNİ ───
-// KRİTİK BUG'IN ÇÖZÜMÜ: Eski saveMasalar TÜM masalar state'ini push ediyordu.
-// Cihaz A masa 1'e ürün ekleyince, A'nın masa 5 boş state'i de push ediliyor,
-// B'nin masa 5'teki yeni eklediği itemlar SİLİNİYORDU (last-writer-wins).
-// Yeni mantık: Push öncesi server'dan latest pull → sadece BU CİHAZIN değiştirdiği
-// masaları lokalden, diğerlerini server'dan al → merge'i push et.
-// Bu sayede paralel cihazların farklı masalar üzerindeki değişiklikleri korunur.
+// ═══════════════════════════════════════════════════════════════════════
+// PER-MASA LAST-WRITE-WINS SYNC (v9)
+// Her masa için bir versiyon timestamp'i (_mv[i]) tutulur = masanın son
+// değiştirildiği an. Çakışmada DAHA YENİ versiyon kazanır. Item-level merge
+// YOK — basit, öngörülebilir, doğru. Eski CRDT/snap yaklaşımı kalıcı
+// snap≠local uyumsuzluğu yüzünden phantom-delete yapıyordu (masalar
+// kayboluyor + ödenen masalar geri açılıyordu); bu yaklaşım o sınıf
+// bug'ları tamamen ortadan kaldırır.
+// ═══════════════════════════════════════════════════════════════════════
 var _postInFlight=false;
 var _pendingPush=false;
-var _retryCount=0;
-// _sonPushSnap: son başarılı sync'e ait masalar JSON snapshot'ı.
-// Hangi masaların DEĞİŞTİĞİNİ bunun ile diff alarak buluruz.
-var _sonPushSnap=JSON.stringify(masalar||{});
 var GET_DURUM='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/durum?sube='+SUBE+'&since=0';
+var GET_MV='https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=cactus_masa_mv_'+SUBE;
 var POST_MASALAR='https://cactus-rapor-api.batuhanbulut.workers.dev/sync/masalar';
+var POST_MV='https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet';
+var MV_SUBE_KEY='cactus_masa_mv_'+SUBE;
 
-function _degisenMasalar(){
-  // Hangi masalar son sync'ten beri değişti?
-  var snap={};
-  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-  var degisen=[];
-  for(var i=1;i<=34;i++){
-    var c=JSON.stringify(masalar[i]||[]);
-    var s=JSON.stringify(snap[i]||[]);
-    if(c!==s) degisen.push(i);
+// _mv: {masaNo: lastModifiedMs}. localStorage'dan yükle.
+var _mv={};
+try{_mv=JSON.parse(localStorage.getItem(LK.mas+'_mv')||'{}')||{};}catch(e){_mv={};}
+// _sonKayit: saveMasalar diff'i için son kaydedilen masalar snapshot'ı
+var _sonKayit=JSON.parse(JSON.stringify(masalar||{}));
+
+// Server masalar dizisini map'e çevir (+stale filtrele)
+function _srvMasalarMap(durum){
+  var m={};
+  if(durum&&Array.isArray(durum.masalar)){
+    durum.masalar.forEach(function(x){m[x.masa]=_staleItemFiltrele(x.items||[]);});
   }
-  return degisen;
+  return m;
 }
-// Belirli bir masada lokal değişiklik var mı (henüz pushlanmamış)?
-function _masaYerelDegisti(no){
-  var snap={};
-  try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-  return JSON.stringify(masalar[no]||[])!==JSON.stringify(snap[no]||[]);
-}
-// Per-item by-id CRDT-style merge — hem add hem remove cross-device propagation.
-// snap = "en son sync olunan server state" referansı.
-// Kurallar:
-//  - snap'te var, local'de yok → kullanıcı sildi (ödeme) → server'da olsa bile re-add YOK
-//  - snap'te var, server'da yok → başka cihaz sildi → local'den de çıkar
-//    (RACE KORUMA: son 30sn'de eklenmiş local item ise dokunma — server'a yazımız varmamış olabilir)
-//  - server'da var, local'de yok, kullanıcı sildi değil → ADD (cross-device add propagation)
-function _itemBirlestir(local,server,snap){
-  var raceMs=30000;
-  var now=Date.now();
-  var snapIds={};(snap||[]).forEach(function(it){if(it&&it.id)snapIds[it.id]=true;});
-  var localById={};(local||[]).forEach(function(it){if(it&&it.id)localById[it.id]=it;});
-  var serverIds={};(server||[]).forEach(function(it){if(it&&it.id)serverIds[it.id]=true;});
-  // Lokal kullanıcı sildi: snap'te var, local'de yok
-  var locallyDeleted={};
-  Object.keys(snapIds).forEach(function(id){if(!localById[id]) locallyDeleted[id]=true;});
-  // Server'dan silindi: snap'te var, server'da yok (RACE: yakın zamanda local eklenmediyse)
-  var serverDeleted={};
-  Object.keys(snapIds).forEach(function(id){
-    if(serverIds[id]) return;
-    var lit=localById[id];
-    if(lit){
-      var ts=_parseTs(lit);
-      if(ts>0 && (now-ts)<raceMs) return; // race koruma: yeni eklendi, server bilmiyor
-    }
-    serverDeleted[id]=true;
-  });
-  // Sonuç: local item'larını al, null/undefined at, server-deleted olanları çıkar
-  var sonuc=(local||[]).filter(function(it){
-    if(!it) return false;          // null/undefined garbage → at
-    if(!it.id) return true;        // id'siz legitimate item → koru
-    return !serverDeleted[it.id];
-  });
-  var sonucIds={};sonuc.forEach(function(it){if(it&&it.id)sonucIds[it.id]=true;});
-  // Server'ın yeni item'larını ekle (local'de yok + kullanıcı silmedi)
-  (server||[]).forEach(function(srvIt){
-    if(!srvIt||!srvIt.id) return;
-    if(sonucIds[srvIt.id]) return;
-    if(locallyDeleted[srvIt.id]) return;
-    sonuc.push(srvIt);
-  });
-  return sonuc;
+// Effective versiyon = max(mv, item ts'leri). mv haritası henüz yokken
+// (ilk yükleme / transition) item timestamp'leri sayesinde doğru karşılaştırma yapılır.
+// Boş masa (ödeme sonrası) için item ts olmadığından mv değeri belirleyici olur.
+function _effVer(items, mv){
+  var v=mv||0;
+  if(Array.isArray(items)){
+    for(var i=0;i<items.length;i++){ var t=_parseTs(items[i]); if(t>v) v=t; }
+  }
+  return v;
 }
 
+// PUSH: per-masa LWW merge → server'a yaz. Lokal versiyon >= server ise lokal kazanır.
 function _doPushMasalar(){
   if(_postInFlight){_pendingPush=true;return;}
   if(!masalar||typeof masalar!=='object')return;
-  var degisen=_degisenMasalar();
-  if(!degisen.length) return; // hiçbir lokal değişiklik yok — push'a gerek yok
   _postInFlight=true;
-  // 1. ADIM: Server'dan latest pull (8sn timeout)
-  var ctrl1=(typeof AbortController!=='undefined')?new AbortController():null;
-  var toId1=ctrl1?setTimeout(function(){ctrl1.abort();},8000):null;
-  fetch(GET_DURUM,{signal:ctrl1?ctrl1.signal:undefined})
-    .then(function(r){if(toId1)clearTimeout(toId1);return r.ok?r.json():null;})
-    .then(function(serverData){
-      // 2. ADIM: Merge. Bizim değiştirdiklerimiz lokal, diğerleri server'dan.
-      var serverMap={};
-      if(serverData&&Array.isArray(serverData.masalar)){
-        serverData.masalar.forEach(function(m){serverMap[m.masa]=m.items||[];});
-      }
-      var snap={};
-      try{snap=JSON.parse(_sonPushSnap)||{};}catch(e){}
-      var merged={};
-      var degisenSet={}; degisen.forEach(function(n){degisenSet[n]=true;});
-      for(var i=1;i<=34;i++){
-        if(degisenSet[i]){
-          // Değişen masa için per-item by-id birleştir: lokal değişiklik +
-          // başka cihazın eklediği yeni itemlar korunur, kullanıcı sildiyse geri gelmez.
-          merged[i]=_itemBirlestir(masalar[i]||[], _staleItemFiltrele(serverMap[i]||[]), snap[i]||[]);
-        } else {
-          merged[i]=_staleItemFiltrele(serverMap[i]||[]);
-        }
-      }
-      // 3. ADIM: Merged'i POST et (10sn timeout)
-      var ctrl2=(typeof AbortController!=='undefined')?new AbortController():null;
-      var toId2=ctrl2?setTimeout(function(){ctrl2.abort();},10000):null;
-      return fetch(POST_MASALAR,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:SUBE,masalar:merged}),
-        signal:ctrl2?ctrl2.signal:undefined
-      }).then(function(r){
-        if(toId2)clearTimeout(toId2);
-        return {r:r,merged:merged};
-      });
-    })
-    .then(function(res){
-      if(res&&res.r&&res.r.ok){
-        _masaLocalWriteTime=Date.now();
-        _retryCount=0;
-        // Snap'i merged state ile güncelle (sonraki diff için referans)
-        _sonPushSnap=JSON.stringify(res.merged);
-        // Lokal masalar'ı da merge ile sync et (server'dan gelen diğer masalalar yansısın)
-        for(var i=1;i<=34;i++){
-          var srvItems=res.merged[i]||[];
-          var locItems=masalar[i]||[];
-          // SADECE değişmemiş masalalar için lokal'i server-side ile güncelle
-          if(degisen.indexOf(i)<0 && JSON.stringify(locItems)!==JSON.stringify(srvItems)){
-            masalar[i]=srvItems;
-          }
-        }
-        try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
-        if(typeof renderMasalar==='function')renderMasalar();
-      } else if(_retryCount<1){
-        _retryCount++;
-        _pendingPush=true;
-        setTimeout(function(){_postInFlight=false;if(_pendingPush){_pendingPush=false;_doPushMasalar();}},1000);
-        return;
-      }
-    })
-    .catch(function(){
-      if(toId1)clearTimeout(toId1);
-      if(_retryCount<1){
-        _retryCount++;
-        setTimeout(function(){_postInFlight=false;_pendingPush=false;_doPushMasalar();},1500);
-        return;
-      }
-    })
-    .finally(function(){
-      _postInFlight=false;
-      if(_pendingPush){_pendingPush=false;_doPushMasalar();}
-    });
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId=ctrl?setTimeout(function(){if(ctrl)ctrl.abort();},10000):null;
+  Promise.all([
+    fetch(GET_DURUM,{signal:ctrl?ctrl.signal:undefined}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    if(toId)clearTimeout(toId);
+    var srvMas=_srvMasalarMap(res[0]);
+    var srvMv=(res[1]&&res[1].v)||{};
+    var mergedMas={}, mergedMv={};
+    for(var i=1;i<=34;i++){
+      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
+      if(lEff>=sEff){ mergedMas[i]=masalar[i]||[]; mergedMv[i]=lEff; }
+      else { mergedMas[i]=srvMas[i]||[]; mergedMv[i]=sEff; }
+    }
+    return Promise.all([
+      fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
+      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,ts:Date.now()}})})
+    ]).then(function(){return {mas:mergedMas,mv:mergedMv};});
+  }).then(function(out){
+    if(!out) return;
+    var degisti=false;
+    for(var i=1;i<=34;i++){
+      if(JSON.stringify(masalar[i]||[])!==JSON.stringify(out.mas[i]||[])){ masalar[i]=out.mas[i]||[]; degisti=true; }
+      _mv[i]=out.mv[i]||0;
+    }
+    _sonKayit=JSON.parse(JSON.stringify(masalar));
+    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+    if(degisti){ if(typeof renderMasalar==='function')renderMasalar(); if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon(); }
+  }).catch(function(){}).finally(function(){
+    _postInFlight=false;
+    if(_pendingPush){_pendingPush=false;_doPushMasalar();}
+  });
 }
+
+// POLL: server'ı çek, per-masa LWW uygula. Server versiyon > lokal ise server kazanır.
+function _masalarSyncCek(){
+  return Promise.all([
+    fetch(GET_DURUM).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    var durum=res[0];
+    if(!durum) return null;
+    var srvMas=_srvMasalarMap(durum);
+    var srvMv=(res[1]&&res[1].v)||{};
+    var degisti=false, pushGerek=false;
+    for(var i=1;i<=34;i++){
+      var lEff=_effVer(masalar[i], _mv[i]), sEff=_effVer(srvMas[i], srvMv[i]);
+      if(sEff>lEff){
+        // Server daha yeni → uygula
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])){ masalar[i]=srvMas[i]||[]; degisti=true; }
+        _mv[i]=sEff;
+      } else if(lEff>sEff){
+        pushGerek=true; // biz daha yeniyiz → server'a yansıt
+      }
+    }
+    if(degisti){
+      _sonKayit=JSON.parse(JSON.stringify(masalar));
+      try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+      if(typeof renderMasalar==='function')renderMasalar();
+      if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
+    }
+    if(pushGerek && typeof _doPushMasalar==='function') _doPushMasalar();
+    return durum; // siparişler için çağıran kullanır
+  }).catch(function(){return null;});
+}
+
 function saveMasalar(){
   if(!masalar||typeof masalar!=='object'){return;}
+  // Değişen masaların versiyonunu bump et (diff vs son kayıt)
+  var now=Date.now();
+  for(var i=1;i<=34;i++){
+    if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_sonKayit[i]||[])){ _mv[i]=now; }
+  }
+  _sonKayit=JSON.parse(JSON.stringify(masalar));
   try{
     localStorage.setItem(LK.mas,JSON.stringify(masalar));
-    localStorage.setItem(LK.mas+'_cycle',_getResetCycleId()); // güncel reset döngüsü damgası
+    localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));
+    localStorage.setItem(LK.mas+'_cycle',_getResetCycleId());
   }catch(e){}
   _masaLocalWriteTime=Date.now();
-  // Debounce 200ms
   clearTimeout(_pushMasalarTimer);
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
-// PROAKTİF PUSH KALDIRILDI:
-// Eski mantık sayfa açılınca lokal masalar'ı TÜM state olarak push ediyordu;
-// cross-device race'in BAŞLICA sebebiydi (cihaz B'nin masa 5'i, A açılınca
-// A'nın eski state'i ile siliniyordu). Smart-merge push (_doPushMasalar) artık
-// her save'de server ile merge ediyor → proaktif push gereksiz ve zararlı.
+// Gece reset / cycle değişiminde _mv'yi de sıfırla
+function _mvSifirla(){ _mv={}; try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){} }
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu (eski v1 verisini görmez)
@@ -2575,59 +2537,13 @@ setInterval(function(){gunCiroYukle();},60000);
   });
 
   function masalarTamCek(){
-    var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
-    // since=0 → tüm masaları çek; since=12saat → bugünkü siparişleri çek
+    // ── MASALAR — per-masa LWW (yeni motor) ──
+    if(typeof _masalarSyncCek==='function') _masalarSyncCek();
+    // ── SİPARİŞLER (bar/mutfak) — son 12 saatteki bekleyenleri yükle ──
     var sipSince=Date.now()-(12*60*60*1000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since=0')
       .then(function(r){return r.json();})
       .then(function(data){
-        // ── MASALAR ──
-        if(data.masalar&&data.masalar.length){
-          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
-          var changed=false;
-          // İlk yükleme: lokalde dolu masa var + server boş → KORU (kendi yazımız henüz server'a varmamış olabilir)
-          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
-          // SMART POLLING MERGE — overwrite yerine _itemBirlestir kullan
-          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-          data.masalar.forEach(function(m){
-            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-            var srv=_staleItemFiltrele(m.items||[]);
-            var loc=mevcut[m.masa]||[];
-            if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            // CRDT merge: lokal + server yenileri korunur, snap-based delete tespiti
-            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-            if(JSON.stringify(loc)!==JSON.stringify(merged)){
-              mevcut[m.masa]=merged;changed=true;
-            }
-          });
-          if(changed){
-            localStorage.setItem(lkMas,JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined'){
-              data.masalar.forEach(function(m){
-                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-                var srv=_staleItemFiltrele(m.items||[]);
-                var loc=(masalar[m.masa]||[]);
-                if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-              });
-            }
-            // Snap'i GERÇEK server state'ine güncelle (per-masa) — diff bizim eklediklerimizi yakalar
-            var yeniSnap={};
-            try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-            data.masalar.forEach(function(m){
-              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
-            });
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
-            // Polling sonrası eğer hala lokal'de pushlanmamış değişiklik varsa hemen push
-            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
-              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
-            }
-            if(typeof renderMasalar==='function')renderMasalar();
-            if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
-          }
-        }
-        // ── SİPARİŞLER (bar/mutfak) — son 12 saatteki bekleyenleri yükle ──
         if(data.siparisler&&data.siparisler.length){
           var lkBar=getLkBar(); var lkMut=getLkMut();
           var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
@@ -2716,6 +2632,8 @@ setInterval(function(){gunCiroYukle();},60000);
     } else {
       localStorage.setItem(lkMas,'{}');
     }
+    // Per-masa versiyon haritasını da sıfırla (yeni gün döngüsü)
+    if(typeof _mvSifirla==='function'){_mvSifirla();} else {try{localStorage.setItem(lkMas+'_mv','{}');}catch(e){}}
     if(typeof renderBar==='function') renderBar();
     if(typeof renderMut==='function') renderMut();
     if(typeof renderMasalar==='function') renderMasalar();
@@ -2729,7 +2647,8 @@ setInterval(function(){gunCiroYukle();},60000);
     // Yavaş ağda interval üst üste fire etmesin — önceki tamamlanmadan yenisini atla
     if(_syncInFlight) return;
     geceKontrolu();
-    var masaKorumaAktif=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:_localWriteTime))<LOKAL_KORUMA_MS;
+    // ── MASALAR — per-masa LWW (yeni motor) ──
+    if(typeof _masalarSyncCek==='function') _masalarSyncCek();
     var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
     _syncInFlight=true;
     // 12 saniye timeout — yavaş ağda sonsuza takılmasın
@@ -2738,52 +2657,6 @@ setInterval(function(){gunCiroYukle();},60000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since,{signal:ctrl?ctrl.signal:undefined})
       .then(function(r){if(toId)clearTimeout(toId);return r.json();})
       .then(function(data){
-        // MASALAR
-        if(!masaKorumaAktif&&data.masalar&&data.masalar.length){
-          var lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar';
-          var mevcut=JSON.parse(localStorage.getItem(lkMas)||'{}');
-          var changed=false;
-          // SON YEREL YAZIMDAN İTİBAREN 30sn — server "boş" diyorsa lokal dolu masaları KORU.
-          // Bu, yavaş ağda kendi push'umuz server'a varmadan stale data ile overwrite olmasını engeller.
-          var lokalDolurum=(Date.now()-(typeof _masaLocalWriteTime!=='undefined'?_masaLocalWriteTime:0))<30000;
-          // SMART POLLING MERGE — CRDT _itemBirlestir, overwrite yok
-          var snap={};try{snap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-          data.masalar.forEach(function(m){
-            if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-            var srv=_staleItemFiltrele(m.items||[]);
-            var loc=mevcut[m.masa]||[];
-            if(lokalDolurum && loc.length>0 && srv.length===0) return;
-            var merged=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-            if(JSON.stringify(loc)!==JSON.stringify(merged)){
-              mevcut[m.masa]=merged;changed=true;
-            }
-          });
-          if(changed){
-            localStorage.setItem(lkMas,JSON.stringify(mevcut));
-            if(typeof masalar!=='undefined'){
-              data.masalar.forEach(function(m){
-                if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-                var srv=_staleItemFiltrele(m.items||[]);
-                var loc=(masalar[m.masa]||[]);
-                if(lokalDolurum && loc.length>0 && srv.length===0) return;
-                masalar[m.masa]=_itemBirlestir(loc,srv,snap[m.masa]||[]);
-              });
-            }
-            // Snap = gerçek server state per masa
-            var yeniSnap={};try{yeniSnap=JSON.parse(_sonPushSnap||'{}')||{};}catch(e){}
-            data.masalar.forEach(function(m){
-              if(typeof _masaYerelDegisti==='function' && _masaYerelDegisti(m.masa)) return;
-              yeniSnap[m.masa]=_staleItemFiltrele(m.items||[]);
-            });
-            if(typeof _sonPushSnap!=='undefined') _sonPushSnap=JSON.stringify(yeniSnap);
-            // Diff varsa hemen push (cross-device propagation)
-            if(typeof _degisenMasalar==='function' && _degisenMasalar().length>0){
-              setTimeout(function(){if(typeof _doPushMasalar==='function')_doPushMasalar();},200);
-            }
-            if(typeof renderMasalar==='function')renderMasalar();
-            if(typeof renderAdisyon==="function"&&!document.querySelector(".drawer.on"))renderAdisyon();
-          }
-        }
 
         // SİPARİŞLER — sadece yeni gelenleri ekle
         if(data.siparisler&&data.siparisler.length){

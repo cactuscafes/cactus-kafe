@@ -955,7 +955,9 @@ let yonKat=Object.keys(MENU)[0];
 
 for(let i=1;i<=30;i++) masalar[i]=[];
 const saved=JSON.parse(localStorage.getItem(LK.mas)||'null');
-if(saved) for(let i=1;i<=30;i++) masalar[i]=saved[i]||[];
+// Açılışta bozuk veriyi temizle: negatif/sıfır/geçersiz adetli item'lar düşürülür
+// (eski/cache'li sürümlerden kalma "₺x × -1" hayalet kayıtları self-heal olur)
+if(saved) for(let i=1;i<=30;i++) masalar[i]=(saved[i]||[]).filter(it=>it&&typeof it.adet==='number'&&it.adet>0);
 
 // ─── GECE 04:00 RESET — STALE GÜN KONTROLÜ ───
 // Cihaz 04:00'te kapalıysa localStorage'da dünkü dolu masalar kalıyor; sayfa
@@ -990,11 +992,13 @@ function _staleItemFiltrele(items){
   if(!Array.isArray(items)) return [];
   var resetMs=_resetNoktasiMs();
   var now=Date.now();
-  if(!(resetMs>0 && resetMs<now && (now-resetMs)<25*3600000)){
-    return items;
-  }
+  var resetGecerli=(resetMs>0 && resetMs<now && (now-resetMs)<25*3600000);
   return items.filter(function(it){
     if(!it) return false;
+    // Bozuk veri: negatif/sıfır/geçersiz adet = her durumda düş (sync ile yayılmasın,
+    // "₺x × -1" hayalet kayıtlar self-heal olsun). ts sanity guard'tan bağımsız çalışır.
+    if(!(typeof it.adet==='number' && it.adet>0)) return false;
+    if(!resetGecerli) return true; // reset noktası mantıksız → sadece adet temizliği yap
     var ts=_parseTs(it);
     if(ts===0) return false;
     if(ts<resetMs) return false;

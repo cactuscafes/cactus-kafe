@@ -2509,6 +2509,33 @@ if(window.innerWidth<=640){
 }
 renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
 setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
+// ═══ OTOMATİK GÜNCELLEME ═══ Açık sekme yeni deploy'u fark edince BOŞTAYKEN kendini yeniler.
+// Cihazları elle yenilemeye gerek kalmaz → "eski kod çalışıyor" sorunu biter.
+(function(){
+  try{ if(location.search.indexOf('au=')>=0) history.replaceState(null,'',location.pathname); }catch(e){}
+  var BASE=null;
+  function bos(){ // güvenli yenileme anı: masa açık değil, modal/drawer yok, input'a yazılmıyor
+    try{
+      if(typeof aktifMasa!=='undefined' && aktifMasa) return false;
+      if(document.querySelector('.moverlay.on')) return false;
+      var dr=document.querySelector('.drawer.on'); if(dr && !dr.classList.contains('kapali')) return false;
+      var ae=document.activeElement; if(ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return false;
+    }catch(e){ return false; }
+    return true;
+  }
+  function kontrol(){
+    fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){
+      var et=r.headers.get('ETag')||r.headers.get('Last-Modified'); if(!et) return;
+      if(BASE===null){ BASE=et; return; }
+      if(et===BASE || !bos()) return;                 // değişmemiş ya da meşgul → bekle
+      var t=parseInt(localStorage.getItem('cactus_au_t')||'0',10);
+      if(Date.now()-t < 600000) return;               // 10 dk'da en fazla 1 oto-yenileme (döngü koruması)
+      try{ localStorage.setItem('cactus_au_t',String(Date.now())); }catch(e){}
+      location.replace(location.pathname+'?au='+Date.now()); // cache-bust → kesin taze kod
+    }).catch(function(){});
+  }
+  setTimeout(function(){ kontrol(); setInterval(kontrol,90000); },45000);
+})();
 // Günün cirosu - başlangıçta tarih yaz, 60sn'de bir arka planda yükle
 gunCiroTarihGoster();renderCanliCiro();
 setInterval(function(){gunCiroYukle();},60000);

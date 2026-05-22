@@ -1362,50 +1362,25 @@ function modalAc(){
 }
 function modalKapat(){ document.getElementById('modalBg').classList.remove('on'); }
 async function yayinla(){
-  let token=localStorage.getItem('cactus_gh_token')||'';
-  if(!token){
-    token=prompt('GitHub Token (tek seferlik kaydedilir):');
-    if(!token){ toast('⚠️ Token girilmedi'); return; }
-    localStorage.setItem('cactus_gh_token',token.trim());
-    token=token.trim();
-  }
+  // TOKEN'SIZ: menü artık GitHub'a değil worker/KV'ye yazılır. menu.html KV'den okur,
+  // adisyon zaten KV'den okuyor → anında güncellenir. GitHub token gerekmez.
   const btn=document.getElementById('modalOkBtn'), dur=document.getElementById('modalDurum');
   btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
-  dur.classList.add('on'); dur.textContent='⏳ Bağlanıyor...';
+  dur.classList.add('on'); dur.textContent='⏳ Yayınlanıyor...';
   try{
-    // menu-data.json formatı: {fsm:{catId:{id,label,urunler:[...]}, ...}, podyum:{...}}
     const perBranch={};
     KAT.forEach(function(k){perBranch[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]};});
     const menuData={fsm:perBranch,podyum:JSON.parse(JSON.stringify(perBranch)),oncu:ONCU};
-    const jsonB64=btoa(unescape(encodeURIComponent(JSON.stringify(menuData,null,2))));
-    const jgr=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{headers:{'Authorization':'token '+token}});
-    const jgd=await jgr.json();
-    const body={message:'Menü güncellendi',content:jsonB64,branch:BRANCH};
-    if(jgd.sha) body.sha=jgd.sha;
-    const jp=await fetch('https://api.github.com/repos/'+REPO+'/contents/menu-data.json',{
-      method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-      body:JSON.stringify(body)
-    });
-    if(jp.ok){
-      // Worker API'ye de kaydet — adisyon anlık güncellenir
-      var _ws=localStorage.getItem('cactus_admin_sube')||'fsm';
-      var _wm={};
-      KAT.forEach(function(k){_wm[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]};});
-      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:'fsm',menu:_wm})
-      }).catch(function(){});
-      fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({sube:'podyum',menu:_wm})
-      }).catch(function(){});
-      dur.textContent='✅ Yayınlandı! Adisyon anında güncellendi.';
+    var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+    var P=function(sube,menu){return fetch(API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:sube,menu:menu})});};
+    // menu_public → public menu.html bunu okur (fsm/podyum/oncu) ; fsm+podyum → adisyon okur
+    var res=await Promise.all([ P('menu_public',menuData), P('fsm',perBranch), P('podyum',perBranch) ]);
+    if(res.every(function(r){return r&&r.ok;})){
+      dur.textContent='✅ Yayınlandı! Menü ve adisyon anında güncellendi.';
       btn.textContent='✅ Tamamlandı';
       toast('🚀 Yayınlandı!');
     } else {
-      const e=await jp.json();
-      if(e.message?.includes('Bad credentials')){ localStorage.removeItem('cactus_gh_token'); dur.textContent='❌ Token geçersiz.'; }
-      else{ dur.textContent='❌ '+(e.message||jp.status); }
+      dur.textContent='❌ Yayınlanamadı (ağ?). Tekrar deneyin.';
       btn.disabled=false; btn.textContent='✅ Yayınla';
     }
   }catch(e){ dur.textContent='❌ '+e.message; btn.disabled=false; btn.textContent='✅ Yayınla'; }

@@ -1050,6 +1050,8 @@ function renderKatListe(){
       <span style="font-size:20px;">${k.label.split(' ')[0]}</span>
       <span style="font-size:14px;font-weight:500;flex:1;">${k.label.split(' ').slice(1).join(' ')}</span>
       <span style="font-size:12px;color:#999;">${k.tip==='ic'?'İçecek':'Yiyecek'} · ${(MENU[k.id]||[]).length} ürün</span>
+      <button type="button" onclick="katTasi(${i},-1)" ${i===0?'disabled':''} style="background:#f0f0f0;border:1px solid #ddd;cursor:pointer;padding:7px 11px;border-radius:6px;font-size:14px;line-height:1;${i===0?'opacity:.3;':''}" title="Yukarı taşı">▲</button>
+      <button type="button" onclick="katTasi(${i},1)" ${i===KAT.length-1?'disabled':''} style="background:#f0f0f0;border:1px solid #ddd;cursor:pointer;padding:7px 11px;border-radius:6px;font-size:14px;line-height:1;${i===KAT.length-1?'opacity:.3;':''}" title="Aşağı taşı">▼</button>
       <button onclick="katDuzenle('${k.id}')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#999;font-size:16px;" title="Düzenle">✏️</button>
       ${(MENU[k.id]||[]).length===0?'<button onclick="katSil(\''+k.id+'\')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#ffaaaa;font-size:16px;" title="Sil">🗑️</button>':''}
     </div>
@@ -1094,6 +1096,16 @@ function renderKatListe(){
       toast('✅ Sıra güncellendi — Yayınla butonuna basın');
     });
   });
+}
+// Mobil/dokunmatik için ↑/↓ ile sıra değiştirme (HTML5 drag mobilde çalışmıyor)
+function katTasi(i, yon){
+  var j=i+yon;
+  if(j<0||j>=KAT.length) return;
+  var t=KAT[i]; KAT[i]=KAT[j]; KAT[j]=t; // komşu kategoriyle yer değiştir
+  localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+  renderKatListe(); renderKatTabs();
+  if(typeof katSeciciDoldur==='function') katSeciciDoldur();
+  toast('✅ Sıra güncellendi — Yayınla butonuna basın');
 }
 
 /* ÖNE ÇIKAN */

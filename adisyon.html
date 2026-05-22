@@ -542,7 +542,7 @@ if('serviceWorker' in navigator){
 </div>
 <!-- SÜRÜM ROZETİ: bu cihaz güncel mi? Dokun → zorla güncelle (cache-bust). Eski tarih görürsen o cihaz eski kodda. -->
 <div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:#5C2E0E;background:rgba(255,255,255,.88);border:1px solid #EDDBBB;padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;">⟳ <span id="surum-txt">…</span></div>
-<script>(function(){var APP_BUILD='23 May 00:45';var e=document.getElementById('surum-txt');if(e)e.textContent=APP_BUILD;})();</script>
+<script>(function(){var APP_BUILD='23 May 01:20';var e=document.getElementById('surum-txt');if(e)e.textContent=APP_BUILD;})();</script>
 
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">
@@ -1685,8 +1685,14 @@ function delItem(id){
 function masayiTemizle(){
   if(!aktifMasa)return;
   if(!confirm('Masa '+aktifMasa+' adisyonu temizlensin mi?'))return;
+  var _enYeni=_maxItemTs(masalar[aktifMasa]||[]);
   masalar[aktifMasa]=[];
-  saveMasalar();renderAdisyon();renderMasalar();
+  saveMasalar();
+  // Temizleme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması/yarış olsa bile
+  // sync'te boş hali kazanır, masa "geri dolmaz" (sorun: temizleyince başka şey geri geliyordu).
+  _mv[aktifMasa]=Math.max(_mv[aktifMasa]||0, _enYeni+1, Date.now());
+  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  renderAdisyon();renderMasalar();
   toast('🗑 Masa '+aktifMasa+' temizlendi');
 }
 
@@ -2146,8 +2152,13 @@ function gunSonuYap(){
 }
 function tumMasalariSifirla(){
   if(!confirm('TÜM masalar sıfırlansın mı? Bu işlem geri alınamaz!'))return;
-  for(let i=1;i<=30;i++) masalar[i]=[];
-  aktifMasa=null;saveMasalar();renderMasalar();renderAdisyon();
+  var _now=Date.now(), _en={};
+  for(let i=1;i<=30;i++){ _en[i]=_maxItemTs(masalar[i]||[]); masalar[i]=[]; }
+  aktifMasa=null;saveMasalar();
+  // Her masanın temizliği silinen ürünlerden KESİN daha yeni damgalansın (saat kayması/yarış koruması)
+  for(let i=1;i<=30;i++){ _mv[i]=Math.max(_mv[i]||0, _en[i]+1, _now); }
+  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  renderMasalar();renderAdisyon();
   document.getElementById('adis-masa-no').textContent='Seçilmedi';
   document.getElementById('adis-masa-mob').textContent='Seçilmedi';
   toast('🗑 Tüm masalar sıfırlandı');

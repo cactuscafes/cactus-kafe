@@ -696,7 +696,7 @@ function toggleMainNav(){
   var audio=new Audio(url);
   audio.loop=true;
   audio.volume=vol;
-  audio.preload='none';
+  audio.preload='auto';
 
   var muted=localStorage.getItem('cactus_music')==='0';
   var playing=false;
@@ -735,6 +735,7 @@ function toggleMainNav(){
   });
 
   if(!muted){
+    startAudio(); // sayfa açılır açılmaz dene; tarayıcı engellerse ilk dokunuş/kaydırmada başlar
     var once=function(){startAudio();document.removeEventListener('click',once);document.removeEventListener('scroll',once);document.removeEventListener('touchstart',once);};
     document.addEventListener('click',once,{passive:true});
     document.addEventListener('scroll',once,{passive:true});

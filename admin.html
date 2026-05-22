@@ -975,6 +975,7 @@ function katEkle(){
   KAT.push({id,label:e+' '+a,tip:t});
   if(!MENU[id]) MENU[id]=[];
   katKaydet(); menuKaydet(); renderKatListe(); renderKatTabs();
+  if(typeof katSeciciDoldur==='function') katSeciciDoldur(); // ürün-ekle seçicisi de yenilensin (yeni kategori hemen görünsün)
   document.getElementById('kE').value=''; document.getElementById('kA').value='';
   toast('✅ Kategori eklendi');
 }
@@ -983,12 +984,13 @@ function katSil(id){
   KAT=KAT.filter(k=>k.id!==id); delete MENU[id];
   if(aktifKat===id) aktifKat=KAT[0]?.id;
   katKaydet(); menuKaydet(); renderKatListe(); renderKatTabs(); renderUrunler();
+  if(typeof katSeciciDoldur==='function') katSeciciDoldur();
   toast('🗑 Silindi');
 }
 function katDuzenle(id){
   const k=KAT.find(x=>x.id===id); if(!k) return;
   const y=prompt('Kategori adı:',k.label); if(!y) return;
-  k.label=y; katKaydet(); renderKatListe(); renderKatTabs(); toast('✅ Güncellendi');
+  k.label=y; katKaydet(); renderKatListe(); renderKatTabs(); if(typeof katSeciciDoldur==='function') katSeciciDoldur(); toast('✅ Güncellendi');
 }
 function katSiralamaUI(){
   const cont=document.getElementById('katSiralama');

@@ -540,6 +540,9 @@ if('serviceWorker' in navigator){
     <div class="td" id="td"></div>
   </div>
 </div>
+<!-- SÜRÜM ROZETİ: bu cihaz güncel mi? Dokun → zorla güncelle (cache-bust). Eski tarih görürsen o cihaz eski kodda. -->
+<div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:#5C2E0E;background:rgba(255,255,255,.88);border:1px solid #EDDBBB;padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;">⟳ <span id="surum-txt">…</span></div>
+<script>(function(){var APP_BUILD='23 May 00:45';var e=document.getElementById('surum-txt');if(e)e.textContent=APP_BUILD;})();</script>
 
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">
@@ -1248,24 +1251,34 @@ function masaUyariSinifi(ms){
 }
 function renderMasalar(){
   const g=document.getElementById('masa-grid');
-  const sureMap=masaBaslangiclariniGuncelle();
+  if(!g) return;
+  let sureMap={}; try{ sureMap=masaBaslangiclariniGuncelle()||{}; }catch(e){ sureMap={}; }
   g.innerHTML='';
   for(let i=1;i<=30;i++){
-    const a=masalar[i];
-    const top=a.reduce((s,x)=>s+x.fiyat*x.adet,0);
-    const adet=a.reduce((s,x)=>s+x.adet,0);
-    const b=document.createElement('button');
-    const uyariCls=adet>0?masaUyariSinifi(sureMap[i]):'';
-    b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'')+(uyariCls?' '+uyariCls:'');
-    b.onclick=()=>masaSec(i);
-    const sureStr=adet>0?masaSureMetin(sureMap[i]):'';
-    b.innerHTML=(adet>0?`<div class="mbdg">${adet}</div>`:'')+
-      `<span class="mn">${i}</span><span class="ml">${({31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'})[i]||'Masa'}</span>`+
-      (top>0?`<span class="mf">₺${top.toLocaleString('tr-TR')}</span>`:'')+
-      (sureStr?`<div class="msure">${sureStr}</div>`:'');
-    g.appendChild(b);
+    try{
+      // KURŞUNGEÇİRMEZ: bozuk veri (undefined dizi / null ürün) bir masayı render'da kaybetmesin
+      let a=masalar[i];
+      if(!Array.isArray(a)){ a=[]; masalar[i]=a; }
+      const temiz=a.filter(x=>x&&typeof x==='object');
+      if(temiz.length!==a.length){ a=temiz; masalar[i]=a; } // null/bozuk item'ları kalıcı ayıkla
+      const top=a.reduce((s,x)=>s+(Number(x.fiyat)||0)*(Number(x.adet)||0),0);
+      const adet=a.reduce((s,x)=>s+(Number(x.adet)||0),0);
+      const b=document.createElement('button');
+      const uyariCls=adet>0?masaUyariSinifi(sureMap[i]):'';
+      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'')+(uyariCls?' '+uyariCls:'');
+      b.onclick=()=>masaSec(i);
+      const sureStr=adet>0?masaSureMetin(sureMap[i]):'';
+      b.innerHTML=(adet>0?`<div class="mbdg">${adet}</div>`:'')+
+        `<span class="mn">${i}</span><span class="ml">${({31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'})[i]||'Masa'}</span>`+
+        (top>0?`<span class="mf">₺${top.toLocaleString('tr-TR')}</span>`:'')+
+        (sureStr?`<div class="msure">${sureStr}</div>`:'');
+      g.appendChild(b);
+    }catch(e){
+      // Bu masa yine de çizilemezse, EN AZINDAN tıklanabilir boş hücre koy — masa asla kaybolmasın
+      try{ const b=document.createElement('button'); b.className='mbtn'; b.onclick=()=>masaSec(i); b.innerHTML='<span class="mn">'+i+'</span><span class="ml">Masa</span>'; g.appendChild(b); }catch(_){}
+    }
   }
-  updateMobBadge();
+  try{updateMobBadge();}catch(e){}
 }
 // Her 30 saniyede masa sürelerini yenile
 setInterval(function(){if(document.getElementById('scr-kas').classList.contains('on'))renderMasalar();},30000);

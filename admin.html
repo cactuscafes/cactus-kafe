@@ -1661,17 +1661,26 @@ var _mzAudio=null,_mzPlaying=false;
 async function muzikYukle(){
   var st=document.getElementById('mz-st');
   st.textContent='⏳ Yükleniyor...';
+  var url='',enabled=false,vol=18;
   try{
-    var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{'User-Agent':'cactus-admin'});
-    var d=await r.json();
-    if(!d.content)throw new Error(d.message||'Dosya alınamadı');
-    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-    var parser=new DOMParser();
-    var doc=parser.parseFromString(html,'text/html');
-    var cfg=doc.getElementById('music-cfg');
-    var url=cfg?cfg.dataset.url||'':'';
-    var enabled=cfg?cfg.dataset.enabled==='1':false;
-    var vol=cfg?parseInt((parseFloat(cfg.dataset.vol||'0.18')*100).toFixed(0)):18;
+    // ÖNCE worker/KV (token'sız yayın buraya yazıyor)
+    var rk=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=muzik_cfg&t='+Date.now());
+    var dk=await rk.json();
+    if(dk && typeof dk.url!=='undefined'){
+      url=dk.url||'';
+      enabled=(dk.enabled===true||dk.enabled==='1'||dk.enabled===1);
+      vol=Math.round((parseFloat(dk.vol)||0.18)*100);
+    }else{
+      // KV boş → mevcut index.html'den oku (ilk geçiş)
+      var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{'User-Agent':'cactus-admin'});
+      var d=await r.json();
+      if(d.content){
+        var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+        var doc=new DOMParser().parseFromString(html,'text/html');
+        var cfg=doc.getElementById('music-cfg');
+        if(cfg){ url=cfg.dataset.url||''; enabled=cfg.dataset.enabled==='1'; vol=parseInt((parseFloat(cfg.dataset.vol||'0.18')*100).toFixed(0)); }
+      }
+    }
     document.getElementById('mz-url').value=url;
     document.getElementById('mz-enabled').checked=enabled;
     document.getElementById('mz-vol').value=vol;
@@ -1751,43 +1760,22 @@ function muzikTestToggle(){
 }
 
 async function muzikKaydet(){
-  var token=localStorage.getItem('cactus_gh_token')||'';
-  if(!token){
-    token=prompt('GitHub Token:');
-    if(!token){toast('⚠️ Token girilmedi');return;}
-    localStorage.setItem('cactus_gh_token',token.trim());
-    token=token.trim();
-  }
+  // TOKEN'SIZ: müzik ayarı GitHub'a değil worker/KV'ye yazılır. index.html KV'den okur.
   var st=document.getElementById('mz-st');
   st.textContent='⏳ Kaydediliyor...';
   try{
-    var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{headers:{'Authorization':'token '+token}});
-    var d=await r.json();
-    if(!d.sha)throw new Error(d.message||'Dosya alınamadı');
-    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-    var parser=new DOMParser();
-    var doc=parser.parseFromString(html,'text/html');
-    var cfg=doc.getElementById('music-cfg');
-    if(!cfg){st.textContent='❌ music-cfg elementi bulunamadı';return;}
     var url=document.getElementById('mz-url').value.trim();
     var enabled=document.getElementById('mz-enabled').checked;
-    var vol=(parseInt(document.getElementById('mz-vol').value)/100).toFixed(2);
-    cfg.dataset.url=url;
-    cfg.dataset.enabled=enabled?'1':'0';
-    cfg.dataset.vol=vol;
-    var newHtml='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
-    var pr=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{
-      method:'PUT',
-      headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-      body:JSON.stringify({message:'Muzik ayarlari guncellendi',content:btoa(unescape(encodeURIComponent(newHtml))),sha:d.sha,branch:'main'})
+    var vol=parseFloat((parseInt(document.getElementById('mz-vol').value)/100).toFixed(2))||0.18;
+    var r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sube:'muzik_cfg',menu:{url:url,enabled:enabled,vol:vol}})
     });
-    var pj=await pr.json();
-    if(pj.commit){
-      st.textContent='✅ Yayınlandı!';
+    if(r.ok){
+      st.textContent='✅ Yayınlandı! Anasayfada anında etkili.';
       toast('✅ Müzik ayarları kaydedildi');
     }else{
-      if(pj.message&&pj.message.indexOf('Bad credentials')>-1)localStorage.removeItem('cactus_gh_token');
-      st.textContent='❌ '+(pj.message||'Hata');
+      st.textContent='❌ Kaydedilemedi (ağ?). Tekrar deneyin.';
     }
   }catch(e){st.textContent='❌ '+e.message;console.error(e);}
 }

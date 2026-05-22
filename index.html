@@ -691,11 +691,8 @@ function toggleMainNav(){
 (function(){
   var cfg=document.getElementById('music-cfg');
   if(!cfg)return;
-  var url=cfg.dataset.url||'';
-  var enabled=cfg.dataset.enabled==='1';
-  var vol=parseFloat(cfg.dataset.vol)||0.18;
+  function kur(url,enabled,vol){
   if(!url||!enabled)return;
-
   var audio=new Audio(url);
   audio.loop=true;
   audio.volume=vol;
@@ -743,6 +740,13 @@ function toggleMainNav(){
     document.addEventListener('scroll',once,{passive:true});
     document.addEventListener('touchstart',once,{passive:true});
   }
+  }
+  // ÖNCE worker/KV (token'sız admin yayını buraya yazar), boşsa statik data-attribute fallback
+  var sUrl=cfg.dataset.url||'', sEn=cfg.dataset.enabled==='1', sVol=parseFloat(cfg.dataset.vol)||0.18;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=muzik_cfg&t='+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d&&typeof d.url!=='undefined') kur(String(d.url||''),(d.enabled===true||d.enabled==='1'||d.enabled===1),parseFloat(d.vol)||0.18); else kur(sUrl,sEn,sVol); })
+    .catch(function(){ kur(sUrl,sEn,sVol); });
 })();
 </script>
 

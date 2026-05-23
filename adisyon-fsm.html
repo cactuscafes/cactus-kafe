@@ -1838,6 +1838,7 @@ function odemeOnayla(){
   } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}else{kartTutar=top;}
   // Seçilen ürünleri masadan düş — index DEĞİL id ile eşleştir.
   // (Ödeme modalı açıkken poll masalar[aktifMasa]'yı değiştirebilir → eski index kayar)
+  var _enYeniOd=_maxItemTs(masalar[aktifMasa]||[]); // ödeme öncesi en yeni ürün ts (saat kayması koruması)
   _secKalemler.forEach(k=>{
     if(k.sec<=0)return;
     const item=masalar[aktifMasa].find(x=>x&&x.id===k.id);
@@ -1857,6 +1858,10 @@ function odemeOnayla(){
   const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':seciliOdemeTipi==='kisi'?('👥 '+_kisiAdet+' kişi '+(_kisiTahsilat==='nakit'?'💵':'💳')):'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
   odemeyiKaydet(oncekiMasa,top,ic,yi,efektifTip,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
   saveMasalar();
+  // Ödeme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması ya da ileri-saatli
+  // başka cihazda eklenen ürün olsa bile ödenen masa sync'te "GERİ AÇILMAZ".
+  _mv[oncekiMasa]=Math.max(_mv[oncekiMasa]||0, _enYeniOd+1, Date.now());
+  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
   closeModal('odeme-modal');
   if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
     closeDrawer();aktifMasa=null;

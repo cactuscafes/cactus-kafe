@@ -2287,19 +2287,13 @@ function rapGoster(){
   const d1Api='https://cactus-rapor-api.batuhanbulut.workers.dev';
   // /islem/listele: işlem (transaction) bazlı temiz veri — icecek_toplam/yiyecek_toplam/nakit_tutar/kart_tutar alanları zaten ayrılmış
   // /rapor/ozet: sadece "En çok satanlar" listesi için kullanılıyor
-  Promise.all([
-    fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}).catch(function(){return null;}),
-    fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}).catch(function(){return null;})
-  ]).then(function(results){
-    // İki endpoint'ten biri düşse bile diğeri gösterilsin; SADECE ikisi de düşerse hata göster
-    if(!results[0] && !results[1]){
-      document.getElementById('rap-ozet').innerHTML='';
-      document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Bağlantı hatası. Tekrar deneyin.</p></div>';
-      document.getElementById('rap-urun-ici').innerHTML='';
-      return;
-    }
+  // SADECE /islem/listele çek (canlı ciro da bunu kullanıyor → çalışıyor). rapor/ozet'e
+  // BAĞIMLI DEĞİL — en çok satılan ürün işlemlerden client-side hesaplanır. Tek hata noktası.
+  fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(data){
     // Önce duplicate'leri at (çift tıklama/race kalıntıları)
-    var islemler=_islemDeduplica(results[0]||[]).filter(function(s){
+    var islemler=_islemDeduplica(data||[]).filter(function(s){
       if(!odemeFil) return true;
       var t=(s.odeme_tipi||'').toLowerCase();
       if(odemeFil==='Nakit') return t==='nakit';
@@ -2336,9 +2330,14 @@ function rapGoster(){
       document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">📋</div><p>Bu dönemde kayıt yok.</p></div>';
     }
 
-    var oz=results[1]||{};
-    // "Satış" başlıklı bölünmüş ödeme kayıtlarını ele
-    var enCok=(oz.en_cok||[]).filter(function(u){return u.urun_adi&&u.urun_adi!=='Satış';});
+    // EN ÇOK SATILAN — işlemlerden client-side hesaplanır (rapor/ozet endpoint'ine bağımlı DEĞİL)
+    var sayac={};
+    islemler.forEach(function(s){
+      var det=s.urun_detay||s.urunDetay;
+      if(Array.isArray(det)){ det.forEach(function(u){ if(u&&u.ad){ sayac[u.ad]=(sayac[u.ad]||0)+(Number(u.adet)||0); } }); }
+      else if(s.urunler){ String(s.urunler).split(',').forEach(function(p){ p=p.trim(); if(!p)return; var m=p.match(/^(.*?)\s*[x×]\s*(\d+)$/i); if(m){ sayac[m[1].trim()]=(sayac[m[1].trim()]||0)+parseInt(m[2],10); } else { sayac[p]=(sayac[p]||0)+1; } }); }
+    });
+    var enCok=Object.keys(sayac).map(function(ad){return {urun_adi:ad,toplam_adet:sayac[ad]};}).filter(function(u){return u.urun_adi&&u.urun_adi!=='Satış';}).sort(function(a,b){return b.toplam_adet-a.toplam_adet;});
     if(enCok.length){
       var mx=enCok[0].toplam_adet||1;
       document.getElementById('rap-urun-ici').innerHTML=enCok.slice(0,10).map(function(u,i){return '<div class="urun-sira"><div class="urun-sira-no">'+(i+1)+'</div><div class="urun-sira-ad">'+u.urun_adi+'</div><div class="urun-sira-bar-wrap"><div class="urun-sira-bar" style="width:'+Math.round((u.toplam_adet||0)/mx*100)+'%"></div></div><div class="urun-sira-adet">'+u.toplam_adet+' adet</div></div>';}).join('');
@@ -2346,7 +2345,9 @@ function rapGoster(){
       document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Veri yok.</p></div>';
     }
   }).catch(function(e){
-    document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Bağlantı hatası. Tekrar deneyin.</p></div>';
+    document.getElementById('rap-ozet').innerHTML='';
+    document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Veri alınamadı'+(e&&e.message?(' ('+e.message+')'):'')+'. Tekrar deneyin.</p></div>';
+    document.getElementById('rap-urun-ici').innerHTML='';
   });
 }
 

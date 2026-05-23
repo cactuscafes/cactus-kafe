@@ -2232,9 +2232,16 @@ function rapGoster(){
 
   const d1Api='https://cactus-rapor-api.batuhanbulut.workers.dev';
   Promise.all([
-    fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}),
-    fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();})
+    fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch(d1Api+'/rapor/ozet?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit).then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(results){
+    // İki endpoint'ten biri düşse bile diğeri gösterilsin; SADECE ikisi de düşerse hata göster
+    if(!results[0] && !results[1]){
+      document.getElementById('rap-ozet').innerHTML='';
+      document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Bağlantı hatası. Tekrar deneyin.</p></div>';
+      document.getElementById('rap-urun-ici').innerHTML='';
+      return;
+    }
     // Önce duplicate'leri at, sonra filtrele
     var islemler=_islemDeduplica(results[0]||[]).filter(function(s){
       if(!odemeFil) return true;
@@ -2485,11 +2492,13 @@ setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JS
 (function(){
   try{ if(location.search.indexOf('au=')>=0) history.replaceState(null,'',location.pathname); }catch(e){}
   var BASE=null, guncelVar=false;
-  function bos(){ // güvenli yenileme anı: modal yok, drawer (sipariş paneli) açık değil, input'a yazılmıyor
+  function bos(){ // güvenli yenileme anı: modal/drawer yok, input'a yazılmıyor, rapor/yönet okunmuyor
     try{
       if(document.querySelector('.moverlay.on')) return false;
       var dr=document.querySelector('.drawer.on'); if(dr && !dr.classList.contains('kapali')) return false;
       var ae=document.activeElement; if(ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return false;
+      var rap=document.getElementById('scr-rap'); if(rap && rap.classList.contains('on')) return false; // rapor okunurken yenileme yapma
+      var yon=document.getElementById('scr-yon'); if(yon && yon.classList.contains('on')) return false; // yönet açıkken yenileme yapma
     }catch(e){ return false; }
     return true;
   }

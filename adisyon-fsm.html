@@ -1332,8 +1332,10 @@ function _doPushMasalar(){
     fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
     if(toId)clearTimeout(toId);
+    // GÜVENLİK: durum VEYA mv GET'i başarısızsa PUSH ETME (eksik görünümle merge masaları siler/geri açar)
+    if(!res[0] || !Array.isArray(res[0].masalar) || !res[1]){ return; }
     var srvMas=_srvMasalarMap(res[0]);
-    var srvMv=(res[1]&&res[1].v)||{};
+    var srvMv=(res[1].v)||{};
     var mergedMas={}, mergedMv={};
     for(var i=1;i<=34;i++){
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
@@ -1367,8 +1369,10 @@ function _masalarSyncCek(){
   ]).then(function(res){
     var durum=res[0];
     if(!durum) return null;
+    // GÜVENLİK: mv GET'i başarısızsa masa merge'i ATLA (ödemeyi göremeden karar → geri açılma)
+    if(!res[1]) return durum;
     var srvMas=_srvMasalarMap(durum);
-    var srvMv=(res[1]&&res[1].v)||{};
+    var srvMv=(res[1].v)||{};
     var degisti=false, pushGerek=false;
     for(var i=1;i<=34;i++){
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);

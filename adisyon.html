@@ -1131,7 +1131,7 @@ function _sifreCloudCek(){
 // Açılışta + her 10 sn'de bir cloud'dan çek
 window.addEventListener('load',function(){
   setTimeout(_sifreCloudCek,1200);
-  setInterval(_sifreCloudCek,10000);
+  setInterval(_sifreCloudCek,60000);
 });
 function _korumaAktif(){return sessionStorage.getItem(KORUMA_SESS)==='1';}
 function _korumaAc(){sessionStorage.setItem(KORUMA_SESS,'1');}
@@ -1518,7 +1518,7 @@ function toggleFav(id,ev){
 // Açılışta + her 10 saniyede bir buluttan favorileri çek
 window.addEventListener('load',function(){
   setTimeout(syncFavsFromCloud,800);
-  setInterval(syncFavsFromCloud,10000);
+  setInterval(syncFavsFromCloud,60000);
 });
 function getFavItems(){
   const fs=getFavs();
@@ -2135,7 +2135,7 @@ function _webhookCloudCek(){
 }
 window.addEventListener('load',function(){
   setTimeout(_webhookCloudCek,1600);
-  setInterval(_webhookCloudCek,15000);
+  setInterval(_webhookCloudCek,60000);
 });
 function gunSonuYap(){
   // Açık masaları topla
@@ -2685,7 +2685,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
   window.addEventListener('load',function(){
     menuGuncelle(); // sayfa açılışında hemen çek
-    setInterval(menuGuncelle,10000); // her 10 saniyede diğer cihazların değişikliklerini al
+    setInterval(menuGuncelle,60000); // 60s: menü nadiren değişir, worker limitini koru
   });
 })();
 </script>
@@ -2746,7 +2746,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
   function init(){
     hookHazirlandiButtons();
-    setInterval(syncFromD1,1500);
+    setInterval(syncFromD1,4000); // 1.5s→4s: Cloudflare worker/D1 günlük limitini doldurmamak için (çok cihaz × sık polling limiti aşıyordu)
     syncFromD1();
   }
 
@@ -2913,7 +2913,7 @@ setInterval(function(){gunCiroYukle();},60000);
   }
   window.addEventListener('load',function(){
     setTimeout(_notlarCloudCek,1500);
-    setInterval(_notlarCloudCek,10000);
+    setInterval(_notlarCloudCek,60000);
   });
 
   function notEkle(masaId, urunIdx) {

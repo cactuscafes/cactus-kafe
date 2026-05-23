@@ -541,8 +541,8 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <!-- SÜRÜM ROZETİ: bu cihaz güncel mi? Dokun → zorla güncelle (cache-bust). Eski tarih görürsen o cihaz eski kodda. -->
-<div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:#5C2E0E;background:rgba(255,255,255,.88);border:1px solid #EDDBBB;padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;">⟳ <span id="surum-txt">…</span></div>
-<script>(function(){var APP_BUILD='23 May 02:15';var e=document.getElementById('surum-txt');if(e)e.textContent=APP_BUILD;})();</script>
+<div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:#5C2E0E;background:rgba(255,255,255,.88);border:1px solid #EDDBBB;padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;"><span id="surum-txt">✓ Güncel</span></div>
+<script>(function(){var b=document.getElementById('surum-rozet');if(b)b.style.color='#2d5a27';})();</script>
 
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">

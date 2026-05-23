@@ -2231,13 +2231,9 @@ function rapGoster(){
   }
 
   const d1Api='https://cactus-rapor-api.batuhanbulut.workers.dev';
-  // SADECE /islem/listele çek (canlı ciro da bunu kullanıyor → çalışıyor). rapor/ozet'e
-  // BAĞIMLI DEĞİL — en çok satılan ürün işlemlerden client-side hesaplanır. Tek hata noktası.
-  fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit)
-    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-    .then(function(data){
-    // Önce duplicate'leri at, sonra filtrele
-    var islemler=_islemDeduplica(data||[]).filter(function(s){
+  // Raporu çiz — worker'dan ya da (worker'a ulaşılamazsa) cihazın localStorage kayıtlarından
+  function _rapCiz(rawData, kaynakNot){
+    var islemler=_islemDeduplica(rawData||[]).filter(function(s){
       if(!odemeFil) return true;
       var t=(s.odeme_tipi||'').toLowerCase();
       if(odemeFil==='Nakit') return t==='nakit';
@@ -2259,9 +2255,9 @@ function rapGoster(){
     var nakit=islemler.reduce(function(a,s){return a+nakitTut(s);},0);
     var kredi=islemler.reduce(function(a,s){return a+kartTut(s);},0);
     renderOzet(islemler.length,ciro,ic,yi,nakit,kredi);
-
+    var notHtml=kaynakNot?'<div style="background:#fff7e6;border:1px solid #f0d9a0;color:#8a6d3b;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:10px;">⚠️ '+kaynakNot+'</div>':'';
     if(islemler.length){
-      document.getElementById('rap-tablo-ici').innerHTML='<table class="rap-tablo"><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ürünler</th><th>İçecek</th><th>Yiyecek</th><th>Toplam</th><th>Ödeme</th><th></th></tr></thead><tbody>'+
+      document.getElementById('rap-tablo-ici').innerHTML=notHtml+'<table class="rap-tablo"><thead><tr><th>Tarih</th><th>Saat</th><th>Masa</th><th>Ürünler</th><th>İçecek</th><th>Yiyecek</th><th>Toplam</th><th>Ödeme</th><th></th></tr></thead><tbody>'+
         islemler.map(function(s){
           var t=(s.odeme_tipi||'').toLowerCase();
           var cssTip=t.includes('nakit')&&!t.includes('kart')&&!t.includes('+')?'nakit':'kart';
@@ -2270,10 +2266,8 @@ function rapGoster(){
           return '<tr><td>'+(s.tarih||'')+'</td><td>'+(s.saat||'')+'</td><td>'+(s.masa||'')+'</td><td style="font-size:11px;color:var(--k2);max-width:240px;" title="'+(s.urunler||'').replace(/"/g,'&quot;')+'">'+urunOzet+'</td><td style="text-align:right;">'+((s.icecek_toplam||0)?('₺'+s.icecek_toplam):'-')+'</td><td style="text-align:right;">'+((s.yiyecek_toplam||0)?('₺'+s.yiyecek_toplam):'-')+'</td><td class="toplam-cell">₺'+(s.toplam||0)+'</td><td><span class="odeme-'+cssTip+'">'+(s.odeme_tipi||'')+'</span></td><td>'+iptalBtn+'</td></tr>';
         }).join('')+'</tbody></table>';
     } else {
-      document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">📋</div><p>Bu dönemde kayıt yok.</p></div>';
+      document.getElementById('rap-tablo-ici').innerHTML=notHtml+'<div class="rap-bos"><div class="bi">📋</div><p>Bu dönemde kayıt yok.</p></div>';
     }
-
-    // EN ÇOK SATILAN — işlemlerden client-side hesaplanır (rapor/ozet endpoint'ine bağımlı DEĞİL)
     var sayac={};
     islemler.forEach(function(s){
       var det=s.urun_detay||s.urunDetay;
@@ -2287,11 +2281,21 @@ function rapGoster(){
     } else {
       document.getElementById('rap-urun-ici').innerHTML='<div class="rap-bos"><div class="bi">🏆</div><p>Veri yok.</p></div>';
     }
-  }).catch(function(e){
-    document.getElementById('rap-ozet').innerHTML='';
-    document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Veri alınamadı'+(e&&e.message?(' ('+e.message+')'):'')+'. Tekrar deneyin.</p></div>';
-    document.getElementById('rap-urun-ici').innerHTML='';
-  });
+  }
+  // SADECE /islem/listele çek; ulaşılamazsa cihazın KENDİ localStorage kayıtlarına düş
+  fetch(d1Api+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(data){ _rapCiz(data, ''); })
+    .catch(function(e){
+      var yerel=[];
+      try{ yerel=(JSON.parse(localStorage.getItem('cactus_satislar')||'[]')||[]).filter(function(s){ var d=s.tarihISO||s.tarih_iso||''; return d>=bas && d<=bit; }); }catch(_){}
+      if(yerel.length){ _rapCiz(yerel, 'Sunucuya ulaşılamadı — yalnız BU cihazın kayıtları gösteriliyor.'); }
+      else {
+        document.getElementById('rap-ozet').innerHTML='';
+        document.getElementById('rap-tablo-ici').innerHTML='<div class="rap-bos"><div class="bi">⚠️</div><p>Sunucuya ulaşılamadı'+(e&&e.message?(' ('+e.message+')'):'')+' — bu cihazda da kayıt yok. (Ağ/eklenti worker erişimini engelliyor olabilir.)</p></div>';
+        document.getElementById('rap-urun-ici').innerHTML='';
+      }
+    });
 }
 
 /* Günün kapanan masalar verisi (API'den) */

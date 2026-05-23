@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v3'; // v1/v2 cache'lerini temizler
+const VERSION = 'cactus-v4'; // v4: HTML her zaman taze çekilir (no-store) — eski kod takılı kalmasın
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',
@@ -42,8 +42,10 @@ self.addEventListener('fetch', (e) => {
   // HTML — network-first; offline fallback SADECE istenen URL'in cache'i (asla başka HTML değil)
   const isHTML = req.mode === 'navigate' || req.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/';
   if (isHTML) {
+    // HTML'i HER ZAMAN ağdan taze çek (cache:'no-store') → CF'nin 10dk tarayıcı cache'ini
+    // baypas eder, deploy sonrası eski kod takılı kalmaz. Offline'da son cache'e düşer.
     e.respondWith(
-      fetch(req).then((res) => {
+      fetch(req, { cache: 'no-store' }).then((res) => {
         if (res && res.ok) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy).catch(() => {}));

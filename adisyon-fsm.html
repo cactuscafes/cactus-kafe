@@ -1318,8 +1318,18 @@ function _masaKazanan(Litems, Lmv, Sitems, Smv){
   Lmv=Lmv||0; Smv=Smv||0;
   if(Le&&Se) return (Lmv>=Smv)?'L':'S';                 // ikisi boş → daha yeni temizleme
   if(!Le&&!Se) return (_effVer(Litems,Lmv)>=_effVer(Sitems,Smv))?'L':'S'; // ikisi dolu → LWW
-  if(Le) return (Lmv>_maxItemTs(Sitems))?'L':'S';       // local boş: ancak gerçek temizlemeyse kazanır
-  return (Smv>_maxItemTs(Litems))?'S':'L';              // server boş: ancak gerçek temizlemeyse kazanır
+  // BİRİ DOLU, BİRİ BOŞ — SAAT KAYMASI KORUMASI:
+  // GELECEK-tarihli bir "boş" mv (saati ileri bir cihazdan) DOLU masayı SİLEMEZ.
+  // Gerçek ödeme/temizleme mv'si ≈ şimdi olur (gelecekte değil) → normal kıyas geçerli,
+  // takeaway/anında ödeme bozulmaz. Yalnız gelecek-tarihli (şüpheli) boş kayıt engellenir.
+  var _ufuk=Date.now()+5000;
+  if(Le){ // local boş, server dolu
+    if(Lmv>_ufuk) return 'S';                           // local "boş" mv gelecekte → şüpheli → server dolu korunur
+    return (Lmv>_maxItemTs(Sitems))?'L':'S';            // değilse: ancak gerçek temizlemeyse boş kazanır
+  }
+  // server boş, local dolu
+  if(Smv>_ufuk) return 'L';                             // server "boş" mv gelecekte → şüpheli → local dolu korunur
+  return (Smv>_maxItemTs(Litems))?'S':'L';              // değilse: ancak gerçek temizlemeyse boş kazanır
 }
 
 function _doPushMasalar(){
@@ -1556,7 +1566,7 @@ function urunEkle(u,el){
   setTimeout(()=>el.style.transform='',200);
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
-  if(ex) ex.adet++;
+  if(ex){ ex.adet++; ex.ts=Date.now(); }   // artırınca da ts tazele → "aktif masa" silinmesin
   else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),ts:Date.now()});
   saveMasalar();renderAdisyon();renderMasalar();
   toast('✓ '+u.ad+' eklendi');

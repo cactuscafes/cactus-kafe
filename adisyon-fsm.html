@@ -1201,7 +1201,32 @@ function renderMasalar(){
       try{ const b=document.createElement('button'); b.className='mbtn'; b.onclick=()=>masaSec(i); b.innerHTML='<span class="mn">'+i+'</span><span class="ml">Masa</span>'; g.appendChild(b); }catch(_){}
     }
   }
+  try{ _masaGridGaranti(); }catch(e){}   // GARANTİ: 1-30 arası hiçbir masa hücresi eksik kalmasın
   try{updateMobBadge();}catch(e){}
+}
+// ═══ MASA HÜCRESİ GARANTİSİ ═══ Ne olursa olsun 1-30 arası her masa ızgarada DURUR.
+// Render bir hücreyi atlasa ya da sonradan bir şey silse bile burada geri eklenir
+// (doğru sırada, dolu masa ürün/tutarıyla) → "masa kayboldu" pratikte imkansız.
+function _masaGridGaranti(){
+  try{
+    var g=document.getElementById('masa-grid'); if(!g) return;
+    var mevcut={};
+    g.querySelectorAll('.mbtn .mn').forEach(function(s){ mevcut[s.textContent.trim()]=true; });
+    for(var i=1;i<=30;i++){
+      if(mevcut[String(i)]) continue;             // hücre var → atla
+      var arr=(typeof masalar!=='undefined'&&Array.isArray(masalar[i]))?masalar[i]:[];
+      var adet=0, top=0;
+      for(var k=0;k<arr.length;k++){ var x=arr[k]; if(x){ adet+=(Number(x.adet)||0); top+=(Number(x.fiyat)||0)*(Number(x.adet)||0); } }
+      var b=document.createElement('button');
+      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'');
+      (function(n){ b.onclick=function(){ if(typeof masaSec==='function') masaSec(n); }; })(i);
+      b.innerHTML=(adet>0?'<div class="mbdg">'+adet+'</div>':'')+'<span class="mn">'+i+'</span><span class="ml">Masa</span>'+(top>0?'<span class="mf">₺'+top.toLocaleString('tr-TR')+'</span>':'');
+      var ref=null, cells=g.querySelectorAll('.mbtn');               // sırayı koru: ilk büyük numaranın önüne
+      for(var c=0;c<cells.length;c++){ var mn=cells[c].querySelector('.mn'); var v=mn?parseInt(mn.textContent.trim(),10):0; if(v>i){ ref=cells[c]; break; } }
+      if(ref) g.insertBefore(b,ref); else g.appendChild(b);
+      mevcut[String(i)]=true;
+    }
+  }catch(e){}
 }
 const LK_MASA_BAS='cactus_masa_baslangic_'+SUBE;
 // Cloud-source masa süresi: item.ts'ten al, lokal damga sadece geriye uyumluluk için fallback.
@@ -1249,6 +1274,8 @@ function masaUyariSinifi(ms){
   return '';
 }
 setInterval(function(){if(document.getElementById('scr-kas').classList.contains('on'))renderMasalar();},30000);
+// GARANTİ AĞI: 4 sn'de bir eksik masa hücresi var mı bak, varsa geri ekle (render'dan bağımsız)
+setInterval(function(){ try{ _masaGridGaranti(); }catch(e){} },4000);
 
 function masaSec(no){
   aktifMasa=no;

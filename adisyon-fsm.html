@@ -525,6 +525,7 @@ if('serviceWorker' in navigator){
   </div>
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
+    <button class="htab" onclick="kartYildizAc()"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="goTo('bar',this)" id="tab-bar"><span class="tico">🥤</span>İçecek Barı<span class="tbadge" id="bdg-bar">0</span></button>
     <button class="htab" onclick="goTo('mut',this)" id="tab-mut"><span class="tico">🍳</span>Mutfak<span class="tbadge" id="bdg-mut">0</span></button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
@@ -1829,8 +1830,6 @@ function odemeOnayla(){
   // Yuvarlama farkını düzelt: indirimde ic+yi her zaman top'a eşit olsun (rapor tutarlılığı)
   const _fark=top-(ic+yi);
   if(_fark!==0){ if(yi>0) yi+=_fark; else ic+=_fark; }
-  const icSayisi=secilen.filter(k=>k.tip==='icecek').reduce((s,k)=>s+k.sec,0);
-  const icUrunler=[];secilen.filter(k=>k.tip==='icecek').forEach(k=>{for(var _i=0;_i<k.sec;_i++)icUrunler.push((k.emoji?k.emoji+' ':'')+k.ad);});
   let nakitTutar=0,kartTutar=0,efektifTip=seciliOdemeTipi;
   if(seciliOdemeTipi==='bolunmus'){
     nakitTutar=parseFloat(document.getElementById('bolme-nakit').value)||0;
@@ -1891,8 +1890,6 @@ function odemeOnayla(){
     gunAcikGuncelle(acikTop,acikMasa);
     setTimeout(function(){if(typeof gunCiroYukle==='function')gunCiroYukle();},4000);
   }
-  // Sadakat kartı pul paneli — opsiyonel
-  setTimeout(function(){ kartPanelAc(oncekiMasa, icSayisi, icUrunler); }, 600);
 }
 
 function openTransfer(){
@@ -2399,6 +2396,20 @@ function rapOtomatikYenile(aktif){
 var _kartSube = SUBE;
 var _kartIcSayisi = 0;
 var _kartIcUrunler = [];
+function kartYildizAc(){
+  var masa = aktifMasa || 0;
+  var arr = (aktifMasa && masalar[aktifMasa]) ? masalar[aktifMasa] : [];
+  var icSayisi = 0, icUrunler = [];
+  (arr || []).forEach(function(it){
+    if(it && it.tip==='icecek'){
+      var ad = (it.emoji ? it.emoji+' ' : '') + (it.ad || 'İçecek');
+      var n = Number(it.adet) || 1;
+      icSayisi += n;
+      for(var _z=0; _z<n; _z++) icUrunler.push(ad);
+    }
+  });
+  kartPanelAc(masa, icSayisi, icUrunler);
+}
 function kartPanelAc(masa, icSayisi, icUrunler){
   _kartIcSayisi = icSayisi || 0;
   _kartIcUrunler = icUrunler || [];

@@ -2521,7 +2521,7 @@ function kartPulEkleRow(btn){
   }).then(function(r){ return r.json(); })
   .then(function(d){
     if(d.ok){
-      var m = d.musteri; var pul = m.pul||0; var esik=10; var bedava=Math.floor(pul/esik);
+      var m = d.musteri; var pul = m.pul||0; var esik=5; var bedava=Math.floor(pul/esik);
       sonucSpan.style.color = '#2d7a4f';
       sonucSpan.textContent = '✓ '+(pul%esik)+'/'+esik+(bedava>0?' 🎉':'');
     } else {

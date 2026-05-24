@@ -5,16 +5,16 @@
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>Cactus Coffee</title>
-<meta name="description" content="Cactus Coffee — İstanbul'un en özel kahve deneyimi. FSM ve Podyumpark şubelerimizde sizi bekliyoruz. Her 10 kahvede 1 bedava dijital sadakat kartı.">
+<meta name="description" content="Cactus Coffee — İstanbul'un en özel kahve deneyimi. FSM ve Podyumpark şubelerimizde sizi bekliyoruz. Her 5 kahvede 1 bedava dijital sadakat kartı.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Cactus Coffee">
 <meta property="og:title" content="Cactus Coffee">
-<meta property="og:description" content="İstanbul'un en özel kahve deneyimi. Dijital sadakat kartımızla her 10 kahvede 1 bedava.">
+<meta property="og:description" content="İstanbul'un en özel kahve deneyimi. Dijital sadakat kartımızla her 5 kahvede 1 bedava.">
 <meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
 <meta property="og:url" content="https://cactuscafes.com">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Cactus Coffee">
-<meta name="twitter:description" content="İstanbul'un en özel kahve deneyimi. Dijital sadakat kartımızla her 10 kahvede 1 bedava.">
+<meta name="twitter:description" content="İstanbul'un en özel kahve deneyimi. Dijital sadakat kartımızla her 5 kahvede 1 bedava.">
 <meta name="twitter:image" content="https://cactuscafes.com/og-image.jpg">
 <meta name="theme-color" content="#0e1f08">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -349,7 +349,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div style="position:relative;z-index:1;">
       <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;font-family:'Montserrat',sans-serif;">Üyelere Özel</p>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,3.5vw,52px);font-weight:300;color:#f7f2ea;line-height:1.1;margin-bottom:16px;">Her kahve seni<br><em style="font-style:italic;color:#e8c47a;">bedavaya</em> götürür</h2>
-      <p style="font-size:13px;color:rgba(240,225,195,.65);line-height:1.9;font-weight:300;margin-bottom:28px;max-width:380px;">Dijital sadakat kartınla her alışverişte 1 yıldız kazan. 10 yıldız tamamlandığında bir içecek bizden. Uygulama yok, kart yok — sadece telefon numaran yeterli.</p>
+      <p style="font-size:13px;color:rgba(240,225,195,.65);line-height:1.9;font-weight:300;margin-bottom:28px;max-width:380px;">Dijital sadakat kartınla her alışverişte 1 yıldız kazan. 5 yıldız tamamlandığında bir içecek bizden. Uygulama yok, kart yok — sadece telefon numaran yeterli.</p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:500;">1</div>
@@ -357,7 +357,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:500;">2</div>
-          <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">10 yıldız dolduğunda bedava içecek hakkı kazanırsın</span>
+          <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">5 yıldız dolduğunda bedava içecek hakkı kazanırsın</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:500;">3</div>
@@ -381,7 +381,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         <div id="kart-damga-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;cursor:pointer;" onclick="kartDamgaReset()" title="Tıkla, baştan başla"></div>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
           <div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#f7f2ea;font-weight:300;"><span id="kart-sayac">0</span>/10</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#f7f2ea;font-weight:300;"><span id="kart-sayac">0</span>/5</div>
             <div style="font-size:8px;color:rgba(200,168,106,.5);letter-spacing:2px;text-transform:uppercase;">yıldız</div>
           </div>
           <div style="text-align:right;">
@@ -423,10 +423,10 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   function cizGrid(doluSayisi){
     if(!grid) return;
     grid.innerHTML='';
-    for(var i=0;i<10;i++){
+    for(var i=0;i<5;i++){
       var d=document.createElement('div');
       if(i<doluSayisi){
-        d.className='kdm dolu'+(i===doluSayisi-1&&doluSayisi===10?' son':'');
+        d.className='kdm dolu'+(i===doluSayisi-1&&doluSayisi===5?' son':'');
         d.textContent='⭐';
       } else if(i===doluSayisi){
         d.className='kdm aktif';
@@ -438,14 +438,14 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     sayacEl.textContent=doluSayisi;
     sayacEl.classList.add('bumb');
     setTimeout(function(){sayacEl.classList.remove('bumb');},250);
-    hakEl.textContent=(doluSayisi>=10?'1':'0')+' hak';
+    hakEl.textContent=(doluSayisi>=5?'1':'0')+' hak';
   }
   function adim(n){
     cizGrid(n);
-    if(n<10){
+    if(n<5){
       timer=setTimeout(function(){adim(n+1);},650);
     } else {
-      // 10 doldu — biraz bekle, baştan başla
+      // 5 doldu — biraz bekle, baştan başla
       timer=setTimeout(function(){if(playing){cizGrid(0);timer=setTimeout(function(){adim(1);},400);}},2500);
     }
   }

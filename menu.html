@@ -370,8 +370,8 @@ footer{padding:40px 20px 24px;}
 <section class="sk-banner">
   <div class="sk-banner-left">
     <div class="sk-banner-eyebrow">Dijital Sadakat Kartı</div>
-    <h2 class="sk-banner-title">10 kahve, 1 tanesi<br><em>bizden.</em></h2>
-    <p class="sk-banner-sub">Her siparişinde yıldız kazan. 10 yıldız doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
+    <h2 class="sk-banner-title">5 kahve, 1 tanesi<br><em>bizden.</em></h2>
+    <p class="sk-banner-sub">Her siparişinde yıldız kazan. 5 yıldız doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
     <a href="kart.html" class="sk-banner-cta">Kartımı Gör →</a>
   </div>
   <div>
@@ -379,15 +379,10 @@ footer{padding:40px 20px 24px;}
       <div class="sk-stamp dolu">⭐</div>
       <div class="sk-stamp dolu">⭐</div>
       <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
       <div class="sk-stamp next"></div>
       <div class="sk-stamp bos"></div>
-      <div class="sk-stamp bos"></div>
     </div>
-    <div class="sk-stamp-label">7 / 10 yıldız</div>
+    <div class="sk-stamp-label">3 / 5 yıldız</div>
   </div>
 </section>
 
@@ -814,7 +809,7 @@ function imgDivZoomKur(imgDiv){
   var stamps=banner.querySelectorAll('.sk-stamp');
   if(!stamps.length) return;
   // Tüm "dolu" damgalar için orijinal class'ı sakla, sonra animasyon ile geri yükle
-  var DOLU=7;
+  var DOLU=3;
   function reset(){
     stamps.forEach(function(s,i){
       s.className='sk-stamp '+(i<DOLU?'bos':(i===DOLU?'bos':'bos'));

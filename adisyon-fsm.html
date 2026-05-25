@@ -1380,8 +1380,8 @@ function _doPushMasalar(){
     var mergedMas={}, mergedMv={};
     for(var i=1;i<=34;i++){
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
-      if(kaz==='L'){ mergedMas[i]=masalar[i]||[]; mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
-      else { mergedMas[i]=srvMas[i]||[]; mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
+      if(kaz==='L'){ mergedMas[i]=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
+      else { mergedMas[i]=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
@@ -1414,6 +1414,15 @@ function _masalarSyncCek(){
     if(!res[1]) return durum;
     var srvMas=_srvMasalarMap(durum);
     var srvMv=(res[1].v)||{};
+    // SELF-HEAL: sunucuda 0-adet/bozuk ürün varsa temizleyici push tetikle (ödeme/temizleme
+    // sonrası "0 adet sipariş geri geliyor" sorunu — temiz hali yazılır, kalıcı silinir).
+    var _sunucudaBozukAdet=false;
+    if(durum&&Array.isArray(durum.masalar)){
+      for(var _di=0;_di<durum.masalar.length&&!_sunucudaBozukAdet;_di++){
+        var _raw=durum.masalar[_di].items||[];
+        for(var _dz=0;_dz<_raw.length;_dz++){ var _it=_raw[_dz]; if(!(_it&&typeof _it.adet==='number'&&_it.adet>0)){ _sunucudaBozukAdet=true; break; } }
+      }
+    }
     var degisti=false, pushGerek=false;
     for(var i=1;i<=34;i++){
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
@@ -1431,7 +1440,7 @@ function _masalarSyncCek(){
       if(typeof renderMasalar==='function')renderMasalar();
       if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
     }
-    if(pushGerek && typeof _doPushMasalar==='function') _doPushMasalar();
+    if((pushGerek||_sunucudaBozukAdet) && typeof _doPushMasalar==='function') _doPushMasalar();
     return durum;
   }).catch(function(){return null;});
 }

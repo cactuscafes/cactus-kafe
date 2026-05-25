@@ -313,6 +313,21 @@ footer{padding:40px 20px 24px;}
   #isBasvuruPop{padding:0;}
   #isBasvuruKart{border-radius:18px 18px 0 0;padding:26px 22px 24px;}
 }
+/* === ÇAY İKRAMI POP-UP — sade & lüks (görselsiz, koyu yeşil-altın tema) === */
+#isBasvuruKart{background:linear-gradient(165deg,#22401a 0%,#16300f 55%,#0d1f08 100%)!important;border:1px solid rgba(200,168,106,.38)!important;box-shadow:0 -10px 60px rgba(0,0,0,.45)!important;overflow:hidden;}
+#isBasvuruKart::before{content:'';position:absolute;top:-34px;right:-34px;width:190px;height:170px;background:radial-gradient(circle,rgba(200,168,106,.18),transparent 70%);pointer-events:none;}
+#isBasvuruPop .ib-eyebrow{color:var(--gold);position:relative;}
+#isBasvuruPop .ib-title{color:#f4ecd8;position:relative;}
+#isBasvuruPop .ib-title em{position:relative;font-style:italic;color:var(--gold);white-space:nowrap;}
+#isBasvuruPop .ib-title em::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#c8a86a 18%,#f6e6bc 50%,#c8a86a 82%,transparent);background-size:220% 100%;animation:ikramSheen 3s linear infinite;}
+@keyframes ikramSheen{0%{background-position:120% 0;}100%{background-position:-120% 0;}}
+#isBasvuruPop .ib-sub{color:rgba(240,228,205,.74);position:relative;}
+#isBasvuruPop .ib-sub strong{color:#f4ecd8;font-weight:600;}
+#isBasvuruPop .ib-actions{position:relative;}
+#isBasvuruPop .ib-btn{background:linear-gradient(135deg,#dcbd80,#c8a86a)!important;color:#15300e!important;cursor:pointer;}
+#isBasvuruPop .ib-btn:hover{background:linear-gradient(135deg,#ecce92,#d8b87a)!important;transform:translateY(-1px);}
+#isBasvuruKapat{color:rgba(240,228,205,.5);}
+#isBasvuruKapat:hover{color:#f4ecd8;}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
@@ -322,12 +337,11 @@ footer{padding:40px 20px 24px;}
 <div id="isBasvuruPop">
   <div id="isBasvuruKart">
     <button id="isBasvuruKapat" onclick="isBasvuruKapat()" aria-label="Kapat">×</button>
-    <div class="ib-eyebrow">Kariyer</div>
-    <div class="ib-title">Bizimle <em>çalışmak</em><br>ister misin?</div>
-    <div class="ib-sub">Cactus Coffee ekibine katılmak için açık pozisyonlarımıza başvurabilirsin.</div>
+    <div class="ib-eyebrow">Bugüne Özel İkram</div>
+    <div class="ib-title">Tatlı alana <em>çay</em><br>bizden ikram!</div>
+    <div class="ib-sub">Günün <strong>her saati</strong> — tatlı siparişinize sıcacık çayımız bizden. Afiyet olsun ☕</div>
     <div class="ib-actions">
-      <a href="iletisim.html#basvuru" class="ib-btn">Başvur →</a>
-      <span class="ib-skip" onclick="isBasvuruKapat()">Şimdi değil</span>
+      <span class="ib-btn" onclick="isBasvuruKapat()">Teşekkürler →</span>
     </div>
   </div>
 </div>

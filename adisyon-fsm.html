@@ -532,6 +532,7 @@ if('serviceWorker' in navigator){
     <button class="htab" onclick="goTo('bar',this)" id="tab-bar"><span class="tico">🥤</span>İçecek Barı<span class="tbadge" id="bdg-bar">0</span></button>
     <button class="htab" onclick="goTo('mut',this)" id="tab-mut"><span class="tico">🍳</span>Mutfak<span class="tbadge" id="bdg-mut">0</span></button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
+    <button class="htab" onclick="goTo('har',this);harGoster();"><span class="tico">💸</span>Gider</button>
     <button class="htab" onclick="goTo('yon',this)"><span class="tico">⚙️</span>Yönet</button>
   </div>
   <div class="hdr-time">
@@ -705,6 +706,30 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- YÖNET -->
+<div class="scr" id="scr-har">
+  <div style="max-width:880px;margin:0 auto;padding:14px 12px 60px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--k1);margin:0;font-weight:700;">💸 Günlük Gider</h2>
+      <button onclick="harEkleAc()" style="background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-weight:700;font-size:13px;letter-spacing:.8px;cursor:pointer;box-shadow:0 4px 12px rgba(192,57,43,.25);">+ Harcama Ekle</button>
+    </div>
+    <div style="background:#fff;border-radius:12px;padding:14px 8px;margin-bottom:14px;box-shadow:var(--sh);display:grid;grid-template-columns:repeat(3,1fr);gap:0;text-align:center;">
+      <div>
+        <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Gelir</div>
+        <div id="har-gelir" style="font-size:20px;font-weight:700;color:#2d7a4f;margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
+      </div>
+      <div style="border-left:1px solid var(--kr2);border-right:1px solid var(--kr2);">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Gider</div>
+        <div id="har-gider" style="font-size:20px;font-weight:700;color:#c0392b;margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Net</div>
+        <div id="har-net" style="font-size:20px;font-weight:700;color:var(--k1);margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
+      </div>
+    </div>
+    <div id="har-liste" style="background:#fff;border-radius:12px;padding:8px;box-shadow:var(--sh);min-height:140px;"></div>
+    <div id="har-tarih" style="text-align:center;font-size:11px;color:var(--kr3);margin-top:14px;letter-spacing:1px;"></div>
+  </div>
+</div>
 <div class="scr" id="scr-yon">
   <div class="yon-wrap">
     <div class="yon-sec">
@@ -2256,6 +2281,69 @@ function rapTarihAraligi(){
     };
   }
   return {bas:bugun,bit:bugun};
+}
+
+// ═══ GÜNLÜK GİDER (HARCAMA) — basit, KV-tabanlı, worker dokunulmadı ═══
+var HAR_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+function _harBugun(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _harKey(){return 'harcama_'+SUBE+'_'+_harBugun();}
+var _harKayitlar=[];
+function harGoster(){
+  var t=document.getElementById('har-tarih'); if(t) t.textContent=new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'});
+  harYukle();
+}
+function harYukle(){
+  fetch(HAR_API+'/menu/cek?sube='+_harKey())
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){ _harKayitlar=(d&&Array.isArray(d.kayitlar))?d.kayitlar:[]; harRender(); })
+    .catch(function(){ _harKayitlar=[]; harRender(); });
+}
+function _harEsc(s){return String(s||'').replace(/[<>&"']/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];});}
+function harRender(){
+  var liste=document.getElementById('har-liste'); if(!liste) return;
+  if(!_harKayitlar.length){
+    liste.innerHTML='<div style="text-align:center;padding:42px 12px;color:var(--kr3);font-size:13.5px;line-height:1.6;">Bugün için kayıt yok.<br><span style="font-size:11px;">Kasadan yapılan harcamaları <b>+ Harcama Ekle</b> ile gir.</span></div>';
+  } else {
+    liste.innerHTML=_harKayitlar.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(k){
+      return '<div style="display:flex;align-items:center;padding:11px 10px;border-bottom:1px solid #f0ede5;">'
+        +'<div style="width:48px;color:var(--k2);font-size:11px;font-weight:600;">'+_harEsc(k.saat||'')+'</div>'
+        +'<div style="flex:1;color:var(--k1);font-size:14px;">'+_harEsc(k.aciklama||'')+'</div>'
+        +'<div style="font-weight:700;color:#c0392b;font-size:14px;margin:0 14px;font-family:\'Lato\',monospace;white-space:nowrap;">−₺'+(Number(k.tutar)||0).toLocaleString('tr-TR')+'</div>'
+        +'<button onclick="harSil(\''+_harEsc(k.id)+'\')" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:18px;padding:4px 8px;line-height:1;" title="Sil">×</button>'
+        +'</div>';
+    }).join('');
+  }
+  var topGider=_harKayitlar.reduce(function(s,k){return s+(Number(k.tutar)||0);},0);
+  var topGelir=(typeof _gunNakit!=='undefined'?Number(_gunNakit)||0:0)+(typeof _gunKart!=='undefined'?Number(_gunKart)||0:0);
+  var net=topGelir-topGider;
+  var fmt=function(v){return '₺'+Math.round(v).toLocaleString('tr-TR');};
+  var g=document.getElementById('har-gelir'); if(g) g.textContent=fmt(topGelir);
+  var h=document.getElementById('har-gider'); if(h) h.textContent='−'+fmt(topGider);
+  var n=document.getElementById('har-net'); if(n){ n.textContent=fmt(net); n.style.color=net>=0?'#2d7a4f':'#c0392b'; }
+}
+function harEkleAc(){
+  var tutarStr=prompt('Harcama tutarı (₺):');
+  if(tutarStr===null) return;
+  var tutar=parseFloat(String(tutarStr).replace(',','.'))||0;
+  if(!(tutar>0)){ try{toast('⚠️ Geçerli tutar girin');}catch(e){alert('Geçerli tutar girin');} return; }
+  var aciklama=prompt('Açıklama (örn: Süt, ekmek, temizlik):','');
+  if(aciklama===null) return;
+  aciklama=String(aciklama||'Harcama').trim().slice(0,100)||'Harcama';
+  var now=new Date();
+  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}), tutar:tutar, aciklama:aciklama, ts:Date.now() };
+  _harKayitlar.push(k);
+  harSunucuKaydet();
+  harRender();
+  try{toast('✓ Harcama eklendi');}catch(e){}
+}
+function harSil(id){
+  if(!confirm('Bu harcama kaydı silinsin mi?')) return;
+  _harKayitlar=_harKayitlar.filter(function(k){return k.id!==id;});
+  harSunucuKaydet();
+  harRender();
+}
+function harSunucuKaydet(){
+  fetch(HAR_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:_harKey(),menu:{tarih:_harBugun(),sube:SUBE,kayitlar:_harKayitlar,guncelleme:Date.now()}})}).catch(function(){});
 }
 
 function rapGoster(){

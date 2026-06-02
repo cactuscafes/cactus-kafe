@@ -2455,10 +2455,18 @@ function harRender(){
     liste.innerHTML='<div style="text-align:center;padding:42px 12px;color:var(--kr3);font-size:13.5px;line-height:1.6;">'+(bugunMu?'Bugün için kayıt yok.':'Bu gün için kayıt yok.')+'<br><span style="font-size:11px;">Harcamaları <b>+ Harcama Ekle</b> ile gir.</span></div>';
   } else {
     liste.innerHTML=_harKayitlar.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(k){
+      var adet=Number(k.adet)||1;
+      var tutar=Number(k.tutar)||0;
+      var adetTxt='';
+      if(adet>1){
+        var birim=tutar/adet;
+        var birimFmt=(Math.round(birim*100)/100).toLocaleString('tr-TR',{maximumFractionDigits:2});
+        adetTxt=' <span style="color:var(--k3);font-size:11px;font-weight:700;">× '+adet+'</span> <span style="color:var(--kr3);font-size:10.5px;font-style:italic;">birim ₺'+birimFmt+'</span>';
+      }
       return '<div style="display:flex;align-items:center;padding:11px 10px;border-bottom:1px solid #f0ede5;">'
         +'<div style="width:48px;color:var(--k2);font-size:11px;font-weight:600;">'+_harEsc(k.saat||'')+'</div>'
-        +'<div style="flex:1;color:var(--k1);font-size:14px;">'+_harEsc(k.aciklama||'')+'</div>'
-        +'<div style="font-weight:700;color:#c0392b;font-size:14px;margin:0 14px;font-family:\'Lato\',monospace;white-space:nowrap;">−₺'+(Number(k.tutar)||0).toLocaleString('tr-TR')+'</div>'
+        +'<div style="flex:1;color:var(--k1);font-size:14px;">'+_harEsc(k.aciklama||'')+adetTxt+'</div>'
+        +'<div style="font-weight:700;color:#c0392b;font-size:14px;margin:0 14px;font-family:\'Lato\',monospace;white-space:nowrap;">−₺'+tutar.toLocaleString('tr-TR')+'</div>'
         +'<button onclick="harSil(\''+_harEsc(k.id)+'\')" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:18px;padding:4px 8px;line-height:1;" title="Sil">×</button>'
         +'</div>';
     }).join('');
@@ -2478,17 +2486,21 @@ function harRender(){
 function harEkleAc(){
   var bugunMu=(_harSecilenTarih===_harBugun());
   var hedefEtk=bugunMu?'':' ('+new Date(_harSecilenTarih+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' için)';
-  var tutarStr=prompt('Harcama tutarı (₺)'+hedefEtk+':');
+  var tutarStr=prompt('Toplam tutar (₺)'+hedefEtk+':');
   if(tutarStr===null) return;
   var tutar=parseFloat(String(tutarStr).replace(',','.'))||0;
   if(!(tutar>0)){ try{toast('⚠️ Geçerli tutar girin');}catch(e){alert('Geçerli tutar girin');} return; }
+  var adetStr=prompt('Kaç adet aldın? (boş = 1; birim fiyat otomatik hesaplanır)','1');
+  if(adetStr===null) return;
+  var adet=parseInt(String(adetStr).replace(',','.'),10)||1;
+  if(adet<1) adet=1;
   var aciklama=prompt('Açıklama (örn: Süt, ekmek, temizlik):','');
   if(aciklama===null) return;
   aciklama=String(aciklama||'Harcama').trim().slice(0,100)||'Harcama';
   var now=new Date();
   // Saat: bugünse anlık, geçmiş güne ekliyorsak saat 12:00 sembolik
   var saat=bugunMu?now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):'12:00';
-  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:saat, tutar:tutar, aciklama:aciklama, ts:Date.now() };
+  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:saat, tutar:tutar, adet:adet, aciklama:aciklama, ts:Date.now() };
   _harKayitlar.push(k);
   harSunucuKaydet();
   harRender();

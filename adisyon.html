@@ -714,12 +714,17 @@ if('serviceWorker' in navigator){
 <!-- YÖNET -->
 <div class="scr" id="scr-har">
   <div style="max-width:880px;margin:0 auto;padding:14px 12px 60px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--k1);margin:0;font-weight:700;">💸 Günlük Gider</h2>
       <button onclick="harEkleAc()" style="background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-weight:700;font-size:13px;letter-spacing:.8px;cursor:pointer;box-shadow:0 4px 12px rgba(192,57,43,.25);">+ Harcama Ekle</button>
     </div>
-    <div style="background:#fff;border-radius:12px;padding:14px 8px;margin-bottom:14px;box-shadow:var(--sh);display:grid;grid-template-columns:repeat(3,1fr);gap:0;text-align:center;">
-      <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#fff;border-radius:10px;padding:8px 12px;box-shadow:var(--sh);flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--k2);text-transform:uppercase;">📅 Tarih</span>
+      <input type="date" id="har-tarih-sec" onchange="harTarihDegisti()" style="flex:1;min-width:140px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
+      <button onclick="harBugunSec()" style="padding:7px 14px;background:var(--k1);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;">Bugün</button>
+    </div>
+    <div style="background:#fff;border-radius:12px;padding:14px 8px;margin-bottom:10px;box-shadow:var(--sh);display:grid;grid-template-columns:repeat(3,1fr);gap:0;text-align:center;">
+      <div id="har-gelir-w">
         <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Gelir</div>
         <div id="har-gelir" style="font-size:20px;font-weight:700;color:#2d7a4f;margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
       </div>
@@ -727,10 +732,14 @@ if('serviceWorker' in navigator){
         <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Gider</div>
         <div id="har-gider" style="font-size:20px;font-weight:700;color:#c0392b;margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
       </div>
-      <div>
+      <div id="har-net-w">
         <div style="font-size:9px;letter-spacing:2px;color:var(--k2);text-transform:uppercase;">Net</div>
         <div id="har-net" style="font-size:20px;font-weight:700;color:var(--k1);margin-top:4px;font-family:'Lato',sans-serif;">₺0</div>
       </div>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--k1),var(--k2));color:var(--kr);border-radius:10px;padding:11px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--sh);">
+      <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">📅 <span id="har-ay-etiket">Bu Ay</span> Toplam Gider</span>
+      <span id="har-aylik" style="font-size:18px;font-weight:700;color:var(--al2);font-family:'Lato',sans-serif;">₺0</span>
     </div>
     <div id="har-liste" style="background:#fff;border-radius:12px;padding:8px;box-shadow:var(--sh);min-height:140px;"></div>
     <div id="har-tarih" style="text-align:center;font-size:11px;color:var(--kr3);margin-top:14px;letter-spacing:1px;"></div>
@@ -2363,14 +2372,49 @@ function rapTarihAraligi(){
   return {bas:bugun,bit:bugun};
 }
 
-// ═══ GÜNLÜK GİDER (HARCAMA) — basit, KV-tabanlı, worker dokunulmadı ═══
+// ═══ GÜNLÜK GİDER (HARCAMA) — KV-tabanlı, tarih seçici + aylık toplam ═══
 var HAR_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
 function _harBugun(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function _harKey(){return 'harcama_'+SUBE+'_'+_harBugun();}
+var _harSecilenTarih=_harBugun();
+function _harKey(t){return 'harcama_'+SUBE+'_'+(t||_harSecilenTarih);}
 var _harKayitlar=[];
+var _harAylikTop=0;
+
 function harGoster(){
-  var t=document.getElementById('har-tarih'); if(t) t.textContent=new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'});
+  if(!_harSecilenTarih) _harSecilenTarih=_harBugun();
+  var inp=document.getElementById('har-tarih-sec'); if(inp) inp.value=_harSecilenTarih;
+  // Üst limit: bugünden sonrasını seçemesin
+  if(inp) inp.max=_harBugun();
+  harYukleEtiket();
   harYukle();
+  harAylikYukle();
+}
+function harYukleEtiket(){
+  var t=document.getElementById('har-tarih'); if(!t) return;
+  var d=new Date(_harSecilenTarih+'T12:00:00');
+  t.textContent=d.toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'});
+  // Aylık etiket: bu ay mı, başka ay mı
+  var ayEt=document.getElementById('har-ay-etiket');
+  if(ayEt){
+    var bugun=new Date();
+    if(d.getFullYear()===bugun.getFullYear()&&d.getMonth()===bugun.getMonth()) ayEt.textContent='Bu Ay';
+    else ayEt.textContent=d.toLocaleDateString('tr-TR',{month:'long',year:'numeric'});
+  }
+}
+function harTarihDegisti(){
+  var v=document.getElementById('har-tarih-sec').value;
+  if(!v) return;
+  _harSecilenTarih=v;
+  harYukleEtiket();
+  harYukle();
+  harAylikYukle(); // ay da değişmiş olabilir, yenile
+}
+function harBugunSec(){
+  _harSecilenTarih=_harBugun();
+  var inp=document.getElementById('har-tarih-sec'); if(inp) inp.value=_harSecilenTarih;
+  harYukleEtiket();
+  harYukle();
+  harAylikYukle();
 }
 function harYukle(){
   fetch(HAR_API+'/menu/cek?sube='+_harKey())
@@ -2378,11 +2422,37 @@ function harYukle(){
     .then(function(d){ _harKayitlar=(d&&Array.isArray(d.kayitlar))?d.kayitlar:[]; harRender(); })
     .catch(function(){ _harKayitlar=[]; harRender(); });
 }
+// Seçili tarihin AYINI tarayıp toplam gider hesapla (paralel, ~30 GET)
+function harAylikYukle(){
+  var sec=new Date(_harSecilenTarih+'T12:00:00');
+  var yil=sec.getFullYear(), ay=sec.getMonth();
+  var bugun=new Date();
+  // Bu aydaysak bugüne kadar, geçmiş aydaysak o ayın tamamı (32 ile güvenli kes)
+  var sonGun;
+  if(yil===bugun.getFullYear()&&ay===bugun.getMonth()) sonGun=bugun.getDate();
+  else { var temp=new Date(yil,ay+1,0); sonGun=temp.getDate(); }
+  var prefix='harcama_'+SUBE+'_';
+  var promises=[];
+  for(var g=1; g<=sonGun; g++){
+    var dStr=yil+'-'+String(ay+1).padStart(2,'0')+'-'+String(g).padStart(2,'0');
+    promises.push(fetch(HAR_API+'/menu/cek?sube='+prefix+dStr).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}));
+  }
+  Promise.all(promises).then(function(arr){
+    var top=0;
+    arr.forEach(function(d){
+      if(d&&Array.isArray(d.kayitlar)) d.kayitlar.forEach(function(k){ top+=Number(k.tutar)||0; });
+    });
+    _harAylikTop=top;
+    var ayEl=document.getElementById('har-aylik');
+    if(ayEl) ayEl.textContent='₺'+Math.round(top).toLocaleString('tr-TR');
+  });
+}
 function _harEsc(s){return String(s||'').replace(/[<>&"']/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];});}
 function harRender(){
   var liste=document.getElementById('har-liste'); if(!liste) return;
+  var bugunMu=(_harSecilenTarih===_harBugun());
   if(!_harKayitlar.length){
-    liste.innerHTML='<div style="text-align:center;padding:42px 12px;color:var(--kr3);font-size:13.5px;line-height:1.6;">Bugün için kayıt yok.<br><span style="font-size:11px;">Kasadan yapılan harcamaları <b>+ Harcama Ekle</b> ile gir.</span></div>';
+    liste.innerHTML='<div style="text-align:center;padding:42px 12px;color:var(--kr3);font-size:13.5px;line-height:1.6;">'+(bugunMu?'Bugün için kayıt yok.':'Bu gün için kayıt yok.')+'<br><span style="font-size:11px;">Harcamaları <b>+ Harcama Ekle</b> ile gir.</span></div>';
   } else {
     liste.innerHTML=_harKayitlar.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(k){
       return '<div style="display:flex;align-items:center;padding:11px 10px;border-bottom:1px solid #f0ede5;">'
@@ -2394,15 +2464,21 @@ function harRender(){
     }).join('');
   }
   var topGider=_harKayitlar.reduce(function(s,k){return s+(Number(k.tutar)||0);},0);
-  var topGelir=(typeof _gunNakit!=='undefined'?Number(_gunNakit)||0:0)+(typeof _gunKart!=='undefined'?Number(_gunKart)||0:0);
+  // Gelir/Net sadece BUGÜN seçiliyse anlamlı (kasanın canlı günlük cirosundan)
+  var topGelir=bugunMu?((typeof _gunNakit!=='undefined'?Number(_gunNakit)||0:0)+(typeof _gunKart!=='undefined'?Number(_gunKart)||0:0)):0;
   var net=topGelir-topGider;
   var fmt=function(v){return '₺'+Math.round(v).toLocaleString('tr-TR');};
-  var g=document.getElementById('har-gelir'); if(g) g.textContent=fmt(topGelir);
+  var g=document.getElementById('har-gelir'); if(g) g.textContent=bugunMu?fmt(topGelir):'—';
   var h=document.getElementById('har-gider'); if(h) h.textContent='−'+fmt(topGider);
-  var n=document.getElementById('har-net'); if(n){ n.textContent=fmt(net); n.style.color=net>=0?'#2d7a4f':'#c0392b'; }
+  var n=document.getElementById('har-net'); if(n){ n.textContent=bugunMu?fmt(net):'—'; n.style.color=bugunMu?(net>=0?'#2d7a4f':'#c0392b'):'var(--kr3)'; }
+  // Geçmiş günde Gelir/Net soluk göster
+  var gw=document.getElementById('har-gelir-w'); if(gw) gw.style.opacity=bugunMu?'1':'.4';
+  var nw=document.getElementById('har-net-w'); if(nw) nw.style.opacity=bugunMu?'1':'.4';
 }
 function harEkleAc(){
-  var tutarStr=prompt('Harcama tutarı (₺):');
+  var bugunMu=(_harSecilenTarih===_harBugun());
+  var hedefEtk=bugunMu?'':' ('+new Date(_harSecilenTarih+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' için)';
+  var tutarStr=prompt('Harcama tutarı (₺)'+hedefEtk+':');
   if(tutarStr===null) return;
   var tutar=parseFloat(String(tutarStr).replace(',','.'))||0;
   if(!(tutar>0)){ try{toast('⚠️ Geçerli tutar girin');}catch(e){alert('Geçerli tutar girin');} return; }
@@ -2410,20 +2486,25 @@ function harEkleAc(){
   if(aciklama===null) return;
   aciklama=String(aciklama||'Harcama').trim().slice(0,100)||'Harcama';
   var now=new Date();
-  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}), tutar:tutar, aciklama:aciklama, ts:Date.now() };
+  // Saat: bugünse anlık, geçmiş güne ekliyorsak saat 12:00 sembolik
+  var saat=bugunMu?now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):'12:00';
+  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:saat, tutar:tutar, aciklama:aciklama, ts:Date.now() };
   _harKayitlar.push(k);
   harSunucuKaydet();
   harRender();
-  try{toast('✓ Harcama eklendi');}catch(e){}
+  harAylikYukle(); // aylık toplamı yenile
+  try{toast('✓ Harcama eklendi'+hedefEtk);}catch(e){}
 }
 function harSil(id){
   if(!confirm('Bu harcama kaydı silinsin mi?')) return;
   _harKayitlar=_harKayitlar.filter(function(k){return k.id!==id;});
   harSunucuKaydet();
   harRender();
+  harAylikYukle(); // aylık toplamı yenile
 }
 function harSunucuKaydet(){
-  fetch(HAR_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:_harKey(),menu:{tarih:_harBugun(),sube:SUBE,kayitlar:_harKayitlar,guncelleme:Date.now()}})}).catch(function(){});
+  // Seçili tarihe yaz (geçmiş güne de ekleme olabilir)
+  fetch(HAR_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:_harKey(),menu:{tarih:_harSecilenTarih,sube:SUBE,kayitlar:_harKayitlar,guncelleme:Date.now()}})}).catch(function(){});
 }
 
 function rapGoster(){

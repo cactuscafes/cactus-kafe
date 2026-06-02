@@ -713,6 +713,14 @@ if('serviceWorker' in navigator){
       <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--k1);margin:0;font-weight:700;">💸 Günlük Gider</h2>
       <button onclick="harEkleAc()" style="background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-weight:700;font-size:13px;letter-spacing:.8px;cursor:pointer;box-shadow:0 4px 12px rgba(192,57,43,.25);">+ Harcama Ekle</button>
     </div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:8px 10px;box-shadow:var(--sh);flex-wrap:wrap;">
+      <span style="font-size:15px;color:var(--k1);font-weight:800;padding:0 2px;">₺</span>
+      <input type="number" id="har-quick-tutar" placeholder="Tutar" inputmode="decimal" step="0.01" min="0" onkeydown="if(event.key==='Enter')harHizliEkle();" style="width:90px;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;font-family:'Lato',sans-serif;color:var(--k1);background:var(--wh);">
+      <span style="font-size:13px;color:var(--kr3);font-weight:700;padding:0 1px;">×</span>
+      <input type="number" id="har-quick-adet" value="1" min="1" inputmode="numeric" onkeydown="if(event.key==='Enter')harHizliEkle();" style="width:62px;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;font-family:'Lato',sans-serif;color:var(--k1);background:var(--wh);text-align:center;">
+      <input type="text" id="har-quick-aciklama" placeholder="Açıklama (örn: Süt, ekmek, temizlik)" maxlength="100" onkeydown="if(event.key==='Enter')harHizliEkle();" style="flex:1;min-width:160px;padding:8px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;font-family:'Lato',sans-serif;color:var(--k1);background:var(--wh);">
+      <button onclick="harHizliEkle()" style="padding:9px 16px;background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;letter-spacing:.8px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">+ Ekle</button>
+    </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#fff;border-radius:10px;padding:8px 12px;box-shadow:var(--sh);flex-wrap:wrap;">
       <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--k2);text-transform:uppercase;">📅 Tarih</span>
       <input type="date" id="har-tarih-sec" onchange="harTarihDegisti()" style="flex:1;min-width:140px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
@@ -2398,6 +2406,32 @@ function harRender(){
   var gw=document.getElementById('har-gelir-w'); if(gw) gw.style.opacity=bugunMu?'1':'.4';
   var nw=document.getElementById('har-net-w'); if(nw) nw.style.opacity=bugunMu?'1':'.4';
 }
+// Inline (hızlı) ekleme — formdaki tutar/adet/açıklama inputlarından okur, prompt yok
+function harHizliEkle(){
+  var tutarEl=document.getElementById('har-quick-tutar');
+  var adetEl=document.getElementById('har-quick-adet');
+  var acEl=document.getElementById('har-quick-aciklama');
+  var tutar=parseFloat(String((tutarEl&&tutarEl.value)||'').replace(',','.'))||0;
+  var adet=parseInt(String((adetEl&&adetEl.value)||'1'),10)||1;
+  if(adet<1) adet=1;
+  var aciklama=String((acEl&&acEl.value)||'').trim().slice(0,100);
+  if(!(tutar>0)){ try{toast('⚠️ Tutar girin');}catch(e){alert('Tutar girin');} if(tutarEl) tutarEl.focus(); return; }
+  if(!aciklama) aciklama='Harcama';
+  var bugunMu=(_harSecilenTarih===_harBugun());
+  var hedefEtk=bugunMu?'':' ('+new Date(_harSecilenTarih+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' için)';
+  var now=new Date();
+  var saat=bugunMu?now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):'12:00';
+  var k={ id:'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), saat:saat, tutar:tutar, adet:adet, aciklama:aciklama, ts:Date.now() };
+  _harKayitlar.push(k);
+  harSunucuKaydet();
+  harRender();
+  harAylikYukle();
+  if(tutarEl){ tutarEl.value=''; tutarEl.focus(); }
+  if(adetEl) adetEl.value='1';
+  if(acEl) acEl.value='';
+  try{toast('✓ Eklendi'+hedefEtk);}catch(e){}
+}
+
 function harEkleAc(){
   var bugunMu=(_harSecilenTarih===_harBugun());
   var hedefEtk=bugunMu?'':' ('+new Date(_harSecilenTarih+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' için)';

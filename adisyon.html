@@ -950,6 +950,7 @@ const MENU_DEFAULT = {
     {id:'so8',ad:'Ice Hazelnut Latte',fiyat:220,emoji:'🧊'},
     {id:'so9',ad:'Ice Vanilla Latte',fiyat:220,emoji:'🧊'},
     {id:'so10',ad:'Ice Filtre',fiyat:200,emoji:'🧊'},
+    {id:'so11',ad:'Buzlu Bardak',fiyat:10,emoji:'🧊'},
   ]},
   cay:{label:'🌿 Çaylar',tip:'icecek',urunler:[
     {id:'c1',ad:'Ihlamur',fiyat:200,emoji:'🌼'},
@@ -993,8 +994,20 @@ const MENU_DEFAULT = {
   ]},
   kurabiye:{label:'🍪 Kurabiye',tip:'yiyecek',urunler:[
     {id:'kur1',ad:'Cevizli Çikolatalı Kurabiye',fiyat:170,emoji:'🍪'},
+    {id:'kur2',ad:'Küçük Kurabiye',fiyat:100,emoji:'🍪'},
+    {id:'kur3',ad:'Kurabiye',fiyat:150,emoji:'🍪'},
   ]},
 };
+
+// MENU_VERSION: fiyat/ürün değiştiğinde bump et — tüm kasalarda eski localStorage cache otomatik temizlenir.
+const MENU_VERSION='pdf-2026-06-02-v2';
+try{
+  var _mvKey='cactus_menu_v_podyum';
+  if(localStorage.getItem(_mvKey)!==MENU_VERSION){
+    localStorage.removeItem('cactus_menu_podyum');
+    localStorage.setItem(_mvKey,MENU_VERSION);
+  }
+}catch(e){}
 
 const LK={mas:'cactus_masalar',bar:'cactus_bar_podyum',mut:'cactus_mut_podyum',menu:'cactus_menu_podyum'};
 var _menuYazmaZamani=0; // menuKaydet'in son çalışma zamanı — polling'in üzerine yazmasını engeller

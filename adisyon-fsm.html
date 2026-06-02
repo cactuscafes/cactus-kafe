@@ -10,16 +10,17 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --k1:#2C1503;--k2:#5C2E0E;--k3:#9C5B2A;
-  --kr:#F7EDD8;--kr2:#EDDBBB;--kr3:#D9BF96;
-  --al:#C9A84C;--al2:#E8C56A;
-  --wh:#FDF8F0;
+  /* ZÜMRÜT & ŞAMPANYA ALTIN teması — derin yeşil + parlak altın + şampanya krem */
+  --k1:#0e3d2a;--k2:#1c5a40;--k3:#2e7e58;
+  --kr:#f5ebd2;--kr2:#ead7b0;--kr3:#c9b685;
+  --al:#d4a64a;--al2:#f0c970;
+  --wh:#fbf6ea;
   --bl:#1A3F6F;--bl2:#2A60A8;
   --gr:#1F5C38;--gr2:#2E8A52;
   --rd:#8B1A1A;--rd2:#B52B2B;
   --or:#B84C00;--or2:#E06010;
-  --sh:0 2px 12px rgba(44,21,3,.13);
-  --sh2:0 4px 20px rgba(44,21,3,.18);
+  --sh:0 2px 12px rgba(14,61,42,.13);
+  --sh2:0 4px 20px rgba(14,61,42,.18);
 }
 body{font-family:'Lato',sans-serif;background:var(--kr);color:var(--k1);min-height:100vh;overflow-x:hidden;}
 button{font-family:'Lato',sans-serif;cursor:pointer;}
@@ -476,7 +477,7 @@ input,select{font-family:'Lato',sans-serif;}
 </style>
 <!-- PWA — FSM şubesi (kendi manifesti ile Podyum'dan ayrı) -->
 <link rel="manifest" href="/manifest-fsm.json">
-<meta name="theme-color" content="#2C1503">
+<meta name="theme-color" content="#0e3d2a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FSM POS">
@@ -541,7 +542,7 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <!-- SÜRÜM ROZETİ: bu cihaz güncel mi? Dokun → zorla güncelle (cache-bust). Eski tarih görürsen o cihaz eski kodda. -->
-<div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:#5C2E0E;background:rgba(255,255,255,.88);border:1px solid #EDDBBB;padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;"><span id="surum-txt">✓ Güncel</span></div>
+<div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:var(--k2);background:rgba(255,255,255,.92);border:1px solid var(--kr2);padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;"><span id="surum-txt">✓ Güncel</span></div>
 <script>(function(){var b=document.getElementById('surum-rozet');if(b)b.style.color='#2d5a27';})();</script>
 
 <!-- KASİYER -->

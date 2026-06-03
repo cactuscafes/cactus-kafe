@@ -2578,14 +2578,39 @@ function harAraUygula(){
   var esles=_harAylikKayitlar.filter(function(k){return String(k.aciklama||'').toLowerCase().indexOf(q)>=0;});
   var top=esles.reduce(function(s,k){return s+(Number(k.tutar)||0);},0);
   var toplamAdet=esles.reduce(function(s,k){return s+(Number(k.adet)||1);},0);
+  // Birim fiyat istatistikleri (zam takibi için)
+  var birimFiyatlar=esles.map(function(k){
+    var ad=Math.max(1, Number(k.adet)||1);
+    return (Number(k.tutar)||0)/ad;
+  }).filter(function(x){return x>0;});
+  var ortBirim=toplamAdet>0?(top/toplamAdet):0;
+  var minBirim=birimFiyatlar.length?Math.min.apply(null,birimFiyatlar):0;
+  var maxBirim=birimFiyatlar.length?Math.max.apply(null,birimFiyatlar):0;
+  var fmtBirim=function(v){return '₺'+(Math.round(v*100)/100).toLocaleString('tr-TR',{maximumFractionDigits:2});};
+  var zamFark=(minBirim>0&&maxBirim>minBirim)?Math.round(((maxBirim-minBirim)/minBirim)*100):0;
   var ayAdi=new Date(_harSecilenTarih+'T12:00:00').toLocaleDateString('tr-TR',{month:'long',year:'numeric'});
   if(ozetEl){
     ozetEl.style.display='';
+    var statSatir='';
+    if(birimFiyatlar.length){
+      statSatir='<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--al);display:flex;flex-wrap:wrap;gap:10px;font-size:12px;align-items:center;">'
+        +'<span style="color:var(--k2);"><b>Ortalama:</b> <span style="color:var(--k1);font-weight:700;font-family:Lato,sans-serif;">'+fmtBirim(ortBirim)+'</span>/birim</span>';
+      if(maxBirim>minBirim){
+        statSatir+='<span style="color:var(--k2);">·</span>'
+          +'<span style="color:#2d7a4f;"><b>En düşük:</b> <span style="font-weight:700;font-family:Lato,sans-serif;">'+fmtBirim(minBirim)+'</span></span>'
+          +'<span style="color:var(--k2);">·</span>'
+          +'<span style="color:#c0392b;"><b>En yüksek:</b> <span style="font-weight:700;font-family:Lato,sans-serif;">'+fmtBirim(maxBirim)+'</span></span>';
+        if(zamFark>0){
+          statSatir+='<span style="background:#fce4e0;color:#c0392b;font-weight:700;padding:2px 8px;border-radius:6px;font-size:11px;">▲ %'+zamFark+' fark</span>';
+        }
+      }
+      statSatir+='</div>';
+    }
     ozetEl.innerHTML='<div style="font-size:10px;letter-spacing:2px;color:var(--k2);font-weight:700;text-transform:uppercase;margin-bottom:6px;">📊 '+_harEsc(ayAdi)+' — "'+_harEsc(q)+'" özeti</div>'
       +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'
       +'<div style="color:var(--k1);font-size:13px;">'+esles.length+' kayıt'+(toplamAdet!==esles.length?' · toplam <b>'+toplamAdet+'</b> birim':'')+'</div>'
       +'<div style="color:#c0392b;font-weight:800;font-size:22px;font-family:Lato,sans-serif;">−₺'+Math.round(top).toLocaleString('tr-TR')+'</div>'
-      +'</div>';
+      +'</div>'+statSatir;
   }
   if(!liste) return;
   if(!esles.length){

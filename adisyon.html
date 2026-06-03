@@ -1435,8 +1435,33 @@ var MV_SUBE_KEY='cactus_masa_mv_'+SUBE;
 // _mv: {masaNo: lastModifiedMs}. localStorage'dan yükle.
 var _mv={};
 try{_mv=JSON.parse(localStorage.getItem(LK.mas+'_mv')||'{}')||{};}catch(e){_mv={};}
+// _tombstone: {masaNo: temizlendigiAn}. Ödeme/temizlik sonrası DAMGALANIR.
+// Clock-skew durumlarında bile bir cihaz ödeme aldıktan sonra başka cihazlardan gelen
+// "dolu" güncellemeler buradan eski sayılır → masa "geri açılmaz".
+var _tombstone={};
+try{_tombstone=JSON.parse(localStorage.getItem(LK.mas+'_t')||'{}')||{};}catch(e){_tombstone={};}
+var _odemeKilit={}; // {masaNo: kilitBitisTs} — ödeme sonrası 3sn boyunca sunucudan "dolu" güncellemeleri reddet
 // _sonKayit: saveMasalar diff'i için son kaydedilen masalar snapshot'ı
 var _sonKayit=JSON.parse(JSON.stringify(masalar||{}));
+
+// TOMBSTONE FILTER: tombstone'dan eski olan ürünleri at, lokal masada temiz olanları bırak
+// 5sn'lik geriye-tampon ile clock skew'a izin verir.
+function _tombstoneFiltrele(){
+  var degisti=false;
+  for(var i=1;i<=34;i++){
+    var t=_tombstone[i]||0;
+    if(!t) continue;
+    var sinir=t-5000; // ödemeden 5sn önceki ürünleri geçersiz say (saat farkı toleransı)
+    var items=masalar[i]||[];
+    if(!items.length) continue;
+    var fil=items.filter(function(it){ return _parseTs(it)>sinir; });
+    if(fil.length!==items.length){
+      masalar[i]=fil;
+      degisti=true;
+    }
+  }
+  return degisti;
+}
 
 // Server masalar dizisini map'e çevir (+stale filtrele)
 function _srvMasalarMap(durum){
@@ -1504,25 +1529,34 @@ function _doPushMasalar(){
     if(!res[0] || !Array.isArray(res[0].masalar) || !res[1]){ return; } // poll bir sonraki sağlam döngüde tekrar dener
     var srvMas=_srvMasalarMap(res[0]);
     var srvMv=(res[1].v)||{};
-    var mergedMas={}, mergedMv={};
+    var srvT=(res[1].t)||{};   // tombstone (yeni)
+    var mergedMas={}, mergedMv={}, mergedT={};
     for(var i=1;i<=34;i++){
+      // Tombstone önce merge — lokal ve sunucudan max al
+      mergedT[i]=Math.max(_tombstone[i]||0, srvT[i]||0);
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
       if(kaz==='L'){ mergedMas[i]=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
       else { mergedMas[i]=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
+      // Tombstone filtresi: damgadan-5sn'den eski item'ları at (saat farkı toleransı)
+      if(mergedT[i]){
+        var _sinir=mergedT[i]-5000;
+        mergedMas[i]=mergedMas[i].filter(function(it){return _parseTs(it)>_sinir;});
+      }
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
-      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,ts:Date.now()}})})
-    ]).then(function(){return {mas:mergedMas,mv:mergedMv};});
+      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,t:mergedT,ts:Date.now()}})})
+    ]).then(function(){return {mas:mergedMas,mv:mergedMv,t:mergedT};});
   }).then(function(out){
     if(!out) return;
     var degisti=false;
     for(var i=1;i<=34;i++){
       if(JSON.stringify(masalar[i]||[])!==JSON.stringify(out.mas[i]||[])){ masalar[i]=out.mas[i]||[]; degisti=true; }
       _mv[i]=out.mv[i]||0;
+      _tombstone[i]=out.t[i]||0;
     }
     _sonKayit=JSON.parse(JSON.stringify(masalar));
-    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){}
     if(degisti){ if(typeof renderMasalar==='function')renderMasalar(); if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon(); }
   }).catch(function(){}).finally(function(){
     _postInFlight=false;
@@ -1543,6 +1577,14 @@ function _masalarSyncCek(){
     if(!res[1]) return durum;
     var srvMas=_srvMasalarMap(durum);
     var srvMv=(res[1].v)||{};
+    var srvT=(res[1].t)||{};
+    // TOMBSTONE merge: sunucu+lokal max'ı al — herhangi bir cihazdaki "temizlendi" tüm cihazlara yansır
+    var _tDegisti=false;
+    for(var _ti=1;_ti<=34;_ti++){
+      var _tMx=Math.max(_tombstone[_ti]||0, srvT[_ti]||0);
+      if(_tMx!==(_tombstone[_ti]||0)){ _tombstone[_ti]=_tMx; _tDegisti=true; }
+    }
+    if(_tDegisti){ try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
     // SELF-HEAL: sunucuda 0-adet/bozuk ürün varsa temizleyici push tetikle (ödeme/temizleme
     // sonrası "0 adet sipariş geri geliyor" sorunu — temiz hali yazılır, kalıcı silinir).
     var _sunucudaBozukAdet=false;
@@ -1554,6 +1596,13 @@ function _masalarSyncCek(){
     }
     var degisti=false, pushGerek=false;
     for(var i=1;i<=34;i++){
+      // ÖDEME KİLİDİ: bu masa için 3sn'lik kilit aktifse sunucudan "dolu" güncelleme kabul etme
+      var _kilit=_odemeKilit[i]||0;
+      if(_kilit>Date.now() && srvMas[i] && srvMas[i].length){
+        // Kilit içinde server "dolu" diyor ama biz az önce ödeme aldık → reddet, push tetikle
+        pushGerek=true;
+        continue;
+      }
       var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
       if(kaz==='S'){
         // Server kazandı → uygula
@@ -1565,9 +1614,11 @@ function _masalarSyncCek(){
         _mv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i]));
       }
     }
+    // TOMBSTONE FİLTRE: damgadan eski item'ları kaldır (clock-skew olsa bile masa geri açılmaz)
+    if(_tombstoneFiltrele()) { degisti=true; pushGerek=true; }
     if(degisti){
       _sonKayit=JSON.parse(JSON.stringify(masalar));
-      try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+      try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){}
       if(typeof renderMasalar==='function')renderMasalar();
       if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon();
     }
@@ -1594,8 +1645,14 @@ function saveMasalar(){
   _pushMasalarTimer=setTimeout(_doPushMasalar,200);
 }
 
-// Gece reset / cycle değişiminde _mv'yi de sıfırla
-function _mvSifirla(){ _mv={}; try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){} }
+// Gece reset / cycle değişiminde _mv'yi ve tombstone'u da sıfırla
+function _mvSifirla(){
+  _mv={}; _tombstone={}; _odemeKilit={};
+  try{
+    localStorage.setItem(LK.mas+'_mv','{}');
+    localStorage.setItem(LK.mas+'_t','{}');
+  }catch(e){}
+}
 
 // ─── FAVORİLER (bulut sync ile tüm cihazlarda aynı — şube bazlı izolasyon) ───
 const LK_FAV='cactus_favs_v2_'+SUBE; // v2: branch izolasyonlu (eski v1 verisini görmez)
@@ -1824,14 +1881,22 @@ function masayiTemizle(){
   if(!aktifMasa)return;
   if(!confirm('Masa '+aktifMasa+' adisyonu temizlensin mi?'))return;
   var _enYeni=_maxItemTs(masalar[aktifMasa]||[]);
-  masalar[aktifMasa]=[];
+  var _hedef=aktifMasa;
+  masalar[_hedef]=[];
   saveMasalar();
   // Temizleme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması/yarış olsa bile
   // sync'te boş hali kazanır, masa "geri dolmaz" (sorun: temizleyince başka şey geri geliyordu).
-  _mv[aktifMasa]=Math.max(_mv[aktifMasa]||0, _enYeni+1, Date.now());
-  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  var _temizAn=Date.now();
+  _mv[_hedef]=Math.max(_mv[_hedef]||0, _enYeni+1, _temizAn);
+  _tombstone[_hedef]=Math.max(_tombstone[_hedef]||0, _enYeni+1, _temizAn);
+  _odemeKilit[_hedef]=_temizAn+3000;
+  try{
+    localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));
+    localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));
+  }catch(e){}
+  if(typeof _doPushMasalar==='function') setTimeout(_doPushMasalar,50);
   renderAdisyon();renderMasalar();
-  toast('🗑 Masa '+aktifMasa+' temizlendi');
+  toast('🗑 Masa '+_hedef+' temizlendi');
 }
 
 function siparisiGonder(){
@@ -2042,8 +2107,18 @@ function odemeOnayla(){
   saveMasalar();
   // Ödeme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması ya da ileri-saatli
   // başka cihazda eklenen ürün olsa bile ödenen masa sync'te "GERİ AÇILMAZ".
-  _mv[oncekiMasa]=Math.max(_mv[oncekiMasa]||0, _enYeniOd+1, Date.now());
-  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  var _odemeAn=Date.now();
+  _mv[oncekiMasa]=Math.max(_mv[oncekiMasa]||0, _enYeniOd+1, _odemeAn);
+  // TOMBSTONE: bu masa "_odemeAn"da temizlendi — damgadan eski tüm ürünler reddedilir
+  _tombstone[oncekiMasa]=Math.max(_tombstone[oncekiMasa]||0, _enYeniOd+1, _odemeAn);
+  // ÖDEME KİLİDİ: 3 sn boyunca bu masaya sunucudan gelen "dolu" güncellemeleri yok say
+  _odemeKilit[oncekiMasa]=_odemeAn+3000;
+  try{
+    localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));
+    localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));
+  }catch(e){}
+  // Push'u GARANTILE — saveMasalar'ın 200ms timeout'una güvenme; tombstone'u hemen yay
+  if(typeof _doPushMasalar==='function') setTimeout(_doPushMasalar,50);
   closeModal('odeme-modal');
   if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
     closeDrawer();aktifMasa=null;

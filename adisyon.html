@@ -1689,7 +1689,7 @@ function saveMasalar(){
   }catch(e){}
   _masaLocalWriteTime=Date.now();
   clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(_doPushMasalar,200);
+  _pushMasalarTimer=setTimeout(_doPushMasalar,50); // 200→50: çoklu cihaz yarış penceresi daraltıldı
 }
 
 // Gece reset / cycle değişiminde _mv'yi ve tombstone'u da sıfırla
@@ -1849,6 +1849,9 @@ function urunEkle(u,el){
   const ex=a.find(x=>x.id===u.id);
   if(ex){ ex.adet++; ex.ts=Date.now(); }   // artırınca da ts tazele → "aktif masa" silinmesin
   else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),ts:Date.now()});
+  // KULLANICI KASTEN EKLEME YAPIYOR → o masanın tombstone'unu temizle, kilidi kaldır.
+  if(typeof _tombstone==='object'){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
+  if(typeof _odemeKilit==='object'){ _odemeKilit[aktifMasa]=0; }
   saveMasalar();renderAdisyon();renderMasalar();
   toast('✓ '+u.ad+' eklendi');
 }
@@ -1912,9 +1915,12 @@ function chAdet(id,d){
   const it=a.find(x=>x.id===id);
   if(!it)return;
   it.adet+=d;
+  it.ts=Date.now(); // adet değişimi de "yeni hareket" — ts tazelensin (polling silmesin)
   // Adet, gönderilenden aşağıya inerse gönderileni de senkronla (yanlış eklenen ürün)
   if((it.gonderilenAdet||0)>it.adet) it.gonderilenAdet=Math.max(0,it.adet);
   if(it.adet<=0) masalar[aktifMasa]=a.filter(x=>x.id!==id);
+  if(typeof _tombstone==='object'){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
+  if(typeof _odemeKilit==='object'){ _odemeKilit[aktifMasa]=0; }
   saveMasalar();renderAdisyon();renderMasalar();
 }
 

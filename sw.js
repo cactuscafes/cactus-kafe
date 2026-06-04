@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v9'; // v9: silme blacklist + 3sn lokal yazma koruması (ekleme/silme yarışları)
+const VERSION = 'cactus-v10'; // v10: PURE UNION CRDT — yıkıcı LWW kaldırıldı + 10sn yazma koruması
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

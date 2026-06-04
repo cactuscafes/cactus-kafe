@@ -1595,24 +1595,14 @@ function _doPushMasalar(){
       srvMas[m]=(srvMas[m]||[]).filter(function(it){return !_silinmisMi(m, it);});
     });
     var mergedMas={}, mergedMv={}, mergedT={}, mergedD=JSON.parse(JSON.stringify(_silinenIdler));
+    // PURE UNION mantığı: TÜM masalar için _itemMerge — CRDT-benzer, yıkıcı LWW kaldırıldı.
+    // Çoklu cihazda ürün ekleme kayıpsız, ürün silme sadece tombstone (silme blacklist) ile mümkün.
     for(var i=1;i<=34;i++){
       mergedT[i]=Math.max(_tombstone[i]||0, srvT[i]||0);
       var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0&&!_silinmisMi(i, it);});
       var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
-      var _Le=!_L.length, _Se=!_S.length;
-      if(!_Le && !_Se){
-        // İKİSİ DOLU → ürün-bazlı UNION (çoklu cihazda ürün silinmesin)
-        mergedMas[i]=_itemMerge(_L, _S, mergedT[i]);
-        mergedMv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(mergedMas[i]));
-      } else {
-        var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
-        if(kaz==='L'){ mergedMas[i]=_L; mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(_L)); }
-        else { mergedMas[i]=_S; mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S)); }
-        if(mergedT[i]){
-          var _sinir=mergedT[i]-5000;
-          mergedMas[i]=mergedMas[i].filter(function(it){return _parseTs(it)>_sinir;});
-        }
-      }
+      mergedMas[i]=_itemMerge(_L, _S, mergedT[i]);
+      mergedMv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(mergedMas[i]));
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
@@ -1646,9 +1636,9 @@ function _masalarSyncCek(){
     // GÜVENLİK: mv GET'i başarısızsa masa merge'i ATLA — ödeme/temizlik bilgisini (mv)
     // göremeden karar verirsek ödenen masa "geri açılır". durum'u yine döndür (siparişler için).
     if(!res[1]) return durum;
-    // LOKAL YAZMA KORUMASI: son 3sn'de aktif yazma varsa polling masa merge'ini ATLA,
-    // sadece push tetikle → kasiyer ekleme yaparken polling silmesin.
-    if(_masaLocalWriteTime && (Date.now() - _masaLocalWriteTime) < 3000){
+    // LOKAL YAZMA KORUMASI: son 10sn'de aktif yazma varsa polling masa merge'ini ATLA,
+    // sadece push tetikle → kasiyer aktif ekleme/silme yaparken polling kesinlikle dokunmasın.
+    if(_masaLocalWriteTime && (Date.now() - _masaLocalWriteTime) < 10000){
       if(typeof _doPushMasalar==='function') _doPushMasalar();
       return durum;
     }
@@ -1696,30 +1686,17 @@ function _masalarSyncCek(){
         pushGerek=true;
         continue;
       }
-      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0&&!_silinmisMi(i, it);});
       var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
-      var _Le=!_L.length, _Se=!_S.length;
-      if(!_Le && !_Se){
-        // İKİSİ DOLU → union (çoklu cihaz ürün ekleme yıkıcı olmasın)
-        var birlesik=_itemMerge(_L, _S, _tombstone[i]||0);
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(birlesik)){
-          masalar[i]=birlesik;
-          degisti=true;
-          pushGerek=true; // birleştirilmiş hali yay
-        }
-        _mv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(birlesik));
-        continue;
+      // PURE UNION — hangi taraf boş hangi dolu fark etmez: ürün-bazlı birleştirme.
+      // Silme sadece _silinenIdler (item blacklist) + _tombstone (masa damgası) ile mümkün.
+      var birlesik=_itemMerge(_L, _S, _tombstone[i]||0);
+      if(JSON.stringify(masalar[i]||[])!==JSON.stringify(birlesik)){
+        masalar[i]=birlesik;
+        degisti=true;
+        pushGerek=true;
       }
-      var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
-      if(kaz==='S'){
-        // Server kazandı → uygula
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)){ masalar[i]=_S; degisti=true; }
-        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S));
-      } else {
-        // Local kazandı → serverdan farklıysa push tetikle
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)) pushGerek=true;
-        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(_L));
-      }
+      _mv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(birlesik));
     }
     // TOMBSTONE FİLTRE: damgadan eski item'ları kaldır (clock-skew olsa bile masa geri açılmaz)
     if(_tombstoneFiltrele()) { degisti=true; pushGerek=true; }

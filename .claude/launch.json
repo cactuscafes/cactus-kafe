@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cactus-admin",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "4201", "/Users/macbookpro/Desktop/cactus-site"],
+      "port": 4201
+    }
+  ]
+}

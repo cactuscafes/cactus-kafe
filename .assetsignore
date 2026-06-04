@@ -12,3 +12,10 @@ wrangler.jsonc
 .dev.vars*
 .env*
 *.zip
+
+# Worker source ve schema - statik servis edilmesin
+src/
+schema-adisyon-events.sql
+wrangler.toml
+package.json
+package-lock.json

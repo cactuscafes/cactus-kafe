@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
+<title>Cactus Coffee — Menü</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --krem:#f7efde; --krem2:#efe5cf; --krem-acik:#fbf4e2;
+  --koyu:#0e2008; --yesil:#1f3a12; --yesil-soft:#2c4a1e;
+  --altin:#c8a86a; --altin-aydinlik:#e8c47a; --altin-koyu:#9a7b3a;
+  --metin:#3a3025; --silik:#7a6a52;
+}
+@page{ size:A4; margin:0; }
+html,body{ background:#dcd1b6; }
+body{ font-family:'Montserrat',sans-serif; color:var(--metin); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+.page{
+  width:210mm; min-height:297mm;
+  padding:13mm 14mm 12mm;
+  margin:14px auto; background:var(--krem);
+  position:relative; overflow:hidden;
+  page-break-after:always;
+  background-image:radial-gradient(ellipse 80% 60% at 50% 0%,var(--krem-acik),var(--krem) 55%,var(--krem2) 100%);
+  box-shadow:0 8px 26px rgba(60,40,10,.15);
+}
+.page::before{ content:''; position:absolute; inset:7mm; border:1px solid rgba(200,168,106,.55); pointer-events:none; }
+.page::after{ content:''; position:absolute; inset:8.5mm; border:1px solid rgba(200,168,106,.22); pointer-events:none; }
+.page:last-child{ page-break-after:auto; }
+
+/* ─── filigran ─── */
+.suBaskisi{
+  position:absolute; left:50%; top:54%; transform:translate(-50%,-50%) rotate(-3deg);
+  font-family:'Cormorant Garamond',serif; font-weight:300;
+  font-size:200pt; color:var(--altin); opacity:.06; line-height:.85;
+  letter-spacing:18px; pointer-events:none; z-index:0; white-space:nowrap;
+}
+
+/* ─── başlık ─── */
+.hdr{ text-align:center; margin-bottom:7mm; position:relative; z-index:1; padding-top:3mm; }
+.hdr-marka{
+  font-family:'Cormorant Garamond',serif; font-weight:400;
+  font-size:46pt; letter-spacing:18px; color:var(--koyu); line-height:1; padding-left:18px;
+}
+.hdr-alt{
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400;
+  font-size:12pt; color:var(--altin-koyu); letter-spacing:5px; margin-top:3mm;
+}
+.hdr-cizgi{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:5mm; }
+.hdr-cizgi::before,.hdr-cizgi::after{ content:''; height:1px; width:85px; background:linear-gradient(90deg,transparent,var(--altin)); }
+.hdr-cizgi::after{ background:linear-gradient(90deg,var(--altin),transparent); }
+.hdr-cizgi span{ font-family:'Montserrat',sans-serif; font-size:7.5pt; letter-spacing:7px; text-transform:uppercase; color:var(--altin-koyu); font-weight:500; }
+
+/* ─── sütun düzeni ─── */
+.sutunlar{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:9mm; margin-top:5mm; position:relative; z-index:1; }
+.sutunlar.iki{ grid-template-columns:1.25fr 1fr; gap:11mm; }
+
+/* ─── bölüm başlığı ─── */
+.bolum{ margin-bottom:7mm; break-inside:avoid; }
+.bolum-bas{
+  font-family:'Cormorant Garamond',serif; font-weight:500;
+  font-size:15.5pt; color:var(--yesil); letter-spacing:2.5px;
+  text-transform:uppercase; text-align:center;
+  padding-bottom:2.5mm; margin-bottom:4mm; position:relative;
+}
+.bolum-bas::before{ content:''; position:absolute; left:18%; right:18%; bottom:0; height:1px; background:var(--altin); }
+.bolum-bas::after{
+  content:'❋'; position:absolute; left:50%; bottom:-7px; transform:translateX(-50%);
+  background:var(--krem); color:var(--altin); font-size:10pt; padding:0 7px; line-height:1;
+}
+
+/* ─── ürün satırı ─── */
+.urun{ display:flex; align-items:baseline; line-height:1.45; margin-bottom:1.6mm; }
+.urun-ad{
+  font-family:'Montserrat',sans-serif; font-weight:500; font-size:8.5pt;
+  color:var(--koyu); text-transform:uppercase; letter-spacing:.45px; white-space:nowrap;
+}
+.urun-leader{ flex:1; border-bottom:1px dotted rgba(154,123,58,.55); margin:0 6px; transform:translateY(-3px); min-width:10px; }
+.urun-fiyat{ font-family:'Montserrat',sans-serif; font-weight:700; font-size:9pt; color:var(--altin-koyu); white-space:nowrap; }
+.urun-fiyat::after{ content:'₺'; font-size:7.5pt; font-weight:500; margin-left:1px; }
+
+/* ─── açıklamalı (waffle/kokteyl) ─── */
+.urun-blok{ margin-bottom:4mm; }
+.urun-blok .ust{ display:flex; align-items:baseline; }
+.urun-blok .urun-ad{ font-size:9.5pt; }
+.urun-blok .urun-fiyat{ font-size:10pt; }
+.urun-not{
+  display:block; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400;
+  font-size:8pt; color:var(--silik); line-height:1.35; margin-top:.7mm; padding-right:8mm;
+}
+
+/* ─── alt bilgi ─── */
+.altbilgi{
+  position:absolute; bottom:9mm; left:14mm; right:14mm; text-align:center;
+  font-family:'Montserrat',sans-serif; font-size:7pt; color:var(--silik);
+  letter-spacing:3px; text-transform:uppercase;
+}
+.altbilgi b{ color:var(--altin-koyu); font-weight:700; letter-spacing:3.5px; }
+.altbilgi-ayrac{ display:inline-block; width:22px; height:1px; background:var(--altin); vertical-align:middle; margin:0 9px; opacity:.6; }
+
+@media print{
+  html,body{ background:#fff; }
+  .page{ margin:0; box-shadow:none; }
+  .page::before,.page::after{ /* hafifletme baskıda */ }
+}
+</style></head>
+<body>
+
+<!-- ════════════ SAYFA 1 — İÇECEKLER ════════════ -->
+<section class="page">
+  <div class="suBaskisi">CACTUS</div>
+
+  <header class="hdr">
+    <div class="hdr-marka">CACTUS</div>
+    <div class="hdr-alt">Coffee &amp; Herbal Tea</div>
+    <div class="hdr-cizgi"><span>Menü</span></div>
+  </header>
+
+  <div class="sutunlar">
+    <!-- SICAK -->
+    <div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Sıcak İçecekler</h2>
+        <div class="urun"><span class="urun-ad">Espresso</span><span class="urun-leader"></span><span class="urun-fiyat">150</span></div>
+        <div class="urun"><span class="urun-ad">Macchiato</span><span class="urun-leader"></span><span class="urun-fiyat">170</span></div>
+        <div class="urun"><span class="urun-ad">Americano</span><span class="urun-leader"></span><span class="urun-fiyat">180</span></div>
+        <div class="urun"><span class="urun-ad">Cortado</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Latte</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Caramel Latte</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Vanilla Latte</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Hazelnut Latte</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Flat White</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Cappuccino</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Mocha</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">White Mocha</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Filtre Kahve</span><span class="urun-leader"></span><span class="urun-fiyat">180</span></div>
+        <div class="urun"><span class="urun-ad">Türk Kahvesi</span><span class="urun-leader"></span><span class="urun-fiyat">130</span></div>
+        <div class="urun"><span class="urun-ad">Double Türk Kahvesi</span><span class="urun-leader"></span><span class="urun-fiyat">170</span></div>
+        <div class="urun"><span class="urun-ad">Dibek Kahvesi</span><span class="urun-leader"></span><span class="urun-fiyat">130</span></div>
+        <div class="urun"><span class="urun-ad">Salep</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Sıcak Çikolata</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Bardak Süt</span><span class="urun-leader"></span><span class="urun-fiyat">90</span></div>
+        <div class="urun"><span class="urun-ad">Ballı Süt</span><span class="urun-leader"></span><span class="urun-fiyat">150</span></div>
+      </div>
+    </div>
+
+    <!-- SOĞUK + VİTAMİN -->
+    <div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Soğuk İçecekler</h2>
+        <div class="urun"><span class="urun-ad">Ice Americano</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Ice Latte</span><span class="urun-leader"></span><span class="urun-fiyat">210</span></div>
+        <div class="urun"><span class="urun-ad">Ice Flat White</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Mocha</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice White Mocha</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Caramel Latte</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Caramel Macchiato</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Hazelnut Latte</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Vanilla Latte</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Ice Filtre</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+      </div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Vitamin</h2>
+        <div class="urun"><span class="urun-ad">Churchill</span><span class="urun-leader"></span><span class="urun-fiyat">170</span></div>
+        <div class="urun"><span class="urun-ad">Cool Lime</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+        <div class="urun"><span class="urun-ad">Frozen</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Milkshake</span><span class="urun-leader"></span><span class="urun-fiyat">210</span></div>
+        <div class="urun"><span class="urun-ad">Limonata</span><span class="urun-leader"></span><span class="urun-fiyat">180</span></div>
+        <div class="urun"><span class="urun-ad">Çilekli Limonata</span><span class="urun-leader"></span><span class="urun-fiyat">190</span></div>
+      </div>
+    </div>
+
+    <!-- BİTKİ ÇAYLARI + KOKTEYL -->
+    <div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Demleme Bitki Çayları</h2>
+        <div class="urun"><span class="urun-ad">Ihlamur</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Adaçayı</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Melisa Çayı</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Hibiskus</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Papatya</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Yeşil Çay</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Kış Çayı</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+        <div class="urun"><span class="urun-ad">Mavi Kelebek Çayı</span><span class="urun-leader"></span><span class="urun-fiyat">200</span></div>
+      </div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Cactus Kokteyl</h2>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Blue Sky</span><span class="urun-leader"></span><span class="urun-fiyat">210</span></div>
+          <span class="urun-not">vanilya, süt, hindistan cevizi, mavi kelebek çayı, buz</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Cactus</span><span class="urun-leader"></span><span class="urun-fiyat">210</span></div>
+          <span class="urun-not">vanilya, elma, süt, buz</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Pink Wind</span><span class="urun-leader"></span><span class="urun-fiyat">210</span></div>
+          <span class="urun-not">karpuz, çilek, limonata, buz</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="altbilgi"><b>cactuscafes.com</b><span class="altbilgi-ayrac"></span>Podyumpark<span class="altbilgi-ayrac"></span>Tüm fiyatlara KDV dahildir</div>
+</section>
+
+<!-- ════════════ SAYFA 2 — WAFFLE & TOST ════════════ -->
+<section class="page">
+  <div class="suBaskisi">CACTUS</div>
+
+  <header class="hdr">
+    <div class="hdr-marka">CACTUS</div>
+    <div class="hdr-alt">Waffle &amp; Tost</div>
+    <div class="hdr-cizgi"><span>Tatlı &amp; Lezzet</span></div>
+  </header>
+
+  <div class="sutunlar iki">
+    <!-- WAFFLE -->
+    <div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Bubble Waffle</h2>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Classic Bubble Waffle</span><span class="urun-leader"></span><span class="urun-fiyat">300</span></div>
+          <span class="urun-not">çilek, muz, sütlü çikolata, beyaz çikolata, oreo parçacıkları</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Dubai Bubble Waffle</span><span class="urun-leader"></span><span class="urun-fiyat">330</span></div>
+          <span class="urun-not">çilek, muz, sütlü çikolata, antep fıstığı çikolata, kadayıf parçacıkları</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Bitter Bubble Waffle</span><span class="urun-leader"></span><span class="urun-fiyat">300</span></div>
+          <span class="urun-not">çilek, muz, bitter çikolata, pasta süslemeleri</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Caramel Bubble Waffle</span><span class="urun-leader"></span><span class="urun-fiyat">300</span></div>
+          <span class="urun-not">çilek, muz, karamel çikolata, sütlü çikolata, lotus parçacıkları</span>
+        </div>
+        <div class="urun-blok">
+          <div class="ust"><span class="urun-ad">Meyveli Bubble Waffle</span><span class="urun-leader"></span><span class="urun-fiyat">300</span></div>
+          <span class="urun-not">çilek, muz, frambuaz çikolata, muzlu çikolata, pasta süslemeleri</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOSTLAR + MEŞRUBAT -->
+    <div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Tostlar</h2>
+        <div class="urun"><span class="urun-ad">Kaşarlı Sosyete Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">160</span></div>
+        <div class="urun"><span class="urun-ad">Sucuklu Sosyete Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">160</span></div>
+        <div class="urun"><span class="urun-ad">Karışık Sosyete Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">180</span></div>
+        <div class="urun"><span class="urun-ad">Kaşarlı Sanayi Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Sucuklu Sanayi Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">220</span></div>
+        <div class="urun"><span class="urun-ad">Karışık Sanayi Tostu</span><span class="urun-leader"></span><span class="urun-fiyat">250</span></div>
+      </div>
+      <div class="bolum">
+        <h2 class="bolum-bas">Meşrubat</h2>
+        <div class="urun"><span class="urun-ad">Su</span><span class="urun-leader"></span><span class="urun-fiyat">30</span></div>
+        <div class="urun"><span class="urun-ad">Sade Soda</span><span class="urun-leader"></span><span class="urun-fiyat">80</span></div>
+        <div class="urun"><span class="urun-ad">Enerji İçeceği</span><span class="urun-leader"></span><span class="urun-fiyat">140</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="altbilgi"><b>cactuscafes.com</b><span class="altbilgi-ayrac"></span>Podyumpark<span class="altbilgi-ayrac"></span>Afiyet Olsun</div>
+</section>
+
+</body></html>

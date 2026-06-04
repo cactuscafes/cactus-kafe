@@ -1,9 +1,16 @@
 name = "cactus-kafe"
 compatibility_date = "2026-04-26"
+main = "src/index.js"
 
-assets = { directory = "." }
+assets = { directory = ".", binding = "ASSETS" }
 
 compatibility_flags = [ "nodejs_compat" ]
+
+# Event-sourced adisyon sync — Square/Toast tarzı append-only event log
+[[d1_databases]]
+binding = "ADISYON_DB"
+database_name = "cactus-adisyon-events"
+database_id = "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
 
 [observability]
 enabled = true

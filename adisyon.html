@@ -1447,6 +1447,31 @@ try{_mv=JSON.parse(localStorage.getItem(LK.mas+'_mv')||'{}')||{};}catch(e){_mv={
 var _tombstone={};
 try{_tombstone=JSON.parse(localStorage.getItem(LK.mas+'_t')||'{}')||{};}catch(e){_tombstone={};}
 var _odemeKilit={}; // {masaNo: kilitBitisTs} — ödeme sonrası 3sn boyunca sunucudan "dolu" güncellemeleri reddet
+// Silinen ürün ID'leri için tombstone — polling silinen ürünü geri açmasın
+var _silinenIdler={}; // {masaNo: {itemId: silmeTs}}
+try{_silinenIdler=JSON.parse(localStorage.getItem(LK.mas+'_d')||'{}')||{};}catch(e){_silinenIdler={};}
+function _silmeIsaretle(masa, itemId){
+  if(!masa || !itemId) return;
+  if(!_silinenIdler[masa]) _silinenIdler[masa]={};
+  _silinenIdler[masa][itemId]=Date.now();
+  try{localStorage.setItem(LK.mas+'_d', JSON.stringify(_silinenIdler));}catch(e){}
+}
+function _silinmisMi(masa, it){
+  if(!it || !it.id) return false;
+  var d=_silinenIdler[masa];
+  if(!d || !d[it.id]) return false;
+  return d[it.id] > _parseTs(it);
+}
+function _silmeTemizle(){
+  var es=5*60*1000, now=Date.now(), d=false;
+  Object.keys(_silinenIdler).forEach(function(m){
+    Object.keys(_silinenIdler[m]||{}).forEach(function(id){
+      if(now - _silinenIdler[m][id] > es){ delete _silinenIdler[m][id]; d=true; }
+    });
+    if(!Object.keys(_silinenIdler[m]||{}).length){ delete _silinenIdler[m]; d=true; }
+  });
+  if(d) try{localStorage.setItem(LK.mas+'_d', JSON.stringify(_silinenIdler));}catch(e){}
+}
 // _sonKayit: saveMasalar diff'i için son kaydedilen masalar snapshot'ı
 var _sonKayit=JSON.parse(JSON.stringify(masalar||{}));
 
@@ -1555,11 +1580,24 @@ function _doPushMasalar(){
     if(!res[0] || !Array.isArray(res[0].masalar) || !res[1]){ return; } // poll bir sonraki sağlam döngüde tekrar dener
     var srvMas=_srvMasalarMap(res[0]);
     var srvMv=(res[1].v)||{};
-    var srvT=(res[1].t)||{};   // tombstone (yeni)
-    var mergedMas={}, mergedMv={}, mergedT={};
+    var srvT=(res[1].t)||{};
+    var srvD=(res[1].d)||{};
+    // Silinen ID listesini KV'den merge et
+    Object.keys(srvD).forEach(function(m){
+      Object.keys(srvD[m]||{}).forEach(function(id){
+        if(!_silinenIdler[m]) _silinenIdler[m]={};
+        var sTs=Number(srvD[m][id])||0;
+        if(sTs > (_silinenIdler[m][id]||0)) _silinenIdler[m][id]=sTs;
+      });
+    });
+    // Silinmiş item'ları sunucu görünümünden FİLTRELE (geri açılmasın)
+    Object.keys(srvMas).forEach(function(m){
+      srvMas[m]=(srvMas[m]||[]).filter(function(it){return !_silinmisMi(m, it);});
+    });
+    var mergedMas={}, mergedMv={}, mergedT={}, mergedD=JSON.parse(JSON.stringify(_silinenIdler));
     for(var i=1;i<=34;i++){
       mergedT[i]=Math.max(_tombstone[i]||0, srvT[i]||0);
-      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0&&!_silinmisMi(i, it);});
       var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
       var _Le=!_L.length, _Se=!_S.length;
       if(!_Le && !_Se){
@@ -1578,8 +1616,8 @@ function _doPushMasalar(){
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
-      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,t:mergedT,ts:Date.now()}})})
-    ]).then(function(){return {mas:mergedMas,mv:mergedMv,t:mergedT};});
+      fetch(POST_MV,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:MV_SUBE_KEY,menu:{v:mergedMv,t:mergedT,d:mergedD,ts:Date.now()}})})
+    ]).then(function(){return {mas:mergedMas,mv:mergedMv,t:mergedT,d:mergedD};});
   }).then(function(out){
     if(!out) return;
     var degisti=false;
@@ -1589,7 +1627,7 @@ function _doPushMasalar(){
       _tombstone[i]=out.t[i]||0;
     }
     _sonKayit=JSON.parse(JSON.stringify(masalar));
-    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){}
+    try{localStorage.setItem(LK.mas,JSON.stringify(masalar));localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));localStorage.setItem(LK.mas+'_d',JSON.stringify(_silinenIdler));}catch(e){}
     if(degisti){ if(typeof renderMasalar==='function')renderMasalar(); if(typeof renderAdisyon==='function'&&!document.querySelector('.drawer.on'))renderAdisyon(); }
   }).catch(function(){}).finally(function(){
     _postInFlight=false;
@@ -1608,9 +1646,27 @@ function _masalarSyncCek(){
     // GÜVENLİK: mv GET'i başarısızsa masa merge'i ATLA — ödeme/temizlik bilgisini (mv)
     // göremeden karar verirsek ödenen masa "geri açılır". durum'u yine döndür (siparişler için).
     if(!res[1]) return durum;
+    // LOKAL YAZMA KORUMASI: son 3sn'de aktif yazma varsa polling masa merge'ini ATLA,
+    // sadece push tetikle → kasiyer ekleme yaparken polling silmesin.
+    if(_masaLocalWriteTime && (Date.now() - _masaLocalWriteTime) < 3000){
+      if(typeof _doPushMasalar==='function') _doPushMasalar();
+      return durum;
+    }
     var srvMas=_srvMasalarMap(durum);
     var srvMv=(res[1].v)||{};
     var srvT=(res[1].t)||{};
+    var srvD=(res[1].d)||{}; // sunucudaki silme blacklist
+    // SİLME BLACKLIST merge — sunucu+lokal max ts
+    var _dDegisti=false;
+    Object.keys(srvD).forEach(function(m){
+      Object.keys(srvD[m]||{}).forEach(function(id){
+        if(!_silinenIdler[m]) _silinenIdler[m]={};
+        var sTs=Number(srvD[m][id])||0;
+        if(sTs > (_silinenIdler[m][id]||0)){ _silinenIdler[m][id]=sTs; _dDegisti=true; }
+      });
+    });
+    if(_dDegisti){ try{localStorage.setItem(LK.mas+'_d',JSON.stringify(_silinenIdler));}catch(e){} }
+    _silmeTemizle();
     // TOMBSTONE merge: sunucu+lokal max'ı al — herhangi bir cihazdaki "temizlendi" tüm cihazlara yansır
     var _tDegisti=false;
     for(var _ti=1;_ti<=34;_ti++){
@@ -1618,6 +1674,10 @@ function _masalarSyncCek(){
       if(_tMx!==(_tombstone[_ti]||0)){ _tombstone[_ti]=_tMx; _tDegisti=true; }
     }
     if(_tDegisti){ try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
+    // SİLİNEN ID'leri her masada srvMas'tan FİLTRELE
+    Object.keys(srvMas).forEach(function(m){
+      srvMas[m]=(srvMas[m]||[]).filter(function(it){return !_silinmisMi(m, it);});
+    });
     // SELF-HEAL: sunucuda 0-adet/bozuk ürün varsa temizleyici push tetikle (ödeme/temizleme
     // sonrası "0 adet sipariş geri geliyor" sorunu — temiz hali yazılır, kalıcı silinir).
     var _sunucudaBozukAdet=false;
@@ -1918,7 +1978,10 @@ function chAdet(id,d){
   it.ts=Date.now(); // adet değişimi de "yeni hareket" — ts tazelensin (polling silmesin)
   // Adet, gönderilenden aşağıya inerse gönderileni de senkronla (yanlış eklenen ürün)
   if((it.gonderilenAdet||0)>it.adet) it.gonderilenAdet=Math.max(0,it.adet);
-  if(it.adet<=0) masalar[aktifMasa]=a.filter(x=>x.id!==id);
+  if(it.adet<=0){
+    masalar[aktifMasa]=a.filter(x=>x.id!==id);
+    _silmeIsaretle(aktifMasa, id); // silindi → blacklist, polling geri açmasın
+  }
   if(typeof _tombstone==='object'){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
   if(typeof _odemeKilit==='object'){ _odemeKilit[aktifMasa]=0; }
   saveMasalar();renderAdisyon();renderMasalar();
@@ -1927,6 +1990,9 @@ function chAdet(id,d){
 function delItem(id){
   if(!aktifMasa)return;
   masalar[aktifMasa]=masalar[aktifMasa].filter(x=>x.id!==id);
+  _silmeIsaretle(aktifMasa, id); // silindi → blacklist, polling geri açmasın
+  if(typeof _tombstone==='object'){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
+  if(typeof _odemeKilit==='object'){ _odemeKilit[aktifMasa]=0; }
   saveMasalar();renderAdisyon();renderMasalar();
 }
 

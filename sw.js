@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v6'; // v6: ödenen masa geri gelmesin → tombstone + ödeme kilidi (clock-skew immune)
+const VERSION = 'cactus-v7'; // v7: çoklu cihaz ürün ekleme yıkıcı olmasın → item-level union (both branches)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

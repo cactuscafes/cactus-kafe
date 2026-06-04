@@ -1492,6 +1492,26 @@ function _maxItemTs(items){
   if(Array.isArray(items)){ for(var i=0;i<items.length;i++){ var t=_parseTs(items[i]); if(t>v) v=t; } }
   return v;
 }
+// ═══ ITEM-LEVEL UNION (ürün-bazlı birleştirme) — çoklu cihazda ürün silinmesin ═══
+// Aynı id → en yeni ts kazanır; eşitse max adet. Farklı id'ler birleşir.
+// Tombstone'dan 5sn'den eski item'lar reddedilir (ödeme/temizlik koruması).
+function _itemMerge(Litems, Sitems, tombstoneT){
+  var byId={};
+  var sinir=tombstoneT?(tombstoneT-5000):0;
+  var ekleVeyaGuncelle=function(it){
+    if(!it||!it.id||typeof it.adet!=='number'||it.adet<=0) return;
+    var ts=_parseTs(it);
+    if(sinir>0&&ts<sinir) return; // tombstone filter
+    if(!byId[it.id]){ byId[it.id]=it; return; }
+    var mvc=byId[it.id];
+    var mvcTs=_parseTs(mvc);
+    if(ts>mvcTs){ byId[it.id]=it; }
+    else if(ts===mvcTs && (Number(it.adet)||0)>(Number(mvc.adet)||0)){ byId[it.id]=it; }
+  };
+  (Litems||[]).forEach(ekleVeyaGuncelle);
+  (Sitems||[]).forEach(ekleVeyaGuncelle);
+  return Object.keys(byId).map(function(k){return byId[k];});
+}
 // ═══ YIKICI-OLMAYAN MERGE ("ekleme kazanır" — masa kaybolmasını engeller) ═══
 // Dönüş: 'L' (local kazanır) | 'S' (server kazanır)
 // KURAL: DOLU masa, BOŞ masaya karşı VARSAYILAN kazanır. Boş ancak GERÇEK temizleme/ödeme
@@ -1538,15 +1558,22 @@ function _doPushMasalar(){
     var srvT=(res[1].t)||{};   // tombstone (yeni)
     var mergedMas={}, mergedMv={}, mergedT={};
     for(var i=1;i<=34;i++){
-      // Tombstone önce merge — lokal ve sunucudan max al
       mergedT[i]=Math.max(_tombstone[i]||0, srvT[i]||0);
-      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
-      if(kaz==='L'){ mergedMas[i]=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
-      else { mergedMas[i]=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
-      // Tombstone filtresi: damgadan-5sn'den eski item'ları at (saat farkı toleransı)
-      if(mergedT[i]){
-        var _sinir=mergedT[i]-5000;
-        mergedMas[i]=mergedMas[i].filter(function(it){return _parseTs(it)>_sinir;});
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _Le=!_L.length, _Se=!_S.length;
+      if(!_Le && !_Se){
+        // İKİSİ DOLU → ürün-bazlı UNION (çoklu cihazda ürün silinmesin)
+        mergedMas[i]=_itemMerge(_L, _S, mergedT[i]);
+        mergedMv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(mergedMas[i]));
+      } else {
+        var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
+        if(kaz==='L'){ mergedMas[i]=_L; mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(_L)); }
+        else { mergedMas[i]=_S; mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S)); }
+        if(mergedT[i]){
+          var _sinir=mergedT[i]-5000;
+          mergedMas[i]=mergedMas[i].filter(function(it){return _parseTs(it)>_sinir;});
+        }
       }
     }
     return Promise.all([
@@ -1609,15 +1636,29 @@ function _masalarSyncCek(){
         pushGerek=true;
         continue;
       }
-      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _Le=!_L.length, _Se=!_S.length;
+      if(!_Le && !_Se){
+        // İKİSİ DOLU → union (çoklu cihaz ürün ekleme yıkıcı olmasın)
+        var birlesik=_itemMerge(_L, _S, _tombstone[i]||0);
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(birlesik)){
+          masalar[i]=birlesik;
+          degisti=true;
+          pushGerek=true; // birleştirilmiş hali yay
+        }
+        _mv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(birlesik));
+        continue;
+      }
+      var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
       if(kaz==='S'){
         // Server kazandı → uygula
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])){ masalar[i]=srvMas[i]||[]; degisti=true; }
-        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i]));
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)){ masalar[i]=_S; degisti=true; }
+        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S));
       } else {
         // Local kazandı → serverdan farklıysa push tetikle
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])) pushGerek=true;
-        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i]));
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)) pushGerek=true;
+        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(_L));
       }
     }
     // TOMBSTONE FİLTRE: damgadan eski item'ları kaldır (clock-skew olsa bile masa geri açılmaz)

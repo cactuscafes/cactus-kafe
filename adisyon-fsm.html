@@ -1386,6 +1386,23 @@ function _maxItemTs(items){
   if(Array.isArray(items)){ for(var i=0;i<items.length;i++){ var t=_parseTs(items[i]); if(t>v) v=t; } }
   return v;
 }
+// ═══ ITEM-LEVEL UNION (ürün-bazlı birleştirme) — çoklu cihazda ürün silinmesin ═══
+// Aynı id → en yeni ts kazanır; eşitse max adet. Farklı id'ler birleşir.
+function _itemMerge(Litems, Sitems){
+  var byId={};
+  var ekleVeyaGuncelle=function(it){
+    if(!it||!it.id||typeof it.adet!=='number'||it.adet<=0) return;
+    var ts=_parseTs(it);
+    if(!byId[it.id]){ byId[it.id]=it; return; }
+    var mvc=byId[it.id];
+    var mvcTs=_parseTs(mvc);
+    if(ts>mvcTs){ byId[it.id]=it; }
+    else if(ts===mvcTs && (Number(it.adet)||0)>(Number(mvc.adet)||0)){ byId[it.id]=it; }
+  };
+  (Litems||[]).forEach(ekleVeyaGuncelle);
+  (Sitems||[]).forEach(ekleVeyaGuncelle);
+  return Object.keys(byId).map(function(k){return byId[k];});
+}
 // ═══ YIKICI-OLMAYAN MERGE ("ekleme kazanır" — masa kaybolmasını engeller) ═══
 // Dönüş: 'L' (local kazanır) | 'S' (server kazanır)
 // KURAL: DOLU masa, BOŞ masaya karşı VARSAYILAN kazanır. Boş ancak GERÇEK temizleme/ödeme
@@ -1428,9 +1445,18 @@ function _doPushMasalar(){
     var srvMv=(res[1].v)||{};
     var mergedMas={}, mergedMv={};
     for(var i=1;i<=34;i++){
-      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
-      if(kaz==='L'){ mergedMas[i]=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i])); }
-      else { mergedMas[i]=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;}); mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i])); }
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _Le=!_L.length, _Se=!_S.length;
+      if(!_Le && !_Se){
+        // İKİSİ DOLU → union (çoklu cihazda ürün ekleme yıkıcı olmasın)
+        mergedMas[i]=_itemMerge(_L, _S);
+        mergedMv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(mergedMas[i]));
+      } else {
+        var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
+        if(kaz==='L'){ mergedMas[i]=_L; mergedMv[i]=Math.max(_mv[i]||0,_maxItemTs(_L)); }
+        else { mergedMas[i]=_S; mergedMv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S)); }
+      }
     }
     return Promise.all([
       fetch(POST_MASALAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,masalar:mergedMas})}),
@@ -1474,13 +1500,27 @@ function _masalarSyncCek(){
     }
     var degisti=false, pushGerek=false;
     for(var i=1;i<=34;i++){
-      var kaz=_masaKazanan(masalar[i], _mv[i], srvMas[i], srvMv[i]);
+      var _L=(masalar[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _S=(srvMas[i]||[]).filter(function(it){return it&&typeof it.adet==='number'&&it.adet>0;});
+      var _Le=!_L.length, _Se=!_S.length;
+      if(!_Le && !_Se){
+        // İKİSİ DOLU → union: ürün silinmesin
+        var birlesik=_itemMerge(_L, _S);
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(birlesik)){
+          masalar[i]=birlesik;
+          degisti=true;
+          pushGerek=true;
+        }
+        _mv[i]=Math.max(_mv[i]||0, srvMv[i]||0, _maxItemTs(birlesik));
+        continue;
+      }
+      var kaz=_masaKazanan(_L, _mv[i], _S, srvMv[i]);
       if(kaz==='S'){
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])){ masalar[i]=srvMas[i]||[]; degisti=true; }
-        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(srvMas[i]));
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)){ masalar[i]=_S; degisti=true; }
+        _mv[i]=Math.max(srvMv[i]||0,_maxItemTs(_S));
       } else {
-        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(srvMas[i]||[])) pushGerek=true;
-        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(masalar[i]));
+        if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_S)) pushGerek=true;
+        _mv[i]=Math.max(_mv[i]||0,_maxItemTs(_L));
       }
     }
     if(degisti){

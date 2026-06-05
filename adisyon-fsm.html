@@ -404,6 +404,30 @@ input,select{font-family:'Lato',sans-serif;}
 .rap-krt-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--kr3);margin-bottom:4px;}
 .rap-krt-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--k1);}
 .rap-krt-sub{font-size:11px;color:var(--kr3);margin-top:2px;}
+/* ═══ AÇILIŞ KASASI BANNER (Kasiyer ekranı üstü) ═══ */
+.acilis-bar{display:flex;align-items:center;gap:12px;padding:14px 18px;margin:10px 14px 12px;background:linear-gradient(135deg,#fdfaf3 0%,#f4ecd8 50%,#fdfaf3 100%);border:1.5px solid var(--al);border-radius:14px;box-shadow:0 6px 20px rgba(168,136,74,.15);position:relative;overflow:hidden;animation:acilisIn .5s cubic-bezier(.2,.7,.2,1);}
+@keyframes acilisIn{0%{opacity:0;transform:translateY(-12px);}100%{opacity:1;transform:translateY(0);}}
+.acilis-bar::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);background-size:200% 100%;animation:acilisShimmer 4s ease-in-out infinite;pointer-events:none;}
+@keyframes acilisShimmer{0%,100%{background-position:120% 0;}50%{background-position:-120% 0;}}
+.acilis-bar-ic{font-size:32px;line-height:1;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08));}
+.acilis-bar-lbl{flex:1;min-width:140px;}
+.acilis-bar-ttl{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--k1);line-height:1.2;letter-spacing:-.2px;}
+.acilis-bar-sub{font-size:11px;color:var(--kr3);margin-top:2px;font-style:italic;}
+.acilis-bar-input{width:130px;padding:10px 12px;border:1.5px solid var(--kr2);border-radius:10px;font-size:16px;font-weight:700;color:var(--k1);font-family:'Lato',sans-serif;text-align:right;background:#fff;outline:none;transition:border-color .2s;}
+.acilis-bar-input:focus{border-color:var(--k1);box-shadow:0 0 0 3px rgba(45,90,39,.1);}
+.acilis-bar-btn{padding:10px 18px;border-radius:10px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.6px;text-transform:uppercase;box-shadow:0 4px 12px rgba(45,90,39,.28);transition:all .2s;font-family:inherit;white-space:nowrap;}
+.acilis-bar-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(45,90,39,.4);}
+.acilis-bar-x{background:transparent;border:none;color:#aaa;cursor:pointer;font-size:22px;padding:4px 8px;line-height:1;border-radius:50%;transition:all .2s;}
+.acilis-bar-x:hover{background:rgba(0,0,0,.06);color:#666;}
+@media(max-width:600px){
+  .acilis-bar{flex-wrap:wrap;padding:12px 14px;gap:10px;margin:8px 10px 10px;}
+  .acilis-bar-ic{font-size:26px;}
+  .acilis-bar-ttl{font-size:14px;}
+  .acilis-bar-sub{font-size:10.5px;}
+  .acilis-bar-input{width:100%;}
+  .acilis-bar-btn{flex:1;}
+}
+
 /* ═══ KASA MUTABAKATI / Z RAPORU ═══ */
 .kasa-wrap{background:linear-gradient(180deg,#fff 0%,#fdfaf3 100%);border:1px solid var(--al);border-radius:14px;padding:18px 16px;box-shadow:var(--sh);margin-bottom:14px;}
 .kasa-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
@@ -582,6 +606,17 @@ if('serviceWorker' in navigator){
 
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">
+  <!-- AÇILIŞ KASASI BANNER — sabah girilmediyse otomatik görünür -->
+  <div class="acilis-bar" id="acilisBar" style="display:none;">
+    <div class="acilis-bar-ic">🌅</div>
+    <div class="acilis-bar-lbl">
+      <div class="acilis-bar-ttl">Sabah Açılış Kasası</div>
+      <div class="acilis-bar-sub">Kasadaki bozuk para + açılış nakit (Z raporu için)</div>
+    </div>
+    <input type="number" class="acilis-bar-input" id="acilisBarInput" placeholder="₺ tutar" inputmode="decimal" min="0" step="any" onkeydown="if(event.key==='Enter')acilisHizliKaydet()">
+    <button class="acilis-bar-btn" onclick="acilisHizliKaydet()">Kasayı Aç</button>
+    <button class="acilis-bar-x" onclick="acilisBarKapat()" title="Şimdilik kapat">×</button>
+  </div>
   <div class="kas-wrap">
     <div class="masa-pnl" id="masa-pnl">
       <div class="masa-pnl-hdr">
@@ -2950,6 +2985,39 @@ function gunCiroYukle(){
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// AÇILIŞ KASASI HIZLI GİRİŞ BANNER (Kasiyer ekranı üstü)
+// ═══════════════════════════════════════════════════════════════════════
+function acilisBarKontrol(){
+  var skipKey='cactus_acilis_skip_'+SUBE+'_'+((typeof isGunu==='function')?isGunu(0):trTarih(0));
+  try{if(localStorage.getItem(skipKey)==='1'){document.getElementById('acilisBar').style.display='none';return;}}catch(e){}
+  fetch(KASA_API+'/menu/cek?sube='+_kasaKey()).then(function(r){return r.ok?r.json():null;}).then(function(d){
+    var b=document.getElementById('acilisBar');
+    if(!b) return;
+    if(d && Number(d.acilis)>0){b.style.display='none';} else {b.style.display='flex';}
+  }).catch(function(){});
+}
+function acilisHizliKaydet(){
+  var inp=document.getElementById('acilisBarInput');
+  var v=parseFloat(inp.value)||0;
+  if(v<=0){toast('₺ tutar gir');inp.focus();return;}
+  var body={sube:_kasaKey(),menu:{tarih:(typeof isGunu==='function')?isGunu(0):trTarih(0),sube_kod:SUBE,acilis:v,acilis_zamani:Date.now()}};
+  fetch(KASA_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+    if(d&&d.ok){
+      toast('✅ Açılış kasası: ₺'+v.toLocaleString('tr-TR'));
+      document.getElementById('acilisBar').style.display='none';
+      var ac=document.getElementById('kasa-acilis');
+      if(ac){ac.value=v;if(typeof kasaHesapla==='function') kasaHesapla();}
+    } else toast('⚠️ Kayıt başarısız');
+  }).catch(function(){toast('⚠️ Bağlantı hatası');});
+}
+function acilisBarKapat(){
+  document.getElementById('acilisBar').style.display='none';
+  var skipKey='cactus_acilis_skip_'+SUBE+'_'+((typeof isGunu==='function')?isGunu(0):trTarih(0));
+  try{localStorage.setItem(skipKey,'1');}catch(e){}
+}
+setTimeout(function(){if(typeof acilisBarKontrol==='function') acilisBarKontrol();}, 1500);
+
+// ═══════════════════════════════════════════════════════════════════════
 // KASA MUTABAKATI / Z RAPORU
 // ═══════════════════════════════════════════════════════════════════════
 var KASA_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
@@ -3783,6 +3851,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

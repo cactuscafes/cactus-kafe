@@ -466,6 +466,10 @@ input,select{font-family:'Lato',sans-serif;}
 .canli-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .canli-baslik{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#f4f1eb;}
 .canli-pulse{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.4);animation:pulse 1.8s infinite;}
+.gun-zrapor-btn{margin-left:auto;padding:7px 14px;border-radius:100px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;font-size:11px;font-weight:800;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;box-shadow:0 4px 12px rgba(45,90,39,.28);transition:all .2s;display:inline-flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap;}
+.gun-zrapor-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(45,90,39,.38);}
+.gun-zrapor-btn:active{transform:translateY(0);}
+@media(max-width:480px){.gun-zrapor-btn{padding:6px 10px;font-size:10px;letter-spacing:.5px;}}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.4);}70%{box-shadow:0 0 0 8px rgba(74,222,128,0);}100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}}
 .canli-ozet{display:flex;gap:10px;margin-bottom:14px;}
 .canli-ozet-krt{flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;}
@@ -657,6 +661,7 @@ if('serviceWorker' in navigator){
     <div class="gun-ciro-wrap">
       <div class="gun-ciro-hdr">
         <div class="gun-ciro-ttl"><span class="canli-pulse"></span>Günün Cirosu</div>
+        <button class="gun-zrapor-btn" onclick="zRaporHizli()" title="Kasa Mutabakatı + Z Raporu">🔐 Z Raporu</button>
         <div class="gun-ciro-tarih" id="gun-tarih-lbl"></div>
       </div>
       <div class="gun-krt-satir">
@@ -2998,6 +3003,19 @@ function kasaKaydet(){
     if(d&&d.ok) toast('✅ Kasa kaydedildi'); else toast('⚠️ Kayıt başarısız');
   }).catch(function(){toast('⚠️ Bağlantı hatası');});
 }
+function zRaporHizli(){
+  var kasa=document.querySelector('.kasa-wrap');
+  if(kasa){
+    kasa.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(function(){
+      var ac=document.getElementById('kasa-acilis');
+      var gercek=document.getElementById('kasa-gercek');
+      if(ac && !parseFloat(ac.value)){ac.focus();toast('🌅 Önce "Açılış Kasası"nı gir');return;}
+      if(gercek && !parseFloat(gercek.value)){gercek.focus();toast('💰 "Gerçek Sayım"ı gir, sonra Z Raporu üretilir');return;}
+      kasaZRapor();
+    },450);
+  }
+}
 function kasaZRapor(){
   var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
   var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
@@ -3757,6 +3775,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

@@ -658,6 +658,7 @@ if('serviceWorker' in navigator){
     <!-- Periyot tabs -->
     <div class="rap-periyot-tabs">
       <button class="rptab" onclick="rapPeriyot('gun',this)">Bugün</button>
+      <button class="rptab" onclick="rapPeriyot('dun',this)">Dün</button>
       <button class="rptab on" onclick="rapPeriyot('hafta',this)">Son 7 Gün</button>
       <button class="rptab" onclick="rapPeriyot('ay',this)">Bu Ay</button>
       <button class="rptab" onclick="rapPeriyot('ozel',this)">Özel Aralık</button>
@@ -2398,9 +2399,12 @@ function odemeyiKaydet(masa,toplam,ic,yi,tip,urunler,nakitTutar,kartTutar){
   const odTip=tip==='nakit'?'Nakit':tip==='kart'?'Kredi Kartı':'Nakit+Kart';
   // DUPLICATE GUARD: aynı içerik 10sn pencerede → aynı id → server overwrite
   const islemId=SUBE+'-'+masa+'-'+toplam+'-'+Math.floor(now.getTime()/10000);
+  // İş günü tarihi: saat 04:00'e kadar yapılan ödemeler bir önceki güne sayılır
+  var _isgIso=(typeof isGunu==='function')?isGunu(0):now.toISOString().split('T')[0];
+  var _isgTR=new Date(_isgIso+'T12:00:00Z').toLocaleDateString('tr-TR');
   const islem={
-    tarih:now.toLocaleDateString('tr-TR'),
-    tarihISO:now.toISOString().split('T')[0],
+    tarih:_isgTR,
+    tarihISO:_isgIso,
     saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),
     masa:'Masa '+masa,
     odeme_tipi:odTip,
@@ -2451,11 +2455,24 @@ function trTarih(offsetDays){
   offsetDays=offsetDays||0;
   return new Date(Date.now()+3*3600000+offsetDays*86400000).toISOString().split('T')[0];
 }
+// İş günü tarihi — saat 04:00'e kadar bir önceki güne sayılır (gece açık şubeler için)
+var IS_GUNU_KESIM=4;
+function isGunu(offsetDays){
+  offsetDays=offsetDays||0;
+  var trNow=new Date(Date.now()+3*3600000);
+  if(trNow.getUTCHours()<IS_GUNU_KESIM){
+    return new Date(trNow.getTime()-86400000+offsetDays*86400000).toISOString().split('T')[0];
+  }
+  return new Date(trNow.getTime()+offsetDays*86400000).toISOString().split('T')[0];
+}
 function rapTarihAraligi(){
-  const bugun=trTarih(0);
+  const bugun=(typeof isGunu==='function')?isGunu(0):trTarih(0);
+  const dun=(typeof isGunu==='function')?isGunu(-1):trTarih(-1);
   if(rapPeriyotAktif==='gun') return {bas:bugun,bit:bugun};
+  if(rapPeriyotAktif==='dun') return {bas:dun,bit:dun};
   if(rapPeriyotAktif==='hafta'){
-    return {bas:trTarih(-6),bit:bugun};
+    var d6=(typeof isGunu==='function')?isGunu(-6):trTarih(-6);
+    return {bas:d6,bit:bugun};
   }
   if(rapPeriyotAktif==='ay'){
     return {bas:bugun.substring(0,7)+'-01',bit:bugun};
@@ -2824,7 +2841,8 @@ function gunAcikGuncelle(acikTop,acikMasa){
 }
 
 function gunCiroYukle(){
-  var bugun=(typeof trTarih==='function')?trTarih(0):new Date().toISOString().split('T')[0];
+  // İş günü tarihi: saat 04:00'e kadar dünkü iş günü devam ediyor
+  var bugun=(typeof isGunu==='function')?isGunu(0):(typeof trTarih==='function'?trTarih(0):new Date().toISOString().split('T')[0]);
   var url='https://cactus-rapor-api.batuhanbulut.workers.dev/islem/listele?sube='+SUBE+'&baslangic='+bugun+'&bitis='+bugun;
   fetch(url).then(function(r){return r.json();}).then(function(islemler){
     var fmt=function(v){return Number(v||0).toLocaleString('tr-TR');};
@@ -3595,4 +3613,5 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 

@@ -570,6 +570,7 @@ if('serviceWorker' in navigator){
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
     <button class="htab" onclick="kartYildizAc()"><span class="tico">⭐</span>Yıldız</button>
+    <button class="htab" onclick="zRapTab(this)"><span class="tico">🔐</span>Z Raporu</button>
     <button class="htab" onclick="goTo('bar',this)" id="tab-bar"><span class="tico">🥤</span>İçecek Barı<span class="tbadge" id="bdg-bar">0</span></button>
     <button class="htab" onclick="goTo('mut',this)" id="tab-mut"><span class="tico">🍳</span>Mutfak<span class="tbadge" id="bdg-mut">0</span></button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
@@ -1345,6 +1346,13 @@ window.sifreDegistir=function(){
 };
 window.sifreCikis=function(){_korumaKapat();if(typeof toast==='function')toast('🔒 Yetki kilitlendi');};
 
+// Z Raporu tab'ı — Raporlar ekranına gider + Kasa bölümüne smooth scroll + Z raporu üretir
+function zRapTab(btn){
+  goTo('rap', btn); // tab vurgusu Z Raporu'da, içerik Raporlar ekranı (şifre korumalı)
+  setTimeout(function(){
+    if(typeof zRaporHizli==='function') zRaporHizli();
+  }, 400);
+}
 function goTo(id,el){
   // Yönet ve Raporlar şifre ister
   if((id==='yon'||id==='rap')&&!_korumaAktif()){
@@ -4196,6 +4204,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

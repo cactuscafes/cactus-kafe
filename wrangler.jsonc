@@ -17,11 +17,5 @@
       "database_name": "cactus-adisyon-events",
       "database_id": "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
     }
-  ],
-  "routes": [
-    {
-      "pattern": "pos.cactuscafes.com",
-      "custom_domain": true
-    }
   ]
 }

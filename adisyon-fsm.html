@@ -1429,6 +1429,7 @@ function _masaKazanan(Litems, Lmv, Sitems, Smv){
 }
 
 function _doPushMasalar(){
+  return; // v11: event-sourced sync devrede
   if(_postInFlight){_pendingPush=true;return;}
   if(!masalar||typeof masalar!=='object')return;
   _postInFlight=true;
@@ -1479,6 +1480,7 @@ function _doPushMasalar(){
 }
 
 function _masalarSyncCek(){
+  return Promise.resolve(null); // v11: event-sourced sync devrede
   return Promise.all([
     fetch(GET_DURUM).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
     fetch(GET_MV).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
@@ -1534,21 +1536,154 @@ function _masalarSyncCek(){
   }).catch(function(){return null;});
 }
 
-function saveMasalar(){
-  if(!masalar||typeof masalar!=='object'){return;}
-  var now=Date.now();
-  for(var i=1;i<=34;i++){
-    if(JSON.stringify(masalar[i]||[])!==JSON.stringify(_sonKayit[i]||[])){ _mv[i]=now; }
-  }
-  _sonKayit=JSON.parse(JSON.stringify(masalar));
+// ═══════════════════════════════════════════════════════════════════════
+// EVENT-SOURCED SYNC (v11) — Square/Toast tarzı append-only event log
+// ═══════════════════════════════════════════════════════════════════════
+const EV_API='https://cactus-kafe.batuhanbulut.workers.dev';
+function _uuid(){
+  return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);
+  });
+}
+var _cihazId=localStorage.getItem('cactus_cihaz_id')||'';
+if(!_cihazId){_cihazId='c_'+_uuid().slice(0,12);try{localStorage.setItem('cactus_cihaz_id',_cihazId);}catch(e){}}
+var _eventLog=[];
+try{_eventLog=JSON.parse(localStorage.getItem('cactus_evlog_'+SUBE)||'[]')||[];}catch(e){_eventLog=[];}
+var _pendingEvents=[];
+try{_pendingEvents=JSON.parse(localStorage.getItem('cactus_evpending_'+SUBE)||'[]')||[];}catch(e){_pendingEvents=[];}
+var _lastSeq=0;
+try{_lastSeq=Number(localStorage.getItem('cactus_evseq_'+SUBE)||0)||0;}catch(e){_lastSeq=0;}
+var _evSyncInFlight=false;
+function _evSave(){
   try{
-    localStorage.setItem(LK.mas,JSON.stringify(masalar));
-    localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));
-    localStorage.setItem(LK.mas+'_cycle',_getResetCycleId());
+    localStorage.setItem('cactus_evlog_'+SUBE, JSON.stringify(_eventLog.slice(-2000)));
+    localStorage.setItem('cactus_evpending_'+SUBE, JSON.stringify(_pendingEvents));
+    localStorage.setItem('cactus_evseq_'+SUBE, String(_lastSeq));
   }catch(e){}
+}
+function _applyEvent(state, evt){
+  if(!evt || !evt.type) return;
+  var m=evt.masa;
+  if(m==null) return;
+  if(!state[m]) state[m]=[];
+  var p=evt.payload||{};
+  switch(evt.type){
+    case 'ITEM_ADD': {
+      var u=p.urun||{};
+      if(!u.id) break;
+      var ex=state[m].find(function(x){return x.id===u.id;});
+      var inc=Number(p.adet)||1;
+      if(ex){ ex.adet=(Number(ex.adet)||0)+inc; ex.ts=evt.ts; }
+      else state[m].push({
+        id:u.id, ad:u.ad, fiyat:u.fiyat, tip:u.tip, emoji:u.emoji,
+        adet:inc, ts:evt.ts,
+        zaman:new Date(evt.ts).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),
+      });
+      break;
+    }
+    case 'ITEM_SUB': {
+      var ex2=state[m].find(function(x){return x.id===p.urunId;});
+      if(ex2){
+        ex2.adet=(Number(ex2.adet)||0)+(Number(p.delta)||-1);
+        if((ex2.gonderilenAdet||0)>ex2.adet) ex2.gonderilenAdet=Math.max(0,ex2.adet);
+        if(ex2.adet<=0) state[m]=state[m].filter(function(x){return x.id!==p.urunId;});
+        else ex2.ts=evt.ts;
+      }
+      break;
+    }
+    case 'ITEM_DEL': {
+      state[m]=state[m].filter(function(x){return x.id!==p.urunId;});
+      break;
+    }
+    case 'MASA_CLEAR': {
+      state[m]=[];
+      break;
+    }
+    case 'MASA_PAY': {
+      if(Array.isArray(p.urunler)){
+        p.urunler.forEach(function(s){
+          var ex=state[m].find(function(x){return x.id===s.id;});
+          if(ex) ex.adet=(Number(ex.adet)||0)-(Number(s.adet)||0);
+        });
+        state[m]=state[m].filter(function(x){return x && Number(x.adet)>0;});
+      }
+      break;
+    }
+  }
+}
+function _rebuildMasalar(){
+  var nyu={};
+  for(var i=1;i<=34;i++) nyu[i]=[];
+  var sirali=_eventLog.slice().sort(function(a,b){
+    var sa=Number(a.server_ts||a.ts||0), sb=Number(b.server_ts||b.ts||0);
+    if(sa!==sb) return sa-sb;
+    return String(a.id).localeCompare(String(b.id));
+  });
+  for(var j=0;j<sirali.length;j++) _applyEvent(nyu, sirali[j]);
+  masalar=nyu;
+  try{localStorage.setItem(LK.mas, JSON.stringify(masalar));}catch(e){}
+}
+function _pushEvent(type, masa, payload){
+  var evt={
+    id: _uuid(),
+    sube: SUBE,
+    type: String(type),
+    masa: masa==null?null:Number(masa),
+    payload: payload||{},
+    ts: Date.now(),
+    cihaz_id: _cihazId,
+  };
+  _eventLog.push(evt);
+  _pendingEvents.push(evt);
+  _applyEvent(masalar, evt);
+  _evSave();
+  try{localStorage.setItem(LK.mas, JSON.stringify(masalar));}catch(e){}
+  if(typeof renderAdisyon==='function') renderAdisyon();
+  if(typeof renderMasalar==='function') renderMasalar();
+  setTimeout(_evSync, 30);
+}
+function _evSync(){
+  if(_evSyncInFlight) return;
+  _evSyncInFlight=true;
+  var pending=_pendingEvents.slice(0, 100);
+  var pushP = pending.length
+    ? fetch(EV_API+'/api/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:pending})}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    : Promise.resolve({ok:true,accepted:0});
+  var pullP = fetch(EV_API+'/api/events?sube='+SUBE+'&since='+_lastSeq).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+  Promise.all([pushP, pullP]).then(function(res){
+    var pushRes=res[0], pullRes=res[1];
+    if(pushRes && pushRes.ok){
+      var pushedIds={};
+      pending.forEach(function(e){pushedIds[e.id]=true;});
+      _pendingEvents=_pendingEvents.filter(function(e){return !pushedIds[e.id];});
+    }
+    if(pullRes && pullRes.ok && Array.isArray(pullRes.events) && pullRes.events.length){
+      var existingIds={};
+      _eventLog.forEach(function(e){existingIds[e.id]=true;});
+      var yeni=pullRes.events.filter(function(e){return !existingIds[e.id];});
+      if(yeni.length){
+        _eventLog=_eventLog.concat(yeni);
+        _lastSeq=Number(pullRes.last_seq)||_lastSeq;
+        _rebuildMasalar();
+        if(typeof renderMasalar==='function') renderMasalar();
+        if(typeof renderAdisyon==='function' && !document.querySelector('.drawer.on')) renderAdisyon();
+      } else {
+        _lastSeq=Number(pullRes.last_seq)||_lastSeq;
+      }
+    }
+    _evSave();
+  }).catch(function(){}).finally(function(){
+    _evSyncInFlight=false;
+  });
+}
+setTimeout(_evSync, 100);
+setInterval(_evSync, 2000);
+
+function saveMasalar(){
+  // EVENT-SOURCED v11: saveMasalar artık SADECE localStorage backup.
+  if(!masalar||typeof masalar!=='object'){return;}
+  try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}
   _masaLocalWriteTime=Date.now();
-  clearTimeout(_pushMasalarTimer);
-  _pushMasalarTimer=setTimeout(_doPushMasalar,50); // 200→50: yarış penceresi daraltıldı
 }
 
 function _mvSifirla(){ _mv={}; try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){} }
@@ -1694,12 +1829,8 @@ function urunEkle(u,el){
   setTimeout(()=>el.style.transform='',200);
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
-  if(ex){ ex.adet++; ex.ts=Date.now(); }   // artırınca da ts tazele → "aktif masa" silinmesin
-  else a.push({...u,adet:1,zaman:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),ts:Date.now()});
-  // KULLANICI KASTEN EKLEME → varsa tombstone'u temizle
-  if(typeof _tombstone==='object' && _tombstone){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
-  if(typeof _odemeKilit==='object' && _odemeKilit){ _odemeKilit[aktifMasa]=0; }
-  saveMasalar();renderAdisyon();renderMasalar();
+  // EVENT-SOURCED v11
+  _pushEvent('ITEM_ADD', aktifMasa, {urun:{id:u.id,ad:u.ad,fiyat:u.fiyat,tip:u.tip,emoji:u.emoji}, adet:1});
   toast('✓ '+u.ad+' eklendi');
 }
 
@@ -1758,37 +1889,29 @@ function updateMobBadge(){
 
 function chAdet(id,d){
   if(!aktifMasa)return;
-  const a=masalar[aktifMasa];
+  const a=masalar[aktifMasa]||[];
   const it=a.find(x=>x.id===id);
   if(!it)return;
-  it.adet+=d;
-  it.ts=Date.now(); // adet değişimi de "yeni hareket" — ts tazele, polling silmesin
-  // Adet, gönderilenden aşağıya inerse gönderileni de senkronla
-  if((it.gonderilenAdet||0)>it.adet) it.gonderilenAdet=Math.max(0,it.adet);
-  if(it.adet<=0) masalar[aktifMasa]=a.filter(x=>x.id!==id);
-  if(typeof _tombstone==='object' && _tombstone){ _tombstone[aktifMasa]=0; try{localStorage.setItem(LK.mas+'_t',JSON.stringify(_tombstone));}catch(e){} }
-  if(typeof _odemeKilit==='object' && _odemeKilit){ _odemeKilit[aktifMasa]=0; }
-  saveMasalar();renderAdisyon();renderMasalar();
+  if(d>0){
+    _pushEvent('ITEM_ADD', aktifMasa, {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:d});
+  } else {
+    var yeniAdet=(Number(it.adet)||0)+d;
+    if(yeniAdet<=0) _pushEvent('ITEM_DEL', aktifMasa, {urunId:id});
+    else _pushEvent('ITEM_SUB', aktifMasa, {urunId:id, delta:d});
+  }
 }
 
 function delItem(id){
   if(!aktifMasa)return;
-  masalar[aktifMasa]=masalar[aktifMasa].filter(x=>x.id!==id);
-  saveMasalar();renderAdisyon();renderMasalar();
+  _pushEvent('ITEM_DEL', aktifMasa, {urunId:id});
 }
 
 function masayiTemizle(){
   if(!aktifMasa)return;
   if(!confirm('Masa '+aktifMasa+' adisyonu temizlensin mi?'))return;
-  var _enYeni=_maxItemTs(masalar[aktifMasa]||[]);
-  masalar[aktifMasa]=[];
-  saveMasalar();
-  // Temizleme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması/yarış olsa bile
-  // sync'te boş hali kazanır, masa "geri dolmaz" (sorun: temizleyince başka şey geri geliyordu).
-  _mv[aktifMasa]=Math.max(_mv[aktifMasa]||0, _enYeni+1, Date.now());
-  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
-  renderAdisyon();renderMasalar();
-  toast('🗑 Masa '+aktifMasa+' temizlendi');
+  var _hedef=aktifMasa;
+  _pushEvent('MASA_CLEAR', _hedef, {});
+  toast('🗑 Masa '+_hedef+' temizlendi');
 }
 
 function siparisiGonder(){
@@ -1983,17 +2106,9 @@ function odemeOnayla(){
     efektifTip=_kisiTahsilat;
     if(efektifTip==='nakit')nakitTutar=top;else kartTutar=top;
   } else if(seciliOdemeTipi==='nakit'){nakitTutar=top;}else{kartTutar=top;}
-  // Seçilen ürünleri masadan düş — index DEĞİL id ile eşleştir.
-  // (Ödeme modalı açıkken poll masalar[aktifMasa]'yı değiştirebilir → eski index kayar)
-  var _enYeniOd=_maxItemTs(masalar[aktifMasa]||[]); // ödeme öncesi en yeni ürün ts (saat kayması koruması)
-  _secKalemler.forEach(k=>{
-    if(k.sec<=0)return;
-    const item=masalar[aktifMasa].find(x=>x&&x.id===k.id);
-    if(!item)return;
-    item.adet-=k.sec;
-  });
-  masalar[aktifMasa]=masalar[aktifMasa].filter(x=>x&&x.adet>0);
+  // EVENT-SOURCED v11: MASA_PAY event'i — düşülecek ürünler payload'da.
   const oncekiMasa=aktifMasa;
+  var _odemeUrunler=_secKalemler.filter(k=>k.sec>0).map(k=>({id:k.id, adet:k.sec}));
   const odTipLabel=efektifTip==='nakit'?'Nakit':efektifTip==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';
   const webhookUrl=localStorage.getItem('cactus_webhook')||VARSAYILAN_WEBHOOK;
@@ -2004,11 +2119,12 @@ function odemeOnayla(){
   const tipLabel=indirim>0?' (-₺'+indirim+' indirim)':'';
   const tip=seciliOdemeTipi==='nakit'?'💵 Nakit':seciliOdemeTipi==='kart'?'💳 Kart':seciliOdemeTipi==='kisi'?('👥 '+_kisiAdet+' kişi '+(_kisiTahsilat==='nakit'?'💵':'💳')):'✂️ Böl (₺'+nakitTutar+' N / ₺'+kartTutar+' K)';
   odemeyiKaydet(oncekiMasa,top,ic,yi,efektifTip,secilen.map(k=>({ad:k.ad,adet:k.sec,fiyat:k.fiyat,tip:k.tip,emoji:k.emoji})),nakitTutar,kartTutar);
-  saveMasalar();
-  // Ödeme, silinen ürünlerden KESİN daha yeni damgalansın → saat kayması ya da ileri-saatli
-  // başka cihazda eklenen ürün olsa bile ödenen masa sync'te "GERİ AÇILMAZ".
-  _mv[oncekiMasa]=Math.max(_mv[oncekiMasa]||0, _enYeniOd+1, Date.now());
-  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  // EVENT-SOURCED v11: MASA_PAY event'i — düşülecek ürünler eventLog'a yazılır.
+  _pushEvent('MASA_PAY', oncekiMasa, {
+    urunler: _odemeUrunler,
+    tutar: top, ic: ic, yi: yi,
+    odemeTipi: efektifTip, nakitTutar: nakitTutar, kartTutar: kartTutar,
+  });
   closeModal('odeme-modal');
   if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
     closeDrawer();aktifMasa=null;
@@ -3479,3 +3595,4 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+

@@ -1008,13 +1008,13 @@ function _dayBannerBaslat(){
 // ═══════════════════════════════════════════════════════════════════════
 var ESIK_YILDIZ=5;
 function _sadakatBaslat(){
-  var tel=localStorage.getItem('cactus_kart_tel');
+  var tel=(localStorage.getItem('cactus_kart_tel')||'').replace(/\D/g,'');
   if(!tel) return; // numara yoksa default statik banner kalır
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/bak?telefon='+encodeURIComponent(tel))
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/bak?telefon='+tel)
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
-      if(!d||!d.ok) return;
-      _sadakatCiz(d);
+      if(!d||!d.ok||!d.musteri) return;
+      _sadakatCiz(d.musteri); // API formatı: {ok, musteri:{ad,pul,...}, gecmis:[]}
     }).catch(function(){});
 }
 function _sadakatCiz(m){

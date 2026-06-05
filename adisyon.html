@@ -437,6 +437,7 @@ input,select{font-family:'Lato',sans-serif;}
 .kasa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:14px;}
 .kasa-krt{background:#fff;border:1.5px solid var(--kr2);border-radius:12px;padding:12px 14px;position:relative;}
 .kasa-krt.acilis{border-color:rgba(45,90,39,.3);background:linear-gradient(135deg,#fff,#f0f8ec);}
+.kasa-krt.cikis{border-color:rgba(192,57,43,.25);background:linear-gradient(135deg,#fff,#fcefeb);}
 .kasa-krt.beklenen{border-color:rgba(180,140,40,.3);background:linear-gradient(135deg,#fff,#faf3e0);}
 .kasa-krt.gercek{border-color:rgba(45,90,39,.3);}
 .kasa-lbl{font-size:9.5px;font-weight:800;letter-spacing:1.6px;color:var(--k2);text-transform:uppercase;margin-bottom:5px;}
@@ -699,6 +700,45 @@ if('serviceWorker' in navigator){
 <div class="scr" id="scr-rap">
   <div class="rap-wrap">
 
+    <!-- KASA MUTABAKATI / Z RAPORU (üstte — en kolay erişim) -->
+    <div class="kasa-wrap">
+      <div class="kasa-hdr">
+        <div class="kasa-ttl">🔐 Kasa Mutabakatı / Z Raporu</div>
+        <div class="kasa-tar" id="kasa-tarih">—</div>
+      </div>
+      <div class="kasa-grid">
+        <div class="kasa-krt acilis">
+          <div class="kasa-lbl">🌅 Açılış Kasası</div>
+          <input type="number" id="kasa-acilis" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
+          <div class="kasa-sub">Gün başında kasadaki nakit</div>
+        </div>
+        <div class="kasa-krt cikis">
+          <div class="kasa-lbl">📤 Kasadan Alınan</div>
+          <input type="number" id="kasa-cikis" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
+          <div class="kasa-sub">Gece bankaya/sahibe teslim edilen</div>
+        </div>
+        <div class="kasa-krt beklenen">
+          <div class="kasa-lbl">📊 Beklenen Nakit</div>
+          <div class="kasa-val" id="kasa-beklenen">₺0</div>
+          <div class="kasa-sub" id="kasa-beklenen-alt">Açılış + Nakit ciro − Gider − Çıkış</div>
+        </div>
+        <div class="kasa-krt gercek">
+          <div class="kasa-lbl">💰 Gerçek Sayım</div>
+          <input type="number" id="kasa-gercek" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
+          <div class="kasa-sub">Gün sonunda kasada bulunan</div>
+        </div>
+      </div>
+      <div class="kasa-mutabakat bekliyor" id="kasa-mutabakat">
+        <span id="kasa-mutabakat-msg">Açılış ve sayımı girin → mutabakat hesaplanır</span>
+        <span class="kasa-mutabakat-tut" id="kasa-mutabakat-tut">—</span>
+      </div>
+      <div class="kasa-btn-row">
+        <button class="kasa-btn kasa-btn-primary" onclick="kasaZRapor()">📋 Z Raporu Oluştur</button>
+        <button class="kasa-btn kasa-btn-sec" onclick="kasaKaydet()">💾 Kasayı Kaydet</button>
+      </div>
+      <div class="kasa-z-ozet" id="kasa-z-ozet"></div>
+    </div>
+
     <!-- Günün Cirosu -->
     <div class="gun-ciro-wrap">
       <div class="gun-ciro-hdr">
@@ -779,40 +819,6 @@ if('serviceWorker' in navigator){
       <div id="rap-urun-ici">
         <div class="rap-bos"><div class="bi">🏆</div><p>Veri bekleniyor...</p></div>
       </div>
-    </div>
-
-    <!-- KASA MUTABAKATI / Z RAPORU -->
-    <div class="kasa-wrap">
-      <div class="kasa-hdr">
-        <div class="kasa-ttl">🔐 Kasa Mutabakatı / Z Raporu</div>
-        <div class="kasa-tar" id="kasa-tarih">—</div>
-      </div>
-      <div class="kasa-grid">
-        <div class="kasa-krt acilis">
-          <div class="kasa-lbl">🌅 Açılış Kasası</div>
-          <input type="number" id="kasa-acilis" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
-          <div class="kasa-sub">Gün başında kasadaki nakit</div>
-        </div>
-        <div class="kasa-krt beklenen">
-          <div class="kasa-lbl">📊 Beklenen Nakit</div>
-          <div class="kasa-val" id="kasa-beklenen">₺0</div>
-          <div class="kasa-sub" id="kasa-beklenen-alt">Açılış + Nakit ciro − Nakit gider</div>
-        </div>
-        <div class="kasa-krt gercek">
-          <div class="kasa-lbl">💰 Gerçek Sayım</div>
-          <input type="number" id="kasa-gercek" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
-          <div class="kasa-sub">Gün sonunda kasada bulunan</div>
-        </div>
-      </div>
-      <div class="kasa-mutabakat bekliyor" id="kasa-mutabakat">
-        <span id="kasa-mutabakat-msg">Açılış ve sayımı girin → mutabakat hesaplanır</span>
-        <span class="kasa-mutabakat-tut" id="kasa-mutabakat-tut">—</span>
-      </div>
-      <div class="kasa-btn-row">
-        <button class="kasa-btn kasa-btn-primary" onclick="kasaZRapor()">📋 Z Raporu Oluştur</button>
-        <button class="kasa-btn kasa-btn-sec" onclick="kasaKaydet()">💾 Kasayı Kaydet</button>
-      </div>
-      <div class="kasa-z-ozet" id="kasa-z-ozet"></div>
     </div>
 
   </div>
@@ -3298,11 +3304,12 @@ function _kasaTarih(){
 }
 function kasaHesapla(){
   var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
+  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
   var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
   var nakitCiro=Number(_gunNakit)||0;
-  var beklenen=ac+nakitCiro-_kasaGiderTop;
+  var beklenen=ac+nakitCiro-_kasaGiderTop-cikis;
   document.getElementById('kasa-beklenen').textContent='₺'+Math.round(beklenen).toLocaleString('tr-TR');
-  document.getElementById('kasa-beklenen-alt').textContent='₺'+Math.round(ac).toLocaleString('tr-TR')+' + ₺'+Math.round(nakitCiro).toLocaleString('tr-TR')+' − ₺'+Math.round(_kasaGiderTop).toLocaleString('tr-TR');
+  document.getElementById('kasa-beklenen-alt').textContent='₺'+Math.round(ac).toLocaleString('tr-TR')+' + ₺'+Math.round(nakitCiro).toLocaleString('tr-TR')+' − ₺'+Math.round(_kasaGiderTop).toLocaleString('tr-TR')+' − ₺'+Math.round(cikis).toLocaleString('tr-TR');
   var mut=document.getElementById('kasa-mutabakat');
   var msg=document.getElementById('kasa-mutabakat-msg');
   var tut=document.getElementById('kasa-mutabakat-tut');
@@ -3360,14 +3367,17 @@ function kasaYukle(){
     .then(function(d){
       if(!d) return;
       var acEl=document.getElementById('kasa-acilis');
+      var ciEl=document.getElementById('kasa-cikis');
       var geEl=document.getElementById('kasa-gercek');
       if(d.acilis!=null && acEl) acEl.value=Number(d.acilis)||'';
+      if(d.cikis!=null && ciEl) ciEl.value=Number(d.cikis)||'';
       if(d.gercek!=null && geEl) geEl.value=Number(d.gercek)||'';
       kasaHesapla();
     }).catch(function(){});
 }
 function kasaKaydet(){
   var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
+  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
   var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
   var body={
     sube:_kasaKey(),
@@ -3375,8 +3385,9 @@ function kasaKaydet(){
       tarih:(typeof isGunu==='function')?isGunu(0):trTarih(0),
       sube_kod:SUBE,
       acilis:ac,
+      cikis:cikis,
       gercek:gercek,
-      beklenen:ac+(_gunNakit||0)-_kasaGiderTop,
+      beklenen:ac+(_gunNakit||0)-_kasaGiderTop-cikis,
       nakit_ciro:_gunNakit||0,
       kart_ciro:_gunKart||0,
       toplam_ciro:_gunKapandiCiro||0,
@@ -3407,7 +3418,7 @@ function zRaporHizli(){
       }
       if(gercek && !parseFloat(gercek.value)){
         gercek.focus();
-        toast('💰 "Gerçek Sayım"ı gir, sonra Z Raporu üretilir');
+        toast('💰 "Gerçek Sayım"ı gir (varsa "Kasadan Alınan"ı da), sonra Z Raporu üretilir');
         return;
       }
       kasaZRapor();
@@ -3416,12 +3427,13 @@ function zRaporHizli(){
 }
 function kasaZRapor(){
   var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
+  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
   var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
   var nakit=Number(_gunNakit)||0;
   var kart=Number(_gunKart)||0;
   var ciro=Number(_gunKapandiCiro)||0;
   var gider=Number(_kasaGiderTop)||0;
-  var beklenen=ac+nakit-gider;
+  var beklenen=ac+nakit-gider-cikis;
   var fark=gercek-beklenen;
   var net=ciro-gider;
   var subeAd=SUBE==='podyum'?'Podyumpark':'FSM';
@@ -3448,6 +3460,7 @@ function kasaZRapor(){
     ln('🌅 Açılış Kasası',fmt(ac))+'\n'+
     ln('+ Nakit Ciro',fmt(nakit))+'\n'+
     ln('− Nakit Gider',fmt(gider))+'\n'+
+    ln('📤 Kasadan Alınan',fmt(cikis))+'\n'+
     ln('= Beklenen',fmt(beklenen))+'\n'+
     ln('💰 Gerçek Sayım',fmt(gercek))+'\n'+
     '─────────────────────────────\n'+
@@ -4293,6 +4306,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

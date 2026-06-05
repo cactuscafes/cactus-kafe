@@ -993,15 +993,19 @@ function _sadakatCiz(m){
   var pul=Number(m.pul)||0;
   var gosterPul=pul%ESIK_YILDIZ;
   var bedavaHak=Math.floor(pul/ESIK_YILDIZ);
-  // Başlık güncelle
+  // Başlık güncelle — ad varsa "Hoşgeldin Batuhan,", yoksa sade "Hoşgeldin,"
   var ttl=document.querySelector('.sk-banner-title');
   if(ttl){
-    var isim=m.ad?m.ad.split(' ')[0]:'Selam';
+    var ham=(m.ad||'').toString().trim();
+    var isim=ham?ham.split(/\s+/)[0]:'';
+    // Çok kısa/anlamsız ise yoksay (örn. tek karakter)
+    if(isim.length<2) isim='';
+    var selam=isim?'Hoşgeldin '+isim+',':'Hoşgeldin,';
     if(bedavaHak>0){
-      ttl.innerHTML='Hoşgeldin '+isim+',<br><em>'+bedavaHak+' bedava içeceğin var 🎁</em>';
+      ttl.innerHTML=selam+'<br><em>'+bedavaHak+' bedava içeceğin var 🎁</em>';
     } else {
       var kalan=ESIK_YILDIZ-gosterPul;
-      ttl.innerHTML='Hoşgeldin '+isim+',<br><em>'+kalan+' yıldız kaldı</em> hediyeye';
+      ttl.innerHTML=selam+'<br><em>'+kalan+' yıldız kaldı</em> hediyeye';
     }
   }
   // Alt yazı

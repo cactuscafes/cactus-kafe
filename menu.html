@@ -358,6 +358,61 @@ footer{padding:40px 20px 24px;}
   .quiz-hero-cta{font-size:13px;padding:10px 16px;width:100%;margin-top:4px;flex-basis:100%;text-align:center;}
 }
 
+/* ═══ Saat & Hava Durumu Banner ═══ */
+.day-banner{margin:16px 16px 4px;padding:14px 18px;border-radius:18px;background:linear-gradient(135deg,#fdfaf3 0%,#f4ecd8 100%);border:1px solid rgba(168,136,74,.18);box-shadow:0 4px 14px rgba(168,136,74,.1);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;}
+.day-banner:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(168,136,74,.18);}
+.day-banner-icon{font-size:30px;line-height:1;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08));animation:dbFloat 4s ease-in-out infinite;}
+@keyframes dbFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-3px) rotate(4deg);}}
+.day-banner-text{flex:1;min-width:0;}
+.day-banner-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:1.6px;color:#c8a86a;text-transform:uppercase;margin-bottom:2px;}
+.day-banner-msg{font-size:14px;font-weight:700;color:#2d5a27;line-height:1.35;letter-spacing:-.2px;}
+.day-banner-msg em{font-style:normal;color:#a8884a;font-weight:800;}
+.day-banner-temp{font-size:12px;color:#888;margin-top:2px;}
+@media(max-width:600px){.day-banner{margin:14px 14px 4px;padding:12px 14px;gap:12px;}.day-banner-icon{font-size:26px;}.day-banner-msg{font-size:13px;}}
+
+/* ═══ Hoşgeldin Toast ═══ */
+.welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#1a3010,#2d5a27);color:#fdfaf3;padding:14px 22px;border-radius:100px;box-shadow:0 10px 32px rgba(45,90,39,.4);font-size:13.5px;font-weight:600;letter-spacing:.3px;z-index:200;display:flex;align-items:center;gap:10px;transition:transform .5s cubic-bezier(.2,.7,.2,1);max-width:90vw;}
+.welcome-toast.on{transform:translateX(-50%) translateY(0);}
+.welcome-toast-emoji{font-size:18px;line-height:1;}
+.welcome-toast-close{background:none;border:none;color:rgba(253,250,243,.65);cursor:pointer;font-size:18px;padding:0 4px;margin-left:6px;line-height:1;}
+.welcome-toast-close:hover{color:#fdfaf3;}
+
+/* ═══ Quiz sonucu — yıldız hatırlatma ═══ */
+.quiz-star-note{background:linear-gradient(135deg,#fdfaf3,#f7f0e2);border:1px dashed rgba(200,168,106,.45);border-radius:14px;padding:11px 14px;margin:8px 0 4px;font-size:12px;color:#5c4f30;line-height:1.45;text-align:left;display:flex;align-items:center;gap:10px;}
+.quiz-star-note .star{font-size:22px;flex-shrink:0;animation:starTw 2s ease-in-out infinite;}
+@keyframes starTw{0%,100%{transform:scale(1) rotate(0);}50%{transform:scale(1.15) rotate(10deg);}}
+.quiz-fal-btn{background:linear-gradient(135deg,#2d5a27,#1a3010);color:#f4ecd8;border:none;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin:6px 0 0;font-family:inherit;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(45,90,39,.25);transition:all .2s;}
+.quiz-fal-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(45,90,39,.4);}
+
+/* ═══ Kahve Falı Modal ═══ */
+.fal-bg{position:fixed;inset:0;background:rgba(15,12,8,.78);backdrop-filter:blur(12px);z-index:310;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .3s;}
+.fal-bg.on{display:flex;opacity:1;}
+.fal-modal{background:radial-gradient(ellipse at top,#1f2010 0%,#0f1108 100%);border-radius:28px;max-width:440px;width:100%;padding:36px 28px 26px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(200,168,106,.15);position:relative;color:#f4ecd8;transform:translateY(15px) scale(.96);transition:transform .4s cubic-bezier(.2,.7,.2,1);overflow:hidden;}
+.fal-bg.on .fal-modal{transform:translateY(0) scale(1);}
+.fal-modal::before{content:'';position:absolute;inset:-50%;background:radial-gradient(circle at 30% 20%,rgba(200,168,106,.18) 0%,transparent 35%),radial-gradient(circle at 70% 80%,rgba(255,200,100,.12) 0%,transparent 40%);pointer-events:none;animation:falGlow 8s ease-in-out infinite;}
+@keyframes falGlow{0%,100%{transform:rotate(0deg);}50%{transform:rotate(180deg);}}
+.fal-modal>*{position:relative;z-index:2;}
+.fal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(244,236,216,.5);font-size:26px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:3;}
+.fal-close:hover{background:rgba(244,236,216,.1);color:#f4ecd8;}
+.fal-title{font-family:'Playfair Display',serif;font-size:22px;color:#dcbd80;margin:0 0 4px;letter-spacing:.5px;font-weight:700;}
+.fal-sub{font-size:11.5px;color:rgba(244,236,216,.55);margin:0 0 22px;letter-spacing:1.5px;text-transform:uppercase;}
+.fal-cup{font-size:90px;line-height:1;margin:8px 0 18px;display:inline-block;filter:drop-shadow(0 8px 24px rgba(200,168,106,.4));animation:falCupSpin 2.4s cubic-bezier(.5,.1,.4,1);}
+@keyframes falCupSpin{0%{transform:rotate(0deg) scale(.8);opacity:0;}30%{transform:rotate(180deg) scale(1.1);opacity:1;}60%{transform:rotate(360deg) scale(1);}100%{transform:rotate(360deg) scale(1);}}
+.fal-loading{font-size:13.5px;color:rgba(244,236,216,.7);font-style:italic;letter-spacing:.5px;display:inline-block;animation:falDots 1.5s ease-in-out infinite;margin:8px 0 18px;}
+@keyframes falDots{0%,100%{opacity:.5;}50%{opacity:1;}}
+.fal-result{display:none;animation:falReveal .8s cubic-bezier(.2,.7,.2,1);}
+.fal-result.on{display:block;}
+@keyframes falReveal{0%{opacity:0;transform:translateY(15px);}100%{opacity:1;transform:translateY(0);}}
+.fal-quote{font-family:'Playfair Display',serif;font-size:19px;font-style:italic;color:#fdfaf3;line-height:1.55;margin:6px 12px 18px;position:relative;}
+.fal-quote::before,.fal-quote::after{content:'❝';color:#dcbd80;font-size:36px;line-height:0;vertical-align:middle;}
+.fal-quote::after{content:'❞';}
+.fal-yorum{font-size:12px;color:rgba(220,189,128,.85);letter-spacing:.6px;margin-bottom:18px;}
+.fal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.fal-btn{padding:10px 18px;border-radius:100px;font-size:12.5px;font-weight:700;cursor:pointer;letter-spacing:.5px;border:1.5px solid rgba(220,189,128,.4);background:transparent;color:#dcbd80;font-family:inherit;transition:all .2s;}
+.fal-btn:hover{background:rgba(220,189,128,.1);border-color:#dcbd80;}
+.fal-btn-primary{background:linear-gradient(135deg,#dcbd80,#c8a86a);color:#1a3010;border-color:transparent;}
+.fal-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(220,189,128,.4);}
+
 /* ═══ Ürün Rozetleri ═══ */
 .product-img-wrap{position:relative;}
 .product-badge{position:absolute;top:8px;left:8px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.2);}
@@ -480,6 +535,16 @@ footer{padding:40px 20px 24px;}
   <button class="sube-tab" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
 </div>
 
+<!-- Saat & Hava Durumu Banner — dinamik öneri -->
+<div class="day-banner" id="dayBanner" style="display:none;" onclick="_dayBannerScroll()">
+  <div class="day-banner-icon" id="dbIcon">☕</div>
+  <div class="day-banner-text">
+    <div class="day-banner-eyebrow" id="dbEyebrow">ŞİMDİ</div>
+    <div class="day-banner-msg" id="dbMsg">—</div>
+    <div class="day-banner-temp" id="dbTemp"></div>
+  </div>
+</div>
+
 <!-- BANA ÖZEL KAHVE BANNER — büyük + dikkat çekici -->
 <section class="quiz-hero" onclick="quizAc()">
   <div class="quiz-hero-bg"></div>
@@ -513,6 +578,34 @@ footer{padding:40px 20px 24px;}
     <div class="spotlight-grid" id="spotlight-grid-podyum"></div>
   </div>
   <div class="cat-list" id="cat-list-podyum"></div>
+</div>
+
+<!-- Hoşgeldin Toast -->
+<div class="welcome-toast" id="welcomeToast">
+  <span class="welcome-toast-emoji" id="wtEmoji">👋</span>
+  <span id="wtMsg">Hoşgeldin! Karar veremezsen yukarıdaki quiz'i dene ☕</span>
+  <button class="welcome-toast-close" onclick="_welcomeKapat()" aria-label="Kapat">×</button>
+</div>
+
+<!-- Kahve Falı Modal -->
+<div class="fal-bg" id="falBg" onclick="if(event.target===this)falKapat()">
+  <div class="fal-modal">
+    <button class="fal-close" onclick="falKapat()" aria-label="Kapat">×</button>
+    <div class="fal-sub">Kahve Falı</div>
+    <div class="fal-title">Kader fincana yazılı</div>
+    <div id="falLoadingWrap">
+      <div class="fal-cup">☕</div>
+      <div class="fal-loading">Telve şekilleniyor...</div>
+    </div>
+    <div class="fal-result" id="falResult">
+      <div class="fal-quote" id="falQuote">—</div>
+      <div class="fal-yorum" id="falYorum">— Telveler böyle söylüyor</div>
+      <div class="fal-actions">
+        <button class="fal-btn" onclick="falBak()">↺ Yeniden bak</button>
+        <button class="fal-btn fal-btn-primary" onclick="falKapat()">Teşekkürler ✨</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -570,10 +663,15 @@ footer{padding:40px 20px 24px;}
         <div class="quiz-result-price" id="qrPrice"></div>
         <div class="quiz-result-desc" id="qrDesc"></div>
       </div>
+      <div class="quiz-star-note">
+        <span class="star">🌟</span>
+        <span>Bu içeceği bugün sipariş ettiğinde sadakat kartına <b>+1 yıldız</b>. Kasiyere telefon numaranı söylemeyi unutma!</span>
+      </div>
       <div class="quiz-actions">
         <button class="quiz-btn quiz-btn-secondary" onclick="quizBaslat()">↺ Tekrar</button>
         <button class="quiz-btn quiz-btn-primary" onclick="quizKapat()">Mükemmel ✨</button>
       </div>
+      <button class="quiz-fal-btn" onclick="quizKapat();setTimeout(falAc,300);">☕ Bir de kahve falı baktıralım</button>
     </div>
   </div>
 </div>
@@ -636,6 +734,9 @@ async function init() {
     altKatBarGuncelle();
     gozlemUrunler();
     altKatBarOto();
+    if(typeof _dayBannerBaslat==='function') _dayBannerBaslat();
+    if(typeof _sadakatBaslat==='function')   _sadakatBaslat();
+    if(typeof _welcomeBaslat==='function')   _welcomeBaslat();
   },50);
 }
 
@@ -777,6 +878,254 @@ function _qSonuc(){
   document.getElementById('qrName').textContent=sec.ad;
   document.getElementById('qrPrice').textContent=sec.fiyat?'₺'+sec.fiyat:'';
   document.getElementById('qrDesc').textContent=sec.desc;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SAAT & HAVA DURUMUNA GÖRE DİNAMİK ÖNERİ BANNER
+// ═══════════════════════════════════════════════════════════════════════
+function _saatDilim(){
+  var h=new Date().getHours();
+  if(h>=6 && h<11)  return {key:'sabah',     ad:'SABAH',          icon:'🌅'};
+  if(h>=11 && h<14) return {key:'oglen',     ad:'ÖĞLEN',          icon:'☀️'};
+  if(h>=14 && h<17) return {key:'oglenden',  ad:'ÖĞLEDEN SONRA',  icon:'🌤'};
+  if(h>=17 && h<21) return {key:'aksam',     ad:'AKŞAM',          icon:'🌇'};
+  return {key:'gece', ad:'GECE', icon:'🌙'};
+}
+function _havaDurum(code){
+  if(code==null) return {key:'normal', icon:'', etiket:''};
+  if(code===0||code===1) return {key:'gunesli', icon:'☀️', etiket:'Güneşli'};
+  if(code===2||code===3) return {key:'bulutlu', icon:'⛅', etiket:'Bulutlu'};
+  if(code>=51 && code<=67) return {key:'yagmurlu', icon:'🌧', etiket:'Yağışlı'};
+  if(code>=71 && code<=77) return {key:'karli',    icon:'❄️', etiket:'Karlı'};
+  if(code>=80 && code<=86) return {key:'yagmurlu', icon:'🌦', etiket:'Sağanak'};
+  if(code>=95) return {key:'firtina', icon:'⛈', etiket:'Fırtınalı'};
+  if(code===45||code===48) return {key:'sisli', icon:'🌫', etiket:'Sisli'};
+  return {key:'normal', icon:'', etiket:''};
+}
+function _oneriMesaj(saat, temp, hava){
+  // Sıcaklığa göre öncelik
+  var sicakHedef='Latte', sogukHedef='Ice Caramel Latte', cay='Ihlamur';
+  if(temp!=null && temp>=27){
+    return {icon:'🧊', em:'YAZ SICAĞI', mesaj:'Hava sıcak — <em>Frozen</em> ya da <em>Ice Caramel Latte</em> tam zamanı', scrollTo:'soguk'};
+  }
+  if(temp!=null && temp<=8){
+    return {icon:'❄️', em:'SOĞUK GÜN', mesaj:'<em>Sıcak Çikolata</em> veya <em>Salep</em> seni ısıtsın', scrollTo:'sicak'};
+  }
+  if(hava.key==='yagmurlu'){
+    return {icon:'🌧', em:'YAĞMURLU GÜN', mesaj:'<em>Türk Kahvesi</em> + <em>Cevizli Kurabiye</em> mükemmel uyum', scrollTo:'sicak'};
+  }
+  if(hava.key==='karli'){
+    return {icon:'❄️', em:'KARLI GÜN', mesaj:'<em>Salep</em> ile sarın, kar manzarasını izle', scrollTo:'sicak'};
+  }
+  switch(saat.key){
+    case 'sabah':    return {icon:'🌅', em:'GÜNE BAŞLA', mesaj:'<em>Latte</em> veya <em>Flat White</em> ile güne enerjik başla', scrollTo:'sicak'};
+    case 'oglen':    return {icon:'☕', em:'ÖĞLE MOLASI', mesaj:'Klasik <em>Cappucino</em> veya ferah <em>Cool Lime</em>', scrollTo:'sicak'};
+    case 'oglenden': return {icon:'🌤', em:'ÖĞLEDEN SONRA', mesaj:'<em>Mocha</em> ile tatlı bir mola — yanına <em>kurabiye</em>?', scrollTo:'sicak'};
+    case 'aksam':    return {icon:'🌇', em:'AKŞAM KEYFİ', mesaj:'<em>Ihlamur</em> ile sakinleş — günü güzel kapat', scrollTo:'cay'};
+    case 'gece':     return {icon:'🌙', em:'GECE SAKİNLİĞİ', mesaj:'Kafeinsiz bir <em>Papatya</em> ya da <em>Sıcak Çikolata</em>', scrollTo:'cay'};
+  }
+  return {icon:'☕', em:'BUGÜN', mesaj:'<em>Sana özel</em> içeceği keşfet', scrollTo:''};
+}
+var _dayBannerHedef='';
+function _dayBannerCiz(temp, weatherCode){
+  var saat=_saatDilim();
+  var hava=_havaDurum(weatherCode);
+  var oneri=_oneriMesaj(saat, temp, hava);
+  var b=document.getElementById('dayBanner');
+  if(!b) return;
+  document.getElementById('dbIcon').textContent=oneri.icon || saat.icon;
+  document.getElementById('dbEyebrow').textContent=oneri.em;
+  document.getElementById('dbMsg').innerHTML=oneri.mesaj;
+  var tempTxt='';
+  if(temp!=null){ tempTxt=hava.icon+' '+Math.round(temp)+'°C'+(hava.etiket?' · '+hava.etiket:''); }
+  document.getElementById('dbTemp').textContent=tempTxt;
+  _dayBannerHedef=oneri.scrollTo;
+  b.style.display='flex';
+}
+function _dayBannerScroll(){
+  // İlk eşleşen kategoriye scroll et
+  if(!_dayBannerHedef) return;
+  var aktifSube=document.querySelector('.sube-tab.on');
+  var sube=(aktifSube && aktifSube.textContent.toLowerCase().indexOf('fsm')>=0)?'fsm':'podyum';
+  var pattern={
+    sicak:['sicak','sıcak','kahve'],
+    soguk:['soguk','soğuk','ice'],
+    cay:['cay','çay','tea','herbal','bitki'],
+  }[_dayBannerHedef]||[];
+  var cats=document.querySelectorAll('#cat-list-'+sube+' .cat-section');
+  for(var i=0;i<cats.length;i++){
+    var ad=(cats[i].dataset.kat||'').toLowerCase();
+    var match=pattern.some(function(p){return ad.indexOf(p)>=0;});
+    if(match){
+      if(!cats[i].classList.contains('open')) cats[i].classList.add('open');
+      setTimeout(function(c){return function(){c.scrollIntoView({behavior:'smooth',block:'start'});};}(cats[i]),100);
+      return;
+    }
+  }
+}
+function _dayBannerBaslat(){
+  // Önce saat-based banner göster (hava beklemeden)
+  _dayBannerCiz(null, null);
+  // Sonra hava durumunu çek (FSM/Podyumpark her ikisi de İstanbul içi)
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=41.06&longitude=28.95&current=temperature_2m,weather_code&timezone=Europe/Istanbul')
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){
+      if(!d||!d.current) return;
+      _dayBannerCiz(d.current.temperature_2m, d.current.weather_code);
+    }).catch(function(){});
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SADAKAT KART CANLI BANNER — telefon varsa API'den çek + sk-banner güncelle
+// ═══════════════════════════════════════════════════════════════════════
+var ESIK_YILDIZ=5;
+function _sadakatBaslat(){
+  var tel=localStorage.getItem('cactus_kart_tel');
+  if(!tel) return; // numara yoksa default statik banner kalır
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/bak?telefon='+encodeURIComponent(tel))
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){
+      if(!d||!d.ok) return;
+      _sadakatCiz(d);
+    }).catch(function(){});
+}
+function _sadakatCiz(m){
+  var pul=Number(m.pul)||0;
+  var gosterPul=pul%ESIK_YILDIZ;
+  var bedavaHak=Math.floor(pul/ESIK_YILDIZ);
+  // Başlık güncelle
+  var ttl=document.querySelector('.sk-banner-title');
+  if(ttl){
+    var isim=m.ad?m.ad.split(' ')[0]:'Selam';
+    if(bedavaHak>0){
+      ttl.innerHTML='Hoşgeldin '+isim+',<br><em>'+bedavaHak+' bedava içeceğin var 🎁</em>';
+    } else {
+      var kalan=ESIK_YILDIZ-gosterPul;
+      ttl.innerHTML='Hoşgeldin '+isim+',<br><em>'+kalan+' yıldız kaldı</em> hediyeye';
+    }
+  }
+  // Alt yazı
+  var sub=document.querySelector('.sk-banner-sub');
+  if(sub){
+    sub.innerHTML='Her siparişinde bir yıldız kazan. Kasiyere telefon numaranı söylemen yeterli.';
+  }
+  // Yıldız grid güncelle
+  var grid=document.querySelector('.sk-stamp-grid');
+  if(grid){
+    grid.innerHTML='';
+    for(var i=0;i<ESIK_YILDIZ;i++){
+      var div=document.createElement('div');
+      if(i<gosterPul){ div.className='sk-stamp dolu'; div.textContent='⭐'; }
+      else if(i===gosterPul){ div.className='sk-stamp next'; }
+      else { div.className='sk-stamp bos'; }
+      grid.appendChild(div);
+    }
+  }
+  // Yıldız label
+  var lbl=document.querySelector('.sk-stamp-label');
+  if(lbl) lbl.textContent=gosterPul+' / '+ESIK_YILDIZ+' yıldız';
+  // Bilgi kutusu — telefon zaten kayıtlı olduğu için farklı mesaj
+  var bilgi=document.querySelector('.sk-kasiyer-not');
+  var tel=localStorage.getItem('cactus_kart_tel')||'';
+  if(bilgi){
+    bilgi.innerHTML='<span class="sk-kasiyer-ikon">📞</span><span>Sipariş verirken <strong>'+tel.slice(-4)+' ile biten numaran</strong> ile yıldızını kazan!</span>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HOŞGELDİN TOAST — ilk açılışta + tekrar açılışta farklı mesaj
+// ═══════════════════════════════════════════════════════════════════════
+function _welcomeBaslat(){
+  var ziyaret=Number(localStorage.getItem('cactus_ziyaret_say')||0);
+  var ad=localStorage.getItem('cactus_kart_tel')?'tekrar':'';
+  var msg, emoji;
+  if(ziyaret===0){
+    msg='Hoşgeldin! Karar veremezsen yukarıdaki <b>quiz\'i</b> dene ☕';
+    emoji='🌵';
+  } else if(ad){
+    msg='Tekrar görmek güzel! Bugün ne içersin?';
+    emoji='👋';
+  } else if(ziyaret<3){
+    msg='Tekrar hoşgeldin ☕ Quiz\'i denediysen <b>kahve falı</b> da var';
+    emoji='✨';
+  } else {
+    msg=null; // 3+ ziyaretten sonra toast gösterme
+  }
+  if(msg){
+    setTimeout(function(){
+      var t=document.getElementById('welcomeToast');
+      if(!t) return;
+      document.getElementById('wtEmoji').textContent=emoji;
+      document.getElementById('wtMsg').innerHTML=msg;
+      t.classList.add('on');
+      setTimeout(_welcomeKapat, 6000);
+    }, 1600);
+  }
+  try{ localStorage.setItem('cactus_ziyaret_say', String(ziyaret+1)); }catch(e){}
+}
+function _welcomeKapat(){
+  var t=document.getElementById('welcomeToast');
+  if(t) t.classList.remove('on');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// KAHVE FALI — eğlence modülü, günde 1 hak (localStorage)
+// ═══════════════════════════════════════════════════════════════════════
+var FAL_QUOTES=[
+  {q:'Yakın zamanda beklenmedik bir haber alacaksın.', y:'Telveler güzel haberlere işaret ediyor'},
+  {q:'Bir yol gözüküyor — kısa ama önemli bir yolculuk.', y:'Hareket var, durağanlık geçici'},
+  {q:'Birisi seni düşünüyor, yakında bir telefon gelecek.', y:'Sevgi göstergesi belirgin'},
+  {q:'Önemli bir karar verme zamanı yaklaşıyor.', y:'Sezgilerine güven, doğru yoldasın'},
+  {q:'Yeni bir başlangıç için fincanın hazır.', y:'Bir kapı açılıyor, içeri gir'},
+  {q:'Eski bir dosttan haber alacaksın.', y:'Geçmiş, güzel bir hatırlatma getiriyor'},
+  {q:'Şanslı renk bu hafta altın sarısı.', y:'Görünüşe dikkat — fark yaratacaksın'},
+  {q:'Bir sürpriz hediye yakında kapını çalacak.', y:'Beklemediğin yerden bir nezaket'},
+  {q:'Hayatına neşeli bir dost giriyor.', y:'Yeni tanışıklık yakın'},
+  {q:'Bu hafta bekleyen iş, beklediğinden daha kolay halledilecek.', y:'Engeller eriyor — rahatla'},
+  {q:'Kalbinin sesini dinle — sezgilerin haklı.', y:'İçindeki ses yol gösterici'},
+  {q:'Çok yakında bir tebrik töreni var: senin için.', y:'Başarı yakın'},
+  {q:'Bir kapı kapanırken, üç kapı açılıyor.', y:'Değişim bereket getirir'},
+  {q:'Bu hafta sevdiğin biriyle güzel bir anı oluşturacaksın.', y:'Birlikte geçecek özel an'},
+  {q:'Para işleri canlanıyor — beklediğin haber yakın.', y:'Maddi rahatlama yolda'},
+  {q:'Bir şey bulduğunu sanıyordun ama kaybettiğin geri dönecek.', y:'Eski olan tazeleniyor'},
+  {q:'Önemli bir buluşmanın kapıda olduğunu unutma.', y:'Hazırlıklı ol — fırsat geliyor'},
+  {q:'Pazar günü güzel bir telefon konuşması var.', y:'Konuşma rahatlatacak'},
+  {q:'Saat 17:00 — şanslı saat. O saatte verilen karar doğru.', y:'Zamanlamaya dikkat'},
+  {q:'Cesaretine güven — geri durduğun şey aslında senin için yapıldı.', y:'Atıl ileri'},
+];
+function _falGunlukKey(){
+  var d=new Date();
+  return 'cactus_fal_'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function falAc(){
+  var bg=document.getElementById('falBg');
+  if(!bg) return;
+  bg.classList.add('on');
+  document.body.style.overflow='hidden';
+  falBak();
+}
+function falKapat(){
+  var bg=document.getElementById('falBg');
+  if(bg) bg.classList.remove('on');
+  document.body.style.overflow='';
+}
+function falBak(){
+  // Loading state
+  var loadEl=document.getElementById('falLoadingWrap');
+  var resEl=document.getElementById('falResult');
+  if(loadEl) loadEl.style.display='';
+  if(resEl) resEl.classList.remove('on');
+  // 2.4 sn animasyon sonrası rastgele fal
+  setTimeout(function(){
+    var idx=Math.floor(Math.random()*FAL_QUOTES.length);
+    var fal=FAL_QUOTES[idx];
+    document.getElementById('falQuote').textContent=fal.q;
+    document.getElementById('falYorum').textContent='— '+fal.y;
+    if(loadEl) loadEl.style.display='none';
+    if(resEl) resEl.classList.add('on');
+    // Günlük key kaydet (istatistik için, kullanılmıyor şu an)
+    try{ localStorage.setItem(_falGunlukKey(),'1'); }catch(e){}
+  }, 2400);
 }
 
 function gozlemUrunler(){

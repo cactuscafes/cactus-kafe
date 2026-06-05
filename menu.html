@@ -328,6 +328,58 @@ footer{padding:40px 20px 24px;}
 #isBasvuruPop .ib-btn:hover{background:linear-gradient(135deg,#ecce92,#d8b87a)!important;transform:translateY(-1px);}
 #isBasvuruKapat{color:rgba(240,228,205,.5);}
 #isBasvuruKapat:hover{color:#f4ecd8;}
+
+/* ═══ Filtre Çubuğu ═══ */
+.filter-bar{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(252,249,242,.92));backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.04);position:sticky;top:0;z-index:80;margin:0 -16px;padding-left:16px;padding-right:16px;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:9px 16px;border:1.5px solid rgba(45,90,39,.18);border-radius:100px;background:#fff;color:#2d5a27;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.2,.7,.2,1);white-space:nowrap;letter-spacing:.3px;}
+.filter-chip:hover{transform:translateY(-1px);border-color:#2d5a27;box-shadow:0 4px 12px rgba(45,90,39,.12);}
+.filter-chip.on{background:linear-gradient(135deg,#2d5a27,#3d6f37);color:#fff;border-color:#2d5a27;box-shadow:0 4px 14px rgba(45,90,39,.28);}
+.filter-empty{text-align:center;padding:60px 24px;color:#999;font-size:14px;display:none;}
+.filter-empty.on{display:block;}
+
+/* ═══ Ürün Rozetleri ═══ */
+.product-img-wrap{position:relative;}
+.product-badge{position:absolute;top:8px;left:8px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.badge-populer{background:linear-gradient(135deg,#ff7e3f,#e84393);color:#fff;}
+.badge-yeni{background:linear-gradient(135deg,#00c896,#2d8f6e);color:#fff;}
+.badge-mevsim{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;}
+
+/* ═══ Bana Özel Kahve Quiz'i ═══ */
+.quiz-fab{position:fixed;bottom:160px;right:18px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#c8a86a,#a8884a);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 8px 24px rgba(168,136,74,.4);z-index:88;transition:all .3s cubic-bezier(.2,.7,.2,1);display:flex;align-items:center;justify-content:center;}
+.quiz-fab:hover{transform:scale(1.08) rotate(-8deg);box-shadow:0 12px 32px rgba(168,136,74,.55);}
+.quiz-fab::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(200,168,106,.4);animation:quizPulse 2.2s ease-in-out infinite;}
+@keyframes quizPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.18);opacity:0;}}
+@media(max-width:768px){.quiz-fab{bottom:130px;right:14px;width:52px;height:52px;font-size:22px;}}
+
+.quiz-bg{position:fixed;inset:0;background:rgba(20,20,20,.65);backdrop-filter:blur(10px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .3s;}
+.quiz-bg.on{display:flex;opacity:1;}
+.quiz-modal{background:#fff;border-radius:28px;max-width:480px;width:100%;padding:36px 28px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.35);position:relative;transform:translateY(20px) scale(.95);transition:transform .35s cubic-bezier(.2,.7,.2,1);}
+.quiz-bg.on .quiz-modal{transform:translateY(0) scale(1);}
+.quiz-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:28px;color:#999;cursor:pointer;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.quiz-close:hover{background:rgba(0,0,0,.06);color:#333;}
+.quiz-progress{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
+.quiz-dot{width:24px;height:4px;border-radius:100px;background:#e5e0d4;transition:all .35s cubic-bezier(.2,.7,.2,1);}
+.quiz-dot.on{background:linear-gradient(90deg,#2d5a27,#c8a86a);width:36px;}
+.quiz-step{display:none;animation:quizFade .4s ease-out;}
+.quiz-step.on{display:block;}
+@keyframes quizFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.quiz-title{font-family:'Playfair Display',serif;font-size:24px;color:#1a3010;margin:0 0 6px;line-height:1.2;}
+.quiz-sub{font-size:13px;color:#888;margin:0 0 22px;letter-spacing:.3px;}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;border:1.5px solid rgba(45,90,39,.15);border-radius:14px;background:#fff;color:#2d5a27;font-size:14.5px;font-weight:600;cursor:pointer;transition:all .22s;text-align:left;font-family:inherit;}
+.quiz-option:hover{background:linear-gradient(135deg,#fafaf6,#f4f0e6);border-color:#2d5a27;transform:translateX(3px);box-shadow:0 4px 12px rgba(45,90,39,.08);}
+.quiz-result-card{background:linear-gradient(135deg,#fdfaf3,#f4ecd8);border-radius:20px;padding:26px 20px;margin:18px 0;border:1px solid rgba(200,168,106,.25);}
+.quiz-result-emoji{font-size:64px;margin-bottom:4px;line-height:1;}
+.quiz-result-name{font-family:'Playfair Display',serif;font-size:28px;color:#1a3010;margin:8px 0 6px;font-weight:700;letter-spacing:-.5px;}
+.quiz-result-price{font-size:14px;color:#c8a86a;font-weight:700;margin-bottom:10px;letter-spacing:.5px;}
+.quiz-result-desc{font-size:13.5px;color:#666;line-height:1.55;font-style:italic;}
+.quiz-actions{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.quiz-btn{flex:1;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:all .2s;font-family:inherit;min-width:120px;}
+.quiz-btn-secondary{background:transparent;border:1.5px solid #2d5a27;color:#2d5a27;}
+.quiz-btn-secondary:hover{background:rgba(45,90,39,.06);}
+.quiz-btn-primary{background:linear-gradient(135deg,#2d5a27,#3d6f37);border:1.5px solid #2d5a27;color:#fff;}
+.quiz-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(45,90,39,.3);}
+
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
@@ -413,6 +465,19 @@ footer{padding:40px 20px 24px;}
   <button class="sube-tab" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
 </div>
 
+<!-- Filtre Çubuğu -->
+<div class="filter-bar" id="filterBar">
+  <button class="filter-chip on" data-filter="all">Tümü</button>
+  <button class="filter-chip" data-filter="populer">⭐ Popüler</button>
+  <button class="filter-chip" data-filter="yeni">🆕 Yeni</button>
+  <button class="filter-chip" data-filter="sicak">☕ Sıcak</button>
+  <button class="filter-chip" data-filter="soguk">🧊 Soğuk</button>
+  <button class="filter-chip" data-filter="cay">🌿 Çay</button>
+  <button class="filter-chip" data-filter="tatli">🍰 Tatlı</button>
+  <button class="filter-chip" data-filter="butce">💰 200₺ altı</button>
+</div>
+<div class="filter-empty" id="filterEmpty">Bu filtreye uyan ürün bulunamadı. Farklı bir filtre dene 🌵</div>
+
 <div id="menu-fsm">
   <div class="spotlight" id="spotlight-fsm">
     <p class="spotlight-title">Öne Çıkanlar</p>
@@ -438,6 +503,64 @@ footer{padding:40px 20px 24px;}
 
 <!-- ⓘ Yukarı çık butonu -->
 <button id="yukari-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Yukarı çık">↑</button>
+
+<!-- ⓘ Bana Özel Kahve Quiz Butonu -->
+<button class="quiz-fab" onclick="quizAc()" aria-label="Bana özel kahve önerisi" title="Bana özel kahve önerisi">☕</button>
+
+<!-- ⓘ Quiz Modal -->
+<div class="quiz-bg" id="quizBg" onclick="if(event.target===this)quizKapat()">
+  <div class="quiz-modal">
+    <button class="quiz-close" onclick="quizKapat()" aria-label="Kapat">×</button>
+    <div class="quiz-progress">
+      <div class="quiz-dot on" id="qd1"></div>
+      <div class="quiz-dot" id="qd2"></div>
+      <div class="quiz-dot" id="qd3"></div>
+    </div>
+
+    <!-- Soru 1: Vibe -->
+    <div class="quiz-step on" id="qs1">
+      <div class="quiz-title">Bugün vibe'ın ne? ✨</div>
+      <div class="quiz-sub">Sana göre olanı bulalım</div>
+      <button class="quiz-option" onclick="qAns(1,'enerji')">⚡ Enerji lazım — uyandır beni</button>
+      <button class="quiz-option" onclick="qAns(1,'sakin')">🌿 Sakin bir an istiyorum</button>
+      <button class="quiz-option" onclick="qAns(1,'tatli')">🍫 Canım tatlı bir şey istedi</button>
+      <button class="quiz-option" onclick="qAns(1,'klasik')">☕ Klasiklerden gidelim</button>
+    </div>
+
+    <!-- Soru 2: Sıcak/Soğuk -->
+    <div class="quiz-step" id="qs2">
+      <div class="quiz-title">Sıcak mı, Soğuk mu? 🧊</div>
+      <div class="quiz-sub">Hangisi sana hitap ediyor?</div>
+      <button class="quiz-option" onclick="qAns(2,'sicak')">☕ Sıcak — buharlı ve yumuşak</button>
+      <button class="quiz-option" onclick="qAns(2,'soguk')">🧊 Soğuk — ferah ve buzlu</button>
+      <button class="quiz-option" onclick="qAns(2,'farketmez')">🤷 Farketmez — bana sürpriz yap</button>
+    </div>
+
+    <!-- Soru 3: Süt -->
+    <div class="quiz-step" id="qs3">
+      <div class="quiz-title">Süt sever misin? 🥛</div>
+      <div class="quiz-sub">Ne kadar kremalı tercih edersin?</div>
+      <button class="quiz-option" onclick="qAns(3,'cok')">🥛 Bol süt — kremalı seviyorum</button>
+      <button class="quiz-option" onclick="qAns(3,'biraz')">🥄 Biraz süt — denge önemli</button>
+      <button class="quiz-option" onclick="qAns(3,'yok')">🚫 Süt yok — sade lütfen</button>
+    </div>
+
+    <!-- Sonuç -->
+    <div class="quiz-step" id="qsResult">
+      <div class="quiz-sub" style="margin-bottom:8px;">İşte sana göre olan:</div>
+      <div class="quiz-result-card">
+        <div class="quiz-result-emoji" id="qrEmoji">☕</div>
+        <div class="quiz-result-name" id="qrName">—</div>
+        <div class="quiz-result-price" id="qrPrice"></div>
+        <div class="quiz-result-desc" id="qrDesc"></div>
+      </div>
+      <div class="quiz-actions">
+        <button class="quiz-btn quiz-btn-secondary" onclick="quizBaslat()">↺ Tekrar</button>
+        <button class="quiz-btn quiz-btn-primary" onclick="quizKapat()">Mükemmel ✨</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Ürün Popup -->
 <div class="upop-bg" id="upopBg" onclick="if(event.target===this)upopKapat()">
@@ -497,6 +620,7 @@ async function init() {
     altKatBarGuncelle();
     gozlemUrunler();
     altKatBarOto();
+    if(typeof _filtreBaglan==='function') _filtreBaglan();
   },50);
 }
 
@@ -530,8 +654,25 @@ function renderMenu(sube) {
       var pidx = POPUP_DATA.length;
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
       var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
-      var h='<div class="product-card" onclick="upopAc('+pidx+')">';
-      h+='<div class="product-img-wrap">'+img+'</div>';
+      // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
+      var rozet='';
+      if(u.populer) rozet='<span class="product-badge badge-populer">⭐ Popüler</span>';
+      else if(u.yeni) rozet='<span class="product-badge badge-yeni">🆕 Yeni</span>';
+      else if(u.mevsim) rozet='<span class="product-badge badge-mevsim">🌸 Mevsim</span>';
+      // ── Filtre için data attribute'leri ──
+      var katId=(kat.id||'').toLowerCase();
+      var tipTag=(katId.indexOf('soguk')>=0||katId.indexOf('soğuk')>=0)?'soguk':
+                 (katId.indexOf('cay')>=0||katId.indexOf('çay')>=0)?'cay':
+                 (katId.indexOf('tatli')>=0||katId.indexOf('tatlı')>=0||katId.indexOf('kurabiye')>=0||katId.indexOf('waffle')>=0)?'tatli':
+                 (kat.tip==='yiyecek'||katId.indexOf('tost')>=0)?'yiyecek':'sicak';
+      var fiyatNum=parseInt(String(u.fiyat||'').replace(/\D/g,''),10)||0;
+      var dataAttr=' data-tip="'+tipTag+'"'
+        +' data-populer="'+(u.populer?'1':'0')+'"'
+        +' data-yeni="'+(u.yeni?'1':'0')+'"'
+        +' data-vegan="'+(u.vegan?'1':'0')+'"'
+        +' data-fiyat="'+fiyatNum+'"';
+      var h='<div class="product-card"'+dataAttr+' onclick="upopAc('+pidx+')">';
+      h+='<div class="product-img-wrap">'+rozet+img+'</div>';
       h+='<div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
@@ -557,6 +698,137 @@ function staggerKategori(catEl){
     });
   });
 }
+// ═══════════════════════════════════════════════════════════════════════
+// FİLTRE ÇUBUĞU — popüler / yeni / sıcak-soğuk / çay / tatlı / bütçe
+// ═══════════════════════════════════════════════════════════════════════
+var _aktifFiltre='all';
+function _filtreBaglan(){
+  document.querySelectorAll('.filter-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.filter-chip').forEach(function(x){x.classList.remove('on');});
+      c.classList.add('on');
+      _aktifFiltre=c.dataset.filter;
+      _filtreUygula();
+      // Yumuşak scroll: kategori listesinin başına çık
+      var t=document.querySelector('.cat-list');
+      if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  });
+}
+function _filtreUygula(){
+  var cards=document.querySelectorAll('.product-card');
+  var aktif=0;
+  cards.forEach(function(card){
+    var goster=true;
+    if(_aktifFiltre!=='all'){
+      var tip=card.dataset.tip||'';
+      switch(_aktifFiltre){
+        case 'populer': goster=card.dataset.populer==='1'; break;
+        case 'yeni':    goster=card.dataset.yeni==='1'; break;
+        case 'sicak':   goster=tip==='sicak'; break;
+        case 'soguk':   goster=tip==='soguk'; break;
+        case 'cay':     goster=tip==='cay'; break;
+        case 'tatli':   goster=tip==='tatli'; break;
+        case 'butce':   goster=parseInt(card.dataset.fiyat||0,10)<=200 && parseInt(card.dataset.fiyat||0,10)>0; break;
+        case 'vegan':   goster=card.dataset.vegan==='1'; break;
+      }
+    }
+    card.style.display=goster?'':'none';
+    if(goster) aktif++;
+  });
+  // Boş kategorileri gizle
+  document.querySelectorAll('.cat-section').forEach(function(s){
+    if(s.style.display==='none' && s.dataset._origDisplay) return;
+    var visible=Array.from(s.querySelectorAll('.product-card')).filter(function(c){return c.style.display!=='none';}).length;
+    s.style.display=visible>0?'':'none';
+    // Filtre aktif olunca otomatik aç
+    if(_aktifFiltre!=='all' && visible>0 && !s.classList.contains('open')){
+      s.classList.add('open');
+    }
+  });
+  // Boş durum mesajı
+  var empty=document.getElementById('filterEmpty');
+  if(empty) empty.classList.toggle('on', aktif===0 && _aktifFiltre!=='all');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BANA ÖZEL KAHVE QUIZ'İ — 3 sorulu, vibe-temp-süt → ürün önerisi
+// ═══════════════════════════════════════════════════════════════════════
+var QUIZ_HARITASI={
+  // anahtar: vibe-temp-sut → {ad, emoji, fiyat, desc}
+  'enerji-sicak-cok':    {ad:'Caramel Latte',         emoji:'🍯', fiyat:'200',  desc:'Bol sütlü, karamel notalarıyla seni nazikçe uyandırır.'},
+  'enerji-sicak-biraz':  {ad:'Flat White',            emoji:'☕', fiyat:'190',  desc:'Yoğun espresso, dengeli süt — odaklan, başla.'},
+  'enerji-sicak-yok':    {ad:'Double Türk Kahvesi',   emoji:'☕', fiyat:'170',  desc:'Saf güç. Türk kahvesinin iki katı yoğunluk — ciddi iş.'},
+  'enerji-soguk-cok':    {ad:'Ice Caramel Latte',     emoji:'🧊', fiyat:'220',  desc:'Buzlu kafein vuruşu + karamel — yaz vibe\'ı tam burada.'},
+  'enerji-soguk-biraz':  {ad:'Ice Flat White',        emoji:'🧊', fiyat:'220',  desc:'Soğuk ve odaklı. Tek bir yudum yeter, seni uyandırır.'},
+  'enerji-soguk-yok':    {ad:'Ice Americano',         emoji:'🧊', fiyat:'200',  desc:'Saf espresso, buzlu. Sade ve etkili.'},
+  'sakin-sicak-cok':     {ad:'Latte',                 emoji:'🥛', fiyat:'190',  desc:'Klasik konfor. Yumuşak, sütlü, huzurlu bir an.'},
+  'sakin-sicak-biraz':   {ad:'Cortado',               emoji:'☕', fiyat:'190',  desc:'Espresso ile az sütün küçük ama tam dengesi.'},
+  'sakin-sicak-yok':     {ad:'Ihlamur',               emoji:'🌼', fiyat:'200',  desc:'Rahatlatıcı, yatıştırıcı — günün stresini söker.'},
+  'sakin-soguk-cok':     {ad:'Ice Latte',             emoji:'🥛', fiyat:'210',  desc:'Buzlu süt + espresso — sakin bir öğleden sonra.'},
+  'sakin-soguk-biraz':   {ad:'Cool Lime',             emoji:'🍋', fiyat:'190',  desc:'Limonun ferahlığı, dingin bir tat profili.'},
+  'sakin-soguk-yok':     {ad:'Hibiskus',              emoji:'🌺', fiyat:'200',  desc:'Çiçeksi, hafif, asitli — soğuk bir mola.'},
+  'tatli-sicak-cok':     {ad:'White Mocha',           emoji:'🍫', fiyat:'200',  desc:'Beyaz çikolatalı tatlı sarılma — günün hediyesi.'},
+  'tatli-sicak-biraz':   {ad:'Mocha',                 emoji:'🍫', fiyat:'200',  desc:'Çikolata + kahve = klasik tatlı uyum.'},
+  'tatli-sicak-yok':     {ad:'Sıcak Çikolata',        emoji:'🍫', fiyat:'190',  desc:'Saf çikolata, lüks bir keyif anı.'},
+  'tatli-soguk-cok':     {ad:'Milkshake',             emoji:'🥤', fiyat:'210',  desc:'Dondurma + süt + neşe. Tatlının saf hali.'},
+  'tatli-soguk-biraz':   {ad:'Ice Mocha',             emoji:'🍫', fiyat:'220',  desc:'Buzlu çikolata-kahve — soğuk tatlı patlama.'},
+  'tatli-soguk-yok':     {ad:'Çilekli Limonata',      emoji:'🍓', fiyat:'190',  desc:'Çilek ve limon — yaz tatlısı.'},
+  'klasik-sicak-cok':    {ad:'Cappucino',             emoji:'☕', fiyat:'190',  desc:'Yumuşak köpük, klasik İtalyan — hiç eskimez.'},
+  'klasik-sicak-biraz':  {ad:'Americano',             emoji:'☕', fiyat:'180',  desc:'Bol sıcak su + espresso. Sade, klasik, tam puan.'},
+  'klasik-sicak-yok':    {ad:'Türk Kahvesi',          emoji:'☕', fiyat:'130',  desc:'Geleneksel, telveli, falı bedava — bizimkiyiz.'},
+  'klasik-soguk-cok':    {ad:'Ice Vanilla Latte',     emoji:'🍦', fiyat:'220',  desc:'Vanilya kokulu, sütlü, buzlu klasik.'},
+  'klasik-soguk-biraz':  {ad:'Ice Filtre',            emoji:'🧊', fiyat:'200',  desc:'Soğuk demleme klasiği — temiz tat.'},
+  'klasik-soguk-yok':    {ad:'Limonata',              emoji:'🍋', fiyat:'180',  desc:'Saf limonata. Yazın klasiği.'},
+};
+var _qAns={};
+function quizAc(){
+  quizBaslat();
+  var bg=document.getElementById('quizBg');
+  if(bg){ bg.classList.add('on'); document.body.style.overflow='hidden'; }
+}
+function quizKapat(){
+  var bg=document.getElementById('quizBg');
+  if(bg){ bg.classList.remove('on'); document.body.style.overflow=''; }
+}
+function quizBaslat(){
+  _qAns={};
+  _qStep(1);
+}
+function qAns(step, val){
+  _qAns[step]=val;
+  if(step<3) _qStep(step+1);
+  else _qSonuc();
+}
+function _qStep(n){
+  document.querySelectorAll('.quiz-step').forEach(function(s){s.classList.remove('on');});
+  var t=document.getElementById('qs'+n);
+  if(t) t.classList.add('on');
+  for(var i=1;i<=3;i++){
+    var d=document.getElementById('qd'+i);
+    if(d) d.classList.toggle('on', i<=n);
+  }
+}
+function _qSonuc(){
+  document.querySelectorAll('.quiz-step').forEach(function(s){s.classList.remove('on');});
+  var t=document.getElementById('qsResult');
+  if(t) t.classList.add('on');
+  // Tüm dotlar dolu
+  for(var i=1;i<=3;i++){ var d=document.getElementById('qd'+i); if(d) d.classList.add('on'); }
+  // Anahtar: vibe-temp-sut. 'farketmez' → biraz veya sicak'a düşür.
+  var temp=_qAns[2]==='farketmez'?'sicak':_qAns[2];
+  var key=_qAns[1]+'-'+temp+'-'+_qAns[3];
+  var sec=QUIZ_HARITASI[key];
+  if(!sec){
+    // fallback: temp=sicak, sut=biraz
+    sec=QUIZ_HARITASI[_qAns[1]+'-sicak-biraz']||QUIZ_HARITASI['klasik-sicak-biraz'];
+  }
+  document.getElementById('qrEmoji').textContent=sec.emoji;
+  document.getElementById('qrName').textContent=sec.ad;
+  document.getElementById('qrPrice').textContent=sec.fiyat?'₺'+sec.fiyat:'';
+  document.getElementById('qrDesc').textContent=sec.desc;
+}
+
 function gozlemUrunler(){
   if(!('IntersectionObserver' in window)) return;
   // Spotlight cards reveal

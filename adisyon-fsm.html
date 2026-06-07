@@ -694,7 +694,40 @@ if('serviceWorker' in navigator){
 <div class="scr" id="scr-rap">
   <div class="rap-wrap">
 
-    <!-- KASA MUTABAKATI / Z RAPORU (üstte — en kolay erişim) -->
+    <!-- Günün Cirosu (en üstte — ilk bakış) -->
+    <div class="gun-ciro-wrap">
+      <div class="gun-ciro-hdr">
+        <div class="gun-ciro-ttl"><span class="canli-pulse"></span>Günün Cirosu</div>
+        <button class="gun-zrapor-btn" onclick="zRaporHizli()" title="Kasa Mutabakatı + Z Raporu">🔐 Z Raporu</button>
+        <div class="gun-ciro-tarih" id="gun-tarih-lbl"></div>
+      </div>
+      <div class="gun-krt-satir">
+        <div class="gun-krt kapandi">
+          <div class="gkl">✅ Kapanan</div>
+          <div class="gkv" id="gun-kapandi-ciro">₺0</div>
+          <div class="gks" id="gun-kapandi-alt">0 işlem</div>
+        </div>
+        <div class="gun-krt acik-krt">
+          <div class="gkl">🔓 Açık</div>
+          <div class="gkv" id="gun-acik-ciro">₺0</div>
+          <div class="gks" id="gun-acik-alt">0 masa</div>
+        </div>
+        <div class="gun-krt gun-toplam-krt">
+          <div class="gkl">Toplam</div>
+          <div class="gkv" id="gun-toplam-ciro">₺0</div>
+          <div class="gks" id="gun-toplam-alt">&nbsp;</div>
+        </div>
+      </div>
+      <div class="gun-odeme-bar" id="gun-odeme-bar">
+        <div class="gun-odeme-pill"><div class="gopl">💵 Nakit</div><div class="gopv" id="gun-nakit-ciro">₺0</div></div>
+        <div class="gun-odeme-pill"><div class="gopl">💳 Kart</div><div class="gopv" id="gun-kart-ciro">₺0</div></div>
+      </div>
+      <!-- Açık masalar listesi -->
+      <div class="gun-acik-baslik">Açık Masalar</div>
+      <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Şu an açık masa yok</div></div>
+    </div>
+
+    <!-- KASA MUTABAKATI / Z RAPORU -->
     <div class="kasa-wrap">
       <div class="kasa-hdr">
         <div class="kasa-ttl">🔐 Kasa Mutabakatı / Z Raporu</div>
@@ -731,39 +764,6 @@ if('serviceWorker' in navigator){
         <button class="kasa-btn kasa-btn-sec" onclick="kasaKaydet()">💾 Kasayı Kaydet</button>
       </div>
       <div class="kasa-z-ozet" id="kasa-z-ozet"></div>
-    </div>
-
-    <!-- Günün Cirosu -->
-    <div class="gun-ciro-wrap">
-      <div class="gun-ciro-hdr">
-        <div class="gun-ciro-ttl"><span class="canli-pulse"></span>Günün Cirosu</div>
-        <button class="gun-zrapor-btn" onclick="zRaporHizli()" title="Kasa Mutabakatı + Z Raporu">🔐 Z Raporu</button>
-        <div class="gun-ciro-tarih" id="gun-tarih-lbl"></div>
-      </div>
-      <div class="gun-krt-satir">
-        <div class="gun-krt kapandi">
-          <div class="gkl">✅ Kapanan</div>
-          <div class="gkv" id="gun-kapandi-ciro">₺0</div>
-          <div class="gks" id="gun-kapandi-alt">0 işlem</div>
-        </div>
-        <div class="gun-krt acik-krt">
-          <div class="gkl">🔓 Açık</div>
-          <div class="gkv" id="gun-acik-ciro">₺0</div>
-          <div class="gks" id="gun-acik-alt">0 masa</div>
-        </div>
-        <div class="gun-krt gun-toplam-krt">
-          <div class="gkl">Toplam</div>
-          <div class="gkv" id="gun-toplam-ciro">₺0</div>
-          <div class="gks" id="gun-toplam-alt">&nbsp;</div>
-        </div>
-      </div>
-      <div class="gun-odeme-bar" id="gun-odeme-bar">
-        <div class="gun-odeme-pill"><div class="gopl">💵 Nakit</div><div class="gopv" id="gun-nakit-ciro">₺0</div></div>
-        <div class="gun-odeme-pill"><div class="gopl">💳 Kart</div><div class="gopv" id="gun-kart-ciro">₺0</div></div>
-      </div>
-      <!-- Açık masalar listesi -->
-      <div class="gun-acik-baslik">Açık Masalar</div>
-      <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Şu an açık masa yok</div></div>
     </div>
 
     <!-- Periyot tabs -->
@@ -3862,6 +3862,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

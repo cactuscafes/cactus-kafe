@@ -6,6 +6,54 @@
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>Cactus Kafe — Adisyon</title>
+<script>
+/* ═══ OTOMATİK CACHE/SW RESET (her sürüm bump'ta çalışır) ═══
+ * Eski Service Worker veya yıkıcı LWW localStorage kalıntısı varsa
+ * sayfa açılır açılmaz tek seferlik temizler + reload yapar.
+ * Sonraki açılışlarda sessiz kalır (versiyon kaydı eşleştiği için).
+ */
+(function(){
+  var APP_VER='cactus-2026-06-08-r1'; // bug fix sonrası bump → tüm cihazlarda zorla reset
+  try{
+    var stored=localStorage.getItem('cactus_app_ver');
+    if(stored===APP_VER) return; // Zaten güncel
+    // Eski LWW snapshot anahtarları (event-sourced'a geçişten kalma)
+    var lwwKeys=['cactus_masalar','cactus_masalar_mv','cactus_masalar_t','cactus_masalar_d'];
+    var lwwVar=lwwKeys.some(function(k){return !!localStorage.getItem(k);});
+    if(!stored && !lwwVar){
+      // Yeni cihaz, eski cache yok → sadece versiyon kaydet, reload gereksiz
+      localStorage.setItem('cactus_app_ver', APP_VER);
+      return;
+    }
+    // Versiyon değişti VEYA eski LWW kalıntısı var — temiz başlangıç gerek
+    console.log('[cactus] auto-reset:', stored||'ilk-yükleme', '→', APP_VER);
+    lwwKeys.forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+    // Önce SW unregister, sonra cache delete, sonra reload
+    var bitir=function(){
+      try{localStorage.setItem('cactus_app_ver', APP_VER);}catch(e){}
+      // 350ms sonra reload — race önlemek için
+      setTimeout(function(){
+        try{location.reload();}catch(e){}
+      },350);
+    };
+    var swP=Promise.resolve();
+    if('serviceWorker' in navigator){
+      swP=navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){return r.unregister();}));
+      }).catch(function(){});
+    }
+    var cacheP=Promise.resolve();
+    if('caches' in window){
+      cacheP=caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){return caches.delete(k);}));
+      }).catch(function(){});
+    }
+    // Sayfayı görsel olarak gizle ki kullanıcı flash görmesin (reload 350ms sonra)
+    try{document.documentElement.style.opacity='0';document.documentElement.style.transition='none';}catch(e){}
+    Promise.all([swP,cacheP]).then(bitir).catch(bitir);
+  }catch(e){/* sessizce yut */}
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}

@@ -13,12 +13,12 @@
  * Sonraki açılışlarda sessiz kalır (versiyon kaydı eşleştiği için).
  */
 (function(){
-  var APP_VER='cactus-2026-06-08-r1'; // bug fix sonrası bump → tüm cihazlarda zorla reset
+  var APP_VER='cactus-2026-06-08-r2-fsm-menu'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver');
     if(stored===APP_VER) return; // Zaten güncel
-    // Eski LWW snapshot anahtarları (event-sourced'a geçişten kalma)
-    var lwwKeys=['cactus_masalar','cactus_masalar_mv','cactus_masalar_t','cactus_masalar_d'];
+    // Eski LWW snapshot + menü cache anahtarları
+    var lwwKeys=['cactus_masalar','cactus_masalar_mv','cactus_masalar_t','cactus_masalar_d','cactus_menu_fsm','cactus_menu_podyum'];
     var lwwVar=lwwKeys.some(function(k){return !!localStorage.getItem(k);});
     if(!stored && !lwwVar){
       // Yeni cihaz, eski cache yok → sadece versiyon kaydet, reload gereksiz
@@ -4354,6 +4354,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

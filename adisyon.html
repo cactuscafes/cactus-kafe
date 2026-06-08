@@ -13,7 +13,7 @@
  * Sonraki açılışlarda sessiz kalır (versiyon kaydı eşleştiği için).
  */
 (function(){
-  var APP_VER='cactus-2026-06-08-r2-fsm-menu'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-06-08-r3-podyum-menu'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver');
     if(stored===APP_VER) return; // Zaten güncel
@@ -1085,39 +1085,39 @@ if('serviceWorker' in navigator){
 const MENU_DEFAULT = {
   sicak:{label:'☕ Sıcak',tip:'icecek',urunler:[
     {id:'si1',ad:'Espresso',fiyat:150,emoji:'☕'},
+    {id:'si23',ad:'Double Espresso',fiyat:190,emoji:'☕'},
     {id:'si2',ad:'Macchiato',fiyat:170,emoji:'☕'},
-    {id:'si3',ad:'Americano',fiyat:180,emoji:'☕'},
-    {id:'si4',ad:'Cortado',fiyat:190,emoji:'☕'},
-    {id:'si5',ad:'Latte',fiyat:190,emoji:'🥛'},
-    {id:'si6',ad:'Caramel Latte',fiyat:200,emoji:'🥛'},
-    {id:'si7',ad:'Vanilla Latte',fiyat:200,emoji:'🥛'},
-    {id:'si8',ad:'Hazelnut Latte',fiyat:200,emoji:'🥛'},
-    {id:'si9',ad:'Flat White',fiyat:190,emoji:'☕'},
-    {id:'si10',ad:'Cappucino',fiyat:190,emoji:'☕'},
-    {id:'si11',ad:'Mocha',fiyat:200,emoji:'🍫'},
-    {id:'si12',ad:'White Mocha',fiyat:200,emoji:'🍫'},
-    {id:'si13',ad:'Filtre Kahve',fiyat:180,emoji:'☕'},
+    {id:'si3',ad:'Americano',fiyat:200,emoji:'☕'},
+    {id:'si4',ad:'Cortado',fiyat:200,emoji:'☕'},
+    {id:'si5',ad:'Latte',fiyat:210,emoji:'🥛'},
+    {id:'si6',ad:'Caramel Latte',fiyat:220,emoji:'🥛'},
+    {id:'si7',ad:'Vanilla Latte',fiyat:220,emoji:'🥛'},
+    {id:'si8',ad:'Hazelnut Latte',fiyat:220,emoji:'🥛'},
+    {id:'si9',ad:'Flat White',fiyat:220,emoji:'☕'},
+    {id:'si10',ad:'Cappuccino',fiyat:210,emoji:'☕'},
+    {id:'si11',ad:'Mocha',fiyat:220,emoji:'🍫'},
+    {id:'si12',ad:'White Mocha',fiyat:220,emoji:'🍫'},
+    {id:'si13',ad:'Filtre Kahve',fiyat:200,emoji:'☕'},
     {id:'si14',ad:'Türk Kahvesi',fiyat:150,emoji:'☕'},
-    {id:'si15',ad:'Double Türk Kahvesi',fiyat:170,emoji:'☕'},
-    {id:'si16',ad:'Dibek Kahvesi',fiyat:130,emoji:'☕'},
-    {id:'si17',ad:'Salep',fiyat:190,emoji:'🌾'},
-    {id:'si18',ad:'Sıcak Çikolata',fiyat:190,emoji:'🍫'},
-    {id:'si19',ad:'Bardak Süt',fiyat:90,emoji:'🥛'},
+    {id:'si15',ad:'Double Türk Kahvesi',fiyat:190,emoji:'☕'},
+    {id:'si16',ad:'Dibek Kahvesi',fiyat:150,emoji:'☕'},
+    {id:'si17',ad:'Salep',fiyat:210,emoji:'🌾'},
+    {id:'si18',ad:'Sıcak Çikolata',fiyat:210,emoji:'🍫'},
+    {id:'si19',ad:'Bardak Süt',fiyat:100,emoji:'🥛'},
     {id:'si20',ad:'Ballı Süt',fiyat:150,emoji:'🍯'},
     {id:'si21',ad:'Çay',fiyat:80,emoji:'🍵'},
   ]},
   soguk:{label:'🧊 Soğuk',tip:'icecek',urunler:[
-    {id:'so1',ad:'Ice Americano',fiyat:200,emoji:'🧊'},
-    {id:'so2',ad:'Ice Latte',fiyat:210,emoji:'🧊'},
-    {id:'so3',ad:'Ice Flat White',fiyat:220,emoji:'🧊'},
-    {id:'so4',ad:'Ice Mocha',fiyat:220,emoji:'🍫'},
-    {id:'so5',ad:'Ice White Mocha',fiyat:220,emoji:'🍫'},
-    {id:'so6',ad:'Ice Caramel Latte',fiyat:220,emoji:'🧊'},
-    {id:'so7',ad:'Ice Caramel Macchiato',fiyat:220,emoji:'🧊'},
-    {id:'so8',ad:'Ice Hazelnut Latte',fiyat:220,emoji:'🧊'},
-    {id:'so9',ad:'Ice Vanilla Latte',fiyat:220,emoji:'🧊'},
-    {id:'so10',ad:'Ice Filtre',fiyat:200,emoji:'🧊'},
-    {id:'so11',ad:'Buzlu Bardak',fiyat:10,emoji:'🧊'},
+    {id:'so1',ad:'Ice Americano',fiyat:210,emoji:'🧊'},
+    {id:'so2',ad:'Ice Latte',fiyat:220,emoji:'🧊'},
+    {id:'so3',ad:'Ice Flat White',fiyat:230,emoji:'🧊'},
+    {id:'so4',ad:'Ice Mocha',fiyat:240,emoji:'🍫'},
+    {id:'so5',ad:'Ice White Mocha',fiyat:240,emoji:'🍫'},
+    {id:'so6',ad:'Ice Caramel Latte',fiyat:240,emoji:'🧊'},
+    {id:'so7',ad:'Ice Caramel Macchiato',fiyat:240,emoji:'🧊'},
+    {id:'so8',ad:'Ice Hazelnut Latte',fiyat:240,emoji:'🧊'},
+    {id:'so9',ad:'Ice Vanilla Latte',fiyat:240,emoji:'🧊'},
+    {id:'so10',ad:'Ice Filtre',fiyat:210,emoji:'🧊'},
   ]},
   cay:{label:'🌿 Çaylar',tip:'icecek',urunler:[
     {id:'c1',ad:'Ihlamur',fiyat:200,emoji:'🌼'},
@@ -1129,11 +1129,11 @@ const MENU_DEFAULT = {
     {id:'c7',ad:'Kış Çayı',fiyat:200,emoji:'❄️'},
     {id:'c8',ad:'Mavi Kelebek Çayı',fiyat:200,emoji:'🦋'},
   ]},
-  vitamin:{label:'🍋 Vitamin',tip:'icecek',urunler:[
-    {id:'v1',ad:'Churchill',fiyat:170,emoji:'🍊'},
-    {id:'v2',ad:'Cool Lime',fiyat:190,emoji:'🍋'},
-    {id:'v3',ad:'Frozen',fiyat:200,emoji:'🧊'},
-    {id:'v4',ad:'Milkshake',fiyat:210,emoji:'🥤'},
+  vitamin:{label:'🍋 Serinletici',tip:'icecek',urunler:[
+    {id:'v1',ad:'Churchill',fiyat:190,emoji:'🍊'},
+    {id:'v2',ad:'Cool Lime',fiyat:200,emoji:'🍋'},
+    {id:'v3',ad:'Frozen',fiyat:220,emoji:'🧊'},
+    {id:'v4',ad:'Milkshake',fiyat:220,emoji:'🥤'},
     {id:'v5',ad:'Limonata',fiyat:180,emoji:'🍋'},
     {id:'v6',ad:'Çilekli Limonata',fiyat:190,emoji:'🍓'},
   ]},
@@ -1142,10 +1142,10 @@ const MENU_DEFAULT = {
     {id:'m2',ad:'Sade Soda',fiyat:90,emoji:'🫧'},
     {id:'m3',ad:'Enerji İçeceği',fiyat:180,emoji:'⚡'},
   ]},
-  kokteyl:{label:'🍹 Kokteyl',tip:'icecek',urunler:[
-    {id:'ko1',ad:'Blue Sky',fiyat:220,emoji:'🫐'},
-    {id:'ko2',ad:'Cactus',fiyat:220,emoji:'🌵'},
-    {id:'ko3',ad:'Pink Wind',fiyat:220,emoji:'🍉'},
+  kokteyl:{label:'🍹 Cactus Kokteyl',tip:'icecek',urunler:[
+    {id:'ko1',ad:'Blue Sky',fiyat:230,emoji:'🫐'},
+    {id:'ko2',ad:'Cactus',fiyat:230,emoji:'🌵'},
+    {id:'ko3',ad:'Pink Wind',fiyat:230,emoji:'🍉'},
   ]},
   waffle:{label:'🧇 Waffle',tip:'yiyecek',urunler:[
     {id:'w1',ad:'Classic Bubble Waffle',fiyat:300,emoji:'🧇'},
@@ -1155,14 +1155,16 @@ const MENU_DEFAULT = {
     {id:'w5',ad:'Meyveli Bubble Waffle',fiyat:300,emoji:'🍓'},
   ]},
   tost:{label:'🥪 Tostlar',tip:'yiyecek',urunler:[
-    {id:'t1',ad:'Kaşarlı Sosyete Tostu',fiyat:160,emoji:'🧀'},
-    {id:'t2',ad:'Sucuklu Sosyete Tostu',fiyat:160,emoji:'🥩'},
-    {id:'t3',ad:'Karışık Sosyete Tostu',fiyat:180,emoji:'🥪'},
+    {id:'t1',ad:'Kaşarlı Sosyete Tostu',fiyat:180,emoji:'🧀'},
+    {id:'t2',ad:'Sucuklu Sosyete Tostu',fiyat:180,emoji:'🥩'},
+    {id:'t3',ad:'Karışık Sosyete Tostu',fiyat:200,emoji:'🥪'},
   ]},
-  kurabiye:{label:'🍪 Kurabiye',tip:'yiyecek',urunler:[
-    {id:'kur1',ad:'Cevizli Çikolatalı Kurabiye',fiyat:170,emoji:'🍪'},
-    {id:'kur2',ad:'Küçük Kurabiye',fiyat:100,emoji:'🍪'},
-    {id:'kur3',ad:'Kurabiye',fiyat:150,emoji:'🍪'},
+  tatlilar:{label:'🍰 Tatlılar',tip:'yiyecek',urunler:[
+    {id:'tat1',ad:'Spoonful',fiyat:300,emoji:'🥄'},
+    {id:'tat2',ad:'Dubai Spoonful',fiyat:330,emoji:'🥄'},
+    {id:'tat3',ad:'Ibiza Pasta',fiyat:300,emoji:'🍰'},
+    {id:'tat4',ad:'Lotus Pasta',fiyat:300,emoji:'🍰'},
+    {id:'kur1',ad:'Cevizli Çikolatalı Kurabiye',fiyat:180,emoji:'🍪'},
   ]},
 };
 
@@ -4354,6 +4356,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 </body>
 </html>
+
 
 
 

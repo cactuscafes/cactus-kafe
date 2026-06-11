@@ -743,9 +743,10 @@ function skeletonGoster(){
 async function init() {
   skeletonGoster();
   var data = null;
+  var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
   // ÖNCE worker/KV (token'sız admin yayını buraya yazıyor — anında güncel)
   try {
-    var rk = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=menu_public&t=' + Date.now());
+    var rk = await fetch(API+'/menu/cek?sube=menu_public&t=' + Date.now());
     var dk = await rk.json();
     if (dk && (dk.fsm || dk.podyum)) data = dk;
   } catch(e) {}
@@ -757,6 +758,29 @@ async function init() {
     } catch(e) { console.error('Menu yuklenemedi', e); }
   }
   if (data) Object.keys(data).forEach(function(k){ menuData[k] = data[k]; });
+  // ── PODYUMPARK menüsünü adisyon KV'sinden override et (kasiyer ekranıyla tek kaynak) ──
+  // Adisyon Podyumpark'ı düzenlediği menü, web sayfasında da görünür.
+  try {
+    var rp = await fetch(API+'/menu/cek?sube=adisyon_podyum&t=' + Date.now());
+    var dp = await rp.json();
+    if (dp && typeof dp==='object' && Object.keys(dp).length){
+      // Adisyon formatı: {sicak:{label,tip,urunler:[...]},...} (id, label, urunler)
+      // Web formatı:    aynı yapı + her urune emoji/foto eklenmiş hali. Direkt atayabiliriz.
+      var podPer={};
+      Object.keys(dp).forEach(function(katKey){
+        var kat=dp[katKey];
+        if(!kat||!kat.urunler) return;
+        podPer[katKey] = {
+          id: katKey,
+          label: kat.label||katKey,
+          urunler: (kat.urunler||[]).map(function(u){
+            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli};
+          })
+        };
+      });
+      if(Object.keys(podPer).length) menuData.podyum = podPer;
+    }
+  } catch(e) { /* sessizce: menu_public.podyum fallback olarak kalır */ }
   POPUP_DATA=[]; // reset on reload
   renderMenu('fsm');
   renderMenu('podyum');
@@ -1653,4 +1677,5 @@ function toggleMainNav(){
 </script>
 </body>
 </html>
+
 

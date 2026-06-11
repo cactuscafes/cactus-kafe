@@ -1071,12 +1071,36 @@ function katEkle(){
   toast('✅ Kategori eklendi');
 }
 function katSil(id){
-  if(!confirm('Bu kategori silinsin mi?')) return;
-  KAT=KAT.filter(k=>k.id!==id); delete MENU[id];
-  if(aktifKat===id) aktifKat=KAT[0]?.id;
+  var kat = KAT.find(function(k){return k.id===id;});
+  if(!kat) return;
+  // Aktif şube + diğer şubedeki ürün sayısını hesapla
+  var aktifSay = (MENU[id]||[]).length;
+  var digerSube = AKTIF_SUBE==='fsm' ? 'podyum' : 'fsm';
+  var digerMenu = JSON.parse(localStorage.getItem(_menuKeyFor(digerSube))||'null')||{};
+  var digerSay = (digerMenu[id]||[]).length;
+  var toplam = aktifSay + digerSay;
+  // Net onay
+  var mesaj = '"'+kat.label+'" kategorisi silinsin mi?\n';
+  if(toplam>0){
+    mesaj += '\n⚠️  İçindeki ürünler de silinecek:';
+    if(aktifSay>0) mesaj += '\n  • '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+': '+aktifSay+' ürün';
+    if(digerSay>0) mesaj += '\n  • '+(digerSube==='fsm'?'FSM':'Podyumpark')+': '+digerSay+' ürün';
+    mesaj += '\n\nBu işlem geri alınamaz. Yayınla butonuna basana kadar canlıya yansımaz.';
+  } else {
+    mesaj += '\n(Kategoride ürün yok)';
+  }
+  if(!confirm(mesaj)) return;
+  // Aktif şubeden + KAT'tan + diğer şubenin localStorage cache'inden sil
+  KAT = KAT.filter(function(k){return k.id!==id;});
+  delete MENU[id];
+  if(digerMenu[id]){
+    delete digerMenu[id];
+    try{ localStorage.setItem(_menuKeyFor(digerSube), JSON.stringify(digerMenu)); }catch(e){}
+  }
+  if(aktifKat===id) aktifKat = KAT[0]?.id;
   katKaydet(); menuKaydet(); renderKatListe(); renderKatTabs(); renderUrunler();
   if(typeof katSeciciDoldur==='function') katSeciciDoldur();
-  toast('🗑 Silindi');
+  toast('🗑 "'+kat.label+'" silindi'+(toplam>0?' ('+toplam+' ürün)':''));
 }
 function katDuzenle(id){
   const k=KAT.find(x=>x.id===id); if(!k) return;
@@ -1144,7 +1168,7 @@ function renderKatListe(){
       <button type="button" onclick="katTasi(${i},-1)" ${i===0?'disabled':''} style="background:#f0f0f0;border:1px solid #ddd;cursor:pointer;padding:7px 11px;border-radius:6px;font-size:14px;line-height:1;${i===0?'opacity:.3;':''}" title="Yukarı taşı">▲</button>
       <button type="button" onclick="katTasi(${i},1)" ${i===KAT.length-1?'disabled':''} style="background:#f0f0f0;border:1px solid #ddd;cursor:pointer;padding:7px 11px;border-radius:6px;font-size:14px;line-height:1;${i===KAT.length-1?'opacity:.3;':''}" title="Aşağı taşı">▼</button>
       <button onclick="katDuzenle('${k.id}')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#999;font-size:16px;" title="Düzenle">✏️</button>
-      ${(MENU[k.id]||[]).length===0?'<button onclick="katSil(\''+k.id+'\')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:#ffaaaa;font-size:16px;" title="Sil">🗑️</button>':''}
+      <button onclick="katSil('${k.id}')" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;color:${(MENU[k.id]||[]).length===0?'#bbb':'#c0392b'};font-size:16px;" title="${(MENU[k.id]||[]).length===0?'Sil':'Sil (içindeki ürünlerle birlikte)'}">🗑️</button>
     </div>
   `).join('');
   

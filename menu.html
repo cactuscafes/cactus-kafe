@@ -548,8 +548,8 @@ footer{padding:40px 20px 24px;}
 </section>
 
 <div class="sube-tabs">
-  <button class="sube-tab on" onclick="subeGoster('fsm',this)">🏙 FSM Şubesi</button>
-  <button class="sube-tab" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
+  <button class="sube-tab on" id="tab-sube-fsm" onclick="subeGoster('fsm',this)">🏙 FSM Şubesi</button>
+  <button class="sube-tab" id="tab-sube-podyum" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
 </div>
 
 <!-- Saat & Hava Durumu Banner — dinamik öneri -->
@@ -758,6 +758,14 @@ async function init() {
   POPUP_DATA=[]; // reset on reload
   renderMenu('fsm');
   renderMenu('podyum');
+  // ── URL'den şube parametresi (?sube=podyum veya ?sube=fsm) — QR koddan direkt aç ──
+  try{
+    var qsSube=(new URLSearchParams(location.search)).get('sube');
+    if(qsSube==='podyum' || qsSube==='fsm'){
+      var btn=document.getElementById('tab-sube-'+qsSube);
+      if(btn && qsSube!==AKTIF_SUBE) subeGoster(qsSube, btn);
+    }
+  }catch(e){}
   setTimeout(function(){
     altKatBarGuncelle();
     gozlemUrunler();

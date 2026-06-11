@@ -163,6 +163,22 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
   /* Giris kart */
   .giris-kart{padding:32px 24px;}
 }
+
+/* ═══ Şube seçici bar (admin) ═══ */
+.admin-sube-bar{position:sticky;top:54px;z-index:99;background:linear-gradient(135deg,#1a3010 0%,#2d5a27 100%);color:#f4ecd8;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 22px;border-bottom:2px solid #c8a86a;box-shadow:0 4px 14px rgba(0,0,0,.15);flex-wrap:wrap;}
+.asb-info{display:flex;align-items:center;gap:10px;}
+.asb-eyebrow{font-size:9.5px;letter-spacing:2px;color:rgba(244,236,216,.62);text-transform:uppercase;font-weight:700;}
+.asb-current{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#dcbd80;letter-spacing:.5px;}
+.asb-tabs{display:flex;gap:6px;background:rgba(0,0,0,.25);padding:4px;border-radius:100px;}
+.asb-tab{padding:7px 16px;border-radius:100px;background:transparent;color:rgba(244,236,216,.7);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;}
+.asb-tab:hover{color:#f4ecd8;}
+.asb-tab.on{background:linear-gradient(135deg,#dcbd80,#c8a86a);color:#1a3010;box-shadow:0 2px 8px rgba(200,168,106,.35);}
+@media(max-width:600px){
+  .admin-sube-bar{padding:10px 14px;gap:8px;top:50px;}
+  .asb-current{font-size:15px;}
+  .asb-tab{padding:6px 12px;font-size:11px;}
+  .asb-eyebrow{font-size:8.5px;letter-spacing:1.5px;}
+}
 </style>
 </head>
 <body>
@@ -193,6 +209,17 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
   </nav>
+  <!-- ŞUBE SEÇİCİ — FSM ve Podyumpark için ayrı menü düzenleme -->
+  <div class="admin-sube-bar">
+    <div class="asb-info">
+      <span class="asb-eyebrow">Şu an düzenleniyor</span>
+      <span class="asb-current" id="asbCurrent">FSM</span>
+    </div>
+    <div class="asb-tabs">
+      <button class="asb-tab on" id="asbTabFsm" onclick="subeDegistir('fsm')">🏙 FSM Şubesi</button>
+      <button class="asb-tab" id="asbTabPodyum" onclick="subeDegistir('podyum')">🌿 Podyumpark</button>
+    </div>
+  </div>
   <div class="wrap">
     <div class="sb-overlay" id="sbOverlay" onclick="mobSbKapat()"></div>
     <div class="sb" id="mainSb">
@@ -715,7 +742,57 @@ const MENU_V={
 };
 
 let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
-let MENU=JSON.parse(localStorage.getItem('cactus_admin_menu')||'null')||JSON.parse(JSON.stringify(MENU_V));
+// ─── Şubeye göre menü saklama ──────────────────────────────────────────
+// FSM ve Podyumpark menüleri ayrı KV anahtarlarına yazılır, localStorage'da ayrı tutulur.
+// Eski tek anahtar (cactus_admin_menu) bir kerelik her iki şubeye kopyalanır.
+let AKTIF_SUBE = localStorage.getItem('cactus_admin_aktif_sube') || 'fsm';
+function _menuKeyFor(sube){ return 'cactus_admin_menu_' + (sube||'fsm'); }
+(function _menuMigrasyon(){
+  // Eski tek-menü varsa hem fsm hem podyum'a kopyala (sadece bir kez)
+  var eski = localStorage.getItem('cactus_admin_menu');
+  if(eski && !localStorage.getItem(_menuKeyFor('fsm'))){
+    try{ localStorage.setItem(_menuKeyFor('fsm'), eski); }catch(e){}
+  }
+  if(eski && !localStorage.getItem(_menuKeyFor('podyum'))){
+    try{ localStorage.setItem(_menuKeyFor('podyum'), eski); }catch(e){}
+  }
+})();
+function _menuYukleAktif(){
+  return JSON.parse(localStorage.getItem(_menuKeyFor(AKTIF_SUBE)) || 'null') || JSON.parse(JSON.stringify(MENU_V));
+}
+let MENU = _menuYukleAktif();
+function subeDegistir(yeniSube){
+  if(yeniSube===AKTIF_SUBE) return;
+  // Önce mevcut MENU'yu kendi şubesine kaydet
+  try{ localStorage.setItem(_menuKeyFor(AKTIF_SUBE), JSON.stringify(MENU)); }catch(e){}
+  AKTIF_SUBE = yeniSube;
+  try{ localStorage.setItem('cactus_admin_aktif_sube', AKTIF_SUBE); }catch(e){}
+  // Yeni şubenin menüsünü yükle
+  MENU = _menuYukleAktif();
+  // UI güncelle (tab + başlık)
+  ['fsm','podyum'].forEach(function(s){
+    var t=document.getElementById('asbTab'+s.charAt(0).toUpperCase()+s.slice(1));
+    if(t) t.classList.toggle('on', s===AKTIF_SUBE);
+  });
+  var curEl=document.getElementById('asbCurrent');
+  if(curEl) curEl.textContent = AKTIF_SUBE==='fsm'?'FSM':'Podyumpark';
+  // Render güncel şube menüsü
+  aktifKat = KAT[0]?.id || 'sicak';
+  if(typeof renderKatTabs==='function') renderKatTabs();
+  if(typeof renderUrunler==='function') renderUrunler();
+  if(typeof katSeciciDoldur==='function') setTimeout(katSeciciDoldur, 200);
+  if(typeof toast==='function') toast('🔀 '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' menüsüne geçildi');
+}
+// Sayfa açılışında doğru tab aktif (FSM default)
+setTimeout(function(){
+  ['fsm','podyum'].forEach(function(s){
+    var t=document.getElementById('asbTab'+s.charAt(0).toUpperCase()+s.slice(1));
+    if(t) t.classList.toggle('on', s===AKTIF_SUBE);
+  });
+  var curEl=document.getElementById('asbCurrent');
+  if(curEl) curEl.textContent = AKTIF_SUBE==='fsm'?'FSM':'Podyumpark';
+}, 50);
+// ───────────────────────────────────────────────────────────────────────
 let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
 let aktifKat=KAT[0]?.id||'sicak';
 
@@ -748,7 +825,7 @@ function basla(){
     });
     if(!kat.length) return;
     KAT=kat; MENU=menu;
-    localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+    localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
     localStorage.setItem('cactus_kat',JSON.stringify(KAT));
     aktifKat=KAT[0]?.id||'sicak';
     renderKatTabs(); renderUrunler();
@@ -799,7 +876,7 @@ function panelAc(id,el){
 }
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
-function menuKaydet(){ localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU)); }
+function menuKaydet(){ localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU)); }
 function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); }
 
 const R2_WORKER='https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/';
@@ -939,7 +1016,7 @@ function urunEkle(){
   if(!a){toast('⚠️ Ad zorunlu');return;}
   if(!MENU[kat])MENU[kat]=[];
   MENU[kat].push({id:kat+'_'+Date.now(),emoji:e,ad:a,fiyat:parseInt(f)||0,aciklama:ac,tip:t,foto:foto});
-  localStorage.setItem('cactus_admin_menu',JSON.stringify(MENU));
+  localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
   document.getElementById('yA').value='';
   document.getElementById('yF').value='0';
   if(document.getElementById('yAc'))document.getElementById('yAc').value='';
@@ -1376,21 +1453,40 @@ function modalAc(){
 }
 function modalKapat(){ document.getElementById('modalBg').classList.remove('on'); }
 async function yayinla(){
-  // TOKEN'SIZ: menü artık GitHub'a değil worker/KV'ye yazılır. menu.html KV'den okur,
-  // adisyon zaten KV'den okuyor → anında güncellenir. GitHub token gerekmez.
+  // TOKEN'SIZ: menü artık GitHub'a değil worker/KV'ye yazılır.
+  // FSM ve Podyumpark menüleri AYRI saklanır, ayrı yayınlanır.
   const btn=document.getElementById('modalOkBtn'), dur=document.getElementById('modalDurum');
   btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
   dur.classList.add('on'); dur.textContent='⏳ Yayınlanıyor...';
   try{
-    const perBranch={};
-    KAT.forEach(function(k){perBranch[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]};});
-    const menuData={fsm:perBranch,podyum:JSON.parse(JSON.stringify(perBranch)),oncu:ONCU};
+    // Önce aktif şubedeki son değişiklikleri diske kaydet
+    try{ localStorage.setItem(_menuKeyFor(AKTIF_SUBE), JSON.stringify(MENU)); }catch(e){}
+    function _yukle(sube){ return JSON.parse(localStorage.getItem(_menuKeyFor(sube))||'null')||JSON.parse(JSON.stringify(MENU_V)); }
+    var fsmMenu=_yukle('fsm');
+    var podyumMenu=_yukle('podyum');
+    function _toPer(menu){
+      var per={};
+      KAT.forEach(function(k){ per[k.id]={id:k.id,label:k.label,urunler:menu[k.id]||[]}; });
+      return per;
+    }
+    var fsmPer=_toPer(fsmMenu);
+    var podyumPer=_toPer(podyumMenu);
+    const menuData={fsm:fsmPer,podyum:podyumPer,oncu:ONCU};
     var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
     var P=function(sube,menu){return fetch(API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:sube,menu:menu})});};
-    // menu_public → public menu.html bunu okur (fsm/podyum/oncu) ; fsm+podyum → adisyon okur
-    var res=await Promise.all([ P('menu_public',menuData), P('fsm',perBranch), P('podyum',perBranch) ]);
+    // menu_public  → public menu.html bunu okur (fsm+podyum+oncu)
+    // adisyon_fsm  → adisyon-fsm.html FSM kasiyer
+    // adisyon_podyum → adisyon.html Podyum kasiyer
+    // fsm/podyum   → eski uyumluluk
+    var res=await Promise.all([
+      P('menu_public', menuData),
+      P('adisyon_fsm', fsmPer),
+      P('adisyon_podyum', podyumPer),
+      P('fsm', fsmPer),
+      P('podyum', podyumPer),
+    ]);
     if(res.every(function(r){return r&&r.ok;})){
-      dur.textContent='✅ Yayınlandı! Menü ve adisyon anında güncellendi.';
+      dur.textContent='✅ Yayınlandı! FSM ve Podyumpark menüleri ayrı ayrı güncellendi.';
       btn.textContent='✅ Tamamlandı';
       toast('🚀 Yayınlandı!');
     } else {
@@ -2481,3 +2577,4 @@ async function ziyaretYukle(){
 
 </body>
 </html>
+

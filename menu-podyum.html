@@ -25,7 +25,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-06-11-menu-pod-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-06-11-ayri-sayfa-r2'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -635,55 +635,10 @@ footer{padding:40px 20px 24px;}
   <button class="sube-tab" id="tab-sube-podyum" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
 </div>
 
-<!-- Saat & Hava Durumu Banner — dinamik öneri (sadece FSM) -->
-<div class="day-banner" id="dayBanner" data-fsm-only style="display:none;" onclick="_dayBannerScroll()">
-  <div class="day-banner-icon" id="dbIcon">☕</div>
-  <div class="day-banner-text">
-    <div class="day-banner-eyebrow" id="dbEyebrow">ŞİMDİ</div>
-    <div class="day-banner-msg" id="dbMsg">—</div>
-    <div class="day-banner-temp" id="dbTemp"></div>
-  </div>
-</div>
+<!-- FSM özel banner'lar (dayBanner / quiz-hero / fal-mini / menu-fsm)
+     menu-podyum.html'den tamamen kaldırıldı — Podyum sayfasında gözükmesinler. -->
 
-<!-- BANA ÖZEL KAHVE BANNER — büyük + dikkat çekici (sadece FSM) -->
-<section class="quiz-hero" data-fsm-only onclick="quizAc()">
-  <div class="quiz-hero-bg"></div>
-  <div class="quiz-hero-content">
-    <div class="quiz-hero-icon">
-      <span class="quiz-hero-cup">☕</span>
-      <span class="quiz-hero-sparkle s1">✨</span>
-      <span class="quiz-hero-sparkle s2">✨</span>
-      <span class="quiz-hero-sparkle s3">⭐</span>
-    </div>
-    <div class="quiz-hero-text">
-      <div class="quiz-hero-eyebrow">3 soruda — saniyeler içinde</div>
-      <h3 class="quiz-hero-title">Bana özel <em>içeceği</em> keşfet</h3>
-      <p class="quiz-hero-sub">Karar veremiyor musun? Vibe'ına uygun olanı bulalım.</p>
-    </div>
-    <button class="quiz-hero-cta" onclick="event.stopPropagation();quizAc()">Başla →</button>
-  </div>
-</section>
-
-<!-- Kahve Falı Mini Kartı — menüde direkt erişim (sadece FSM) -->
-<div class="fal-mini" data-fsm-only onclick="falAc()" role="button" aria-label="Kahve falı bak">
-  <div class="fal-mini-icon">☕</div>
-  <div class="fal-mini-text">
-    <div class="fal-mini-eyebrow">Eğlence</div>
-    <div class="fal-mini-title">Bir de <em>kahve falın</em>a bakalım mı?</div>
-    <div class="fal-mini-sub">Telveler bugün ne söylüyor görelim ✨</div>
-  </div>
-  <div class="fal-mini-arrow">→</div>
-</div>
-
-<div id="menu-fsm">
-  <div class="spotlight" id="spotlight-fsm">
-    <p class="spotlight-title">Öne Çıkanlar</p>
-    <div class="spotlight-grid" id="spotlight-grid-fsm"></div>
-  </div>
-  <div class="cat-list" id="cat-list-fsm"></div>
-</div>
-
-<div id="menu-podyum" style="display:none;">
+<div id="menu-podyum">
   <div class="spotlight" id="spotlight-podyum">
     <p class="spotlight-title">Öne Çıkanlar</p>
     <div class="spotlight-grid" id="spotlight-grid-podyum"></div>
@@ -706,11 +661,7 @@ footer{padding:40px 20px 24px;}
   </div>
 </div>
 
-<div class="welcome-toast" id="welcomeToast" data-fsm-only>
-  <span class="welcome-toast-emoji" id="wtEmoji">👋</span>
-  <span id="wtMsg">Hoşgeldin! Karar veremezsen yukarıdaki quiz'i dene ☕</span>
-  <button class="welcome-toast-close" onclick="_welcomeKapat()" aria-label="Kapat">×</button>
-</div>
+<!-- welcome-toast: FSM özel, Podyum'da yok -->
 
 <!-- Kahve Falı Modal -->
 <div class="fal-bg" id="falBg" onclick="if(event.target===this)falKapat()">

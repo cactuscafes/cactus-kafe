@@ -7,11 +7,11 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="theme-color" content="#0b1a07">
 <title>Sadakat Kartım — Cactus Coffee</title>
-<meta name="description" content="Cactus Coffee Dijital Sadakat Kartı — her 5 kahvede 1 bedava. Uygulama yok, kart yok — sadece telefon numaran yeterli.">
+<meta name="description" content="Cactus Coffee Dijital Sadakat Kartı — her 7 içecekte 1 bedava. Uygulama yok, kart yok — sadece telefon numaran yeterli.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Cactus Coffee">
 <meta property="og:title" content="Sadakat Kartım — Cactus Coffee">
-<meta property="og:description" content="Her 5 kahvede 1 bedava. Uygulama yok, kart yok — sadece telefon numaran yeterli.">
+<meta property="og:description" content="Her 7 içecekte 1 bedava. Uygulama yok, kart yok — sadece telefon numaran yeterli.">
 <meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
 <meta property="og:url" content="https://cactuscafes.com/kart.html">
 <meta name="twitter:card" content="summary_large_image">
@@ -97,9 +97,9 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
 .dk-ikon{font-size:22px;opacity:.6;}
 .dk-ad{font-size:12px;color:rgba(245,234,216,.45);letter-spacing:1px;margin-bottom:18px;font-weight:300;}
 
-/* Pul ızgarası */
-.pul-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px;}
-.pul{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(232,160,48,.2);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .35s;background:rgba(255,255,255,.03);}
+/* Pul ızgarası — 7 pul */
+.pul-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:22px;}
+.pul{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(232,160,48,.2);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .35s;background:rgba(255,255,255,.03);}
 .pul.dolu{background:linear-gradient(135deg,var(--amber),var(--amber3));border-color:transparent;box-shadow:0 3px 12px rgba(200,168,106,.35);}
 .pul.dolu::after{content:'⭐';}
 .pul.next{border-color:rgba(200,168,106,.6);background:rgba(200,168,106,.08);animation:pulseNext 1.4s ease-in-out infinite;}
@@ -197,9 +197,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
     <div class="hero-inner">
       <div class="hero-eyebrow">Dijital Sadakat Kartı</div>
       <h1 class="hero-title">Her kahve,<em>bir adım daha.</em></h1>
-      <p class="hero-sub">5 yıldız topla, 1 bedava içecek kazan. Uygulama yok,<br>kart yok — sadece telefon numaran yeterli.</p>
+      <p class="hero-sub">7 yıldız topla, 1 bedava içecek kazan. Uygulama yok,<br>kart yok — sadece telefon numaran yeterli.</p>
       <!-- Yıldız önizleme -->
       <div class="hero-pullar">
+        <div class="hero-pul d">⭐</div>
+        <div class="hero-pul d">⭐</div>
         <div class="hero-pul d">⭐</div>
         <div class="hero-pul d">⭐</div>
         <div class="hero-pul d">⭐</div>
@@ -241,7 +243,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
         <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
         <div class="dk-alt">
           <div>
-            <div class="dk-pul-say" id="dkPulSay">0/5</div>
+            <div class="dk-pul-say" id="dkPulSay">0/7</div>
             <div class="dk-pul-lbl">Yıldız</div>
           </div>
           <div style="text-align:right">
@@ -277,8 +279,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
       <div class="kaydirma-sef">
         <div class="avantaj-krt">
           <span class="avantaj-ikon">☕</span>
-          <div class="avantaj-baslik">5'te 1 Bedava</div>
-          <div class="avantaj-acik">Her içecekte yıldız kazan, 5 dolunca bedava içecek</div>
+          <div class="avantaj-baslik">7'de 1 Bedava</div>
+          <div class="avantaj-acik">Her içecekte yıldız kazan, 7 dolunca bedava içecek</div>
         </div>
         <div class="avantaj-krt">
           <span class="avantaj-ikon">📱</span>
@@ -321,7 +323,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
 
 <script>
 var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
-var ESIK = 5;
+var ESIK = 7;
 
 function telFormat(input){
   input.value=input.value.replace(/\D/g,'');

@@ -577,7 +577,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <!-- SADAKAT KARTI -->
       <div class="panel" id="panel-sadakat">
         <div class="pttl">🎖 Sadakat Kartı</div>
-        <div class="psub">Kayıtlı müşteriler · 5 pul = 1 bedava içecek</div>
+        <div class="psub">Kayıtlı müşteriler · 7 pul = 1 bedava içecek</div>
         <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
           <button onclick="kartListeYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
           <select id="kartFilter" onchange="kartListeRender()" style="padding:8px 12px;border:1.5px solid var(--stone);font-size:12px;font-family:inherit;background:#fff;">
@@ -2378,11 +2378,11 @@ function kartListeRender(){
   if(window.innerWidth < 700){
     listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'
       + data.map(function(m){
-          var bedava = m.pul >= 5;
+          var bedava = m.pul >= 7;
           var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
           var pulBar = '';
-          for(var i=0;i<5;i++){
-            pulBar += '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;margin:2px;background:'+(i<(m.pul%5)?'var(--gold)':'#e8e4de')+';"></span>';
+          for(var i=0;i<7;i++){
+            pulBar += '<span style="display:inline-block;width:11px;height:11px;border-radius:50%;margin:2px;background:'+(i<(m.pul%7)?'var(--gold)':'#e8e4de')+';"></span>';
           }
           var mJson = encodeURIComponent(JSON.stringify(m));
           return '<div class="mob-musteri-kart'+(bedava?' bedava':'')+'">'
@@ -2401,7 +2401,7 @@ function kartListeRender(){
             + '<div style="display:flex;gap:8px;">'
               + (bedava
                 ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="flex:1;padding:10px 8px;background:var(--gold);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border-radius:4px;">✓ Bedavayı Kullandı</button>'
-                : '<div style="flex:1;padding:10px 8px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;color:var(--mist);text-align:center;border-radius:4px;">'+(5-m.pul)+' pul kaldı</div>')
+                : '<div style="flex:1;padding:10px 8px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;color:var(--mist);text-align:center;border-radius:4px;">'+(7-m.pul)+' pul kaldı</div>')
               + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:10px 14px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✎</button>'
               + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:10px 14px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✕</button>'
             + '</div>'
@@ -2417,11 +2417,11 @@ function kartListeRender(){
     + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'
     + '</tr></thead><tbody>'
     + data.map(function(m){
-        var bedava = m.pul >= 5;
+        var bedava = m.pul >= 7;
         var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
         var pulBar = '';
-        for(var i=0;i<5;i++){
-          pulBar += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:1px;background:'+(i<(m.pul%5)?'var(--gold)':'#e0dbd3')+';"></span>';
+        for(var i=0;i<7;i++){
+          pulBar += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:1px;background:'+(i<(m.pul%7)?'var(--gold)':'#e0dbd3')+';"></span>';
         }
         var mJson = encodeURIComponent(JSON.stringify(m));
         return '<tr style="'+(bedava?'background:rgba(184,150,90,.06);':'')+'">'
@@ -2437,7 +2437,7 @@ function kartListeRender(){
           + '<td style="white-space:nowrap;text-align:center;">'
             + (bedava
               ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="padding:5px 10px;background:var(--gold);color:#fff;border:none;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;white-space:nowrap;">✓ Bedava</button> '
-              : '<span style="font-size:10px;color:#ccc;margin-right:6px;">' + (5 - m.pul) + ' pul kaldı</span>')
+              : '<span style="font-size:10px;color:#ccc;margin-right:6px;">' + (7 - m.pul) + ' pul kaldı</span>')
             + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:5px 10px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✎ Düzenle</button> '
             + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:5px 10px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✕ Sil</button>'
           + '</td>'
@@ -2447,12 +2447,12 @@ function kartListeRender(){
 }
 
 async function kartSifirla(telefon){
-  if(!confirm(telefon + ' numaralı müşterinin bedava içeceğini kullandı olarak işaretlensin mi?\n(5 pul düşülecek)')) return;
+  if(!confirm(telefon + ' numaralı müşterinin bedava içeceğini kullandı olarak işaretlensin mi?\n(7 pul düşülecek)')) return;
   try {
     var r = await fetch(KART_API + '/kart/kullan', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({telefon: telefon, esik: 5, aciklama: 'Admin — bedava içecek kullanıldı'})
+      body: JSON.stringify({telefon: telefon, esik: 7, aciklama: 'Admin — bedava içecek kullanıldı'})
     });
     var d = await r.json();
     if(d.ok){

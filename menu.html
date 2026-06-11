@@ -136,8 +136,8 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .sk-banner-sub{font-size:12px;font-weight:300;color:rgba(240,230,210,.6);line-height:1.8;margin-bottom:28px;}
 .sk-banner-cta{display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
 .sk-banner-cta:hover{background:#e8c47a;transform:translateY(-1px);}
-.sk-stamp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;flex-shrink:0;position:relative;z-index:1;}
-.sk-stamp{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .2s;}
+.sk-stamp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;flex-shrink:0;position:relative;z-index:1;}
+.sk-stamp{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;transition:transform .2s;}
 .sk-stamp.dolu{background:linear-gradient(135deg,rgba(200,168,106,.35),rgba(232,196,122,.2));border:1.5px solid #c8a86a;box-shadow:0 2px 12px rgba(200,168,106,.25);}
 .sk-stamp.dolu:hover{transform:scale(1.08);}
 .sk-stamp.bos{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);}
@@ -148,8 +148,8 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .sk-kasiyer-not strong{font-weight:700;color:#f3dca0;}
 @keyframes skPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,168,106,.6);}60%{box-shadow:0 0 0 10px rgba(200,168,106,0);}}
 .sk-stamp.next{background:rgba(200,168,106,.1);border:1.5px dashed #c8a86a;animation:skPulse 2s ease-in-out infinite;}
-@media(max-width:900px){.sk-banner{flex-direction:column;align-items:flex-start;padding:48px 40px;}.sk-stamp-grid{grid-template-columns:repeat(5,1fr);}}
-@media(max-width:560px){.sk-banner{padding:40px 20px;}.sk-stamp{width:42px;height:42px;font-size:16px;}.sk-stamp-grid{gap:8px;}}
+@media(max-width:900px){.sk-banner{flex-direction:column;align-items:flex-start;padding:48px 40px;}.sk-stamp-grid{grid-template-columns:repeat(7,1fr);}}
+@media(max-width:560px){.sk-banner{padding:40px 20px;}.sk-stamp{width:34px;height:34px;font-size:13px;}.sk-stamp-grid{gap:5px;}}
 
 /* MOBILE */
 .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
@@ -551,8 +551,8 @@ footer{padding:40px 20px 24px;}
 <section class="sk-banner">
   <div class="sk-banner-left">
     <div class="sk-banner-eyebrow">Dijital Sadakat Kartı</div>
-    <h2 class="sk-banner-title">5 kahve, 1 tanesi<br><em>bizden.</em></h2>
-    <p class="sk-banner-sub">Her siparişinde yıldız kazan. 5 yıldız doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
+    <h2 class="sk-banner-title">7 içecek, 1 tanesi<br><em>bizden.</em></h2>
+    <p class="sk-banner-sub">Her siparişinde yıldız kazan. 7 yıldız doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
     <a href="kart.html" class="sk-banner-cta">Kartımı Gör →</a>
   </div>
   <div>
@@ -562,8 +562,10 @@ footer{padding:40px 20px 24px;}
       <div class="sk-stamp dolu">⭐</div>
       <div class="sk-stamp next"></div>
       <div class="sk-stamp bos"></div>
+      <div class="sk-stamp bos"></div>
+      <div class="sk-stamp bos"></div>
     </div>
-    <div class="sk-stamp-label">3 / 5 yıldız</div>
+    <div class="sk-stamp-label">3 / 7 yıldız</div>
     <div class="sk-kasiyer-not">
       <span class="sk-kasiyer-ikon">📱</span>
       <span>Yıldız kazanmak için sipariş verirken <strong>telefon numaranı kasiyere söylemeyi unutma!</strong></span>
@@ -1076,7 +1078,7 @@ function _dayBannerBaslat(){
 // ═══════════════════════════════════════════════════════════════════════
 // SADAKAT KART CANLI BANNER — telefon varsa API'den çek + sk-banner güncelle
 // ═══════════════════════════════════════════════════════════════════════
-var ESIK_YILDIZ=5;
+var ESIK_YILDIZ=7;
 function _sadakatBaslat(){
   var tel=(localStorage.getItem('cactus_kart_tel')||'').replace(/\D/g,'');
   if(!tel) return; // numara yoksa default statik banner kalır

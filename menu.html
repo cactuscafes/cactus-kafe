@@ -21,6 +21,39 @@
 <link rel="apple-touch-icon" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>
+/* ═══ OTOMATİK CACHE/SW RESET (versiyon bump'ta çalışır) ═══
+ * Eski Service Worker / browser cache kalıntısı varsa
+ * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
+(function(){
+  var APP_VER='cactus-2026-06-11-menu-pod-r1'; // bump → cihazlarda zorla reset
+  try{
+    var stored=localStorage.getItem('cactus_app_ver_menu');
+    if(stored===APP_VER) return; // Güncel — sessiz geç
+    if(!stored){
+      // Yeni cihaz — reload gereksiz, sadece kaydet
+      try{localStorage.setItem('cactus_app_ver_menu', APP_VER);}catch(e){}
+      return;
+    }
+    console.log('[cactus] menu auto-reset:', stored, '→', APP_VER);
+    var bitir=function(){
+      try{localStorage.setItem('cactus_app_ver_menu', APP_VER);}catch(e){}
+      setTimeout(function(){try{location.reload();}catch(e){}}, 300);
+    };
+    var swP=Promise.resolve();
+    if('serviceWorker' in navigator){
+      swP=navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){return r.unregister();}));
+      }).catch(function(){});
+    }
+    var cacheP=Promise.resolve();
+    if('caches' in window){
+      cacheP=caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){return caches.delete(k);}));
+      }).catch(function(){});
+    }
+    Promise.all([swP, cacheP]).then(bitir).catch(bitir);
+  }catch(e){}
+})();
 // ?sube=podyum URL'inde HTML parse sırasında aktif şubeyi ayarla.
 // Bu sayede sayfa açılırken FSM flash'ı olmadan direkt Podyumpark açılır.
 (function(){

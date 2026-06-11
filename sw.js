@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v12'; // v12: auto-reset (eski SW + LWW localStorage kalıntılarını tek seferlik temizler)
+const VERSION = 'cactus-v13'; // v13: menu.html Podyum FSM banner gizleme + flash fix — eski cache temizliği
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

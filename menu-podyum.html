@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<title>FSM Menü — Cactus Coffee</title>
-<meta name="description" content="Cactus Coffee FSM Şubesi menüsü — sıcak & soğuk içecekler, kahvaltı ve özel lezzetler.">
+<title>Podyumpark Menü — Cactus Coffee</title>
+<meta name="description" content="Cactus Coffee Podyumpark Şubesi menüsü — sıcak & soğuk içecekler, tatlılar ve özel lezzetler.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Cactus Coffee">
-<meta property="og:title" content="FSM Menü — Cactus Coffee">
-<meta property="og:description" content="Cactus Coffee FSM Şubesi menüsü — sıcak & soğuk içecekler, kahvaltı ve özel lezzetler.">
+<meta property="og:title" content="Podyumpark Menü — Cactus Coffee">
+<meta property="og:description" content="Cactus Coffee Podyumpark Şubesi menüsü — sıcak & soğuk içecekler, tatlılar ve özel lezzetler.">
 <meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
-<meta property="og:url" content="https://cactuscafes.com/menu.html">
+<meta property="og:url" content="https://cactuscafes.com/menu-podyum.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FSM Menü — Cactus Coffee">
+<meta name="twitter:title" content="Podyumpark Menü — Cactus Coffee">
 <meta name="twitter:image" content="https://cactuscafes.com/og-image.jpg">
 <meta name="theme-color" content="#0e1f08">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -54,18 +54,10 @@
     Promise.all([swP, cacheP]).then(bitir).catch(bitir);
   }catch(e){}
 })();
-// menu.html — FSM Şubesi'ne sabitlenmiş
-// Eski ?sube=podyum URL'leri (QR, paylaşım) için redirect menu-podyum.html'e
+// menu-podyum.html — Podyumpark Şubesi'ne sabitlenmiş
 (function(){
-  try{
-    var s=new URLSearchParams(location.search).get('sube');
-    if(s==='podyum'){
-      location.replace('menu-podyum.html');
-      return;
-    }
-  }catch(e){}
-  document.documentElement.dataset.initialSube='fsm';
-  window.__INITIAL_SUBE='fsm';
+  document.documentElement.dataset.initialSube='podyum';
+  window.__INITIAL_SUBE='podyum';
 })();
 </script>
 <style>
@@ -597,9 +589,9 @@ footer{padding:40px 20px 24px;}
 }
 </style>
 <script>
-// menu.html — FSM sayfası, nav'da FSM Menü linki sarı vurgu
+// menu-podyum.html — Podyum sayfası, nav'da Podyumpark Menü linki sarı vurgu
 (function(){
-  ['navFsm','navFsmMob'].forEach(function(id){
+  ['navPod','navPodMob'].forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.style.color='#c8a86a';
   });

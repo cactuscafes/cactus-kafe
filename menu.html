@@ -41,6 +41,8 @@ html[data-initial-sube="podyum"] #menu-fsm{display:none!important;}
 html[data-initial-sube="podyum"] #menu-podyum{display:block!important;}
 html[data-initial-sube="podyum"] #tab-sube-fsm{color:#999!important;border-bottom-color:transparent!important;}
 html[data-initial-sube="podyum"] #tab-sube-podyum{color:var(--dark)!important;border-bottom-color:var(--dark)!important;}
+/* FSM özel banner'lar (gece sakinliği, quiz, kahve falı, welcome toast) Podyum'da görünmesin */
+html[data-initial-sube="podyum"] [data-fsm-only]{display:none!important;}
 body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;}
 
 /* NAV */
@@ -680,7 +682,7 @@ footer{padding:40px 20px 24px;}
   </div>
 </div>
 
-<div class="welcome-toast" id="welcomeToast">
+<div class="welcome-toast" id="welcomeToast" data-fsm-only>
   <span class="welcome-toast-emoji" id="wtEmoji">👋</span>
   <span id="wtMsg">Hoşgeldin! Karar veremezsen yukarıdaki quiz'i dene ☕</span>
   <button class="welcome-toast-close" onclick="_welcomeKapat()" aria-label="Kapat">×</button>
@@ -860,6 +862,8 @@ async function init() {
     var mp=document.getElementById('menu-podyum');  if(mp) mp.style.display='';
     var tf=document.getElementById('tab-sube-fsm');     if(tf) tf.classList.remove('on');
     var tp=document.getElementById('tab-sube-podyum');  if(tp) tp.classList.add('on');
+    // FSM özel elementleri gizle (CSS de yapıyor — bu JS state için)
+    if(typeof _subeOzelGoruntule==='function') _subeOzelGoruntule('podyum');
     // Podyum kampanya pop-up'ı — oturumda bir kez (subeGoster ile aynı mantık)
     try{
       if(!sessionStorage.getItem('cactus_kampanya_gosterildi')){
@@ -1414,6 +1418,8 @@ function subeGoster(sube,btn) {
     });
   }
   AKTIF_SUBE=sube;
+  // CSS kuralları için dataset güncellemesi (data-fsm-only gizleme kuralı vs.)
+  document.documentElement.dataset.initialSube=sube;
   setTimeout(function(){altKatBarGuncelle();},20);
   _subeOzelGoruntule(sube);
 }

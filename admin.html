@@ -219,6 +219,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="asb-tab on" id="asbTabFsm" onclick="subeDegistir('fsm')">🏙 FSM Şubesi</button>
       <button class="asb-tab" id="asbTabPodyum" onclick="subeDegistir('podyum')">🌿 Podyumpark</button>
     </div>
+    <button onclick="adisyondanYenile()" title="Aktif şubenin menüsünü adisyondan (kasiyer ekranı) çek" style="padding:7px 14px;border-radius:100px;background:rgba(220,189,128,.15);border:1px solid rgba(220,189,128,.45);color:#dcbd80;font-size:11.5px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;">🔄 Adisyondan Yükle</button>
   </div>
   <div class="wrap">
     <div class="sb-overlay" id="sbOverlay" onclick="mobSbKapat()"></div>
@@ -782,6 +783,8 @@ function subeDegistir(yeniSube){
   if(typeof renderUrunler==='function') renderUrunler();
   if(typeof katSeciciDoldur==='function') setTimeout(katSeciciDoldur, 200);
   if(typeof toast==='function') toast('🔀 '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' menüsüne geçildi');
+  // Yeni şubeye geçince adisyon KV'sinden fresh çek (kasiyer ile senkron)
+  if(typeof adisyondanYenile==='function') setTimeout(adisyondanYenile, 100);
 }
 // Sayfa açılışında doğru tab aktif (FSM default)
 setTimeout(function(){
@@ -804,47 +807,56 @@ function giris(){
   } else { document.getElementById('gHata').style.display='block'; }
 }
 function cikis(){ localStorage.removeItem('ca'); location.reload(); }
+// ─── Adisyon (kasiyer) KV'sinden menü çekme ─────────────────────────────
+// adisyon_fsm / adisyon_podyum KV'leri TEK KAYNAK — kasiyerin ekranıyla aynı.
+function _adminMenuUygula(data, kaynak){
+  var kat=[]; var menu={};
+  // {catId:{label,urunler}} veya {fsm:{...}} formatını destekle
+  var src=data;
+  if(data.fsm||data.podyum) src=data.fsm||data.podyum;
+  Object.keys(src).forEach(function(catId){
+    var cat=src[catId];
+    if(!cat) return;
+    var urunler=Array.isArray(cat)?cat:(cat.urunler||[]);
+    var catTip=(cat&&cat.tip) || (urunler.length?urunler[0].tip:'ic');
+    kat.push({id:catId,label:(cat.label||catId),tip:catTip});
+    menu[catId]=urunler;
+  });
+  if(!kat.length) return false;
+  KAT=kat; MENU=menu;
+  localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
+  localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+  aktifKat=KAT[0]?.id||'sicak';
+  renderKatTabs(); renderUrunler();
+  setTimeout(katSeciciDoldur,500);
+  toast('✅ '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' menüsü yüklendi — '+kaynak+' ('+kat.length+' kategori)');
+  return true;
+}
+// Aktif şubenin adisyon KV'sinden menüyü çeker. UI butonu da bunu çağırır.
+function adisyondanYenile(){
+  var kvKey = 'adisyon_' + AKTIF_SUBE; // adisyon_fsm | adisyon_podyum
+  toast('⏳ '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' adisyonundan çekiliyor…');
+  return fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube='+kvKey+'&t='+Date.now())
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(data){
+      if(data && Object.keys(data).length){
+        return _adminMenuUygula(data, 'adisyon ('+AKTIF_SUBE+')');
+      }
+      toast('⚠️ Adisyon KV boş, eski menü korundu');
+      return false;
+    })
+    .catch(function(e){
+      console.warn('Adisyon KV okuma hatası:',e);
+      toast('❌ Adisyondan çekilemedi: '+e.message);
+    });
+}
 function basla(){
   document.getElementById('admin').style.display='block';
   aktifKat=KAT[0]?.id||'sicak';
   renderKatTabs(); renderUrunler();
   setTimeout(katSeciciDoldur, 500);
-  // Menü yükle: önce Worker (anlık), boşsa GitHub'dan fallback
-  function _adminMenuUygula(data, kaynak){
-    var kat=[]; var menu={};
-    // {catId:{label,urunler}} veya {fsm:{...}} formatını destekle
-    var src=data;
-    if(data.fsm||data.podyum) src=data.fsm||data.podyum;
-    Object.keys(src).forEach(function(catId){
-      var cat=src[catId];
-      if(!cat) return;
-      var urunler=Array.isArray(cat)?cat:(cat.urunler||[]);
-      var catTip=(urunler.length)?urunler[0].tip:'ic';
-      kat.push({id:catId,label:(cat.label||catId),tip:catTip});
-      menu[catId]=urunler;
-    });
-    if(!kat.length) return;
-    KAT=kat; MENU=menu;
-    localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
-    localStorage.setItem('cactus_kat',JSON.stringify(KAT));
-    aktifKat=KAT[0]?.id||'sicak';
-    renderKatTabs(); renderUrunler();
-    setTimeout(katSeciciDoldur,500);
-    toast('✅ Menü yüklendi — '+kaynak+' ('+kat.length+' kategori)');
-  }
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=fsm')
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(data){
-      if(data&&Object.keys(data).length){
-        _adminMenuUygula(data,'worker');
-      } else {
-        // Worker boş — GitHub'dan yükle
-        return fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t='+Date.now())
-          .then(function(r){return r.json();})
-          .then(function(ghData){if(ghData)_adminMenuUygula(ghData,'GitHub');});
-      }
-    })
-    .catch(function(e){console.warn('Menü yükleme hatası:',e);});
+  // İlk açılışta otomatik: aktif şubenin adisyon KV'sinden çek
+  adisyondanYenile();
 }
 function mobSbToggle(){
   document.getElementById('mainSb').classList.toggle('mob-open');

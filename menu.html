@@ -20,9 +20,27 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+// ?sube=podyum URL'inde HTML parse sırasında aktif şubeyi ayarla.
+// Bu sayede sayfa açılırken FSM flash'ı olmadan direkt Podyumpark açılır.
+(function(){
+  try{
+    var s=new URLSearchParams(location.search).get('sube');
+    if(s==='podyum' || s==='fsm'){
+      document.documentElement.dataset.initialSube=s;
+      window.__INITIAL_SUBE=s;
+    }
+  }catch(e){}
+})();
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#2d5a27;--dark:#1a1a1a;--light:#f8f6f2;--border:#e8e4df;}
+/* ?sube=podyum — HTML parse sırasında etkin (anti-flash) */
+html[data-initial-sube="podyum"] #menu-fsm{display:none!important;}
+html[data-initial-sube="podyum"] #menu-podyum{display:block!important;}
+html[data-initial-sube="podyum"] #tab-sube-fsm{color:#999!important;border-bottom-color:transparent!important;}
+html[data-initial-sube="podyum"] #tab-sube-podyum{color:var(--dark)!important;border-bottom-color:var(--dark)!important;}
 body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;}
 
 /* NAV */
@@ -775,7 +793,7 @@ footer{padding:40px 20px 24px;}
 var menuData = {};
 var oncuData = [];
 var POPUP_DATA = [];
-var AKTIF_SUBE='fsm';
+var AKTIF_SUBE = (window.__INITIAL_SUBE==='podyum' || window.__INITIAL_SUBE==='fsm') ? window.__INITIAL_SUBE : 'fsm';
 
 // 15. Skeleton — sayfa açılır açılmaz placeholder göster
 function skeletonGoster(){
@@ -835,14 +853,20 @@ async function init() {
   POPUP_DATA=[]; // reset on reload
   renderMenu('fsm');
   renderMenu('podyum');
-  // ── URL'den şube parametresi (?sube=podyum veya ?sube=fsm) — QR koddan direkt aç ──
-  try{
-    var qsSube=(new URLSearchParams(location.search)).get('sube');
-    if(qsSube==='podyum' || qsSube==='fsm'){
-      var btn=document.getElementById('tab-sube-'+qsSube);
-      if(btn && qsSube!==AKTIF_SUBE) subeGoster(qsSube, btn);
-    }
-  }catch(e){}
+  // ── İlk açılış: AKTIF_SUBE zaten URL'den belirlendi (head'deki inline script).
+  //    Sadece DOM'u (menü görünürlüğü + tab class'ı) AKTIF_SUBE ile senkronla.
+  if(AKTIF_SUBE==='podyum'){
+    var mf=document.getElementById('menu-fsm');     if(mf) mf.style.display='none';
+    var mp=document.getElementById('menu-podyum');  if(mp) mp.style.display='';
+    var tf=document.getElementById('tab-sube-fsm');     if(tf) tf.classList.remove('on');
+    var tp=document.getElementById('tab-sube-podyum');  if(tp) tp.classList.add('on');
+    // Podyum kampanya pop-up'ı — oturumda bir kez (subeGoster ile aynı mantık)
+    try{
+      if(!sessionStorage.getItem('cactus_kampanya_gosterildi')){
+        setTimeout(function(){ if(typeof kampanyaAc==='function') kampanyaAc(); }, 600);
+      }
+    }catch(e){ setTimeout(function(){ if(typeof kampanyaAc==='function') kampanyaAc(); }, 600); }
+  }
   setTimeout(function(){
     altKatBarGuncelle();
     gozlemUrunler();

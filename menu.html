@@ -387,6 +387,28 @@ footer{padding:40px 20px 24px;}
 .day-banner-temp{font-size:12px;color:#888;margin-top:2px;}
 @media(max-width:600px){.day-banner{margin:14px 14px 4px;padding:12px 14px;gap:12px;}.day-banner-icon{font-size:26px;}.day-banner-msg{font-size:13px;}}
 
+/* ═══ Podyumpark Kampanya Pop-up (modal) ═══ */
+.kampanya-bg{position:fixed;inset:0;background:rgba(26,48,16,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .35s;}
+.kampanya-bg.on{display:flex;opacity:1;}
+.kampanya-modal{background:linear-gradient(160deg,#fdfaf3 0%,#f7ecd0 100%);border:2px solid #c8a86a;border-radius:24px;max-width:420px;width:100%;padding:34px 28px 28px;text-align:center;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.35),0 0 0 1px rgba(220,189,128,.4) inset;transform:scale(.85) translateY(20px);transition:transform .45s cubic-bezier(.2,.9,.3,1.2);overflow:hidden;}
+.kampanya-bg.on .kampanya-modal{transform:scale(1) translateY(0);}
+.kampanya-modal::before{content:"";position:absolute;top:-40%;left:-30%;width:160%;height:80%;background:radial-gradient(ellipse,rgba(220,189,128,.25),transparent 70%);pointer-events:none;}
+.kampanya-close{position:absolute;top:12px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(26,48,16,.08);border:none;color:#1a3010;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;line-height:1;transition:all .2s;}
+.kampanya-close:hover{background:rgba(26,48,16,.18);transform:rotate(90deg);}
+.kampanya-eyebrow{font-size:10px;letter-spacing:3px;color:#c8a86a;font-weight:800;text-transform:uppercase;margin-bottom:10px;position:relative;}
+.kampanya-eyebrow::before,.kampanya-eyebrow::after{content:"";display:inline-block;width:24px;height:1px;background:#c8a86a;vertical-align:middle;margin:0 10px;opacity:.6;}
+.kampanya-icons{font-size:36px;margin-bottom:14px;letter-spacing:8px;line-height:1;position:relative;animation:kampFloat 3s ease-in-out infinite;}
+@keyframes kampFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.kampanya-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#1a3010;line-height:1.2;margin-bottom:12px;position:relative;}
+.kampanya-title em{font-style:italic;color:#c8a86a;}
+.kampanya-price{display:inline-block;background:linear-gradient(135deg,#2d5a27,#1a3010);color:#dcbd80;font-family:'Playfair Display',serif;font-size:38px;font-weight:700;padding:8px 28px;border-radius:14px;margin:8px 0 14px;letter-spacing:1px;box-shadow:0 8px 22px rgba(45,90,39,.35);position:relative;}
+.kampanya-price small{font-size:18px;vertical-align:top;margin-right:2px;}
+.kampanya-sub{font-size:13.5px;color:#5c4f30;line-height:1.55;margin-bottom:18px;position:relative;}
+.kampanya-note{font-size:11px;color:#8a7a5a;letter-spacing:.5px;position:relative;}
+.kampanya-cta{background:linear-gradient(135deg,#dcbd80,#c8a86a);color:#1a3010;border:none;padding:13px 30px;border-radius:100px;font-size:13.5px;font-weight:800;letter-spacing:.6px;cursor:pointer;font-family:inherit;margin-top:6px;box-shadow:0 6px 18px rgba(200,168,106,.35);transition:all .2s;text-transform:uppercase;position:relative;}
+.kampanya-cta:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(200,168,106,.5);}
+@media(max-width:480px){.kampanya-modal{padding:28px 22px 24px;}.kampanya-title{font-size:22px;}.kampanya-price{font-size:32px;padding:7px 22px;}.kampanya-icons{font-size:32px;letter-spacing:6px;}}
+
 /* ═══ Hoşgeldin Toast ═══ */
 .welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#1a3010,#2d5a27);color:#fdfaf3;padding:14px 22px;border-radius:100px;box-shadow:0 10px 32px rgba(45,90,39,.4);font-size:13.5px;font-weight:600;letter-spacing:.3px;z-index:200;display:flex;align-items:center;gap:10px;transition:transform .5s cubic-bezier(.2,.7,.2,1);max-width:90vw;}
 .welcome-toast.on{transform:translateX(-50%) translateY(0);}
@@ -554,8 +576,8 @@ footer{padding:40px 20px 24px;}
   <button class="sube-tab" id="tab-sube-podyum" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
 </div>
 
-<!-- Saat & Hava Durumu Banner — dinamik öneri -->
-<div class="day-banner" id="dayBanner" style="display:none;" onclick="_dayBannerScroll()">
+<!-- Saat & Hava Durumu Banner — dinamik öneri (sadece FSM) -->
+<div class="day-banner" id="dayBanner" data-fsm-only style="display:none;" onclick="_dayBannerScroll()">
   <div class="day-banner-icon" id="dbIcon">☕</div>
   <div class="day-banner-text">
     <div class="day-banner-eyebrow" id="dbEyebrow">ŞİMDİ</div>
@@ -564,8 +586,8 @@ footer{padding:40px 20px 24px;}
   </div>
 </div>
 
-<!-- BANA ÖZEL KAHVE BANNER — büyük + dikkat çekici -->
-<section class="quiz-hero" onclick="quizAc()">
+<!-- BANA ÖZEL KAHVE BANNER — büyük + dikkat çekici (sadece FSM) -->
+<section class="quiz-hero" data-fsm-only onclick="quizAc()">
   <div class="quiz-hero-bg"></div>
   <div class="quiz-hero-content">
     <div class="quiz-hero-icon">
@@ -583,8 +605,8 @@ footer{padding:40px 20px 24px;}
   </div>
 </section>
 
-<!-- Kahve Falı Mini Kartı — menüde direkt erişim -->
-<div class="fal-mini" onclick="falAc()" role="button" aria-label="Kahve falı bak">
+<!-- Kahve Falı Mini Kartı — menüde direkt erişim (sadece FSM) -->
+<div class="fal-mini" data-fsm-only onclick="falAc()" role="button" aria-label="Kahve falı bak">
   <div class="fal-mini-icon">☕</div>
   <div class="fal-mini-text">
     <div class="fal-mini-eyebrow">Eğlence</div>
@@ -611,6 +633,20 @@ footer{padding:40px 20px 24px;}
 </div>
 
 <!-- Hoşgeldin Toast -->
+<!-- Podyumpark Kampanya Pop-up -->
+<div class="kampanya-bg" id="kampanyaBg" onclick="if(event.target===this)kampanyaKapat()">
+  <div class="kampanya-modal" role="dialog" aria-labelledby="kampanyaTitle">
+    <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">×</button>
+    <div class="kampanya-eyebrow">Podyumpark'a Özel</div>
+    <div class="kampanya-icons">🍰 ✦ 🍋</div>
+    <h2 class="kampanya-title" id="kampanyaTitle">Dilediğiniz <em>tatlı</em> + limonata</h2>
+    <div class="kampanya-price"><small>₺</small>400</div>
+    <p class="kampanya-sub">Menüdeki herhangi bir tatlı + ev yapımı limonatamız bir arada — şimdi tek fiyatla.</p>
+    <button class="kampanya-cta" onclick="kampanyaKapat();document.querySelector('.cat-section[data-kat*=\'Tatlı\'],[data-kat*=\'tatli\']')?.scrollIntoView({behavior:'smooth',block:'start'});">Tatlılara Bak ↓</button>
+    <div class="kampanya-note" style="margin-top:14px;">Kampanya stoklarla sınırlıdır</div>
+  </div>
+</div>
+
 <div class="welcome-toast" id="welcomeToast">
   <span class="welcome-toast-emoji" id="wtEmoji">👋</span>
   <span id="wtMsg">Hoşgeldin! Karar veremezsen yukarıdaki quiz'i dene ☕</span>
@@ -1339,6 +1375,53 @@ function subeGoster(sube,btn) {
   }
   AKTIF_SUBE=sube;
   setTimeout(function(){altKatBarGuncelle();},20);
+  _subeOzelGoruntule(sube);
+}
+// FSM'e özel elementleri (dayBanner, quiz-hero, fal-mini) Podyum'da gizle
+// + Podyumpark kampanya pop-up'ını sadece Podyum sekmesinde göster (oturumda 1 kez)
+function _subeOzelGoruntule(sube){
+  var fsmOnly=document.querySelectorAll('[data-fsm-only]');
+  fsmOnly.forEach(function(el){
+    if(sube==='podyum'){
+      el.dataset.prevDisplay = el.style.display || '';
+      el.style.display='none';
+    } else {
+      // FSM: orijinal display'i geri ver (dayBanner JS ile show'a alınıyor, ona dokunma)
+      if(el.id==='dayBanner'){
+        // dayBanner sadece veri geldiğinde gösterilir; gizle/aç JS'ine bırak
+        if(el.dataset.prevDisplay==='none' || el.dataset.prevDisplay===undefined){
+          // dokunma
+        } else {
+          el.style.display='';
+        }
+      } else {
+        el.style.display='';
+      }
+    }
+  });
+  if(sube==='podyum'){
+    // Oturumda bir kez göster
+    try{
+      if(!sessionStorage.getItem('cactus_kampanya_gosterildi')){
+        setTimeout(kampanyaAc, 400);
+      }
+    }catch(e){ setTimeout(kampanyaAc, 400); }
+  } else {
+    kampanyaKapat();
+  }
+}
+function kampanyaAc(){
+  var bg=document.getElementById('kampanyaBg');
+  if(!bg) return;
+  bg.classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function kampanyaKapat(){
+  var bg=document.getElementById('kampanyaBg');
+  if(!bg) return;
+  bg.classList.remove('on');
+  document.body.style.overflow='';
+  try{ sessionStorage.setItem('cactus_kampanya_gosterildi','1'); }catch(e){}
 }
 
 // 9. Alt kategori barını besle (aktif şubeye göre)

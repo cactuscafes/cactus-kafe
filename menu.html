@@ -710,7 +710,7 @@ footer{padding:40px 20px 24px;}
     <h2 class="kampanya-title" id="kampanyaTitle">Dilediğiniz <em>tatlı</em> + limonata</h2>
     <div class="kampanya-price"><small>₺</small>400</div>
     <p class="kampanya-sub">Menüdeki herhangi bir tatlı + ev yapımı limonatamız bir arada — şimdi tek fiyatla.</p>
-    <button class="kampanya-cta" onclick="kampanyaKapat();document.querySelector('.cat-section[data-kat*=\'Tatlı\'],[data-kat*=\'tatli\']')?.scrollIntoView({behavior:'smooth',block:'start'});">Tatlılara Bak ↓</button>
+    <button class="kampanya-cta" onclick="kampanyaTatlilara()">Tatlılara Bak ↓</button>
     <div class="kampanya-note" style="margin-top:14px;">Kampanya stoklarla sınırlıdır</div>
   </div>
 </div>
@@ -1501,6 +1501,23 @@ function kampanyaKapat(){
   bg.classList.remove('on');
   document.body.style.overflow='';
   try{ sessionStorage.setItem('cactus_kampanya_gosterildi','1'); }catch(e){}
+}
+// Kampanya pop-up CTA: aktif şubedeki Tatlılar kategorisini aç + scroll et
+function kampanyaTatlilara(){
+  kampanyaKapat();
+  var sube=(typeof AKTIF_SUBE!=='undefined' && AKTIF_SUBE) ? AKTIF_SUBE : 'podyum';
+  // Önce id ile bul (cat-tatlilar-podyum) — yoksa label içinde "Tatlı" geçen ilk kategori
+  var el=document.getElementById('cat-tatlilar-'+sube)
+      || document.querySelector('#cat-list-'+sube+' .cat-section[data-kat*="Tatlı"]')
+      || document.querySelector('#cat-list-'+sube+' .cat-section[data-kat*="tatlı"]')
+      || document.querySelector('#cat-list-'+sube+' .cat-section[data-kat*="tatli"]');
+  if(!el) return;
+  if(!el.classList.contains('open')){
+    el.classList.add('open');
+    if(typeof staggerKategori==='function') staggerKategori(el);
+  }
+  // Kategori açılma animasyonu sonrası scroll
+  setTimeout(function(){ el.scrollIntoView({behavior:'smooth',block:'start'}); }, 120);
 }
 
 // 9. Alt kategori barını besle (aktif şubeye göre)

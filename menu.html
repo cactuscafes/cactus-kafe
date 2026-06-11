@@ -1035,7 +1035,7 @@ function _oneriMesaj(saat, temp, hava){
     case 'oglen':    return {icon:'☕', em:'ÖĞLE MOLASI', mesaj:'Klasik <em>Cappucino</em> veya ferah <em>Cool Lime</em>', scrollTo:'sicak'};
     case 'oglenden': return {icon:'🌤', em:'ÖĞLEDEN SONRA', mesaj:'<em>Mocha</em> ile tatlı bir mola — yanına <em>kurabiye</em>?', scrollTo:'sicak'};
     case 'aksam':    return {icon:'🌇', em:'AKŞAM KEYFİ', mesaj:'<em>Ihlamur</em> ile sakinleş — günü güzel kapat', scrollTo:'cay'};
-    case 'gece':     return {icon:'🌙', em:'GECE SAKİNLİĞİ', mesaj:'Kafeinsiz bir <em>Papatya</em> ya da <em>Sıcak Çikolata</em>', scrollTo:'cay'};
+    case 'gece':     return {icon:'🌙', em:'GECE SAKİNLİĞİ', mesaj:'Geceyi tatlandır — <em>Ice Latte</em> yanında <em>Spoonful</em>', scrollTo:'tatli'};
   }
   return {icon:'☕', em:'BUGÜN', mesaj:'<em>Sana özel</em> içeceği keşfet', scrollTo:''};
 }
@@ -1064,6 +1064,7 @@ function _dayBannerScroll(){
     sicak:['sicak','sıcak','kahve'],
     soguk:['soguk','soğuk','ice'],
     cay:['cay','çay','tea','herbal','bitki'],
+    tatli:['tatli','tatlı','dessert','kek','pasta','waffle','spoonful','brownie','kurabiye'],
   }[_dayBannerHedef]||[];
   var cats=document.querySelectorAll('#cat-list-'+sube+' .cat-section');
   for(var i=0;i<cats.length;i++){

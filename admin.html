@@ -173,11 +173,13 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 .asb-tab{padding:7px 16px;border-radius:100px;background:transparent;color:rgba(244,236,216,.7);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;}
 .asb-tab:hover{color:#f4ecd8;}
 .asb-tab.on{background:linear-gradient(135deg,#dcbd80,#c8a86a);color:#1a3010;box-shadow:0 2px 8px rgba(200,168,106,.35);}
-@media(max-width:600px){
-  .admin-sube-bar{padding:10px 14px;gap:8px;top:50px;}
-  .asb-current{font-size:15px;}
-  .asb-tab{padding:6px 12px;font-size:11px;}
-  .asb-eyebrow{font-size:8.5px;letter-spacing:1.5px;}
+@media(max-width:768px){
+  /* Mobilde sticky kaldır — drawer'ın üstüne binmesin */
+  .admin-sube-bar{position:relative!important;top:auto!important;padding:10px 14px;gap:8px;}
+  .asb-eyebrow{display:none;}
+  .asb-current{font-size:14px;}
+  .asb-tab{padding:6px 10px;font-size:10.5px;}
+  .asb-yukle-text{display:none;}
 }
 </style>
 </head>
@@ -219,7 +221,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="asb-tab on" id="asbTabFsm" onclick="subeDegistir('fsm')">🏙 FSM Şubesi</button>
       <button class="asb-tab" id="asbTabPodyum" onclick="subeDegistir('podyum')">🌿 Podyumpark</button>
     </div>
-    <button onclick="adisyondanYenile()" title="Aktif şubenin menüsünü adisyondan (kasiyer ekranı) çek" style="padding:7px 14px;border-radius:100px;background:rgba(220,189,128,.15);border:1px solid rgba(220,189,128,.45);color:#dcbd80;font-size:11.5px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;">🔄 Adisyondan Yükle</button>
+    <button onclick="adisyondanYenile()" title="Aktif şubenin menüsünü adisyondan (kasiyer ekranı) çek" style="padding:7px 14px;border-radius:100px;background:rgba(220,189,128,.15);border:1px solid rgba(220,189,128,.45);color:#dcbd80;font-size:11.5px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;">🔄<span class="asb-yukle-text"> Adisyondan Yükle</span></button>
   </div>
   <div class="wrap">
     <div class="sb-overlay" id="sbOverlay" onclick="mobSbKapat()"></div>

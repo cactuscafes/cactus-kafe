@@ -25,7 +25,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-06-11-ayri-sayfa-r2'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-06-12-servis-badge'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -502,10 +502,15 @@ footer{padding:40px 20px 24px;}
 
 /* ═══ Ürün Rozetleri ═══ */
 .product-img-wrap{position:relative;}
+.spotlight-img-wrap{position:relative;overflow:hidden;}
+.spotlight-img-wrap img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .5s ease;}
 .product-badge{position:absolute;top:8px;left:8px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.2);}
 .badge-populer{background:linear-gradient(135deg,#ff7e3f,#e84393);color:#fff;}
 .badge-yeni{background:linear-gradient(135deg,#00c896,#2d8f6e);color:#fff;}
 .badge-mevsim{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;}
+/* Servis bilgisi rozeti — fotoğrafın sağ alt köşesinde */
+.product-servis{position:absolute;bottom:8px;right:8px;background:rgba(26,48,16,.86);color:#fdfaf3;font-size:10px;font-weight:700;padding:4px 9px;border-radius:8px;letter-spacing:.3px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.25);border:1px solid rgba(220,189,128,.35);line-height:1.2;}
+@media(max-width:600px){.product-servis{font-size:9px;padding:3px 7px;bottom:6px;right:6px;}}
 
 /* (Quiz FAB kaldırıldı — sağ altta sadece müzik butonu kalır, hero banner yukarıda var.) */
 
@@ -810,7 +815,7 @@ async function init() {
           id: katKey,
           label: kat.label||katKey,
           urunler: (kat.urunler||[]).map(function(u){
-            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli};
+            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli, servis:u.servis||''};
           })
         };
       });
@@ -861,9 +866,10 @@ function renderMenu(sube) {
   if (spotItems.length > 0 && spotGridEl) {
     spotGridEl.innerHTML = spotItems.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||''});
+      var servisBadge = u.servis?'<span class="product-servis">'+u.servis+'</span>':'';
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
-      c+='<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
+      c+='<div class="spotlight-img-wrap">'+servisBadge+'<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'"></div>';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
       return c;
@@ -874,15 +880,16 @@ function renderMenu(sube) {
     if (!urunler.length) return '';
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||''});
       var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
       // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
       var rozet='';
       if(u.populer) rozet='<span class="product-badge badge-populer">⭐ Popüler</span>';
       else if(u.yeni) rozet='<span class="product-badge badge-yeni">🆕 Yeni</span>';
       else if(u.mevsim) rozet='<span class="product-badge badge-mevsim">🌸 Mevsim</span>';
+      var servisBadge = u.servis?'<span class="product-servis">'+u.servis+'</span>':'';
       var h='<div class="product-card" onclick="upopAc('+pidx+')">';
-      h+='<div class="product-img-wrap">'+rozet+img+'</div>';
+      h+='<div class="product-img-wrap">'+rozet+servisBadge+img+'</div>';
       h+='<div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>';
       if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';

@@ -9,7 +9,7 @@
 <script>
 /* ═══ OTOMATİK CACHE/SW RESET (her sürüm bump'ta çalışır) ═══ */
 (function(){
-  var APP_VER='cactus-2026-06-08-r3-podyum-menu';
+  var APP_VER='cactus-2026-06-12-otomatik-masa-kapatma';
   try{
     var stored=localStorage.getItem('cactus_app_ver');
     if(stored===APP_VER) return;
@@ -1246,6 +1246,31 @@ function _staleItemFiltrele(items){
     try{localStorage.setItem(LK.mas+'_cycle',currentCycle);}catch(e){}
   }catch(e){}
 })();
+// Periyodik yeni-gün kontrolü — cihaz açık kaldığı durumda da gece 04:00'te masaları otomatik kapatır
+setInterval(function(){
+  try{
+    var currentCycle=_getResetCycleId();
+    var savedCycle=localStorage.getItem(LK.mas+'_cycle');
+    if(!savedCycle){ try{localStorage.setItem(LK.mas+'_cycle',currentCycle);}catch(e){} return; }
+    if(savedCycle===currentCycle) return;
+    // Yeni iş günü başladı — açık masaları kapat + D1'e MASA_CLEAR event'i gönder
+    var temizlenen=[];
+    for(var i=1;i<=34;i++){
+      if((masalar[i]||[]).length>0){
+        temizlenen.push(i);
+        masalar[i]=[];
+        if(typeof _pushEvent==='function') _pushEvent('MASA_CLEAR', i, {});
+      }
+    }
+    try{localStorage.setItem(LK.mas+'_cycle', currentCycle);}catch(e){}
+    try{localStorage.setItem(LK.mas, JSON.stringify(masalar));}catch(e){}
+    try{localStorage.setItem(LK.mas+'_mv','{}');}catch(e){}
+    if(temizlenen.length>0){
+      if(typeof toast==='function') toast('🌅 Yeni iş günü — '+temizlenen.length+' önceki gün masası kapatıldı');
+      if(typeof renderMasalar==='function') renderMasalar();
+    }
+  }catch(e){}
+}, 60*1000); // dakikada bir
 
 // Migration: stale 'ic'/'yi' tip değerlerini 'icecek'/'yiyecek' olarak normalleştir
 function _normTip(t){return (t==='ic'||t==='icecek')?'icecek':'yiyecek';}

@@ -4,7 +4,7 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
 
 ## Proje
 - **Repo:** github.com/cactuscafes/cactus-kafe (branch: `main`)
-- **Ana dizin:** `/Users/macbookpro/Desktop/cactus-site`
+- **Ana dizin:** `/Users/bulut/Desktop/cactus-site`
 - **Yayın:** Cloudflare Pages → cactuscafes.com (push → otomatik deploy, ~1-2 dk)
 
 ## Dosyalar

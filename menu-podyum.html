@@ -926,6 +926,21 @@ function renderMenu(sube) {
   var spotItems = (menuData.oncu && menuData.oncu.length > 0)
     ? menuData.oncu
     : allProducts.filter(function(u){ return u.foto; }).slice(0,4);
+  // Öne çıkanlar fiyat/bilgiyi snapshot tutar → aktif şubenin GÜNCEL ürününden çöz
+  // (şubeye göre fiyat farkı + sonradan değişen fiyat doğru yansısın; eşleşme yoksa snapshot)
+  var _liveById={}, _liveByAd={};
+  allProducts.forEach(function(p){ if(p&&p.id) _liveById[p.id]=p; if(p&&p.ad) _liveByAd[p.ad]=p; });
+  spotItems = spotItems.map(function(o){
+    var live=_liveById[o.id]||_liveByAd[o.ad];
+    if(!live) return o;
+    return Object.assign({}, o, {
+      fiyat: live.fiyat,
+      aciklama: (live.aciklama!=null?live.aciklama:o.aciklama),
+      servis: (live.servis!=null?live.servis:o.servis),
+      emoji: (live.emoji!=null?live.emoji:o.emoji),
+      foto: (live.foto||o.foto)
+    });
+  });
   var spotGridEl = document.getElementById('spotlight-grid-' + sube);
   var spotlightEl = document.getElementById('spotlight-' + sube);
   if (spotItems.length > 0 && spotGridEl) {

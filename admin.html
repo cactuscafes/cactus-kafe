@@ -989,6 +989,43 @@ setTimeout(function(){
 }, 50);
 // ───────────────────────────────────────────────────────────────────────
 let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+// ── ÖNE ÇIKAN tek-kapı: en fazla 4 + aynı ürün 2 kez eklenemez ──────────
+const ONCU_MAX=4;
+var _oncuSecId=''; // dropdown'dan seçilen ürünün gerçek id'si (oncuEkle kullanır)
+function _oncuKey(x){ return ((x&&x.ad||'').trim().toLowerCase()) || ('id:'+(x&&x.id)); }
+function oncuIndexOf(item){
+  if(!Array.isArray(ONCU)) return -1;
+  var k=_oncuKey(item);
+  return ONCU.findIndex(function(x){
+    return _oncuKey(x)===k || (item.id!=null && x.id!=null && String(x.id)===String(item.id));
+  });
+}
+// Tek giriş kapısı — eklendiyse true. Limit + duplicate burada zorlanır.
+function oncuTryAdd(item){
+  if(!Array.isArray(ONCU)) ONCU=[];
+  if(oncuIndexOf(item)>-1){ if(typeof toast==='function') toast('⚠️ "'+(item.ad||'Bu ürün')+'" zaten öne çıkanlarda'); return false; }
+  if(ONCU.length>=ONCU_MAX){ if(typeof toast==='function') toast('⚠️ En fazla '+ONCU_MAX+' öne çıkan olabilir — önce birini kaldırın'); return false; }
+  ONCU.push(item);
+  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  return true;
+}
+// Mevcut veriyi temizle: duplicate'leri at + 4'e indir. Değiştiyse true.
+function oncuNormalize(){
+  if(!Array.isArray(ONCU)){ ONCU=[]; return false; }
+  var seen={}, temiz=[];
+  ONCU.forEach(function(x){
+    if(!x) return;
+    var k=_oncuKey(x);
+    if(seen[k]) return;
+    seen[k]=1;
+    if(temiz.length<ONCU_MAX) temiz.push(x);
+  });
+  var degisti=JSON.stringify(temiz)!==JSON.stringify(ONCU);
+  ONCU=temiz;
+  if(degisti) localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  return degisti;
+}
+oncuNormalize();
 let aktifKat=KAT[0]?.id||'sicak';
 
 function giris(){
@@ -1188,9 +1225,8 @@ function renderUrunler(){
       btn.onclick=function(){
         if(!ONCU)ONCU=[];
         var oidx=ONCU.findIndex(function(x){return x.id===urun.id;});
-        if(oidx>-1){ONCU.splice(oidx,1);btn.innerHTML='☆';toast('Öne Çıkandan kaldırıldı');}
-        else{ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''});btn.innerHTML='⭐';toast('⭐ Öne Çıkanlara eklendi!');}
-        localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+        if(oidx>-1){ONCU.splice(oidx,1);localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));btn.innerHTML='☆';toast('Öne Çıkandan kaldırıldı');}
+        else{ if(oncuTryAdd({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''})){btn.innerHTML='⭐';toast('⭐ Öne Çıkanlara eklendi!');} } // limit/duplicate dolu ise eklenmez, ikon ☆ kalır
         if(typeof renderOncuGrid==='function') renderOncuGrid();
       };
       silBtn.parentElement.insertBefore(btn,silBtn);
@@ -1474,7 +1510,7 @@ function doldurDropdown(){
     const g=document.createElement('optgroup'); g.label=k.label;
     ul.forEach(u=>{
       const o=document.createElement('option');
-      o.value=JSON.stringify({ad:u.ad,fiyat:u.fiyat,aciklama:u.aciklama||'',foto:u.foto||''});
+      o.value=JSON.stringify({id:u.id||'',ad:u.ad,fiyat:u.fiyat,aciklama:u.aciklama||'',foto:u.foto||''});
       o.textContent=u.ad+' — ₺'+u.fiyat;
       g.appendChild(o);
     });
@@ -1485,6 +1521,7 @@ function oncuSecDegisti(){
   const v=document.getElementById('oncuSec').value; if(!v) return;
   try{
     const u=JSON.parse(v);
+    _oncuSecId=u.id||'';
     document.getElementById('oAd').value=u.ad;
     document.getElementById('oFiyat').value=u.fiyat;
     document.getElementById('oAc').value=u.aciklama;
@@ -1499,9 +1536,10 @@ function oncuEkle(){
   const ac=document.getElementById('oAc').value.trim();
   const foto=document.getElementById('oUrl').value.trim();
   if(!ad){ toast('⚠️ Ürün adı zorunlu'); return; }
-  if(!ONCU)ONCU=[];
-  ONCU.push({id:Date.now(),ad,fiyat:parseInt(fiyat)||0,aciklama:ac,foto});
-  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  // Tek kapı: 4 limiti + aynı ürün tekrarını engeller. Gerçek ürün id'si (dropdown) kullanılır.
+  var eklendi=oncuTryAdd({id:_oncuSecId||('oncu_'+Date.now()),ad,fiyat:parseInt(fiyat)||0,aciklama:ac,foto});
+  if(!eklendi) return; // limit doldu ya da zaten var → form temizlenmesin
+  _oncuSecId='';
   document.getElementById('oAd').value='';
   document.getElementById('oFiyat').value='';
   document.getElementById('oAc').value='';
@@ -2873,7 +2911,7 @@ function oncuBtnClick(btn){
   }else{
     var urun=null;
     Object.values(MENU).forEach(function(arr){arr.forEach(function(u){if(u.id===uid)urun=u;});});
-    if(urun)ONCU.push({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''});
+    if(!urun || !oncuTryAdd({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''})) return; // 4 limiti + duplicate engeli
     btn.innerHTML='\u2B50';
     toast('\u2B50 Öne Çıkanlara eklendi! Yayınla\'ya basın.');
   }

@@ -326,33 +326,47 @@
       "label": "🍹 Kokteyl",
       "urunler": [
         {
-          "id": "k1",
-          "ad": "Blue Sky",
-          "fiyat": 220,
-          "emoji": "🫐",
-          "tip": "ic",
-          "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
-          "gizli": false
-        },
-        {
-          "id": "k2",
-          "ad": "Cactus",
-          "fiyat": 220,
-          "emoji": "🌵",
-          "tip": "ic",
-          "aciklama": "Süt, vanilya, elma",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
-          "gizli": false
-        },
-        {
-          "id": "k3",
+          "id": "ko3",
           "ad": "Pink Wind",
-          "fiyat": 220,
+          "fiyat": 230,
           "emoji": "🍉",
           "tip": "ic",
           "aciklama": "Karpuz, limonata, çilek",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196197365",
+          "ad": "Kuzu Firarda",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "kuzukulağı, limon",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274774939-chzcnxbw7gd.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196213643",
+          "ad": "Apollo",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "Mango, hindistan cevizi, tarçın",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274783935-vifh1rg8lk.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196219910",
+          "ad": "Zeus",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "Acı portakal, çilek, karanfil",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274790597-ylu8fhlyqf.jpg",
+          "servis": "350 ml plastik bardak",
           "gizli": false
         }
       ]
@@ -981,33 +995,47 @@
       "label": "🍹 Kokteyl",
       "urunler": [
         {
-          "id": "k1",
-          "ad": "Blue Sky",
-          "fiyat": 220,
-          "emoji": "🫐",
-          "tip": "ic",
-          "aciklama": "Süt, vanilya, hindistan cevizi, mavi kelebek çayı",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg",
-          "gizli": false
-        },
-        {
-          "id": "k2",
-          "ad": "Cactus",
-          "fiyat": 220,
-          "emoji": "🌵",
-          "tip": "ic",
-          "aciklama": "Süt, vanilya, elma",
-          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728905483-a28hqjlxuwj.jpg",
-          "gizli": false
-        },
-        {
-          "id": "k3",
+          "id": "ko3",
           "ad": "Pink Wind",
-          "fiyat": 220,
+          "fiyat": 230,
           "emoji": "🍉",
           "tip": "ic",
           "aciklama": "Karpuz, limonata, çilek",
           "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728937269-35awlkgxl06.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196197365",
+          "ad": "Kuzu Firarda",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "kuzukulağı, limon",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274774939-chzcnxbw7gd.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196213643",
+          "ad": "Apollo",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "Mango, hindistan cevizi, tarçın",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274783935-vifh1rg8lk.jpg",
+          "servis": "350 ml plastik bardak",
+          "gizli": false
+        },
+        {
+          "id": "kokteyl_1781196219910",
+          "ad": "Zeus",
+          "fiyat": 250,
+          "emoji": "☕",
+          "tip": "ic",
+          "aciklama": "Acı portakal, çilek, karanfil",
+          "foto": "https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781274790597-ylu8fhlyqf.jpg",
+          "servis": "350 ml plastik bardak",
           "gizli": false
         }
       ]

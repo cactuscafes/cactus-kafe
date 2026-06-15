@@ -1,0 +1,28 @@
+# === Bağımlılıklar / cache (context'i en çok şişirenler) ===
+node_modules/          # 228 MB
+.git/                  # 21 MB
+.wrangler/             # wrangler build cache
+.serena/               # Serena'nın kendi cache/memory'si (kendi okur)
+
+# === Claude / editör / OS ===
+.claude/
+.DS_Store
+
+# === Lock & lockfile'lar ===
+package-lock.json
+*.lock
+
+# === Sırlar (context'e asla girmesin) ===
+.dev.vars
+.dev.vars.example
+.env*
+
+# === Binary / medya (text olarak okunamaz, sadece şişirir) ===
+*.png
+*.jpg
+*.jpeg
+*.zip
+qr-podyumpark.png
+og-image.png
+og-image.jpg
+Arşiv.zip

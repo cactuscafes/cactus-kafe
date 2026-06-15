@@ -564,17 +564,31 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 
       <!-- ÖNE ÇIKAN -->
       <div class="panel" id="panel-oncu">
-        <div class="pttl">⭐ Öne Çıkanlar</div>
-        <div class="psub">Anasayfada ve menüde vitrinde gösterilir. Menüden en fazla 4 ürün seç — fiyat ve görsel menüden otomatik gelir, ayrıca bir şey girmene gerek yok.</div>
+        <div class="pttl">⭐ Öne Çıkan</div>
+        <div class="psub">Menüden ürün seç veya manuel gir, fotoğraf ekle.</div>
         <div class="kart">
-          <label class="lbl">Menüden ürün ekle</label>
-          <div style="display:flex;gap:8px;align-items:stretch;">
-            <select class="yi" id="oncuSec" style="flex:1;">
+          <div style="margin-bottom:12px;">
+            <label class="lbl">Menüden Seç</label>
+            <select class="yi" id="oncuSec" onchange="oncuSecDegisti()">
               <option value="">-- Ürün seçin --</option>
             </select>
-            <button id="oncuEkleBtn" onclick="oncuEkle()" style="padding:0 20px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Ekle</button>
           </div>
-          <div id="oncuSayac" style="font-size:11px;color:var(--mist);margin-top:10px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;margin-bottom:10px;">
+            <div><label class="lbl">Ürün Adı *</label><input class="yi" id="oAd" placeholder="Caramel Latte"></div>
+            <div><label class="lbl">Fiyat (₺)</label><input class="yi" id="oFiyat" type="number" placeholder="200"></div>
+          </div>
+          <div style="margin-bottom:10px;"><label class="lbl">Açıklama</label><input class="yi" id="oAc" placeholder="Kısa açıklama"></div>
+          <div style="margin-bottom:12px;">
+            <label class="lbl">Fotoğraf *</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+              <input type="file" id="oDosya" accept="image/*" style="display:none" onchange="fotoIsle(this,'oUrl','oOnizle','oDosyaAd')">
+              <button class="foto-btn" onclick="document.getElementById('oDosya').click()">📷 Fotoğraf Seç</button>
+              <span id="oDosyaAd" style="font-size:11px;color:var(--mist);">Seçilmedi</span>
+            </div>
+            <input class="yi" id="oUrl" placeholder="veya URL yapıştır" oninput="urlOnizle(this.value,'oOnizle')">
+            <img id="oOnizle" class="foto-onizle">
+          </div>
+          <button onclick="oncuEkle()" style="width:100%;padding:11px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;">+ ÖNE ÇIKANLARA EKLE</button>
         </div>
         <div class="oncu-grid" id="oncuGrid"></div>
       </div>
@@ -1503,14 +1517,38 @@ function doldurDropdown(){
     sel.appendChild(g);
   });
 }
+function oncuSecDegisti(){
+  const v=document.getElementById('oncuSec').value; if(!v) return;
+  try{
+    const u=JSON.parse(v);
+    _oncuSecId=u.id||'';
+    document.getElementById('oAd').value=u.ad;
+    document.getElementById('oFiyat').value=u.fiyat;
+    document.getElementById('oAc').value=u.aciklama;
+    document.getElementById('oUrl').value=u.foto;
+    const oe=document.getElementById('oOnizle');
+    if(u.foto){oe.src=u.foto;oe.style.display='block';}else{oe.style.display='none';}
+  }catch(e){}
+}
 function oncuEkle(){
-  var v=document.getElementById('oncuSec').value;
-  if(!v){ toast('⚠️ Önce menüden ürün seçin'); return; }
-  var u; try{ u=JSON.parse(v); }catch(e){ return; }
-  // Tek kapı: max 4 + duplicate engeli. Fiyat/görsel menüden gelir (snapshot değil — public canlı çözer).
-  var eklendi=oncuTryAdd({id:u.id||('oncu_'+Date.now()),ad:u.ad,fiyat:parseInt(u.fiyat)||0,aciklama:u.aciklama||'',foto:u.foto||''});
+  const ad=document.getElementById('oAd').value.trim();
+  const fiyat=document.getElementById('oFiyat').value.trim();
+  const ac=document.getElementById('oAc').value.trim();
+  const foto=document.getElementById('oUrl').value.trim();
+  if(!ad){ toast('⚠️ Ürün adı zorunlu'); return; }
+  // Tek kapı: 4 limiti + aynı ürün tekrarını engeller. Gerçek ürün id'si (dropdown) kullanılır.
+  var eklendi=oncuTryAdd({id:_oncuSecId||('oncu_'+Date.now()),ad,fiyat:parseInt(fiyat)||0,aciklama:ac,foto});
+  if(!eklendi) return; // limit doldu ya da zaten var → form temizlenmesin
+  _oncuSecId='';
+  document.getElementById('oAd').value='';
+  document.getElementById('oFiyat').value='';
+  document.getElementById('oAc').value='';
+  document.getElementById('oUrl').value='';
+  document.getElementById('oOnizle').style.display='none';
+  document.getElementById('oDosyaAd').textContent='Seçilmedi';
   document.getElementById('oncuSec').value='';
-  if(eklendi){ renderOncuGrid(); toast('✅ "'+u.ad+'" öne çıkanlara eklendi'); }
+  renderOncuGrid();
+  toast('✅ Eklendi!');
 }
 function oncuSil(id){
   if(!ONCU)ONCU=[];
@@ -1520,20 +1558,14 @@ function oncuSil(id){
 }
 function renderOncuGrid(){
   const d=ONCU||[];
-  const dolu=d.length>=ONCU_MAX;
-  const sayac=document.getElementById('oncuSayac');
-  if(sayac) sayac.textContent=d.length+' / '+ONCU_MAX+' öne çıkan'+(dolu?' — dolu (eklemek için önce birini kaldırın)':'');
-  const sel=document.getElementById('oncuSec'); if(sel) sel.disabled=dolu;
-  const btn=document.getElementById('oncuEkleBtn');
-  if(btn){ btn.disabled=dolu; btn.style.opacity=dolu?'.45':''; btn.style.cursor=dolu?'not-allowed':'pointer'; }
-  document.getElementById('oncuGrid').innerHTML=!d.length
-    ? '<div style="color:var(--mist);font-size:13px;padding:6px 0;">Henüz öne çıkan ürün yok — yukarıdan menüden ekleyin.</div>'
-    : d.map(u=>`
+  document.getElementById('oncuGrid').innerHTML=!d.length?'<div style="color:var(--mist);font-size:13px;">Henüz öne çıkan ürün yok.</div>':
+  d.map(u=>`
     <div class="oncu-kart">
-      <img class="oncu-kart-img" src="${u.foto||''}" alt="${u.ad}" onerror="this.style.display='none'">
+      <img class="oncu-kart-img" src="${u.foto}" alt="${u.ad}" onerror="this.style.background='var(--paper)'">
       <div class="oncu-info">
         <div class="oncu-ad">${u.ad}</div>
         ${u.fiyat?`<div class="oncu-fiyat">₺${u.fiyat}</div>`:''}
+        ${u.aciklama?`<div style="font-size:11px;color:var(--mist);margin-top:4px;">${u.aciklama}</div>`:''}
         <button class="oncu-sil" onclick="oncuSil('${u.id}')">🗑 Kaldır</button>
       </div>
     </div>`).join('');

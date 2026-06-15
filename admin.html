@@ -187,6 +187,90 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
   .asb-tab{padding:6px 10px;font-size:10.5px;}
   .asb-yukle-text{display:none;}
 }
+
+/* ════════════════════════════════════════════════════════════
+   MINIMAL REFINEMENT — az renk · ince çizgiler · bol boşluk
+   En sonda; mevcut kuralları override eder. Nav yüksekliği/offset
+   sabit (52px) bırakıldı; sadece görsel rafine.
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#1d1c1a;
+  --paper:#fbfaf8;
+  --stone:#e7e4df;
+  --line:#efece7;
+  --mist:#9b988f;
+  --rad:14px;
+  --rad-sm:9px;
+}
+body{-webkit-font-smoothing:antialiased;letter-spacing:.1px;color:var(--ink);}
+
+/* NAV — beyaz, hairline alt çizgi */
+.nav{background:#fff;border-bottom:1px solid var(--line);padding:0 26px;}
+.nav-logo{color:var(--ink);font-weight:400;letter-spacing:2.5px;}
+.nav-btn{border-radius:100px;font-weight:500;}
+.btn-yayinla{background:var(--ink);color:#fff;}
+.btn-cikis{color:var(--mist);border:1px solid var(--line);}
+.nav-ham span{background:var(--ink);}
+
+/* SIDEBAR — ferah, hairline */
+.sb{background:#fff;border-right:1px solid var(--line);padding:26px 0;}
+.sb-ttl{color:var(--mist);letter-spacing:2.5px;padding:0 24px;margin:22px 0 10px;}
+.sb-btn{padding:11px 24px;font-size:13.5px;color:#4a4843;transition:background .18s,color .18s;}
+.sb-btn:hover{background:var(--paper);color:var(--ink);}
+.sb-btn.on{background:linear-gradient(90deg,rgba(184,150,90,.10),rgba(184,150,90,0));border-left-color:var(--gold);color:var(--ink);font-weight:500;}
+
+/* BAŞLIK / İÇERİK — bol boşluk */
+.main{padding:40px 46px;}
+.pttl{font-size:34px;font-weight:300;letter-spacing:.3px;}
+.psub{font-size:12.5px;color:var(--mist);margin-bottom:30px;}
+
+/* KARTLAR — hairline + yumuşak köşe, gölgesiz (düz/minimal) */
+.kart,.urun-kart,.oncu-kart,.bsv-kart,.rap-krt,.rap-nakit-krt,.mob-musteri-kart{
+  border:1px solid var(--line);border-radius:var(--rad);box-shadow:none;
+}
+.kart{padding:26px;margin-bottom:18px;}
+.rap-krt{padding:20px 16px;}
+.urun-kart{padding:18px;transition:border-color .2s,box-shadow .2s,transform .2s;}
+.urun-kart:hover{box-shadow:0 10px 30px -16px rgba(25,22,18,.22);transform:translateY(-2px);}
+.uk-emoji{border-radius:var(--rad-sm);background:var(--paper);}
+
+/* INPUT — ince çizgi + nazik focus */
+.inp,.yi{border:1px solid var(--stone);border-radius:var(--rad-sm);padding:11px 14px;transition:border-color .18s,box-shadow .18s;}
+.inp:focus,.yi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,150,90,.13);}
+
+/* BUTON / PILL */
+.kat-tab,.uk-btn,.foto-btn{border:1px solid var(--stone);border-radius:100px;transition:all .18s;}
+.kat-tab:hover{border-color:var(--ink);}
+.kat-tab.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.uk-btn:hover{border-color:var(--ink);}
+
+/* TABLO — sadece hairline satır çizgisi */
+th{border-bottom:1px solid var(--stone);color:var(--mist);font-weight:500;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px 8px;}
+td{border-bottom:1px solid var(--line);padding:11px 8px;}
+
+/* MODAL */
+.modal{border-radius:var(--rad);box-shadow:0 40px 90px -24px rgba(0,0,0,.42);padding:34px;}
+.modal-ok,.modal-iptal,.modal-durum{border-radius:var(--rad-sm);}
+.modal-iptal{border:1px solid var(--stone);}
+
+/* TOAST */
+.toast{border-radius:100px;box-shadow:0 14px 34px -10px rgba(0,0,0,.34);}
+
+/* GİRİŞ */
+.giris-kart{border-radius:var(--rad);box-shadow:0 40px 100px -30px rgba(0,0,0,.6);}
+.giris-btn{border-radius:var(--rad-sm);}
+
+/* ŞUBE BAR — koyu yeşil yerine sade açık şerit */
+.admin-sube-bar{background:var(--paper);color:var(--ink);border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:none;padding:12px 26px;}
+.asb-eyebrow{color:var(--mist);}
+.asb-current{font-family:'Cormorant Garamond',serif;color:var(--ink);font-weight:400;}
+.asb-tabs{background:#fff;border:1px solid var(--line);}
+.asb-tab{color:var(--mist);}
+.asb-tab:hover{color:var(--ink);}
+.asb-tab.on{background:var(--ink);color:#fff;box-shadow:none;}
+.admin-sube-bar > button:last-child{background:#fff!important;border:1px solid var(--stone)!important;color:#5a574f!important;border-radius:100px!important;}
+
+@media(max-width:768px){ .main{padding:18px 16px;} .pttl{font-size:24px;} .admin-sube-bar{padding:10px 14px;} }
 </style>
 </head>
 <body>
@@ -246,10 +330,10 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('ziyaret',this);ziyaretYukle()">📈 Ziyaretçiler</button>
       <div class="sb-ttl">Sayfalar</div>
-      <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:#2d7a4f;color:#fff;">📊 Raporlar</button>
+      <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:rgba(184,150,90,.12);color:#8a6d39;font-weight:600;">📊 Raporlar</button>
       <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
       <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
-      <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:#2d5a27;color:#fff;font-weight:600;">🏠 Ana Sayfa</button>
+      <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:rgba(184,150,90,.12);color:#8a6d39;font-weight:600;">🏠 Ana Sayfa</button>
       <button class="sb-btn" onclick="panelAc('muzik',this)">🎵 Müzik</button>
       <div class="sb-ttl">Sayfa Düzenle</div>
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>

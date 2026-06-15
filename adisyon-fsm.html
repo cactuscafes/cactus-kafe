@@ -2354,13 +2354,15 @@ function openTransfer(){
 function transferYap(){
   const hedef=parseInt(document.getElementById('transfer-hedef').value);
   if(!hedef||!aktifMasa)return;
-  masalar[aktifMasa].forEach(item=>{
-    const ex=masalar[hedef].find(x=>x.id===item.id);
-    if(ex) ex.adet+=item.adet; else masalar[hedef].push({...item});
+  const onceki=aktifMasa;
+  // EVENT-SOURCED v11: doğrudan masalar mutasyonu rebuild'de geri alınıyordu.
+  // Hedefe ITEM_ADD (id eşleşirse adet birikir) + kaynağa MASA_CLEAR event'i.
+  (masalar[onceki]||[]).slice().forEach(item=>{
+    _pushEvent('ITEM_ADD', hedef, {urun:{id:item.id,ad:item.ad,fiyat:item.fiyat,tip:item.tip,emoji:item.emoji}, adet:item.adet});
   });
-  masalar[aktifMasa]=[];saveMasalar();
+  _pushEvent('MASA_CLEAR', onceki, {});
   closeModal('transfer-modal');
-  const onceki=aktifMasa;aktifMasa=hedef;
+  aktifMasa=hedef;
   document.getElementById('adis-masa-no').textContent='Masa '+hedef;
   document.getElementById('adis-masa-mob').textContent='Masa '+hedef;
   renderMasalar();renderAdisyon();
@@ -2545,9 +2547,9 @@ function gunSonuYap(){
   const detay=acik.map(m=>'Masa '+m.masa+': '+m.sayi+' ürün ₺'+m.top.toLocaleString('tr-TR')).join('\n');
   const onay='🌙 GÜN SONU\n\n'+acik.length+' açık masa var (toplam ₺'+toplam.toLocaleString('tr-TR')+'):\n\n'+detay+'\n\n⚠ Bu masalar kapatılacak ama CİROYA YANSIMAYACAK (ödeme alınmadı).\n\nDevam edilsin mi?';
   if(!confirm(onay)) return;
-  acik.forEach(m=>{masalar[m.masa]=[];});
+  // EVENT-SOURCED v11: her açık masaya MASA_CLEAR event'i (yoksa sync'te geri açılıyordu)
+  acik.forEach(m=>{_pushEvent('MASA_CLEAR', m.masa, {});});
   aktifMasa=null;
-  saveMasalar();
   renderMasalar();renderAdisyon();
   const noEl=document.getElementById('adis-masa-no');if(noEl)noEl.textContent='Seçilmedi';
   const moEl=document.getElementById('adis-masa-mob');if(moEl)moEl.textContent='Seçilmedi';
@@ -2557,12 +2559,9 @@ function gunSonuYap(){
 }
 function tumMasalariSifirla(){
   if(!confirm('TÜM masalar sıfırlansın mı? Bu işlem geri alınamaz!'))return;
-  var _now=Date.now(), _en={};
-  for(let i=1;i<=30;i++){ _en[i]=_maxItemTs(masalar[i]||[]); masalar[i]=[]; }
-  aktifMasa=null;saveMasalar();
-  // Her masanın temizliği silinen ürünlerden KESİN daha yeni damgalansın (saat kayması/yarış koruması)
-  for(let i=1;i<=30;i++){ _mv[i]=Math.max(_mv[i]||0, _en[i]+1, _now); }
-  try{localStorage.setItem(LK.mas+'_mv',JSON.stringify(_mv));}catch(e){}
+  // EVENT-SOURCED v11: dolu her masaya MASA_CLEAR event'i (eski _mv/snapshot yolu ölüydü)
+  for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) _pushEvent('MASA_CLEAR', i, {}); }
+  aktifMasa=null;
   renderMasalar();renderAdisyon();
   document.getElementById('adis-masa-no').textContent='Seçilmedi';
   document.getElementById('adis-masa-mob').textContent='Seçilmedi';

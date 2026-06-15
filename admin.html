@@ -21,11 +21,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .giris-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:2px;cursor:pointer;font-family:inherit;}
 .giris-hata{font-size:12px;color:var(--rd);text-align:center;margin-top:10px;display:none;}
 .nav{position:fixed;top:0;left:0;right:0;height:52px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;}
+/* Sabit nav 52px yer kaplar; tüm admin içeriğini (şube barı dahil) aşağı it ki nav'ın arkasında kalmasın */
+#admin{padding-top:52px;}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:#fff;letter-spacing:2px;}
 .nav-btn{padding:7px 16px;font-size:11px;font-weight:500;letter-spacing:1px;border:none;cursor:pointer;font-family:inherit;}
 .btn-yayinla{background:var(--gold);color:var(--ink);}
 .btn-cikis{background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);}
-.wrap{display:grid;grid-template-columns:200px 1fr;min-height:100vh;padding-top:52px;}
+.wrap{display:grid;grid-template-columns:200px 1fr;min-height:100vh;}
 .sb{background:#fff;border-right:1px solid var(--stone);padding:20px 0;}
 .sb-ttl{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--mist);padding:0 16px;margin:16px 0 8px;}
 .sb-btn{width:100%;text-align:left;padding:10px 16px;background:none;border:none;border-left:3px solid transparent;font-size:13px;font-family:inherit;cursor:pointer;color:var(--ink);}

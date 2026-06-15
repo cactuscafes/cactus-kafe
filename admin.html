@@ -1775,19 +1775,53 @@ function _bgDelta(bugun, dun){
   var up = pct>0;
   return '<span style="color:'+(up?'#7bd88f':'#f3a3a3')+';">'+(up?'▲':'▼')+' %'+Math.abs(pct)+' <span style="opacity:.6;">(dün '+_bgFmt(dun)+')</span></span>';
 }
+// ─── Bugün cirosu artık EVENT-SOURCED worker'dan (Canlı Masalar ile aynı kaynak) ───
+// Eski rapor-api hook'u güvenilmezdi (özellikle Podyum rapor-api'ye düşmüyordu → ciro 0/eksik).
+// Event log tek doğru kaynak. Aşağıdaki yardımcılar event'leri rapor-api ile aynı şekle indirger,
+// böylece alttaki render kodu değişmeden çalışır.
+function _evTumEvents(sube){
+  var hepsi=[];
+  function sayfa(since,tur){
+    if(tur>30) return hepsi; // güvenlik tavanı (~30k event)
+    return fetch(_CM_EV_API+'/api/events?sube='+sube+'&since='+since)
+      .then(function(r){return r.json();})
+      .then(function(j){
+        var evs=(j&&j.events)||[];
+        hepsi=hepsi.concat(evs);
+        if(evs.length>=1000) return sayfa(evs[evs.length-1].seq, (tur||0)+1);
+        return hepsi;
+      });
+  }
+  return sayfa(0,0).catch(function(){return hepsi;});
+}
+function _trGun(ts){ // ms epoch → Türkiye saati (UTC+3) 'YYYY-MM-DD'
+  var d=new Date(Number(ts||0)+10800000), p=function(n){return String(n).padStart(2,'0');};
+  return d.getUTCFullYear()+'-'+p(d.getUTCMonth()+1)+'-'+p(d.getUTCDate());
+}
+function _evGunRapor(evs, gun){ // event log → rapor-api uyumlu özet (tek gün)
+  var ciro=0,adet=0,nakit=0,kredi=0,urunSay={},adMap={};
+  evs.forEach(function(e){ if(e.type==='ITEM_ADD'){ var u=(e.payload||{}).urun||{}; if(u.id&&u.ad) adMap[u.id]=u.ad; } });
+  evs.forEach(function(e){
+    if(e.type!=='MASA_PAY' || _trGun(e.ts)!==gun) return;
+    var p=e.payload||{};
+    var tut=Number(p.tutar)||0, nt=Number(p.nakitTutar)||0, kt=Number(p.kartTutar)||0;
+    if(!nt && !kt && tut>0){ if((p.odemeTipi||'').toLowerCase().indexOf('nakit')>=0) nt=tut; else kt=tut; }
+    ciro+=tut; nakit+=nt; kredi+=kt;
+    (p.urunler||[]).forEach(function(s){ var a=Number(s.adet)||0; adet+=a; var ad=adMap[s.id]||('#'+s.id); urunSay[ad]=(urunSay[ad]||0)+a; });
+  });
+  var en_cok=Object.keys(urunSay).map(function(k){return {urun_adi:k,toplam_adet:urunSay[k]};}).sort(function(a,b){return b.toplam_adet-a.toplam_adet;});
+  return { gunler:(ciro||adet)?[{tarih:gun,ciro:ciro,adet:adet}]:[], odeme:[{odeme_tipi:'nakit',ciro:nakit},{odeme_tipi:'kredi',ciro:kredi}], en_cok:en_cok };
+}
 async function bugunYukle(){
-  var pad=function(n){return String(n).padStart(2,'0');};
-  var d=new Date();
-  var bugun=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-  var y=new Date(d.getTime()-86400000);
-  var dun=y.getFullYear()+'-'+pad(y.getMonth()+1)+'-'+pad(y.getDate());
+  var bugun=_trGun(Date.now()), dun=_trGun(Date.now()-86400000);
   document.getElementById('bg-tarih').textContent=bugun+' · iki şube';
   document.getElementById('bg-toplam').textContent='⏳';
 
-  var Q=function(sube,g){return fetch(_RAP_API+'/rapor/ozet?baslangic='+g+'&bitis='+g+'&sube='+sube).then(function(r){return r.json();}).catch(function(){return {};});};
   try{
-    var res=await Promise.all([Q('podyum',bugun),Q('fsm',bugun),Q('podyum',dun),Q('fsm',dun)]);
-    var oP=res[0], oF=res[1], yP=res[2], yF=res[3];
+    var ev=await Promise.all([_evTumEvents('podyum'),_evTumEvents('fsm')]);
+    var evP=ev[0], evF=ev[1];
+    var oP=_evGunRapor(evP,bugun), oF=_evGunRapor(evF,bugun);
+    var yP=_evGunRapor(evP,dun),  yF=_evGunRapor(evF,dun);
     var cP=_ozetCiro(oP), cF=_ozetCiro(oF), cToplam=cP+cF;
     var cdun=_ozetCiro(yP)+_ozetCiro(yF);
 

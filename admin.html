@@ -2246,6 +2246,15 @@ if(localStorage.getItem('ca')==='1'){
         var badge=document.getElementById('sikayetBadge');
         if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
       }).catch(function(){});
+    // Sadakat: son bakıştan beri YENİ KAYIT olan üye sayısı (bildirim rozeti)
+    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/listele')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var gorulen=Number(localStorage.getItem('cactus_sadakat_gorulen'))||(Date.now()-7*86400000);
+        var yeni=(data||[]).filter(function(m){var d=m.kayit_tarih?new Date(m.kayit_tarih).getTime():0;return d>gorulen;}).length;
+        var badge=document.getElementById('sadakatBadge');
+        if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;badge.title=yeni+' yeni kayıt';}
+      }).catch(function(){});
   },2000);
 }
 
@@ -3058,10 +3067,11 @@ async function kartListeYukle(){
   try {
     var r = await fetch(KART_API + '/kart/listele');
     _kartVerisi = await r.json();
-    // Badge: bedava hakkı olanlar
     var bedavaCount = _kartVerisi.filter(function(m){ return m.pul >= 5; }).length;
+    // Panel açıldı = yeni kayıt bildirimi görüldü → rozeti temizle + "görülme" zamanını işaretle
+    try{ localStorage.setItem('cactus_sadakat_gorulen', String(Date.now())); }catch(e){}
     var badge = document.getElementById('sadakatBadge');
-    if(badge){ badge.style.display = bedavaCount > 0 ? 'inline' : 'none'; badge.textContent = bedavaCount; }
+    if(badge){ badge.style.display = 'none'; }
     // Özet
     var toplam = _kartVerisi.length;
     var toplamPul = _kartVerisi.reduce(function(s,m){ return s + (m.toplam_kazanilan||0); }, 0);
@@ -3173,6 +3183,12 @@ function kartListeRender(){
     listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
     return;
   }
+  // Son 7 günde kayıt olanlara "🆕 YENİ" etiketi
+  var _yeniEsik = Date.now() - 7*86400000;
+  var _yeniTag = function(m){
+    var d = m.kayit_tarih ? new Date(m.kayit_tarih).getTime() : 0;
+    return (d && d>=_yeniEsik) ? ' <span style="background:#2d5a27;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.5px;white-space:nowrap;">🆕 YENİ</span>' : '';
+  };
 
   // ── Mobil: kart görünümü ──
   if(window.innerWidth < 700){
@@ -3188,7 +3204,7 @@ function kartListeRender(){
           return '<div class="mob-musteri-kart'+(bedava?' bedava':'')+'">'
             + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">'
               + '<div>'
-                + '<div style="font-size:15px;font-weight:600;">' + (m.ad||'—') + '</div>'
+                + '<div style="font-size:15px;font-weight:600;">' + (m.ad||'—') + _yeniTag(m) + '</div>'
                 + '<div style="font-size:12px;color:var(--mist);margin-top:2px;">' + m.telefon + (m.sube?' · '+m.sube:'') + '</div>'
               + '</div>'
               + '<div style="text-align:right;">'
@@ -3226,7 +3242,7 @@ function kartListeRender(){
         var mJson = encodeURIComponent(JSON.stringify(m));
         return '<tr style="'+(bedava?'background:rgba(184,150,90,.06);':'')+'">'
           + '<td style="font-weight:600;">' + m.telefon + '</td>'
-          + '<td style="color:var(--mist);">' + (m.ad||'—') + '</td>'
+          + '<td style="color:var(--mist);">' + (m.ad||'—') + _yeniTag(m) + '</td>'
           + '<td style="text-align:center;">'
             + '<div style="font-size:16px;font-weight:700;color:'+(bedava?'var(--gold)':'var(--ink)')+'">' + m.pul + '</div>'
             + '<div>' + pulBar + '</div>'

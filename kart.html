@@ -82,6 +82,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
 .giris-btn:hover{background:linear-gradient(135deg,#d8b87a,var(--amber));transform:translateY(-1px);box-shadow:0 6px 24px rgba(200,168,106,.3);}
 .giris-btn:disabled{background:rgba(232,160,48,.3);color:rgba(26,12,4,.5);cursor:default;transform:none;box-shadow:none;}
 .giris-hata{font-size:12px;color:#ff8c6e;text-align:center;padding:8px;min-height:32px;}
+.giris-tesvik{font-size:12px;color:var(--amber);text-align:center;margin:2px 0 12px;letter-spacing:.3px;}
+.giris-tesvik b{color:var(--latte);font-weight:600;}
+.kart-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);padding:13px 22px;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:.3px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:99999;transition:transform .4s cubic-bezier(.22,1,.36,1);max-width:90vw;text-align:center;}
+.kart-toast.on{transform:translateX(-50%) translateY(0);}
 
 /* ── KART SAYFASI ── */
 .kart-bg{min-height:100vh;background:linear-gradient(160deg,#2c4a1e 0%,#1a3310 45%,#0b1a07 100%);padding:90px 20px 60px;position:relative;overflow:hidden;}
@@ -211,13 +215,14 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
       </div>
       <!-- Form -->
       <div class="giris-kart">
-        <div class="giris-kart-baslik">Kartımı Görüntüle</div>
-        <div class="giris-kart-alt">Telefon numaranla giriş yap</div>
+        <div class="giris-kart-baslik">Kartını Oluştur</div>
+        <div class="giris-kart-alt">Telefon numaran yeterli — uygulama yok, üyelik yok</div>
         <input class="giris-input" id="telInput" type="tel" placeholder="05XX XXX XX XX"
           inputmode="numeric" maxlength="11" oninput="telFormat(this)" onkeydown="if(event.key==='Enter')girisYap()">
-        <input class="giris-input" id="adInput" type="text" placeholder="Ad Soyad (ilk kez için)"
+        <input class="giris-input" id="adInput" type="text" placeholder="Adın (opsiyonel)"
           onkeydown="if(event.key==='Enter')girisYap()">
-        <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Gör →</button>
+        <div class="giris-tesvik">🎁 İlk kez mi? <b>İlk yıldızın bizden.</b></div>
+        <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Oluştur →</button>
         <div class="giris-hata" id="girisHata"></div>
       </div>
     </div>
@@ -325,6 +330,15 @@ body{font-family:'Montserrat',sans-serif;background:var(--espresso);color:var(--
 var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
 var ESIK = 7;
 
+var _ktt;
+function kartToast(msg){
+  var el=document.getElementById('kartToast');
+  if(!el){ el=document.createElement('div'); el.id='kartToast'; el.className='kart-toast'; document.body.appendChild(el); }
+  el.textContent=msg;
+  requestAnimationFrame(function(){ el.classList.add('on'); });
+  clearTimeout(_ktt); _ktt=setTimeout(function(){ el.classList.remove('on'); },4200);
+}
+
 function telFormat(input){
   input.value=input.value.replace(/\D/g,'');
   var btn=document.getElementById('girisBtn');
@@ -349,8 +363,20 @@ function girisYap(){
     .then(function(d){
       if(!d.ok){throw new Error(d.error||'Hata');}
       localStorage.setItem('cactus_kart_tel',tel);
-      kartGoster(d.musteri);
-      kartGecmisCek(tel);
+      if(d.yeni){
+        // Yeni üyeye hoş geldin yıldızı (+1) — yalnızca ilk kayıtta
+        fetch(API+'/kart/ekle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,miktar:1,aciklama:'Hoş geldin yıldızı'})})
+          .then(function(r){return r.json();})
+          .then(function(e){
+            kartGoster(e&&e.ok?e.musteri:d.musteri);
+            kartGecmisCek(tel);
+            kartToast('🎁 Hoş geldin! İlk yıldızın hesabına eklendi.');
+          })
+          .catch(function(){ kartGoster(d.musteri); kartGecmisCek(tel); });
+      } else {
+        kartGoster(d.musteri);
+        kartGecmisCek(tel);
+      }
     })
     .catch(function(){
       sayfa('sayfaGiris');

@@ -2143,34 +2143,41 @@ async function yayinla(){
   btn.disabled=true; btn.textContent='⏳ Yayınlanıyor...';
   dur.classList.add('on'); dur.textContent='⏳ Yayınlanıyor...';
   try{
-    // Önce aktif şubedeki son değişiklikleri diske kaydet
+    // Aktif şubenin son düzenlemelerini diske kaydet
     try{ localStorage.setItem(_menuKeyFor(AKTIF_SUBE), JSON.stringify(MENU)); }catch(e){}
-    function _yukle(sube){ return JSON.parse(localStorage.getItem(_menuKeyFor(sube))||'null')||JSON.parse(JSON.stringify(MENU_V)); }
-    var fsmMenu=_yukle('fsm');
-    var podyumMenu=_yukle('podyum');
-    function _toPer(menu){
+    var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+    var aktif=AKTIF_SUBE, diger=(aktif==='fsm')?'podyum':'fsm';
+    // Aktif şubeyi DÜZENLENEN menüden, kendi KAT'ı ile kur (global KAT karışması yok)
+    function _toPer(menu, kat){
       var per={};
-      KAT.forEach(function(k){ per[k.id]={id:k.id,label:k.label,urunler:menu[k.id]||[]}; });
+      kat.forEach(function(k){ per[k.id]={id:k.id,label:k.label,urunler:menu[k.id]||[]}; });
       return per;
     }
-    var fsmPer=_toPer(fsmMenu);
-    var podyumPer=_toPer(podyumMenu);
-    const menuData={fsm:fsmPer,podyum:podyumPer,oncu:ONCU};
-    var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+    var aktifPer=_toPer(MENU, KAT);
+    // KRİTİK FİX: diğer şubeyi ASLA bayat localStorage/MENU_V ile ezme — buluttan TAZE al.
+    // (Eski kod her iki şubeyi de localStorage'dan yazıyordu → bir şubeyi yayınlayınca
+    //  diğeri o cihazdaki eski veriye dönüyordu = "menü sürekli bozuluyor".)
+    var digerPer=null;
+    try{ var dr=await fetch(API+'/menu/cek?sube=adisyon_'+diger+'&t='+Date.now()); if(dr.ok) digerPer=await dr.json(); }catch(e){}
+    if(!digerPer || !Object.keys(digerPer).length){
+      dur.textContent='❌ Diğer şube ('+diger.toUpperCase()+') buluttan okunamadı. Veri kaybını önlemek için yayın iptal edildi — tekrar deneyin.';
+      btn.disabled=false; btn.textContent='✅ Yayınla'; return;
+    }
+    var fsmPer=(aktif==='fsm')?aktifPer:digerPer;
+    var podyumPer=(aktif==='podyum')?aktifPer:digerPer;
+    // menu_public'i buluttan al, SADECE aktif şube + öne çıkanları güncelle (diğer şube korunur)
+    var mp={};
+    try{ var mr=await fetch(API+'/menu/cek?sube=menu_public&t='+Date.now()); if(mr.ok) mp=(await mr.json())||{}; }catch(e){}
+    mp.fsm=fsmPer; mp.podyum=podyumPer; mp.oncu=ONCU;
     var P=function(sube,menu){return fetch(API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:sube,menu:menu})});};
-    // menu_public  → public menu.html bunu okur (fsm+podyum+oncu)
-    // adisyon_fsm  → adisyon-fsm.html FSM kasiyer
-    // adisyon_podyum → adisyon.html Podyum kasiyer
-    // fsm/podyum   → eski uyumluluk
+    // SADECE aktif şubenin adisyon KV'sini yaz — diğer şubeninkine DOKUNMA
     var res=await Promise.all([
-      P('menu_public', menuData),
-      P('adisyon_fsm', fsmPer),
-      P('adisyon_podyum', podyumPer),
-      P('fsm', fsmPer),
-      P('podyum', podyumPer),
+      P('menu_public', mp),
+      P('adisyon_'+aktif, aktifPer),
+      P(aktif, aktifPer), // eski uyumluluk (sadece aktif)
     ]);
     if(res.every(function(r){return r&&r.ok;})){
-      dur.textContent='✅ Yayınlandı! FSM ve Podyumpark menüleri ayrı ayrı güncellendi.';
+      dur.textContent='✅ Yayınlandı! '+(aktif==='fsm'?'FSM':'Podyumpark')+' menüsü güncellendi (diğer şube korundu).';
       btn.textContent='✅ Tamamlandı';
       toast('🚀 Yayınlandı!');
     } else {

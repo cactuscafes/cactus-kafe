@@ -285,6 +285,67 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   .section-divider{transform:scaleX(1);transition:none;}
 }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CafeOrCoffeeShop",
+      "@id": "https://cactuscafes.com/#fsm",
+      "name": "Cactus Coffee — FSM Şubesi",
+      "image": "https://cactuscafes.com/og-image.jpg",
+      "url": "https://cactuscafes.com",
+      "telephone": "+90 538 014 66 00",
+      "email": "info@cactuscafes.com",
+      "priceRange": "₺₺",
+      "servesCuisine": ["Coffee", "Dessert", "Snack"],
+      "menu": "https://cactuscafes.com/menu.html",
+      "hasMap": "https://share.google/mhU7p1kX5MocaCvLF",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Fatih Sultan Mehmet Caddesi",
+        "addressLocality": "Nilüfer",
+        "addressRegion": "Bursa",
+        "addressCountry": "TR"
+      },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "10:30",
+        "closes": "00:00"
+      }],
+      "sameAs": ["https://www.instagram.com/cactuscafe.fsm"]
+    },
+    {
+      "@type": "CafeOrCoffeeShop",
+      "@id": "https://cactuscafes.com/#podyumpark",
+      "name": "Cactus Coffee — Podyumpark",
+      "image": "https://cactuscafes.com/og-image.jpg",
+      "url": "https://cactuscafes.com",
+      "telephone": "+90 538 014 66 00",
+      "email": "info@cactuscafes.com",
+      "priceRange": "₺₺",
+      "servesCuisine": ["Coffee", "Dessert", "Snack", "Waffle"],
+      "menu": "https://cactuscafes.com/menu-podyum.html",
+      "hasMap": "https://share.google/EkVqq0ZsMokrMi3UF",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Podyumpark AVM",
+        "addressLocality": "Nilüfer",
+        "addressRegion": "Bursa",
+        "addressCountry": "TR"
+      },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "15:00",
+        "closes": "03:00"
+      }],
+      "sameAs": ["https://www.instagram.com/cactuscafe.tr"]
+    }
+  ]
+}
+</script>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
@@ -520,6 +581,58 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   </div>
 </section>
 
+<!-- ÖNE ÇIKAN ÜRÜNLER -->
+<section class="section-menu" style="padding-top:40px;background:var(--light);">
+  <div class="section-header">
+    <p class="section-eyebrow fade-up">Favoriler</p>
+    <h2 class="section-title fade-up fade-up-d1">Öne Çıkan <span>Lezzetler</span></h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="oncu-grid">
+    <a class="oncu-card fade-up" href="menu-podyum.html">
+      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg" alt="Dubai Bubble Waffle" loading="lazy"></div>
+      <div class="oncu-body">
+        <h3 class="oncu-name">Dubai Bubble Waffle</h3>
+        <span class="oncu-price">330 ₺</span>
+      </div>
+    </a>
+    <a class="oncu-card fade-up fade-up-d1" href="menu.html">
+      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg" alt="Blue Sky" loading="lazy"></div>
+      <div class="oncu-body">
+        <h3 class="oncu-name">Blue Sky</h3>
+        <span class="oncu-price">210 ₺</span>
+      </div>
+    </a>
+    <a class="oncu-card fade-up fade-up-d2" href="menu.html">
+      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg" alt="Cortado" loading="lazy"></div>
+      <div class="oncu-body">
+        <h3 class="oncu-name">Cortado</h3>
+        <span class="oncu-price">180 ₺</span>
+      </div>
+    </a>
+    <a class="oncu-card fade-up fade-up-d3" href="menu-podyum.html">
+      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg" alt="Classic Bubble Waffle" loading="lazy"></div>
+      <div class="oncu-body">
+        <h3 class="oncu-name">Classic Bubble Waffle</h3>
+        <span class="oncu-price">300 ₺</span>
+      </div>
+    </a>
+  </div>
+</section>
+<style>
+.oncu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1100px;margin:0 auto;}
+.oncu-card{text-decoration:none;background:#fff;border:1px solid #eee;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s,border-color .3s;}
+.oncu-card:hover{transform:translateY(-8px);box-shadow:0 24px 48px -20px rgba(0,0,0,.25);border-color:var(--gold);}
+.oncu-img{aspect-ratio:1;overflow:hidden;background:#f0ece4;}
+.oncu-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1);}
+.oncu-card:hover .oncu-img img{transform:scale(1.07);}
+.oncu-body{padding:18px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.oncu-name{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:400;color:var(--dark);letter-spacing:.5px;line-height:1.2;}
+.oncu-price{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:500;}
+@media(max-width:900px){.oncu-grid{grid-template-columns:repeat(2,1fr);gap:14px;}}
+@media(max-width:768px){.oncu-grid{padding:0 4px;}.oncu-name{font-size:18px;}}
+</style>
+
 <section class="section-about">
   <div class="about-inner">
     <p class="about-eyebrow fade-up">Hikayemiz</p>
@@ -605,10 +718,6 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;letter-spacing:7px;text-transform:uppercase;margin-bottom:10px;">CACTUS</div>
       <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;margin-bottom:22px;font-family:'Montserrat',sans-serif;">COFFEE · SNACK · DESSERT</div>
       <p style="font-size: 12px; line-height: 2; color: rgb(119, 119, 119); font-weight: 300; margin-bottom: 28px; position: relative;">Her yudumda bir hikaye.<br>Bursa'nın kalbinde iki şube.</p>
-      <a href="https://wa.me/905380146600" target="_blank" rel="noopener" style="display:none!important;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
-        WhatsApp
-      </a>
     </div>
 
     <!-- FSM Şubesi -->
@@ -658,7 +767,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
   <!-- Alt çizgi -->
   <div style="border-top:1px solid #222;padding:28px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-    <p style="font-size: 11px; color: rgb(68, 68, 68); letter-spacing: 1px; font-family: Montserrat, sans-serif; position: relative;">© 2025 Cactus Coffee · Bursa, Türkiye</p>
+    <p style="font-size: 11px; color: rgb(68, 68, 68); letter-spacing: 1px; font-family: Montserrat, sans-serif; position: relative;">© <span id="footer-year">2026</span> Cactus Coffee · Bursa, Türkiye</p>
     <p style="font-size: 11px; color: rgb(68, 68, 68); letter-spacing: 1px; font-family: Montserrat, sans-serif; position: relative;">info@cactuscafes.com</p>
   </div>
 </footer>
@@ -678,6 +787,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 
 <script>
+(function(){var fy=document.getElementById('footer-year');if(fy)fy.textContent=new Date().getFullYear();})();
 function toggleMainNav(){
   var mob=document.getElementById('mainMobMenu');
   var isOpen=mob.style.display==='flex';

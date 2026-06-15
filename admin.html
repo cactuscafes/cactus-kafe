@@ -238,6 +238,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
       <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
       <button class="sb-btn" onclick="panelAc('tukendi',this)">🚫 Tükendi</button>
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
+      <button class="sb-btn" onclick="panelAc('yogunluk',this)">🕐 Yoğun Saatler</button>
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
@@ -647,6 +648,31 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
         </div>
       </div>
 
+      <!-- YOĞUN SAATLER -->
+      <div class="panel" id="panel-yogunluk" style="max-width:1100px;">
+        <div class="pttl">🕐 Yoğun Saatler</div>
+        <div class="psub">Hangi saat ve günlerde yoğunsun — sakin saatler happy hour için ideal.</div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 8px;align-items:flex-end;">
+          <div><label class="lbl">Başlangıç</label><input type="date" id="yogBas" class="yi" style="width:148px;"></div>
+          <div><label class="lbl">Bitiş</label><input type="date" id="yogBit" class="yi" style="width:148px;"></div>
+          <button onclick="yogunlukYukle()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">📊 Getir</button>
+        </div>
+        <div class="rap-tabs" style="margin-bottom:18px;">
+          <button id="ytab-h" class="rap-tab on-p" onclick="yogSube('hepsi')">Hepsi</button>
+          <button id="ytab-p" class="rap-tab" onclick="yogSube('podyum')">🟢 Podyumpark</button>
+          <button id="ytab-f" class="rap-tab" onclick="yogSube('fsm')">🟠 FSM</button>
+        </div>
+
+        <div id="yog-happy"></div>
+        <div class="rap-sek-ttl">Saatlik Ciro</div>
+        <div id="yog-saat" style="margin-bottom:22px;"></div>
+        <div class="rap-sek-ttl">Haftanın Günleri</div>
+        <div id="yog-gun" style="margin-bottom:22px;"></div>
+        <div class="rap-sek-ttl">Gün × Saat Isı Haritası</div>
+        <div style="overflow-x:auto;"><div id="yog-heat"></div></div>
+      </div>
+
       <!-- SADAKAT KARTI -->
       <div class="panel" id="panel-sadakat">
         <div class="pttl">🎖 Sadakat Kartı</div>
@@ -960,6 +986,7 @@ function panelAc(id,el){
   if(id==='tukendi') renderTukendi();
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
+  if(id==='yogunluk') yogunlukYukle();
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
   if(id==='muzik'){setTimeout(function(){muzikYukle();},150);}
@@ -1606,6 +1633,126 @@ function rapTemizle(){
   document.getElementById('rBas').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-01';
   document.getElementById('rBit').value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
   rapGoster();
+}
+
+/* YOĞUN SAATLER — saatlik/günlük analiz + happy hour önerisi */
+var _yogData={podyum:[],fsm:[]}, _yogSubeSec='hepsi';
+var _YOG_GUNLER=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+function _yogFmt(v){ return '₺'+Number(v||0).toLocaleString('tr-TR'); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function yogSube(s){
+  _yogSubeSec=s;
+  ['h','p','f'].forEach(function(k){ var b=document.getElementById('ytab-'+k); if(b) b.classList.remove('on-p'); });
+  var map={hepsi:'h',podyum:'p',fsm:'f'};
+  var b=document.getElementById('ytab-'+map[s]); if(b) b.classList.add('on-p');
+  yogRender();
+}
+async function yogunlukYukle(){
+  var pad=function(n){return String(n).padStart(2,'0');};
+  var now=new Date();
+  var bas=document.getElementById('yogBas'), bit=document.getElementById('yogBit');
+  if(!bas.value){ var g=new Date(now.getTime()-29*86400000); bas.value=g.getFullYear()+'-'+pad(g.getMonth()+1)+'-'+pad(g.getDate()); }
+  if(!bit.value){ bit.value=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()); }
+  document.getElementById('yog-saat').innerHTML='<div style="color:var(--mist);font-size:13px;padding:16px 0;">⏳ Yükleniyor…</div>';
+  document.getElementById('yog-gun').innerHTML=''; document.getElementById('yog-heat').innerHTML=''; document.getElementById('yog-happy').innerHTML='';
+  var q='baslangic='+bas.value+'&bitis='+bit.value;
+  try{
+    var res=await Promise.all([
+      fetch(_RAP_API+'/rapor/listele?'+q+'&sube=podyum').then(function(r){return r.json();}),
+      fetch(_RAP_API+'/rapor/listele?'+q+'&sube=fsm').then(function(r){return r.json();})
+    ]);
+    _yogData={podyum:res[0]||[], fsm:res[1]||[]};
+    yogRender();
+  }catch(e){
+    document.getElementById('yog-saat').innerHTML='<div style="color:var(--rd);font-size:13px;padding:16px 0;">⚠️ Yüklenemedi: '+e.message+'</div>';
+  }
+}
+function yogRender(){
+  var rows = _yogSubeSec==='hepsi' ? _yogData.podyum.concat(_yogData.fsm)
+           : (_yogData[_yogSubeSec]||[]);
+  var saat=new Array(24).fill(0), gun=new Array(7).fill(0);
+  var heat=[]; for(var d=0;d<7;d++) heat.push(new Array(24).fill(0));
+  var topCiro=0;
+  rows.forEach(function(r){
+    var ca=String(r.created_at||'');
+    var hh=parseInt(ca.slice(11,13),10);
+    var tutar=Number(r.toplam)||0;
+    topCiro+=tutar;
+    if(!isNaN(hh)&&hh>=0&&hh<24){ saat[hh]+=tutar;
+      var dd=new Date((r.tarih||ca.slice(0,10))+'T00:00:00');
+      var gi=isNaN(dd.getTime())?-1:(dd.getDay()+6)%7;
+      if(gi>=0){ gun[gi]+=tutar; heat[gi][hh]+=tutar; }
+    }
+  });
+  if(!topCiro){
+    document.getElementById('yog-saat').innerHTML='<div style="padding:20px;text-align:center;color:var(--mist);font-size:13px;">Bu dönemde kayıt yok.</div>';
+    return;
+  }
+  // Açık saat aralığı
+  var hmin=24,hmax=0; for(var h=0;h<24;h++){ if(saat[h]>0){ if(h<hmin)hmin=h; if(h>hmax)hmax=h; } }
+  // Saatlik barlar
+  var maxSaat=Math.max.apply(null,saat);
+  var sH='';
+  for(var h=hmin;h<=hmax;h++){
+    var pct=Math.round(saat[h]/maxSaat*100);
+    var sakin=saat[h]<maxSaat*0.35;
+    sH+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;font-size:12px;">'
+      +'<div style="width:54px;color:var(--mist);">'+pad2(h)+':00</div>'
+      +'<div style="flex:1;background:#f0ede8;border-radius:6px;height:18px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+(sakin?'#dcbd80':'#2d7a4f')+';"></div></div>'
+      +'<div style="width:92px;text-align:right;font-weight:600;">'+_yogFmt(saat[h])+'</div></div>';
+  }
+  document.getElementById('yog-saat').innerHTML=sH;
+  // Günlük barlar
+  var maxGun=Math.max.apply(null,gun);
+  var gH='';
+  for(var d2=0;d2<7;d2++){
+    var p2=maxGun?Math.round(gun[d2]/maxGun*100):0;
+    gH+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;font-size:12px;">'
+      +'<div style="width:54px;color:var(--mist);">'+_YOG_GUNLER[d2]+'</div>'
+      +'<div style="flex:1;background:#f0ede8;border-radius:6px;height:18px;overflow:hidden;"><div style="width:'+p2+'%;height:100%;background:#2d7a4f;"></div></div>'
+      +'<div style="width:92px;text-align:right;font-weight:600;">'+_yogFmt(gun[d2])+'</div></div>';
+  }
+  document.getElementById('yog-gun').innerHTML=gH;
+  // Isı haritası (gün × saat)
+  var maxHeat=0; for(var a=0;a<7;a++)for(var b=hmin;b<=hmax;b++) if(heat[a][b]>maxHeat) maxHeat=heat[a][b];
+  var hd='<table style="border-collapse:collapse;font-size:10px;"><thead><tr><th style="padding:3px 5px;"></th>';
+  for(var hc=hmin;hc<=hmax;hc++) hd+='<th style="padding:3px 4px;color:var(--mist);font-weight:600;">'+pad2(hc)+'</th>';
+  hd+='</tr></thead><tbody>';
+  for(var dr=0;dr<7;dr++){
+    hd+='<tr><td style="padding:3px 6px;color:var(--mist);font-weight:600;">'+_YOG_GUNLER[dr]+'</td>';
+    for(var hcc=hmin;hcc<=hmax;hcc++){
+      var v=heat[dr][hcc], al=maxHeat?v/maxHeat:0;
+      var bg = v===0 ? '#f5f3ef' : 'rgba(45,122,79,'+(0.12+al*0.85).toFixed(2)+')';
+      var col = al>0.5?'#fff':'#555';
+      hd+='<td title="'+_YOG_GUNLER[dr]+' '+pad2(hcc)+':00 — '+_yogFmt(v)+'" style="width:26px;height:24px;text-align:center;background:'+bg+';color:'+col+';border:1px solid #fff;">'+(v>0?Math.round(v/1000)+'k':'')+'</td>';
+    }
+    hd+='</tr>';
+  }
+  hd+='</tbody></table><div style="font-size:11px;color:var(--mist);margin-top:6px;">Hücre = o gün/saat cirosu (k = bin ₺). Koyu = yoğun.</div>';
+  document.getElementById('yog-heat').innerHTML=hd;
+  // Happy hour önerisi — çekirdek saatler (zirvenin %15+'i) içinde en sakin 2 saatlik pencere.
+  // Açılış/kapanış kuyruğunu (neredeyse boş uç saatler) eler ki öneri gündüz lull'una düşsün.
+  var esik=maxSaat*0.15, best=null;
+  for(var s0=hmin;s0<hmax;s0++){
+    if(saat[s0]<esik||saat[s0+1]<esik) continue;
+    var sum=saat[s0]+saat[s0+1];
+    if(!best||sum<best.sum) best={h:s0,sum:sum};
+  }
+  // Hiç çekirdek pencere yoksa, açık saatlerdeki en düşük pencereye düş
+  if(!best){
+    for(var s1=hmin;s1<hmax;s1++){
+      if(saat[s1]<=0||saat[s1+1]<=0) continue;
+      var sm=saat[s1]+saat[s1+1];
+      if(!best||sm<best.sum) best={h:s1,sum:sm};
+    }
+  }
+  if(best){
+    document.getElementById('yog-happy').innerHTML=
+      '<div style="background:#fffdf3;border:1.5px solid #e6cf8f;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">'
+      +'<span style="font-size:26px;">🍹</span>'
+      +'<div><div style="font-weight:700;font-size:14px;color:#9a7500;">Happy hour önerisi: '+pad2(best.h)+':00–'+pad2(best.h+2)+':00</div>'
+      +'<div style="font-size:12px;color:#7a6a3a;margin-top:2px;">Bu 2 saat seçili dönemin en sakin dilimi ('+_yogFmt(best.sum)+'). İndirim/kampanya için ideal.</div></div></div>';
+  }
 }
 
 /* BUGÜN — GÜNLÜK ÖZET PANOSU */

@@ -194,6 +194,9 @@ input,select{font-family:'Lato',sans-serif;}
 .ukrt:hover.ic{border-color:var(--bl2);}
 .ukrt:hover.yi{border-color:var(--or);}
 .ukrt .ue{font-size:22px;display:block;margin-bottom:4px;}
+.ukrt.tukendi{opacity:.5;filter:grayscale(1);}
+.ukrt.tukendi .ue,.ukrt.tukendi .uf{opacity:.6;}
+.ukrt-tukendi{position:absolute;top:6px;left:6px;background:#5a5a5a;color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.5px;padding:2px 6px;border-radius:100px;z-index:2;}
 .ukrt .ua{font-family:'Playfair Display',serif;font-size:11px;color:var(--k1);margin-bottom:3px;line-height:1.3;word-break:break-word;}
 .ukrt .uf{font-size:13px;font-weight:700;}
 .ukrt.ic .uf{color:var(--bl2);}
@@ -1989,11 +1992,12 @@ function renderUrunler(){
   urunler.forEach(u=>{
     const ic=u.tip==='icecek';
     const d=document.createElement('button');
-    d.className='ukrt '+(ic?'ic':'yi');
+    d.className='ukrt '+(ic?'ic':'yi')+(u.tukendi?' tukendi':'');
     const favOn=favSet.has(u.id);
-    d.innerHTML=`<button class="fav-btn${favOn?' on':''}" onclick="toggleFav('${u.id}',event)" title="${favOn?'Favoriden çıkar':'Favorilere ekle'}" aria-label="Favori">${favOn?'★':'☆'}</button><span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
+    d.innerHTML=`${u.tukendi?'<span class="ukrt-tukendi">TÜKENDİ</span>':''}<button class="fav-btn${favOn?' on':''}" onclick="toggleFav('${u.id}',event)" title="${favOn?'Favoriden çıkar':'Favorilere ekle'}" aria-label="Favori">${favOn?'★':'☆'}</button><span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
     d.onclick=(e)=>{
       if(e.target&&e.target.classList&&e.target.classList.contains('fav-btn'))return;
+      if(u.tukendi){ toast('🚫 '+u.ad+' tükendi'); return; }
       urunEkle(u,d);
     };
     g.appendChild(d);

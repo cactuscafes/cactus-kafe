@@ -3210,6 +3210,42 @@ async function ziyaretYukle(){
   </div>
 </div>
 
+<!-- ═══ Service Worker — admin'i tüm cihazlarda otomatik güncelle ═══
+     HTML'i her zaman ağdan taze çeker (no-store), apex/GitHub Pages'in
+     tarayıcı cache'ini baypas eder. Yeni sürüm gelince düzenleme/yayınlama
+     yokken sayfayı otomatik yeniler. -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('/sw.js').then(function(reg){
+      reg.addEventListener('updatefound',function(){
+        var sw=reg.installing;
+        if(!sw)return;
+        sw.addEventListener('statechange',function(){
+          if(sw.state==='installed'&&navigator.serviceWorker.controller){
+            sw.postMessage('SKIP_WAITING'); // yeni sürümü hemen aktive et
+          }
+        });
+      });
+    }).catch(function(){});
+  });
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(window._pwaUpdated) return;
+    window._pwaUpdated=true;
+    // Yeni sürüm devraldı — modal/drawer açık değilken yenile (veri localStorage'da, kayıp yok).
+    function ifIdleReload(tries){
+      if((tries||0)>60) return; // ~5 dk sonra vazgeç
+      var mb=document.getElementById('modalBg'), so=document.getElementById('sbOverlay');
+      var ae=document.activeElement, yaziyor=ae&&(/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)||ae.isContentEditable);
+      var mesgul=(mb&&mb.classList.contains('on'))||(so&&so.classList.contains('on'))||yaziyor;
+      if(!mesgul){ location.reload(); }
+      else { setTimeout(function(){ifIdleReload((tries||0)+1);},5000); }
+    }
+    setTimeout(function(){ifIdleReload(0);},3000); // 3sn güvenlik gecikmesi
+  });
+}
+</script>
+
 </body>
 </html>
 

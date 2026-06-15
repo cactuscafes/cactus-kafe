@@ -1871,10 +1871,80 @@ function _cmItemTs(it){
   var t=Number(it&&(it.ts||it.zaman))||0;
   return t>1e12 ? t : 0; // ms epoch makul mü
 }
+// Kasiyer (adisyon) v11 EVENT-SOURCED sync kullanıyor — masa durumu artık
+// cactus-kafe worker'ının /api/events log'unda. Eski /sync/durum snapshot'ı
+// güncellenmiyordu (bu yüzden admin hep "açık masa yok" gösteriyordu).
+// Burada adisyon.html'deki _applyEvent reducer'ının birebir aynısını uygulayıp
+// event log'unu canlı masa durumuna indirgiyoruz.
+var _CM_EV_API='https://cactus-kafe.batuhanbulut.workers.dev';
+function _cmApplyEvent(state, evt){
+  if(!evt || !evt.type) return;
+  var m=evt.masa;
+  if(m==null) return;
+  if(!state[m]) state[m]=[];
+  var p=evt.payload||{};
+  switch(evt.type){
+    case 'ITEM_ADD': {
+      var u=p.urun||{};
+      if(!u.id) break;
+      var ex=state[m].find(function(x){return x.id===u.id;});
+      var inc=Number(p.adet)||1;
+      if(ex){ ex.adet=(Number(ex.adet)||0)+inc; ex.ts=evt.ts; }
+      else state[m].push({id:u.id, ad:u.ad, fiyat:u.fiyat, tip:u.tip, emoji:u.emoji, adet:inc, ts:evt.ts});
+      break;
+    }
+    case 'ITEM_SUB': {
+      var ex2=state[m].find(function(x){return x.id===p.urunId;});
+      if(ex2){
+        ex2.adet=(Number(ex2.adet)||0)+(Number(p.delta)||-1);
+        if(ex2.adet<=0) state[m]=state[m].filter(function(x){return x.id!==p.urunId;});
+        else ex2.ts=evt.ts;
+      }
+      break;
+    }
+    case 'ITEM_DEL': { state[m]=state[m].filter(function(x){return x.id!==p.urunId;}); break; }
+    case 'MASA_CLEAR': { state[m]=[]; break; }
+    case 'MASA_PAY': {
+      if(Array.isArray(p.urunler)){
+        p.urunler.forEach(function(s){
+          var ex=state[m].find(function(x){return x.id===s.id;});
+          if(ex) ex.adet=(Number(ex.adet)||0)-(Number(s.adet)||0);
+        });
+        state[m]=state[m].filter(function(x){return x && Number(x.adet)>0;});
+      }
+      break;
+    }
+    // ITEM_GONDER vb. masa içeriğini değiştirmez → yok say
+  }
+}
+// Event log'u tek kaynak olarak masalar:[{masa,items,guncelleme}] şekline indir.
+function _cmDurumFromEvents(sube){
+  return fetch(_CM_EV_API+'/api/events?sube='+sube+'&since=0')
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var evs=(j&&j.events)||[];
+      evs.sort(function(a,b){
+        var sa=Number(a.server_ts||a.ts||0), sb=Number(b.server_ts||b.ts||0);
+        if(sa!==sb) return sa-sb;
+        return String(a.id).localeCompare(String(b.id));
+      });
+      var state={}, lastTs={};
+      evs.forEach(function(e){
+        _cmApplyEvent(state, e);
+        var mm=e.masa;
+        if(mm!=null){ var t=Number(e.server_ts||e.ts||0); if(t>(lastTs[mm]||0)) lastTs[mm]=t; }
+      });
+      var masalar=Object.keys(state).map(function(mm){
+        return {masa:Number(mm), items:state[mm]||[], guncelleme:lastTs[mm]||0};
+      });
+      return {masalar:masalar};
+    })
+    .catch(function(){return {masalar:[]};});
+}
 async function canliMasaYukle(){
   var fmt=function(v){return '₺'+Number(v||0).toLocaleString('tr-TR');};
   var now=Date.now();
-  var D=function(sube){return fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sync/durum?sube='+sube+'&since=0').then(function(r){return r.json();}).catch(function(){return {masalar:[]};});};
+  var D=function(sube){return _cmDurumFromEvents(sube);};
 
   var subeBlok=function(elId, ad, renk, data){
     var masalar=(data&&data.masalar)||[];

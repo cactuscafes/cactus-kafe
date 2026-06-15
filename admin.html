@@ -178,8 +178,10 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 .asb-tab:hover{color:#f4ecd8;}
 .asb-tab.on{background:linear-gradient(135deg,#dcbd80,#c8a86a);color:#1a3010;box-shadow:0 2px 8px rgba(200,168,106,.35);}
 @media(max-width:768px){
-  /* Mobilde sticky kaldır — drawer'ın üstüne binmesin */
-  .admin-sube-bar{position:relative!important;top:auto!important;padding:10px 14px;gap:8px;}
+  /* Mobilde sticky kaldır — drawer'ın üstüne binmesin.
+     Fixed nav (52px) bar'ı örtmesin diye nav boşluğunu wrap yerine bar'a taşı. */
+  .admin-sube-bar{position:relative!important;top:auto!important;margin-top:52px;padding:10px 14px;gap:8px;}
+  .wrap{padding-top:0!important;}
   .asb-eyebrow{display:none;}
   .asb-current{font-size:14px;}
   .asb-tab{padding:6px 10px;font-size:10.5px;}

@@ -276,6 +276,52 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 .admin-sube-bar > button:last-child{background:#fff!important;border:1px solid var(--stone)!important;color:#5a574f!important;border-radius:100px!important;}
 
 @media(max-width:768px){ .main{padding:18px 16px;} .pttl{font-size:24px;} .admin-sube-bar{padding:10px 14px;} }
+
+/* ════════════════════════════════════════════════════════════
+   UI/UX REVİZYON — buton dili · erişilebilirlik · skeleton · mobil
+   En sonda; önceki kuralları override eder.
+   ════════════════════════════════════════════════════════════ */
+:root{--brand:#2d5a27;--brand-dark:#1f3d1b;}
+
+/* Tek birincil/ikincil buton dili (marka yeşili) */
+.btn-primary{background:var(--brand);color:#fff;border:none;border-radius:100px;padding:11px 26px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:filter .18s,transform .08s;}
+.btn-primary:hover{filter:brightness(1.09);}
+.btn-primary:active{transform:translateY(1px);}
+.btn-secondary{background:var(--surface);color:#5a574f;border:1px solid var(--stone);border-radius:100px;padding:11px 22px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .18s,color .18s;}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink);}
+
+/* Nav Yayınla → marka yeşili + bekleyen değişiklik noktası */
+.btn-yayinla{background:var(--brand);color:#fff;position:relative;}
+.btn-yayinla:hover{filter:brightness(1.09);}
+.nav-dot{display:none;position:absolute;top:-3px;right:-3px;width:11px;height:11px;background:#e74c3c;border:2px solid var(--surface);border-radius:50%;}
+.btn-yayinla.pending .nav-dot{display:block;animation:dotPulse 1.6s infinite;}
+@keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+
+/* Klavye erişilebilirliği — net odak halkası */
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px;}
+/* Müzik switch'i için görünür odak (gizli checkbox → track'e ring) */
+#mz-enabled:focus-visible + #mz-toggle{outline:2px solid var(--gold);outline-offset:2px;}
+
+/* Sidebar dış-bağlantı satırı */
+.sb-ext{font-size:9px;color:var(--mist);letter-spacing:1px;vertical-align:middle;margin-left:4px;}
+/* Panel başlığı yanında canlı sayfa linki */
+.canli-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--gold);text-decoration:none;border:1px solid var(--stone);border-radius:100px;padding:4px 12px;transition:all .18s;font-weight:500;}
+.canli-link:hover{border-color:var(--gold);background:rgba(184,150,90,.08);}
+
+/* Skeleton (yükleme) */
+@keyframes shimmer{0%{background-position:-440px 0;}100%{background-position:440px 0;}}
+.sk{background:linear-gradient(90deg,rgba(0,0,0,.05) 25%,rgba(0,0,0,.09) 37%,rgba(0,0,0,.05) 63%);background-size:880px 100%;animation:shimmer 1.25s infinite linear;border-radius:8px;display:block;}
+#bg-hero.loading .sk{background:linear-gradient(90deg,rgba(255,255,255,.12) 25%,rgba(255,255,255,.28) 37%,rgba(255,255,255,.12) 63%);background-size:880px 100%;animation:shimmer 1.25s infinite linear;}
+
+/* Mobil alt sekme çubuğu — en sık işlemler */
+.mob-tabbar{display:none;}
+@media(max-width:768px){
+  .mob-tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;height:58px;background:var(--surface);border-top:1px solid var(--line);z-index:95;box-shadow:0 -4px 18px rgba(60,48,30,.08);}
+  .mob-tabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:inherit;font-size:9.5px;color:var(--mist);cursor:pointer;letter-spacing:.2px;}
+  .mob-tabbar button .ic{font-size:18px;line-height:1;}
+  .mob-tabbar button.on{color:var(--brand);font-weight:700;}
+  .main{padding-bottom:76px!important;}
+}
 </style>
 </head>
 <body>
@@ -302,7 +348,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
       <div class="nav-logo">🌵 CACTUS Admin</div>
     </div>
     <div style="display:flex;gap:8px;">
-      <button class="nav-btn btn-yayinla" onclick="modalAc()">🚀 Yayınla</button>
+      <button class="nav-btn btn-yayinla" id="navYayinlaBtn" onclick="modalAc()" title="Menü değişikliklerini canlı siteye uygula">🚀 Yayınla<span class="nav-dot"></span></button>
       <button class="nav-btn btn-cikis" onclick="cikis()">Çıkış</button>
     </div>
   </nav>
@@ -321,29 +367,30 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
   <div class="wrap">
     <div class="sb-overlay" id="sbOverlay" onclick="mobSbKapat()"></div>
     <div class="sb" id="mainSb">
-      <div class="sb-ttl">Yönetim</div>
+      <div class="sb-ttl">Operasyon</div>
       <button class="sb-btn on" onclick="panelAc('bugun',this)">🏠 Bugün</button>
       <button class="sb-btn" onclick="panelAc('canli',this)">🟢 Canlı Masalar</button>
-      <button class="sb-btn" onclick="panelAc('menu',this)">📋 Menü</button>
-      <button class="sb-btn" onclick="panelAc('kategori',this)">🗂 Kategoriler</button>
-      <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
       <button class="sb-btn" onclick="panelAc('tukendi',this)">🚫 Tükendi</button>
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
       <button class="sb-btn" onclick="panelAc('yogunluk',this)">🕐 Yoğun Saatler</button>
+
+      <div class="sb-ttl">Menü Yönetimi</div>
+      <button class="sb-btn" onclick="panelAc('menu',this)">📋 Menü</button>
+      <button class="sb-btn" onclick="panelAc('kategori',this)">🗂 Kategoriler</button>
+      <button class="sb-btn" onclick="panelAc('oncu',this)">⭐ Öne Çıkan</button>
+
+      <div class="sb-ttl">Müşteri</div>
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('ziyaret',this);ziyaretYukle()">📈 Ziyaretçiler</button>
-      <div class="sb-ttl">Sayfalar</div>
-      <button class="sb-btn" onclick="window.open('rapor.html','_blank')" style="background:rgba(184,150,90,.12);color:#8a6d39;font-weight:600;">📊 Raporlar</button>
-      <button class="sb-btn" onclick="window.open('index.html','_blank')">🔗 Ana Sayfa</button>
-      <button class="sb-btn" onclick="window.open('menu.html','_blank')">🔗 Menü</button>
-      <button class="sb-btn" onclick="panelAc('anasayfa',this)" style="background:rgba(184,150,90,.12);color:#8a6d39;font-weight:600;">🏠 Ana Sayfa</button>
-      <button class="sb-btn" onclick="panelAc('muzik',this)">🎵 Müzik</button>
-      <div class="sb-ttl">Sayfa Düzenle</div>
+
+      <div class="sb-ttl">Site İçeriği</div>
+      <button class="sb-btn" onclick="panelAc('anasayfa',this)">🏠 Ana Sayfa</button>
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
       <button class="sb-btn" onclick="panelAc('galeri',this)">🖼 Galeri</button>
-      <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü</button>
+      <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
+      <button class="sb-btn" onclick="panelAc('muzik',this)">🎵 Müzik</button>
     </div>
     <div class="main">
 
@@ -407,14 +454,14 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
         <div id="tk-tumu"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 0;margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--mist);">Değişiklikler <b>Yayınla</b>'dan sonra menüye ve adisyona yansır.</span>
-          <button onclick="modalAc()" style="padding:10px 22px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">🚀 Yayınla</button>
+          <button class="btn-primary" onclick="modalAc()">🚀 Yayınla</button>
         </div>
       </div>
 
       <!-- MENÜ -->
       <div class="panel" id="panel-anasayfa" style="max-width:1400px;padding-bottom:0;">
         <div class="pttl">🏠 Ana Sayfa Yönetimi</div>
-        <div class="psub">📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla</div>
+        <div class="psub">📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla &nbsp;·&nbsp; <a class="canli-link" href="index.html" target="_blank" rel="noopener">↗ Canlı sayfayı aç</a></div>
 
         <div id="as-loading" style="padding:40px;text-align:center;color:#aaa;font-size:14px;">⏳ Sayfa yükleniyor...</div>
         <div style="position:relative;overflow:hidden;">
@@ -425,7 +472,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
           <span id="as-st" style="font-size:13px;color:#888;">-</span>
           <div style="display:flex;gap:10px;">
             <button type="button" onclick="asLoad()" style="padding:10px 18px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">🔄 Yenile</button>
-            <button type="button" onclick="asYayinla()" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Yayınla</button>
+            <button type="button" class="btn-primary" onclick="asYayinla()">🚀 Yayınla</button>
           </div>
         </div>
 
@@ -442,7 +489,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
             </div>
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
               <button type="button" onclick="document.getElementById('as-m').style.display='none'" style="padding:10px 22px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;">İptal</button>
-              <button type="button" onclick="asKaydet()" style="padding:10px 26px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✅ Uygula</button>
+              <button type="button" class="btn-primary" onclick="asKaydet()">✅ Uygula</button>
             </div>
           </div>
         </div>
@@ -456,9 +503,9 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
             <span style="font-size:13px;font-weight:600;">Müzik Aktif</span>
             <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
-              <input type="checkbox" id="mz-enabled" style="opacity:0;width:0;height:0;" onchange="muzikOnizle()">
-              <span id="mz-toggle" onclick="document.getElementById('mz-enabled').click()" style="position:absolute;inset:0;background:#ccc;border-radius:26px;transition:.3s;cursor:pointer;"></span>
-              <span id="mz-knob" onclick="document.getElementById('mz-enabled').click()" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;"></span>
+              <input type="checkbox" id="mz-enabled" aria-label="Müzik aktif" onchange="muzikOnizle()" style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2;">
+              <span id="mz-toggle" style="position:absolute;inset:0;background:#ccc;border-radius:26px;transition:.3s;pointer-events:none;"></span>
+              <span id="mz-knob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3);pointer-events:none;"></span>
             </label>
           </div>
 
@@ -489,7 +536,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
           <audio id="mz-audio" style="display:none;"></audio>
 
           <div style="display:flex;justify-content:flex-end;">
-            <button type="button" onclick="muzikKaydet()" style="padding:12px 32px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">🚀 Kaydet & Yayınla</button>
+            <button type="button" class="btn-primary" onclick="muzikKaydet()">🚀 Kaydet & Yayınla</button>
           </div>
           <div id="mz-st" style="font-size:13px;color:#888;text-align:right;margin-top:10px;"></div>
         </div>
@@ -498,39 +545,39 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
       <!-- İLETİŞİM SAYFA EDİTÖRÜ -->
       <div class="panel" id="panel-iletisim" style="max-width:1200px;">
         <div class="pttl">📬 İletişim Sayfası</div>
-        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla &nbsp;·&nbsp; <a class="canli-link" href="iletisim.html" target="_blank" rel="noopener">↗ Canlı sayfayı aç</a></div>
         <div id="il-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="il-st" style="font-size:13px;color:#888;">-</span>
-          <button onclick="seYayinla('iletisim.html','il-wrap','il-st','İletişim sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+          <button class="btn-primary" onclick="seYayinla('iletisim.html','il-wrap','il-st','İletişim sayfası güncellendi')">🚀 Yayınla</button>
         </div>
       </div>
 
       <!-- GALERİ SAYFA EDİTÖRÜ -->
       <div class="panel" id="panel-galeri" style="max-width:1200px;">
         <div class="pttl">🖼 Galeri Sayfası</div>
-        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla &nbsp;·&nbsp; <a class="canli-link" href="galeri.html" target="_blank" rel="noopener">↗ Canlı sayfayı aç</a></div>
         <div id="gl-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="gl-st" style="font-size:13px;color:#888;">-</span>
-          <button onclick="seYayinla('galeri.html','gl-wrap','gl-st','Galeri sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+          <button class="btn-primary" onclick="seYayinla('galeri.html','gl-wrap','gl-st','Galeri sayfası güncellendi')">🚀 Yayınla</button>
         </div>
       </div>
 
       <!-- MENÜ SAYFA EDİTÖRÜ -->
       <div class="panel" id="panel-menusayfa" style="max-width:1200px;">
         <div class="pttl">📋 Menü Sayfası</div>
-        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Uygula</div>
+        <div class="psub">Sayfa üst başlık/yazılarını düzenle (ürün/fiyat için "Menü Yönetimi"ni kullanın). &nbsp;·&nbsp; <a class="canli-link" href="menu.html" target="_blank" rel="noopener">↗ Canlı sayfayı aç</a></div>
         <div id="mn-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="mn-st" style="font-size:13px;color:#888;">-</span>
-          <button onclick="seYayinla('menu.html','mn-wrap','mn-st','Menü sayfası güncellendi')" style="padding:12px 28px;background:#2d5a27;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">🚀 Uygula</button>
+          <button class="btn-primary" onclick="seYayinla('menu.html','mn-wrap','mn-st','Menü sayfası güncellendi')">🚀 Yayınla</button>
         </div>
       </div>
 
       <div class="panel" id="panel-menu">
         <div class="pttl">📋 Menü Yönetimi</div>
-        <div class="psub">Ürün ekle, güncelle, fotoğraf ekle. Yayınla ile siteye uygula.</div>
+        <div class="psub">Ürün ekle, güncelle, fotoğraf ekle. Yayınla ile siteye uygula. &nbsp;·&nbsp; <a class="canli-link" href="menu.html" target="_blank" rel="noopener">↗ Menüyü canlı gör</a></div>
         <div class="kart">
           <div style="font-size:12px;font-weight:600;margin-bottom:14px;">➕ Yeni Ürün Ekle</div>
           <div style="display:grid;grid-template-columns:70px 1fr 110px;gap:10px;margin-bottom:10px;">
@@ -632,7 +679,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
       <!-- RAPOR -->
       <div class="panel" id="panel-rapor">
         <div class="pttl">📊 Raporlar</div>
-        <div class="psub">Şubelere göre satış verileri.</div>
+        <div class="psub">Şubelere göre satış verileri. &nbsp;·&nbsp; <a class="canli-link" href="rapor.html" target="_blank" rel="noopener">↗ Detaylı rapor sayfası</a></div>
 
         <!-- Tarih Filtresi (ortaklaşılan) -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
@@ -807,6 +854,15 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 
     </div>
   </div>
+
+  <!-- MOBİL ALT SEKME ÇUBUĞU — en sık işlemler -->
+  <nav class="mob-tabbar" id="mobTabbar">
+    <button class="on" onclick="mobTab('bugun',this)"><span class="ic">🏠</span>Bugün</button>
+    <button onclick="mobTab('canli',this)"><span class="ic">🟢</span>Canlı</button>
+    <button onclick="mobTab('tukendi',this)"><span class="ic">🚫</span>Tükendi</button>
+    <button onclick="mobTab('menu',this)"><span class="ic">📋</span>Menü</button>
+    <button onclick="mobSbToggle()"><span class="ic">☰</span>Tümü</button>
+  </nav>
 </div>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)modalKapat()">
@@ -835,7 +891,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
       <button onclick="seKapat()" style="padding:10px 22px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-weight:600;">İptal</button>
-      <button onclick="seKaydet()" style="padding:10px 22px;background:#2d5a27;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✅ Kaydet</button>
+      <button class="btn-primary" onclick="seKaydet()">✅ Kaydet</button>
     </div>
   </div>
 </div>
@@ -1012,6 +1068,7 @@ function oncuTryAdd(item){
   if(ONCU.length>=ONCU_MAX){ if(typeof toast==='function') toast('⚠️ En fazla '+ONCU_MAX+' öne çıkan olabilir — önce birini kaldırın'); return false; }
   ONCU.push(item);
   localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  if(typeof pendingSet==='function') pendingSet(true);
   return true;
 }
 // Mevcut veriyi temizle: duplicate'leri at + 4'e indir. Değiştiyse true.
@@ -1087,6 +1144,7 @@ function adisyondanYenile(){
 }
 function basla(){
   document.getElementById('admin').style.display='block';
+  subeBarGuncelle('bugun');  // açılış paneli şubeye bağlı değil → barı gizle
   aktifKat=KAT[0]?.id||'sicak';
   renderKatTabs(); renderUrunler();
   setTimeout(katSeciciDoldur, 500);
@@ -1109,6 +1167,8 @@ function panelAc(id,el){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('panel-'+id).classList.add('on');
   el.classList.add('on');
+  subeBarGuncelle(id);   // şube barını sadece menüye-bağlı panellerde göster
+  mobTabbarSync(id);     // mobil alt sekme aktif durumu
   mobSbKapat(); // mobilde drawer'ı kapat
   if(_canliTimer){ clearInterval(_canliTimer); _canliTimer=null; }
   if(id==='bugun') bugunYukle();
@@ -1128,10 +1188,38 @@ function panelAc(id,el){
   if(id==='galeri'){setTimeout(function(){seLoad('https://cactuscafes.com/galeri.html','galeri.html','gl-wrap','gl-st');},200);}
   if(id==='menusayfa'){setTimeout(function(){seLoad('https://cactuscafes.com/menu.html','menu.html','mn-wrap','mn-st',['.menu-header-eyebrow','.menu-header-title','.menu-header-sub']);},200);}
 }
+// Şube barı sadece şubeye-bağlı panellerde anlamlı → diğerlerinde gizle
+var SUBE_PANELS=['menu','kategori','oncu','tukendi'];
+function subeBarGuncelle(id){
+  var bar=document.querySelector('.admin-sube-bar');
+  if(bar) bar.style.display = (SUBE_PANELS.indexOf(id)>-1) ? '' : 'none';
+}
+// Mobil alt sekme: aktif durumu senkronla
+function mobTabbarSync(id){
+  document.querySelectorAll('.mob-tabbar button').forEach(function(b){
+    var oc=b.getAttribute('onclick')||'';
+    b.classList.toggle('on', oc.indexOf("mobTab('"+id+"'")>-1);
+  });
+}
+// Mobil alt sekmeden panel aç — eşleşen sidebar düğmesini tetikleyip senkron tut
+function mobTab(id,btn){
+  var hedef=null;
+  document.querySelectorAll('#mainSb .sb-btn').forEach(function(b){
+    var oc=b.getAttribute('onclick')||'';
+    if(oc.indexOf("panelAc('"+id+"'")>-1) hedef=b;
+  });
+  if(hedef) hedef.click();
+}
+// Bekleyen (yayınlanmamış) menü değişikliği göstergesi
+function pendingSet(v){
+  var b=document.getElementById('navYayinlaBtn');
+  if(b) b.classList.toggle('pending', !!v);
+}
+
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
-function menuKaydet(){ localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU)); }
-function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); }
+function menuKaydet(){ localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU)); pendingSet(true); }
+function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); pendingSet(true); }
 
 const R2_WORKER='https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/';
 
@@ -1219,6 +1307,7 @@ function urunOncuToggle(k,i){
   if(idx>-1){
     ONCU.splice(idx,1);
     localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+    pendingSet(true);
     toast('Öne çıkandan kaldırıldı');
   } else {
     if(!oncuTryAdd({id:u.id,ad:u.ad,fiyat:u.fiyat,foto:u.foto||'',emoji:u.emoji||''})) return;
@@ -1942,7 +2031,15 @@ function _evGunRapor(evs, gun){ // event log → rapor-api uyumlu özet (tek gü
 async function bugunYukle(){
   var bugun=_trGun(Date.now()), dun=_trGun(Date.now()-86400000);
   document.getElementById('bg-tarih').textContent=bugun+' · iki şube';
-  document.getElementById('bg-toplam').textContent='⏳';
+
+  // — Skeleton (yükleniyor) —
+  var _sk=function(w,h){return '<span class="sk" style="width:'+w+';height:'+h+';margin:4px 0;"></span>';};
+  document.getElementById('bg-hero').classList.add('loading');
+  document.getElementById('bg-toplam').innerHTML=_sk('200px','40px');
+  document.getElementById('bg-toplam-sub').innerHTML='&nbsp;';
+  document.getElementById('bg-sube-p').innerHTML=_sk('55%','12px')+_sk('70%','26px')+_sk('40%','11px');
+  document.getElementById('bg-sube-f').innerHTML=_sk('55%','12px')+_sk('70%','26px')+_sk('40%','11px');
+  document.getElementById('bg-nakit').innerHTML='<div class="rap-nakit-krt">'+_sk('60%','12px')+_sk('50%','22px')+'</div><div class="rap-nakit-krt">'+_sk('60%','12px')+_sk('50%','22px')+'</div>';
 
   try{
     var ev=await Promise.all([_evTumEvents('podyum'),_evTumEvents('fsm')]);
@@ -1953,6 +2050,7 @@ async function bugunYukle(){
     var cdun=_ozetCiro(yP)+_ozetCiro(yF);
 
     // Hero
+    document.getElementById('bg-hero').classList.remove('loading');
     document.getElementById('bg-toplam').textContent=_bgFmt(cToplam);
     document.getElementById('bg-toplam-sub').innerHTML=_bgDelta(cToplam,cdun);
 
@@ -1996,8 +2094,12 @@ async function bugunYukle(){
       document.getElementById('bg-urun').innerHTML='<div style="padding:18px;text-align:center;color:var(--mist);font-size:13px;">Bugün henüz satış yok.</div>';
     }
   }catch(e){
+    document.getElementById('bg-hero').classList.remove('loading');
     document.getElementById('bg-toplam').textContent='—';
-    document.getElementById('bg-toplam-sub').innerHTML='<span style="opacity:.8;">⚠️ Yüklenemedi</span>';
+    document.getElementById('bg-toplam-sub').innerHTML='<span style="opacity:.85;">⚠️ Veri alınamadı · <a href="javascript:bugunYukle()" style="color:#fff;text-decoration:underline;">tekrar dene</a></span>';
+    document.getElementById('bg-sube-p').innerHTML='<span style="color:var(--mist);font-size:12px;">—</span>';
+    document.getElementById('bg-sube-f').innerHTML='<span style="color:var(--mist);font-size:12px;">—</span>';
+    document.getElementById('bg-nakit').innerHTML='';
   }
 
   // Bekleyenler (başvuru + şikayet)
@@ -2220,6 +2322,7 @@ async function yayinla(){
     if(res.every(function(r){return r&&r.ok;})){
       dur.textContent='✅ Yayınlandı! '+(aktif==='fsm'?'FSM':'Podyumpark')+' menüsü güncellendi (diğer şube korundu).';
       btn.textContent='✅ Tamamlandı';
+      pendingSet(false);
       toast('🚀 Yayınlandı!');
     } else {
       dur.textContent='❌ Yayınlanamadı (ağ?). Tekrar deneyin.';

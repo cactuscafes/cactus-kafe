@@ -102,6 +102,21 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .branch-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
 .branch-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:3px;}
 .branch-sub{font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:0.7;margin-top:8px;}
+.branch-wrap{display:flex;flex-direction:column;}
+.branch-meta{background:#fff;border:1px solid #ece7dd;border-top:none;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
+.branch-meta-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.branch-saat{font-size:13px;color:#666;}
+.branch-saat b{font-weight:500;color:#1a1a1a;}
+.branch-actions{display:flex;gap:10px;}
+.bmini{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px 16px;font-size:13px;font-weight:500;letter-spacing:.3px;text-decoration:none;transition:all .2s;font-family:'Montserrat',sans-serif;}
+.bmini.ara{background:#fff;border:1.5px solid #d8d2c6;color:#1a1a1a;}
+.bmini.ara:hover{border-color:var(--gold);color:var(--gold);}
+.bmini.yol{background:var(--gold);border:1.5px solid var(--gold);color:#fff;}
+.bmini.yol:hover{filter:brightness(1.07);}
+.acik-rozet{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.4px;padding:5px 13px;border-radius:20px;}
+.acik-rozet::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;}
+.acik-rozet.acik{background:rgba(39,150,80,.14);color:#1e8e4f;}
+.acik-rozet.kapali{background:rgba(180,60,60,.12);color:#b04545;}
 
 /* FOOTER */
 footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
@@ -311,7 +326,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       "openingHoursSpecification": [{
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "opens": "10:30",
+        "opens": "11:00",
         "closes": "00:00"
       }],
       "sameAs": ["https://www.instagram.com/cactuscafe.fsm"]
@@ -335,12 +350,20 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         "addressRegion": "Bursa",
         "addressCountry": "TR"
       },
-      "openingHoursSpecification": [{
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "opens": "15:00",
-        "closes": "03:00"
-      }],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+          "opens": "16:00",
+          "closes": "01:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Saturday","Sunday"],
+          "opens": "14:00",
+          "closes": "02:00"
+        }
+      ],
       "sameAs": ["https://www.instagram.com/cactuscafe.tr"]
     }
   ]
@@ -655,20 +678,44 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div class="section-divider"></div>
   </div>
   <div class="branches-grid">
-    <a class="branch-card fade-up" href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" style="text-decoration:none;">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776784970135-0fqpyb1p1lnj.jpg" alt="FSM Şubesi" data-as-key="img_4">
-      <div class="branch-overlay">
-        <div class="branch-name">FSM Şubesi</div>
-        <div class="branch-sub">Fatih Sultan Mehmet Caddesi</div>
+    <div class="branch-wrap">
+      <a class="branch-card fade-up" href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" style="text-decoration:none;">
+        <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776784970135-0fqpyb1p1lnj.jpg" alt="FSM Şubesi" data-as-key="img_4">
+        <div class="branch-overlay">
+          <div class="branch-name">FSM Şubesi</div>
+          <div class="branch-sub">Fatih Sultan Mehmet Caddesi</div>
+        </div>
+      </a>
+      <div class="branch-meta">
+        <div class="branch-meta-top">
+          <span class="acik-rozet" data-branch="fsm"></span>
+          <span class="branch-saat">Her gün <b>11:00 – 00:00</b></span>
+        </div>
+        <div class="branch-actions">
+          <a href="tel:+905380146600" class="bmini ara">📞 Ara</a>
+          <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" class="bmini yol">🧭 Yol Tarifi</a>
+        </div>
       </div>
-    </a>
-    <a class="branch-card fade-up fade-up-d1" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" style="text-decoration:none;">
-      <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_5">
-      <div class="branch-overlay">
-        <div class="branch-name">Podyumpark</div>
-        <div class="branch-sub">Podyumpark AVM</div>
+    </div>
+    <div class="branch-wrap">
+      <a class="branch-card fade-up fade-up-d1" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" style="text-decoration:none;">
+        <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_5">
+        <div class="branch-overlay">
+          <div class="branch-name">Podyumpark</div>
+          <div class="branch-sub">Podyumpark AVM</div>
+        </div>
+      </a>
+      <div class="branch-meta">
+        <div class="branch-meta-top">
+          <span class="acik-rozet" data-branch="podyum"></span>
+          <span class="branch-saat">Hafta içi <b>16:00–01:00</b> · Hafta sonu <b>14:00–02:00</b></span>
+        </div>
+        <div class="branch-actions">
+          <a href="tel:+905380146600" class="bmini ara">📞 Ara</a>
+          <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="bmini yol">🧭 Yol Tarifi</a>
+        </div>
       </div>
-    </a>
+    </div>
   </div>
 </section>
 
@@ -744,8 +791,9 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div>
       <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Montserrat, sans-serif; position: relative;">FSM Şubesi</h4>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Fatih Sultan Mehmet Cad.<br>Nilüfer, Bursa</p>
-      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 10:30 – 00:00</p>
+      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 11:00 – 00:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="tel:+905380146600" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📞 0538 014 66 00</a>
         <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
         <a href="https://g.page/r/CQQuHm0-DVGYEAE/review" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
         <a href="https://instagram.com/cactuscafe.fsm" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Montserrat',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.fsm</a>
@@ -756,8 +804,9 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div>
       <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Montserrat, sans-serif; position: relative;">Podyumpark</h4>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Podyumpark AVM<br>Nilüfer, Bursa</p>
-      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 15:00 – 03:00</p>
+      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Hafta içi 16:00 – 01:00<br>Hafta sonu 14:00 – 02:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="tel:+905380146600" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📞 0538 014 66 00</a>
         <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
         <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
         <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Montserrat, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.tr</a>
@@ -1295,6 +1344,35 @@ function toggleMainNav(){
       lastIsMob=nowMob;
     }
   },{passive:true});
+})();
+</script>
+<script>
+/* Şu an açık mı? — FSM: her gün 11:00–00:00 · Podyum: hafta içi 16:00–01:00, hafta sonu 14:00–02:00 */
+(function(){
+  function aralik(branch,g){
+    if(branch==='fsm') return [660,1440];
+    var haftaSonu=(g===0||g===6);
+    return haftaSonu?[840,1560]:[960,1500];
+  }
+  function acikMi(branch){
+    var now=new Date();
+    var tr=new Date(now.getTime()+(now.getTimezoneOffset()+180)*60000);
+    var g=tr.getDay(), dk=tr.getHours()*60+tr.getMinutes();
+    var bug=aralik(branch,g);
+    if(dk>=bug[0] && dk<bug[1]) return true;
+    var dun=aralik(branch,(g+6)%7);
+    if(dun[1]>1440 && dk<(dun[1]-1440)) return true;
+    return false;
+  }
+  function render(){
+    document.querySelectorAll('.acik-rozet[data-branch]').forEach(function(el){
+      var a=acikMi(el.getAttribute('data-branch'));
+      el.textContent=a?'Şu an açık':'Şu an kapalı';
+      el.classList.toggle('acik',a);
+      el.classList.toggle('kapali',!a);
+    });
+  }
+  render(); setInterval(render,60000);
 })();
 </script>
 </body></html>

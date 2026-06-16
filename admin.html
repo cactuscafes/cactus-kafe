@@ -60,6 +60,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .uk-btn{flex:1;padding:7px;border:1.5px solid var(--stone);background:#fff;font-size:11px;cursor:pointer;font-family:inherit;}
 .uk-btn.red{color:var(--rd);}
 .uk-btn.red:hover{border-color:var(--rd);}
+.uk-oncu{width:100%;margin-top:10px;padding:10px;border:1.5px solid var(--stone);background:#fff;color:var(--ink);font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;border-radius:6px;transition:all .15s;}
+.uk-oncu:hover{border-color:var(--gold);color:var(--gold);}
+.uk-oncu.on{background:var(--gold);border-color:var(--gold);color:#fff;}
 .foto-btn{padding:8px 14px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;}
 .foto-onizle{width:100%;max-height:140px;object-fit:cover;margin-top:8px;display:none;}
 .oncu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
@@ -1179,7 +1182,9 @@ function renderKatTabs(){
 function renderUrunler(){
   const ul=MENU[aktifKat]||[];
   document.getElementById('urunGrid').innerHTML=!ul.length?'<div style="color:var(--mist);font-size:13px;padding:20px 0;">Bu kategoride ürün yok.</div>':
-  ul.map((u,i)=>`
+  ul.map(function(u,i){
+    var isOncu=(ONCU||[]).some(function(x){return (x.id&&u.id&&x.id===u.id)||(u.ad&&x.ad===u.ad);});
+    return `
     <div class="urun-kart${u.gizli?' gizli':''}${u.tukendi?' tukendi':''}">
       <div class="uk-ust">
         <label class="uk-emoji" style="cursor:pointer;display:flex;align-items:center;justify-content:center;">
@@ -1194,45 +1199,31 @@ function renderUrunler(){
         <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" oninput="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value)||0)"></div>
         <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" oninput="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
       </div>
+      <button class="uk-oncu${isOncu?' on':''}" onclick="urunOncuToggle('${aktifKat}',${i})">${isOncu?'⭐ Öne Çıkanda':'☆ Öne Çıkar'}</button>
       <div class="uk-btns">
         <button class="uk-btn warn${u.tukendi?' on':''}" onclick="urunTukendi('${aktifKat}',${i})">${u.tukendi?'✅ Stokta':'🚫 Tükendi'}</button>
         <button class="uk-btn" onclick="urunGizle('${aktifKat}',${i})">${u.gizli?'👁 Göster':'🙈 Gizle'}</button>
         <button class="uk-btn red" onclick="urunSil('${aktifKat}',${i})">🗑 Sil</button>
       </div>
-    </div>`).join('');
-
-
-
-  // ☆ Öne Çıkan butonlarını ekle
-  setTimeout(function(){
-    document.querySelectorAll('.urun-kart').forEach(function(kart){
-      if(kart.querySelector('.oncu-btn'))return;
-      var silBtn=kart.querySelector('button[onclick*="urunSil"]');
-      if(!silBtn)return;
-      var m=silBtn.getAttribute('onclick').match(/urunSil\(['"]([^'"]+)['"]\s*,\s*(\d+)\)/);
-      if(!m)return;
-      var katId=m[1],idx=parseInt(m[2]);
-      var urun=MENU[katId]&&MENU[katId][idx];
-      if(!urun)return;
-      if(!urun.id){urun.id=katId+'_'+idx;MENU[katId][idx].id=urun.id;menuKaydet();}
-      var isOncu=ONCU&&ONCU.some(function(x){return x.id===urun.id;});
-      var btn=document.createElement('button');
-      btn.className='oncu-btn';
-      btn.title='Öne Çıkan';
-      btn.innerHTML=isOncu?'⭐':'☆';
-      btn.setAttribute('style','background:none;border:none;cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px;line-height:1;transition:transform .15s;');
-      btn.onmouseover=function(){this.style.transform='scale(1.2)';};
-      btn.onmouseout=function(){this.style.transform='scale(1)';};
-      btn.onclick=function(){
-        if(!ONCU)ONCU=[];
-        var oidx=ONCU.findIndex(function(x){return x.id===urun.id;});
-        if(oidx>-1){ONCU.splice(oidx,1);localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));btn.innerHTML='☆';toast('Öne Çıkandan kaldırıldı');}
-        else{ if(oncuTryAdd({id:urun.id,ad:urun.ad,fiyat:urun.fiyat,foto:urun.foto||'',emoji:urun.emoji||''})){btn.innerHTML='⭐';toast('⭐ Öne Çıkanlara eklendi!');} } // limit/duplicate dolu ise eklenmez, ikon ☆ kalır
-        if(typeof renderOncuGrid==='function') renderOncuGrid();
-      };
-      silBtn.parentElement.insertBefore(btn,silBtn);
-    });
-  },100);
+    </div>`;
+  }).join('');
+}
+/* Tek-tık öne çıkar/çıkar — menü ürün kartındaki ⭐ düğmesi (max 4, duplicate korumalı) */
+function urunOncuToggle(k,i){
+  var u=MENU[k]&&MENU[k][i]; if(!u) return;
+  if(!u.id){ u.id=k+'_'+i; menuKaydet(); }
+  if(!Array.isArray(ONCU)) ONCU=[];
+  var idx=ONCU.findIndex(function(x){return (x.id&&x.id===u.id)||(u.ad&&x.ad===u.ad);});
+  if(idx>-1){
+    ONCU.splice(idx,1);
+    localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+    toast('Öne çıkandan kaldırıldı');
+  } else {
+    if(!oncuTryAdd({id:u.id,ad:u.ad,fiyat:u.fiyat,foto:u.foto||'',emoji:u.emoji||''})) return;
+    toast('⭐ Öne çıkanlara eklendi! Yayınla\'ya basın.');
+  }
+  renderUrunler();
+  if(typeof renderOncuGrid==='function') renderOncuGrid();
 }
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
 function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }

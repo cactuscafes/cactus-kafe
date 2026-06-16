@@ -611,35 +611,11 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <h2 class="section-title fade-up fade-up-d1">Öne Çıkan <span>Lezzetler</span></h2>
     <div class="section-divider"></div>
   </div>
-  <div class="oncu-grid">
-    <a class="oncu-card fade-up" href="menu-podyum.html">
-      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729120276-pg4v3csgsv.jpg" alt="Dubai Bubble Waffle" loading="lazy"></div>
-      <div class="oncu-body">
-        <h3 class="oncu-name">Dubai Bubble Waffle</h3>
-        <span class="oncu-price">330 ₺</span>
-      </div>
-    </a>
-    <a class="oncu-card fade-up fade-up-d1" href="menu.html">
-      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776728845040-s8radoymnwb.jpg" alt="Blue Sky" loading="lazy"></div>
-      <div class="oncu-body">
-        <h3 class="oncu-name">Blue Sky</h3>
-        <span class="oncu-price">210 ₺</span>
-      </div>
-    </a>
-    <a class="oncu-card fade-up fade-up-d2" href="menu.html">
-      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776727397164-mgw26n8uy6.jpg" alt="Cortado" loading="lazy"></div>
-      <div class="oncu-body">
-        <h3 class="oncu-name">Cortado</h3>
-        <span class="oncu-price">180 ₺</span>
-      </div>
-    </a>
-    <a class="oncu-card fade-up fade-up-d3" href="menu-podyum.html">
-      <div class="oncu-img"><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776729107910-sfmo73qfgsc.jpg" alt="Classic Bubble Waffle" loading="lazy"></div>
-      <div class="oncu-body">
-        <h3 class="oncu-name">Classic Bubble Waffle</h3>
-        <span class="oncu-price">300 ₺</span>
-      </div>
-    </a>
+  <div class="oncu-grid" id="anaOncuGrid">
+    <div class="oncu-card oncu-skel"><div class="oncu-img"></div><div class="oncu-body"><h3 class="oncu-name">&nbsp;</h3></div></div>
+    <div class="oncu-card oncu-skel"><div class="oncu-img"></div><div class="oncu-body"><h3 class="oncu-name">&nbsp;</h3></div></div>
+    <div class="oncu-card oncu-skel"><div class="oncu-img"></div><div class="oncu-body"><h3 class="oncu-name">&nbsp;</h3></div></div>
+    <div class="oncu-card oncu-skel"><div class="oncu-img"></div><div class="oncu-body"><h3 class="oncu-name">&nbsp;</h3></div></div>
   </div>
 </section>
 <style>
@@ -1373,6 +1349,53 @@ function toggleMainNav(){
     });
   }
   render(); setInterval(render,60000);
+})();
+</script>
+
+<script>
+/* Anasayfa öne çıkanlar — menüden görselli ürünleri her gün dönüşümlü çeker (fiyatsız) */
+(function(){
+  var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+  function topla(data){
+    var out=[];
+    ['fsm','podyum'].forEach(function(br){
+      var b=data&&data[br]; if(!b) return;
+      Object.keys(b).forEach(function(cat){
+        var c=b[cat]; if(!c||!c.urunler) return;
+        c.urunler.forEach(function(u){
+          if(u&&u.foto&&!u.gizli&&!u.tukendi) out.push({ad:u.ad,foto:u.foto,sube:br});
+        });
+      });
+    });
+    var seen={},uniq=[];
+    out.forEach(function(p){ var k=(p.ad||'').toLowerCase(); if(k&&!seen[k]){seen[k]=1;uniq.push(p);} });
+    return uniq;
+  }
+  function karistir(arr,seed){ /* günlük deterministik karıştırma */
+    var a=arr.slice(),s=seed;
+    for(var i=a.length-1;i>0;i--){ s=(s*9301+49297)%233280; var j=Math.floor(s/233280*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; }
+    return a;
+  }
+  function render(urunler){
+    var grid=document.getElementById('anaOncuGrid'); if(!grid||!urunler.length) return;
+    var gun=Math.floor((Date.now()+3*3600000)/86400000); /* TR günü */
+    var sec=karistir(urunler,gun).slice(0,4);
+    grid.innerHTML=sec.map(function(p){
+      var link=p.sube==='fsm'?'menu.html':'menu-podyum.html';
+      return '<a class="oncu-card" href="'+link+'"><div class="oncu-img"><img src="'+p.foto+'" alt="'+p.ad+'" loading="lazy"></div><div class="oncu-body"><h3 class="oncu-name">'+p.ad+'</h3></div></a>';
+    }).join('');
+  }
+  function yukle(){
+    fetch(API+'/menu/cek?sube=menu_public&t='+Date.now())
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){ var u=topla(d); if(u.length) return render(u); throw 0; })
+      .catch(function(){
+        fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/menu-data.json?t='+Date.now())
+          .then(function(r){return r.ok?r.json():null;})
+          .then(function(d){ render(topla(d)); }).catch(function(){});
+      });
+  }
+  yukle();
 })();
 </script>
 </body></html>

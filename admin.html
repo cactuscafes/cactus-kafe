@@ -975,6 +975,7 @@ function subeDegistir(yeniSube){
   aktifKat = KAT[0]?.id || 'sicak';
   if(typeof renderKatTabs==='function') renderKatTabs();
   if(typeof renderUrunler==='function') renderUrunler();
+  if(typeof renderOncuGrid==='function') renderOncuGrid(); // öne çıkan fiyatları yeni şubeye göre
   if(typeof katSeciciDoldur==='function') setTimeout(katSeciciDoldur, 200);
   var _tp=document.getElementById('panel-tukendi');
   if(_tp&&_tp.classList.contains('on')&&typeof renderTukendi==='function') renderTukendi();
@@ -1061,6 +1062,7 @@ function _adminMenuUygula(data, kaynak){
   localStorage.setItem('cactus_kat',JSON.stringify(KAT));
   aktifKat=KAT[0]?.id||'sicak';
   renderKatTabs(); renderUrunler();
+  if(typeof renderOncuGrid==='function') renderOncuGrid(); // öne çıkan fiyatları çekilen şubeye göre
   setTimeout(katSeciciDoldur,500);
   toast('✅ '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' menüsü yüklendi — '+kaynak+' ('+kat.length+' kategori)');
   return true;
@@ -1550,17 +1552,26 @@ function oncuSil(id){
 }
 function renderOncuGrid(){
   const d=ONCU||[];
+  // Fiyat/foto'yu düzenlenen şubenin (AKTIF_SUBE) GÜNCEL menüsünden çöz — snapshot değil.
+  // (Öne çıkanlar tek liste ama fiyat şubeye göre farklı; panel hangi şubedeysen onu gösterir.)
+  var byId={}, byAd={};
+  try{ Object.keys(MENU||{}).forEach(function(k){ (MENU[k]||[]).forEach(function(p){ if(p&&p.id) byId[p.id]=p; if(p&&p.ad) byAd[(p.ad||'').toLowerCase()]=p; }); }); }catch(e){}
+  var subeAd=(typeof AKTIF_SUBE!=='undefined' && AKTIF_SUBE==='fsm')?'FSM':'Podyumpark';
   document.getElementById('oncuGrid').innerHTML=!d.length?'<div style="color:var(--mist);font-size:13px;">Henüz öne çıkan ürün yok.</div>':
-  d.map(u=>`
+  d.map(function(u){
+    var live=byId[u.id]||byAd[(u.ad||'').toLowerCase()]||{};
+    var fiyat=(live.fiyat!=null?live.fiyat:u.fiyat);
+    var foto=live.foto||u.foto||'';
+    return `
     <div class="oncu-kart">
-      <img class="oncu-kart-img" src="${u.foto}" alt="${u.ad}" onerror="this.style.background='var(--paper)'">
+      <img class="oncu-kart-img" src="${foto}" alt="${u.ad}" onerror="this.style.background='var(--paper)'">
       <div class="oncu-info">
         <div class="oncu-ad">${u.ad}</div>
-        ${u.fiyat?`<div class="oncu-fiyat">₺${u.fiyat}</div>`:''}
-        ${u.aciklama?`<div style="font-size:11px;color:var(--mist);margin-top:4px;">${u.aciklama}</div>`:''}
+        ${fiyat?`<div class="oncu-fiyat">₺${fiyat} <span style="color:var(--mist);font-weight:400;">· ${subeAd}</span></div>`:''}
         <button class="oncu-sil" onclick="oncuSil('${u.id}')">🗑 Kaldır</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 /* RAPOR */

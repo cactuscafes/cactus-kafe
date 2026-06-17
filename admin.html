@@ -825,7 +825,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           </select>
           <div id="kartFilterChips" style="display:flex;gap:6px;flex-wrap:wrap;">
             <button onclick="kartFilterSec('hepsi',this)" class="kf-chip on" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">Tümü</button>
-            <button onclick="kartFilterSec('yeni',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🆕 Yeni Kayıt</button>
+            <button onclick="kartFilterSec('yeni',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🆕 Bugün Kayıt</button>
             <button onclick="kartFilterSec('bedava',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🎁 Bedava Hakkı</button>
           </div>
           <span id="kartSayac" style="font-size:12px;color:var(--mist);"></span>
@@ -3295,10 +3295,10 @@ function kartListeRender(){
   if(filtre === 'bedava'){
     data = _kartVerisi.filter(function(m){ return m.pul >= 5; });
   } else if(filtre === 'yeni'){
-    // Son 30 günde kayıt olanlar — en yeni en üstte
+    // Son 1 günde kayıt olanlar — en yeni en üstte
     var _now = Date.now(), _gun = 86400000;
     var _yas = function(t){ if(!t) return Infinity; var d=new Date(t).getTime(); return isNaN(d)?Infinity:(_now-d)/_gun; };
-    data = _kartVerisi.filter(function(m){ return _yas(m.kayit_tarih) <= 30; })
+    data = _kartVerisi.filter(function(m){ return _yas(m.kayit_tarih) <= 1; })
                       .sort(function(a,b){ return (new Date(b.kayit_tarih).getTime()||0) - (new Date(a.kayit_tarih).getTime()||0); });
   } else {
     data = _kartVerisi;
@@ -3307,8 +3307,8 @@ function kartListeRender(){
     listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
     return;
   }
-  // Son 7 günde kayıt olanlara "🆕 YENİ" etiketi
-  var _yeniEsik = Date.now() - 7*86400000;
+  // Son 1 günde kayıt olanlara "🆕 YENİ" etiketi
+  var _yeniEsik = Date.now() - 1*86400000;
   var _yeniTag = function(m){
     var d = m.kayit_tarih ? new Date(m.kayit_tarih).getTime() : 0;
     return (d && d>=_yeniEsik) ? ' <span style="background:#2d5a27;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.5px;white-space:nowrap;">🆕 YENİ</span>' : '';

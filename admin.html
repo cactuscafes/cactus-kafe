@@ -285,6 +285,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 
 /* Tek birincil/ikincil buton dili (marka yeşili) */
 .btn-primary{background:var(--brand);color:#fff;border:none;border-radius:100px;padding:11px 26px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:filter .18s,transform .08s;}
+.kf-chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
 .btn-primary:hover{filter:brightness(1.09);}
 .btn-primary:active{transform:translateY(1px);}
 .btn-secondary{background:var(--surface);color:#5a574f;border:1px solid var(--stone);border-radius:100px;padding:11px 22px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .18s,color .18s;}
@@ -817,11 +818,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div class="psub">Kayıtlı müşteriler · 7 pul = 1 bedava içecek</div>
         <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
           <button onclick="kartListeYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
-          <select id="kartFilter" onchange="kartListeRender()" style="padding:8px 12px;border:1.5px solid var(--stone);font-size:12px;font-family:inherit;background:#fff;">
+          <select id="kartFilter" style="display:none;">
             <option value="hepsi">Tüm Müşteriler</option>
-            <option value="yeni">🆕 Yeni Kayıt Olanlar (son 30 gün)</option>
-            <option value="bedava">Bedava Hakkı Olanlar</option>
+            <option value="yeni">Yeni Kayıt</option>
+            <option value="bedava">Bedava Hakkı</option>
           </select>
+          <div id="kartFilterChips" style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="kartFilterSec('hepsi',this)" class="kf-chip on" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">Tümü</button>
+            <button onclick="kartFilterSec('yeni',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🆕 Yeni Kayıt</button>
+            <button onclick="kartFilterSec('bedava',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🎁 Bedava Hakkı</button>
+          </div>
           <span id="kartSayac" style="font-size:12px;color:var(--mist);"></span>
         </div>
         <!-- Özet kartlar -->
@@ -3266,6 +3272,19 @@ function kartAnalitik(){
   el.innerHTML = kartlar
     + '<div style="display:grid;grid-template-columns:1fr;gap:0;">'+dagilim+'</div>'
     + sadik;
+}
+
+function kartFilterSec(deger, btn){
+  document.getElementById('kartFilter').value = deger;
+  document.querySelectorAll('.kf-chip').forEach(function(b){
+    b.style.background = '#fff';
+    b.style.color = '#1a1a1a';
+    b.style.borderColor = '';
+  });
+  btn.style.background = 'var(--ink)';
+  btn.style.color = '#fff';
+  btn.style.borderColor = 'var(--ink)';
+  kartListeRender();
 }
 
 function kartListeRender(){

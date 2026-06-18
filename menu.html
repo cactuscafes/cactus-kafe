@@ -19,7 +19,9 @@
 <meta name="theme-color" content="#0e1f08">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="favicon.svg">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script>
 /* ═══ OTOMATİK CACHE/SW RESET (versiyon bump'ta çalışır) ═══
  * Eski Service Worker / browser cache kalıntısı varsa
@@ -78,7 +80,7 @@ html[data-initial-sube="podyum"] #tab-sube-fsm{color:#999!important;border-botto
 html[data-initial-sube="podyum"] #tab-sube-podyum{color:var(--dark)!important;border-bottom-color:var(--dark)!important;}
 /* FSM özel banner'lar (gece sakinliği, quiz, kahve falı, welcome toast) Podyum'da görünmesin */
 html[data-initial-sube="podyum"] [data-fsm-only]{display:none!important;}
-body{font-family:'Montserrat',sans-serif;color:var(--dark);background:#fff;}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff;}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--border);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;}
@@ -90,14 +92,14 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 /* HEADER */
 .menu-header{text-align:center;padding:70px 40px 50px;border-bottom:1px solid var(--border);}
 .menu-header-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
-.menu-header-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,6vw,80px);font-weight:300;letter-spacing:2px;line-height:1;}
+.menu-header-title{font-family:'Fraunces',serif;font-size:clamp(48px,6vw,80px);font-weight:300;letter-spacing:2px;line-height:1;}
 .menu-header-title em{font-style:italic;}
 .menu-header-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#999;margin-top:16px;}
 
 /* SUBE TABS */
 /* Ayrı sayfa modeli — sube-tabs gerekmiyor */
 .sube-tabs{display:none!important;}
-.sube-tab{padding:18px 48px;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;color:#999;font-family:'Montserrat',sans-serif;font-weight:400;transition:all .3s;}
+.sube-tab{padding:18px 48px;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;color:#999;font-family:'Inter',sans-serif;font-weight:400;transition:all .3s;}
 .sube-tab.on{color:var(--dark);border-bottom-color:var(--dark);}
 
 /* SPOTLIGHT */
@@ -108,7 +110,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .spotlight-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .5s ease;}
 .spotlight-card:hover img{transform:scale(1.04);}
 .spotlight-card-info{padding:14px 4px;}
-.spotlight-card-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:4px;}
+.spotlight-card-name{font-family:'Fraunces',serif;font-size:18px;font-weight:400;margin-bottom:4px;}
 .spotlight-card-price{font-size:12px;color:#666;font-weight:500;}
 .spotlight-card-emoji{font-size:13px;margin-right:4px;}
 
@@ -118,7 +120,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .cat-header{display:flex;align-items:center;justify-content:space-between;padding:32px 0;cursor:pointer;transition:opacity .2s;}
 .cat-header:hover{opacity:.7;}
 .cat-header-left{display:flex;align-items:baseline;gap:20px;}
-.cat-name{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,52px);font-weight:300;letter-spacing:1px;}
+.cat-name{font-family:'Fraunces',serif;font-size:clamp(32px,4vw,52px);font-weight:300;letter-spacing:1px;}
 .cat-count{font-size:11px;letter-spacing:2px;color:#bbb;text-transform:uppercase;}
 .cat-arrow{font-size:20px;color:#bbb;transition:transform .3s;}
 .cat-section.open .cat-arrow{transform:rotate(45deg);}
@@ -131,7 +133,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .product-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s;}
 .product-card:hover .product-img-wrap img{transform:scale(1.04);}
 .product-emoji-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:#f8f6f2;}
-.product-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;margin-bottom:4px;line-height:1.3;}
+.product-name{font-family:'Fraunces',serif;font-size:17px;font-weight:400;margin-bottom:4px;line-height:1.3;}
 .product-desc{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px;font-weight:300;}
 .product-price{font-size:13px;font-weight:500;color:var(--dark);}
 
@@ -145,7 +147,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .upop-img img{width:100%;height:100%;object-fit:cover;display:block;}
 .upop-emoji{width:100%;height:220px;display:flex;align-items:center;justify-content:center;font-size:72px;background:#f8f6f2;}
 .upop-body{padding:24px 28px 36px;}
-.upop-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;line-height:1.15;margin-bottom:10px;}
+.upop-name{font-family:'Fraunces',serif;font-size:30px;font-weight:400;line-height:1.15;margin-bottom:10px;}
 .upop-desc{font-size:13px;color:#777;line-height:1.75;font-weight:300;margin-bottom:18px;}
 .upop-price{font-size:22px;font-weight:600;color:var(--gold);}
 .product-card{cursor:pointer;}
@@ -154,7 +156,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 /* FOOTER */
 footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .ft-grid{display:grid;grid-template-columns:1.6fr 1fr 1.4fr 1fr;gap:48px;padding-bottom:60px;border-bottom:1px solid #222;}
-.ft-brand-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:8px;text-transform:uppercase;margin-bottom:10px;}
+.ft-brand-name{font-family:'Fraunces',serif;font-size:32px;font-weight:300;letter-spacing:8px;text-transform:uppercase;margin-bottom:10px;}
 .ft-brand-tag{font-size:11px;color:#666;letter-spacing:2px;line-height:1.7;margin-bottom:28px;font-weight:300;}
 .ft-social{display:flex;gap:12px;}
 .ft-social a{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #333;color:#888;text-decoration:none;font-size:15px;transition:all .3s;}
@@ -177,7 +179,7 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .ft-wa-btn:hover{background:rgba(37,211,102,0.2);border-color:rgba(37,211,102,0.5);}
 .ft-bottom{display:flex;justify-content:space-between;align-items:center;padding:20px 0;gap:16px;}
 .ft-copy{font-size:11px;color:#444;letter-spacing:1px;}
-.ft-top-btn{background:none;border:1px solid #333;color:#666;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .3s;font-family:'Montserrat',sans-serif;}
+.ft-top-btn{background:none;border:1px solid #333;color:#666;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;}
 .ft-top-btn:hover{border-color:#666;color:#fff;}
 @media(max-width:900px){.ft-grid{grid-template-columns:1fr 1fr;gap:36px;}}
 @media(max-width:560px){.ft-grid{grid-template-columns:1fr;gap:28px;}footer{padding:48px 20px 0;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
@@ -187,10 +189,10 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .sk-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(184,150,90,.12) 0%,transparent 65%);pointer-events:none;}
 .sk-banner-left{max-width:520px;position:relative;z-index:1;}
 .sk-banner-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;}
-.sk-banner-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,42px);font-weight:300;color:#f7f2ea;line-height:1.15;margin-bottom:12px;}
+.sk-banner-title{font-family:'Fraunces',serif;font-size:clamp(28px,3.5vw,42px);font-weight:300;color:#f7f2ea;line-height:1.15;margin-bottom:12px;}
 .sk-banner-title em{font-style:italic;color:#e8c47a;}
 .sk-banner-sub{font-size:12px;font-weight:300;color:rgba(240,230,210,.6);line-height:1.8;margin-bottom:28px;}
-.sk-banner-cta{display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+.sk-banner-cta{display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
 .sk-banner-cta:hover{background:#e8c47a;transform:translateY(-1px);}
 .sk-stamp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;flex-shrink:0;position:relative;z-index:1;}
 .sk-stamp{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;transition:transform .2s;}
@@ -212,7 +214,7 @@ footer{background:#0e0e0e;color:#fff;padding:72px 60px 0;margin-top:80px;}
 .nav-burger span{display:block;width:22px;height:1.5px;background:var(--dark);transition:all .3s;}
 .menu-mob{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.99);z-index:490;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
 .menu-mob.on{display:flex;}
-.menu-mob a{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;font-style:italic;color:var(--dark);text-decoration:none;transition:color .2s;}
+.menu-mob a{font-family:'Fraunces',serif;font-size:32px;font-weight:300;font-style:italic;color:var(--dark);text-decoration:none;transition:color .2s;}
 .menu-mob a:hover{color:var(--gold);}
 @media(max-width:768px){
 nav{padding:14px 20px;}
@@ -312,7 +314,7 @@ footer{padding:40px 20px 24px;}
 #alt-kat-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px) saturate(150%);border-top:1px solid var(--border);z-index:85;padding:10px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.7,.2,1);box-shadow:0 -6px 22px rgba(0,0,0,.06);-webkit-overflow-scrolling:touch;}
 #alt-kat-bar::-webkit-scrollbar{display:none;}
 #alt-kat-bar.on{transform:translateY(0);}
-.akb-pill{flex-shrink:0;padding:8px 14px;border:1.5px solid var(--border);border-radius:18px;background:#fff;color:#666;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s;white-space:nowrap;}
+.akb-pill{flex-shrink:0;padding:8px 14px;border:1.5px solid var(--border);border-radius:18px;background:#fff;color:#666;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap;}
 .akb-pill.aktif{background:var(--dark);color:#fff;border-color:var(--dark);}
 @media(min-width:769px){#alt-kat-bar{display:none;}}
 
@@ -352,11 +354,11 @@ footer{padding:40px 20px 24px;}
 #isBasvuruKapat{position:absolute;top:12px;right:14px;background:none;border:none;color:#bbb;font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
 #isBasvuruKapat:hover{color:var(--dark);}
 #isBasvuruPop .ib-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-#isBasvuruPop .ib-title{font-family:'Cormorant Garamond',serif;font-size:clamp(23px,5vw,31px);font-weight:300;color:var(--dark);line-height:1.15;margin-bottom:10px;}
+#isBasvuruPop .ib-title{font-family:'Fraunces',serif;font-size:clamp(23px,5vw,31px);font-weight:300;color:var(--dark);line-height:1.15;margin-bottom:10px;}
 #isBasvuruPop .ib-title em{font-style:italic;color:var(--gold);}
 #isBasvuruPop .ib-sub{font-size:12.5px;font-weight:300;color:#777;line-height:1.7;margin-bottom:22px;}
 #isBasvuruPop .ib-actions{display:flex;gap:14px;align-items:center;}
-#isBasvuruPop .ib-btn{padding:13px 28px;background:var(--gold);color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s,transform .15s;flex-shrink:0;border-radius:4px;}
+#isBasvuruPop .ib-btn{padding:13px 28px;background:var(--gold);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s,transform .15s;flex-shrink:0;border-radius:4px;}
 #isBasvuruPop .ib-btn:hover{background:#234a1f;transform:translateY(-1px);}
 #isBasvuruPop .ib-skip{font-size:11px;color:#999;cursor:pointer;transition:color .2s;}
 #isBasvuruPop .ib-skip:hover{color:var(--dark);}
@@ -571,14 +573,14 @@ footer{padding:40px 20px 24px;}
 
 
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.08);">
-  <a href="index.html" style="text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
+  <a href="index.html" style="text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;">CACTUS</a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
-    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Ana Sayfa</a>
-    <a id="navFsm" href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">FSM Menü</a>
-    <a id="navPod" href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">Podyumpark Menü</a>
-    <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:400;">İş Başvurusu</a>
+    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
+    <a id="navFsm" href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">FSM Menü</a>
+    <a id="navPod" href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Podyumpark Menü</a>
+    <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
     <span id="bs1" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
@@ -589,8 +591,8 @@ footer{padding:40px 20px 24px;}
 <!-- 🔔 Nav'a sabit kayar duyuru şeridi (FSM — çay ikram) -->
 <div id="promoMarquee" role="marquee" aria-label="Duyuru: Tatlı alana çay ikram" style="position:fixed;left:0;right:0;top:60px;z-index:998;overflow:hidden;height:34px;display:flex;align-items:center;background:linear-gradient(90deg,#1a3010,#2d5a27);color:#fdfaf3;border-bottom:1px solid rgba(255,255,255,.10);box-shadow:0 4px 14px rgba(0,0,0,.10);">
   <div class="pm-track" style="display:flex;flex:none;white-space:nowrap;will-change:transform;animation:pmScroll 24s linear infinite;">
-    <span class="pm-seg" style="display:inline-block;font-family:'Montserrat',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🍰&nbsp;&nbsp;Tatlı alana çay ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;☕&nbsp;&nbsp;Cactus'ta her tatlının yanında çayımız ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
-    <span class="pm-seg" aria-hidden="true" style="display:inline-block;font-family:'Montserrat',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🍰&nbsp;&nbsp;Tatlı alana çay ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;☕&nbsp;&nbsp;Cactus'ta her tatlının yanında çayımız ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
+    <span class="pm-seg" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🍰&nbsp;&nbsp;Tatlı alana çay ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;☕&nbsp;&nbsp;Cactus'ta her tatlının yanında çayımız ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
+    <span class="pm-seg" aria-hidden="true" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🍰&nbsp;&nbsp;Tatlı alana çay ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;☕&nbsp;&nbsp;Cactus'ta her tatlının yanında çayımız ikram&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
   </div>
 </div>
 <style>
@@ -609,12 +611,12 @@ footer{padding:40px 20px 24px;}
 })();
 </script>
 <div id="mainMobMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;">
-  <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Ana Sayfa</a>
-  <a id="navFsmMob" href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">FSM Menü</a>
-  <a id="navPodMob" href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">Podyumpark Menü</a>
-  <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Montserrat',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Montserrat',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Montserrat',sans-serif;">İş Başvurusu</a>
+  <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
+  <a id="navFsmMob" href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">FSM Menü</a>
+  <a id="navPodMob" href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Podyumpark Menü</a>
+  <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
 @media(max-width:768px){
@@ -652,7 +654,7 @@ footer{padding:40px 20px 24px;}
 .menu-google{position:absolute;top:50%;right:40px;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;padding:18px 22px;border:1px solid var(--border);border-radius:14px;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.06);transition:transform .3s,box-shadow .3s,border-color .3s;min-width:152px;}
 .menu-google:hover{transform:translateY(-50%) translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.13);border-color:var(--gold);}
 .mg-top{display:flex;align-items:center;gap:8px;}
-.mg-score{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:400;color:var(--dark);line-height:1;}
+.mg-score{font-family:'Fraunces',serif;font-size:34px;font-weight:400;color:var(--dark);line-height:1;}
 .mg-stars{font-size:14px;letter-spacing:2px;color:#f4b400;}
 .mg-count{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#999;}
 .mg-cta{margin-top:6px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff;background:var(--gold);padding:8px 16px;border-radius:100px;font-weight:600;transition:background .3s;}
@@ -1856,7 +1858,7 @@ function toggleMainNav(){
 <style>
 #pt-veil{position:fixed;inset:0;z-index:99999;background:#0b1a07;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .55s cubic-bezier(.4,0,.2,1);}
 #pt-veil.pt-out{opacity:0;pointer-events:none;}
-#pt-word{font-family:'Cormorant Garamond',serif;font-size:30px;letter-spacing:14px;color:#c8a86a;text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
+#pt-word{font-family:'Fraunces',serif;font-size:30px;letter-spacing:14px;color:#c8a86a;text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
 #pt-veil.pt-out #pt-word{opacity:0;transform:scale(.94);}
 </style>
 <script>

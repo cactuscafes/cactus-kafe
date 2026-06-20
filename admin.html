@@ -2385,7 +2385,7 @@ async function yayinla(){
 }
 
 /* BAŞLAT */
-if(localStorage.getItem('ca')==='1'){
+if(localStorage.getItem('ca')==='1' || (function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null');return !!(t&&t.token&&t.exp>Date.now());}catch(e){return false;}})()){
   document.getElementById('giris').style.display='none';
   basla();
   // badge for applications

@@ -1,6 +1,53 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<!-- 🔒 Yönetim girişi koruması (cactus-rapor-api auth) -->
+<script>
+(function(){
+  var API="https://cactus-rapor-api.batuhanbulut.workers.dev";
+  var TKEY="cactus_yonetim_token";
+  function tokenGet(){ try{var t=JSON.parse(localStorage.getItem(TKEY)||"null"); return (t&&t.token&&t.exp>Date.now())?t.token:null;}catch(e){return null;} }
+  function tokenTemizle(){ try{localStorage.removeItem(TKEY);}catch(e){} }
+  var _f=window.fetch;
+  window.fetch=function(input,init){
+    try{
+      var u=(typeof input==="string")?input:(input&&input.url)||"";
+      if(u.indexOf("cactus-rapor-api")>=0){
+        var tok=tokenGet(); init=init||{};
+        var h=init.headers;
+        if(h instanceof Headers){ if(tok)h.set("X-Cactus-Key",tok); }
+        else { h=Object.assign({},h||{}); if(tok)h["X-Cactus-Key"]=tok; init.headers=h; }
+        return _f.call(window,input,init).then(function(r){ if(r.status===401){ tokenTemizle(); _giris(); } return r; });
+      }
+    }catch(e){}
+    return _f.apply(window,arguments);
+  };
+  function _giris(){
+    if(document.getElementById("cactusGiris")||!document.body) return;
+    var ov=document.createElement("div");
+    ov.id="cactusGiris";
+    ov.style.cssText="position:fixed;inset:0;z-index:2147483647;background:#0e1b08;display:flex;align-items:center;justify-content:center;padding:24px;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;";
+    ov.innerHTML='<div style="background:#fdfaf3;border:1px solid #c8a86a;border-radius:12px;max-width:340px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);"><div style="font-family:Georgia,serif;font-size:20px;letter-spacing:6px;color:#1a3010;text-transform:uppercase;margin-bottom:4px;">CACTUS</div><div style="font-size:11px;letter-spacing:2px;color:#b8965a;text-transform:uppercase;margin-bottom:22px;">Yönetim Girişi</div><input id="cgSifre" type="password" placeholder="Parola" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #e0dbd3;border-radius:8px;font-size:15px;outline:none;margin-bottom:12px;" /><div id="cgHata" style="color:#c0392b;font-size:12px;min-height:16px;margin-bottom:10px;"></div><button id="cgBtn" style="width:100%;padding:13px;border:none;border-radius:8px;background:#1a3010;color:#fdfaf3;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Giriş</button></div>';
+    document.body.appendChild(ov);
+    var inp=ov.querySelector("#cgSifre"),btn=ov.querySelector("#cgBtn"),hata=ov.querySelector("#cgHata");
+    function dene(){
+      var s=inp.value; if(!s)return;
+      btn.disabled=true; btn.textContent="..."; hata.textContent="";
+      _f.call(window,API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sifre:s})})
+        .then(function(r){return r.json();})
+        .then(function(d){ if(d&&d.ok&&d.token){ localStorage.setItem(TKEY,JSON.stringify({token:d.token,exp:d.exp})); location.reload(); } else { hata.textContent="Hatalı parola"; btn.disabled=false; btn.textContent="Giriş"; inp.value=""; inp.focus(); } })
+        .catch(function(){ hata.textContent="Bağlantı hatası"; btn.disabled=false; btn.textContent="Giriş"; });
+    }
+    btn.addEventListener("click",dene);
+    inp.addEventListener("keydown",function(e){ if(e.key==="Enter")dene(); });
+    setTimeout(function(){inp.focus();},100);
+  }
+  window._cactusCikis=function(){ tokenTemizle(); _giris(); };
+  function init(){ if(!tokenGet()) _giris(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">

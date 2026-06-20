@@ -373,15 +373,10 @@ function girisYap(){
       if(!d.ok){throw new Error(d.error||'Hata');}
       localStorage.setItem('cactus_kart_tel',tel);
       if(d.yeni){
-        // Yeni üyeye hoş geldin yıldızı (+1) — yalnızca ilk kayıtta
-        fetch(API+'/kart/ekle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,miktar:1,aciklama:'Hoş geldin yıldızı'})})
-          .then(function(r){return r.json();})
-          .then(function(e){
-            kartGoster(e&&e.ok?e.musteri:d.musteri);
-            kartGecmisCek(tel);
-            kartToast('🎁 Hoş geldin! İlk yıldızın hesabına eklendi.');
-          })
-          .catch(function(){ kartGoster(d.musteri); kartGecmisCek(tel); });
+        // Hoş geldin yıldızı (+1) artık sunucuda /kart/kayit içinde veriliyor (tek sefer, telefon doğrulamalı)
+        kartGoster(d.musteri);
+        kartGecmisCek(tel);
+        kartToast('🎁 Hoş geldin! İlk yıldızın hesabına eklendi.');
       } else {
         kartGoster(d.musteri);
         kartGecmisCek(tel);

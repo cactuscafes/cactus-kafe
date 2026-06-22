@@ -941,6 +941,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
 <script>
 const RAPOR_API = "https://cactus-rapor-api.batuhanbulut.workers.dev"; // tek kaynak — tüm rapor-api takma adları buna bağlı
+const KEYS = {
+  token: 'cactus_yonetim_token',
+  kat: 'cactus_kat',
+  ghToken: 'cactus_gh_token',
+  oncu: 'cactus_oncu',
+  raporEmail: 'cactus_rapor_email',
+  sadakatGorulen: 'cactus_sadakat_gorulen',
+  aktifSube: 'cactus_admin_aktif_sube',
+  adminMenuLegacy: 'cactus_admin_menu',
+  adminMenuPrefix: 'cactus_admin_menu_'
+}; // tek anahtar kaynağı (guard kendi TKEY scope'unu kullanır)
 const REPO='cactuscafes/cactus-kafe', BRANCH='main';
 // (Eski sabit admin/1234 kaldırıldı — giriş token tabanlı)
 
@@ -1036,15 +1047,15 @@ const MENU_V={
   ],
 };
 
-let KAT=JSON.parse(localStorage.getItem('cactus_kat')||'null')||JSON.parse(JSON.stringify(KAT_V));
+let KAT=JSON.parse(localStorage.getItem(KEYS.kat)||'null')||JSON.parse(JSON.stringify(KAT_V));
 // ─── Şubeye göre menü saklama ──────────────────────────────────────────
 // FSM ve Podyumpark menüleri ayrı KV anahtarlarına yazılır, localStorage'da ayrı tutulur.
 // Eski tek anahtar (cactus_admin_menu) bir kerelik her iki şubeye kopyalanır.
-let AKTIF_SUBE = localStorage.getItem('cactus_admin_aktif_sube') || 'fsm';
-function _menuKeyFor(sube){ return 'cactus_admin_menu_' + (sube||'fsm'); }
+let AKTIF_SUBE = localStorage.getItem(KEYS.aktifSube) || 'fsm';
+function _menuKeyFor(sube){ return KEYS.adminMenuPrefix + (sube||'fsm'); }
 (function _menuMigrasyon(){
   // Eski tek-menü varsa hem fsm hem podyum'a kopyala (sadece bir kez)
-  var eski = localStorage.getItem('cactus_admin_menu');
+  var eski = localStorage.getItem(KEYS.adminMenuLegacy);
   if(eski && !localStorage.getItem(_menuKeyFor('fsm'))){
     try{ localStorage.setItem(_menuKeyFor('fsm'), eski); }catch(e){}
   }
@@ -1061,7 +1072,7 @@ function subeDegistir(yeniSube){
   // Önce mevcut MENU'yu kendi şubesine kaydet
   try{ localStorage.setItem(_menuKeyFor(AKTIF_SUBE), JSON.stringify(MENU)); }catch(e){}
   AKTIF_SUBE = yeniSube;
-  try{ localStorage.setItem('cactus_admin_aktif_sube', AKTIF_SUBE); }catch(e){}
+  try{ localStorage.setItem(KEYS.aktifSube, AKTIF_SUBE); }catch(e){}
   // Yeni şubenin menüsünü yükle
   MENU = _menuYukleAktif();
   // UI güncelle (tab + başlık)
@@ -1093,7 +1104,7 @@ setTimeout(function(){
   if(curEl) curEl.textContent = AKTIF_SUBE==='fsm'?'FSM':'Podyumpark';
 }, 50);
 // ───────────────────────────────────────────────────────────────────────
-let ONCU=JSON.parse(localStorage.getItem('cactus_oncu')||'[]');
+let ONCU=JSON.parse(localStorage.getItem(KEYS.oncu)||'[]');
 // ── ÖNE ÇIKAN tek-kapı: en fazla 4 + aynı ürün 2 kez eklenemez ──────────
 const ONCU_MAX=4;
 var _oncuSecId=''; // dropdown'dan seçilen ürünün gerçek id'si (oncuEkle kullanır)
@@ -1111,7 +1122,7 @@ function oncuTryAdd(item){
   if(oncuIndexOf(item)>-1){ if(typeof toast==='function') toast('⚠️ "'+(item.ad||'Bu ürün')+'" zaten öne çıkanlarda'); return false; }
   if(ONCU.length>=ONCU_MAX){ if(typeof toast==='function') toast('⚠️ En fazla '+ONCU_MAX+' öne çıkan olabilir — önce birini kaldırın'); return false; }
   ONCU.push(item);
-  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  localStorage.setItem(KEYS.oncu,JSON.stringify(ONCU));
   if(typeof pendingSet==='function') pendingSet(true);
   return true;
 }
@@ -1128,13 +1139,13 @@ function oncuNormalize(){
   });
   var degisti=JSON.stringify(temiz)!==JSON.stringify(ONCU);
   ONCU=temiz;
-  if(degisti) localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  if(degisti) localStorage.setItem(KEYS.oncu,JSON.stringify(ONCU));
   return degisti;
 }
 oncuNormalize();
 let aktifKat=KAT[0]?.id||'sicak';
 
-function cikis(){ try{localStorage.removeItem('cactus_yonetim_token');}catch(e){} localStorage.removeItem('ca'); location.reload(); }
+function cikis(){ try{localStorage.removeItem(KEYS.token);}catch(e){} localStorage.removeItem('ca'); location.reload(); }
 // ─── Adisyon (kasiyer) KV'sinden menü çekme ─────────────────────────────
 // adisyon_fsm / adisyon_podyum KV'leri TEK KAYNAK — kasiyerin ekranıyla aynı.
 function _adminMenuUygula(data, kaynak){
@@ -1153,7 +1164,7 @@ function _adminMenuUygula(data, kaynak){
   if(!kat.length) return false;
   KAT=kat; MENU=menu;
   localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
-  localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+  localStorage.setItem(KEYS.kat,JSON.stringify(KAT));
   aktifKat=KAT[0]?.id||'sicak';
   renderKatTabs(); renderUrunler();
   if(typeof renderOncuGrid==='function') renderOncuGrid(); // öne çıkan fiyatları çekilen şubeye göre
@@ -1256,7 +1267,7 @@ function pendingSet(v){
 let _tt;
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('on'),3000); }
 function menuKaydet(){ localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU)); pendingSet(true); }
-function katKaydet(){ localStorage.setItem('cactus_kat',JSON.stringify(KAT)); pendingSet(true); }
+function katKaydet(){ localStorage.setItem(KEYS.kat,JSON.stringify(KAT)); pendingSet(true); }
 
 const R2_WORKER='https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/';
 
@@ -1343,7 +1354,7 @@ function urunOncuToggle(k,i){
   var idx=ONCU.findIndex(function(x){return (x.id&&x.id===u.id)||(u.ad&&x.ad===u.ad);});
   if(idx>-1){
     ONCU.splice(idx,1);
-    localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+    localStorage.setItem(KEYS.oncu,JSON.stringify(ONCU));
     pendingSet(true);
     toast('Öne çıkandan kaldırıldı');
   } else {
@@ -1527,7 +1538,7 @@ function katSiralamaUI(){
       const moved=KAT.splice(dragIdx,1)[0];
       KAT.splice(i,0,moved);
       dragIdx=null;
-      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+      localStorage.setItem(KEYS.kat,JSON.stringify(KAT));
       renderKatTabs();
       
       katSeciciDoldur&&katSeciciDoldur();
@@ -1549,7 +1560,7 @@ function dragKatDrop(e, toIdx){
   toast('✅ Sıra güncellendi');
 }
 function saveKat(){
-  localStorage.setItem('cactus_kat', JSON.stringify(KAT));
+  localStorage.setItem(KEYS.kat, JSON.stringify(KAT));
 }
 function renderKatListe(){
   const cont=document.getElementById('katListe');
@@ -1601,7 +1612,7 @@ function renderKatListe(){
       const moved=KAT.splice(dragIdx,1)[0];
       KAT.splice(i,0,moved);
       dragIdx=null;
-      localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+      localStorage.setItem(KEYS.kat,JSON.stringify(KAT));
       renderKatListe();
       renderKatTabs();
       katSeciciDoldur&&katSeciciDoldur();
@@ -1614,7 +1625,7 @@ function katTasi(i, yon){
   var j=i+yon;
   if(j<0||j>=KAT.length) return;
   var t=KAT[i]; KAT[i]=KAT[j]; KAT[j]=t; // komşu kategoriyle yer değiştir
-  localStorage.setItem('cactus_kat',JSON.stringify(KAT));
+  localStorage.setItem(KEYS.kat,JSON.stringify(KAT));
   renderKatListe(); renderKatTabs();
   if(typeof katSeciciDoldur==='function') katSeciciDoldur();
   toast('✅ Sıra güncellendi — Yayınla butonuna basın');
@@ -1673,7 +1684,7 @@ function oncuEkle(){
 function oncuSil(id){
   if(!ONCU)ONCU=[];
   ONCU=ONCU.filter(u=>String(u.id)!==String(id));
-  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  localStorage.setItem(KEYS.oncu,JSON.stringify(ONCU));
   renderOncuGrid(); toast('🗑 Kaldırıldı');
 }
 function renderOncuGrid(){
@@ -2369,7 +2380,7 @@ async function yayinla(){
 }
 
 /* BAŞLAT */
-if((function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null');return !!(t&&t.token&&t.exp>Date.now());}catch(e){return false;}})()){
+if((function(){try{var t=JSON.parse(localStorage.getItem(KEYS.token)||'null');return !!(t&&t.token&&t.exp>Date.now());}catch(e){return false;}})()){
   basla();
   // badge for applications
   setTimeout(function(){
@@ -2391,7 +2402,7 @@ if((function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')
     fetch(RAPOR_API+'/kart/listele')
       .then(function(r){return r.json();})
       .then(function(data){
-        var gorulen=Number(localStorage.getItem('cactus_sadakat_gorulen'))||(Date.now()-7*86400000);
+        var gorulen=Number(localStorage.getItem(KEYS.sadakatGorulen))||(Date.now()-7*86400000);
         var yeni=(data||[]).filter(function(m){var d=m.kayit_tarih?new Date(m.kayit_tarih).getTime():0;return d>gorulen;}).length;
         var badge=document.getElementById('sadakatBadge');
         if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;badge.title=yeni+' yeni kayıt';}
@@ -2411,7 +2422,7 @@ async function asLoad(){
   iframe.style.display='none';
   st.textContent='Yükleniyor...';
   try{
-    var token=localStorage.getItem('cactus_gh_token')||'';
+    var token=localStorage.getItem(KEYS.ghToken)||'';
     var headers={'User-Agent':'cactus-admin'};
     if(token)headers['Authorization']='token '+token;
     var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{headers:headers});
@@ -2574,11 +2585,11 @@ function asImgUpload(input){
 }
 
 async function asYayinla(){
-  var token=localStorage.getItem('cactus_gh_token')||'';
+  var token=localStorage.getItem(KEYS.ghToken)||'';
   if(!token){
     token=prompt('GitHub Token (tek seferlik kaydedilir):');
     if(!token){toast('⚠️ Token girilmedi');return;}
-    localStorage.setItem('cactus_gh_token',token.trim());
+    localStorage.setItem(KEYS.ghToken,token.trim());
     token=token.trim();
   }
   var st=document.getElementById('as-st');
@@ -2624,7 +2635,7 @@ async function asYayinla(){
       st.textContent='✅ Yayınlandı!';
       toast('✅ Ana sayfa güncellendi');
     }else{
-      if(pj.message&&pj.message.indexOf('Bad credentials')>-1)localStorage.removeItem('cactus_gh_token');
+      if(pj.message&&pj.message.indexOf('Bad credentials')>-1)localStorage.removeItem(KEYS.ghToken);
       st.textContent='❌ '+(pj.message||'Hata');
       console.error(pj);
     }
@@ -2994,11 +3005,11 @@ function seImgYukle(inp){
 }
 
 async function seYayinla(pageFile, wrapId, stId, commitMsg){
-  var token=localStorage.getItem('cactus_gh_token')||'';
+  var token=localStorage.getItem(KEYS.ghToken)||'';
   if(!token){
     token=prompt('GitHub Token (tek seferlik kaydedilir):');
     if(!token){toast('⚠️ Token girilmedi');return;}
-    localStorage.setItem('cactus_gh_token',token.trim());
+    localStorage.setItem(KEYS.ghToken,token.trim());
     token=token.trim();
   }
   var repo='cactuscafes/cactus-kafe';
@@ -3041,7 +3052,7 @@ async function seYayinla(pageFile, wrapId, stId, commitMsg){
       if(st) st.textContent='✅ Yayınlandı! Site 30 sn içinde güncellenir.';
       toast('🚀 '+pageFile+' yayınlandı!');
     } else {
-      if(pd.message&&pd.message.includes('Bad credentials')){localStorage.removeItem('cactus_gh_token');}
+      if(pd.message&&pd.message.includes('Bad credentials')){localStorage.removeItem(KEYS.ghToken);}
       if(st) st.textContent='❌ '+(pd.message||'Hata');
       console.error(pd);
     }
@@ -3066,7 +3077,7 @@ function oncuBtnClick(btn){
     btn.innerHTML='\u2B50';
     toast('\u2B50 Öne Çıkanlara eklendi! Yayınla\'ya basın.');
   }
-  localStorage.setItem('cactus_oncu',JSON.stringify(ONCU));
+  localStorage.setItem(KEYS.oncu,JSON.stringify(ONCU));
 }
 
 /* ══════════ HAFTALIK E-POSTA ══════════ */
@@ -3088,7 +3099,7 @@ async function emailGonder(){
     if(d.ok){
       sonuc.style.color = '#2d7a4f';
       sonuc.textContent = '✓ E-posta gönderildi → ' + d.alici;
-      if(typeof _emailKaydet==='function') _emailKaydet(alici); else localStorage.setItem('cactus_rapor_email', alici);
+      if(typeof _emailKaydet==='function') _emailKaydet(alici); else localStorage.setItem(KEYS.raporEmail, alici);
     } else {
       sonuc.style.color = 'var(--rd)';
       sonuc.textContent = '✗ ' + (d.error || 'Hata oluştu');
@@ -3161,7 +3172,7 @@ var _EMAIL_CLOUD_KEY='cactus_admin_rapor_email';
 var _EMAIL_API=RAPOR_API;
 var _emailYazmaZamani=0;
 function _emailKaydet(email){
-  localStorage.setItem('cactus_rapor_email', email);
+  localStorage.setItem(KEYS.raporEmail, email);
   _emailYazmaZamani=Date.now();
   fetch(_EMAIL_API+'/menu/kaydet',{
     method:'POST',headers:{'Content-Type':'application/json'},
@@ -3174,9 +3185,9 @@ function _emailCloudCek(){
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
       if(!d||typeof d.email==='undefined') return;
-      var simdiki=localStorage.getItem('cactus_rapor_email')||'';
+      var simdiki=localStorage.getItem(KEYS.raporEmail)||'';
       if(simdiki!==d.email){
-        localStorage.setItem('cactus_rapor_email', d.email);
+        localStorage.setItem(KEYS.raporEmail, d.email);
         var el=document.getElementById('emailAlici'); if(el && !el.matches(':focus')) el.value=d.email;
         var el2=document.getElementById('gunlukAlici'); if(el2 && !el2.matches(':focus')) el2.value=d.email;
       }
@@ -3186,7 +3197,7 @@ window._emailKaydet=_emailKaydet; // setItem override için
 
 // Önceden kaydedilmiş e-postayı yükle + günlük tarih alanını bugüne ayarla
 document.addEventListener('DOMContentLoaded', function(){
-  var saved = localStorage.getItem('cactus_rapor_email');
+  var saved = localStorage.getItem(KEYS.raporEmail);
   if(saved){ var el=document.getElementById('emailAlici'); if(el) el.value=saved; var el2=document.getElementById('gunlukAlici'); if(el2) el2.value=saved; }
   var td = document.getElementById('gunlukTarih');
   if(td) td.value = new Date().toISOString().slice(0,10);
@@ -3210,7 +3221,7 @@ async function kartListeYukle(){
     _kartVerisi = await r.json();
     var bedavaCount = _kartVerisi.filter(function(m){ return m.pul >= 5; }).length;
     // Panel açıldı = yeni kayıt bildirimi görüldü → rozeti temizle + "görülme" zamanını işaretle
-    try{ localStorage.setItem('cactus_sadakat_gorulen', String(Date.now())); }catch(e){}
+    try{ localStorage.setItem(KEYS.sadakatGorulen, String(Date.now())); }catch(e){}
     var badge = document.getElementById('sadakatBadge');
     if(badge){ badge.style.display = 'none'; }
     // Özet

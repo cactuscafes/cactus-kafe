@@ -940,6 +940,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 </div>
 
 <script>
+const RAPOR_API = "https://cactus-rapor-api.batuhanbulut.workers.dev"; // tek kaynak — tüm rapor-api takma adları buna bağlı
 const REPO='cactuscafes/cactus-kafe', BRANCH='main';
 // (Eski sabit admin/1234 kaldırıldı — giriş token tabanlı)
 
@@ -1164,7 +1165,7 @@ function _adminMenuUygula(data, kaynak){
 function adisyondanYenile(){
   var kvKey = 'adisyon_' + AKTIF_SUBE; // adisyon_fsm | adisyon_podyum
   toast('⏳ '+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+' adisyonundan çekiliyor…');
-  return fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube='+kvKey+'&t='+Date.now())
+  return fetch(RAPOR_API+'/menu/cek?sube='+kvKey+'&t='+Date.now())
     .then(function(r){return r.ok?r.json():null;})
     .then(function(data){
       if(data && Object.keys(data).length){
@@ -1700,7 +1701,7 @@ function renderOncuGrid(){
 }
 
 /* RAPOR */
-var _RAP_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _RAP_API = RAPOR_API;
 var _rapAktifSek = 'p'; // p = Podyumpark, f = FSM
 
 function rapSekme(k) {
@@ -2324,7 +2325,7 @@ async function yayinla(){
   try{
     // Aktif şubenin son düzenlemelerini diske kaydet
     try{ localStorage.setItem(_menuKeyFor(AKTIF_SUBE), JSON.stringify(MENU)); }catch(e){}
-    var API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+    var API=RAPOR_API;
     var aktif=AKTIF_SUBE, diger=(aktif==='fsm')?'podyum':'fsm';
     // Aktif şubeyi DÜZENLENEN menüden, kendi KAT'ı ile kur (global KAT karışması yok)
     function _toPer(menu, kat){
@@ -2372,14 +2373,14 @@ if((function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')
   basla();
   // badge for applications
   setTimeout(function(){
-    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/basvuru/listele')
+    fetch(RAPOR_API+'/basvuru/listele')
       .then(function(r){return r.json();})
       .then(function(data){
         var yeni=data.filter(function(b){return !b.okundu;}).length;
         var badge=document.getElementById('basvuruBadge');
         if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
       }).catch(function(){});
-    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/sikayet/listele')
+    fetch(RAPOR_API+'/sikayet/listele')
       .then(function(r){return r.json();})
       .then(function(data){
         var yeni=data.filter(function(s){return !s.okundu;}).length;
@@ -2387,7 +2388,7 @@ if((function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')
         if(badge&&yeni>0){badge.style.display='inline';badge.textContent=yeni;}
       }).catch(function(){});
     // Sadakat: son bakıştan beri YENİ KAYIT olan üye sayısı (bildirim rozeti)
-    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/listele')
+    fetch(RAPOR_API+'/kart/listele')
       .then(function(r){return r.json();})
       .then(function(data){
         var gorulen=Number(localStorage.getItem('cactus_sadakat_gorulen'))||(Date.now()-7*86400000);
@@ -2639,7 +2640,7 @@ async function muzikYukle(){
   var url='',enabled=false,vol=18;
   try{
     // ÖNCE worker/KV (token'sız yayın buraya yazıyor)
-    var rk=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=muzik_cfg&t='+Date.now());
+    var rk=await fetch(RAPOR_API+'/menu/cek?sube=muzik_cfg&t='+Date.now());
     var dk=await rk.json();
     if(dk && typeof dk.url!=='undefined'){
       url=dk.url||'';
@@ -2742,7 +2743,7 @@ async function muzikKaydet(){
     var url=document.getElementById('mz-url').value.trim();
     var enabled=document.getElementById('mz-enabled').checked;
     var vol=parseFloat((parseInt(document.getElementById('mz-vol').value)/100).toFixed(2))||0.18;
-    var r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+    var r=await fetch(RAPOR_API+'/menu/kaydet',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({sube:'muzik_cfg',menu:{url:url,enabled:enabled,vol:vol}})
     });
@@ -2777,7 +2778,7 @@ function muzikDosyaYukle(input){
 }
 
 /* ===== IS BASVURULARI ===== */
-var BASVURU_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var BASVURU_API=RAPOR_API;
 async function basvuruYukle(){
   var el=document.getElementById('basvuruListesi');
   if(!el)return;
@@ -2816,7 +2817,7 @@ async function basvuruSil(id){
 }
 
 /* ===== ŞİKAYET & ÖNERİLER ===== */
-var SIKAYET_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var SIKAYET_API=RAPOR_API;
 async function sikayetYukle(){
   var el=document.getElementById('sikayetListesi');
   if(!el)return;
@@ -3078,7 +3079,7 @@ async function emailGonder(){
   btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
   sonuc.style.color = 'var(--mist)'; sonuc.textContent = '';
   try {
-    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/haftalik-gonder', {
+    var r = await fetch(RAPOR_API+'/rapor/haftalik-gonder', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email: alici, donem: donem})
@@ -3110,7 +3111,7 @@ async function gunlukEmailGonder(){
   btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
   sonuc.style.color = 'var(--mist)'; sonuc.textContent = '';
   try {
-    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/gunluk-gonder', {
+    var r = await fetch(RAPOR_API+'/rapor/gunluk-gonder', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email: alici, tarih: tarih})
@@ -3137,7 +3138,7 @@ async function waTest(){
   btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
   sonuc.textContent = '';
   try {
-    var r = await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/rapor/wa-test', {
+    var r = await fetch(RAPOR_API+'/rapor/wa-test', {
       method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
     });
     var d = await r.json();
@@ -3157,7 +3158,7 @@ async function waTest(){
 
 // Rapor email cloud sync — admin paneli ortak ayar, tüm cihazlara yansır
 var _EMAIL_CLOUD_KEY='cactus_admin_rapor_email';
-var _EMAIL_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var _EMAIL_API=RAPOR_API;
 var _emailYazmaZamani=0;
 function _emailKaydet(email){
   localStorage.setItem('cactus_rapor_email', email);
@@ -3195,7 +3196,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 /* ══════════ SADAKAT KARTI ══════════ */
-var KART_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+var KART_API = RAPOR_API;
 var _kartVerisi = [];
 
 async function kartListeYukle(){
@@ -3508,7 +3509,7 @@ async function ziyaretYukle(){
   if(!ozet) return;
   ozet.innerHTML='<div style="color:var(--mist);font-size:13px;">Yükleniyor…</div>';
   try {
-    const r=await fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/sayac');
+    const r=await fetch(RAPOR_API+'/ziyaret/sayac');
     const d=await r.json();
     function kart(baslik,deger,alt,renk){
       return '<div style="background:#fff;border:1px solid var(--stone);padding:14px 16px;border-radius:6px;"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:'+renk+';margin-bottom:6px;font-weight:700;">'+baslik+'</div><div style="font-size:26px;font-weight:300;color:var(--ink);">'+(deger||0).toLocaleString('tr-TR')+'</div><div style="font-size:11px;color:var(--mist);margin-top:2px;">'+alt+'</div></div>';

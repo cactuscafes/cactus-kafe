@@ -374,18 +374,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 </head>
 <body>
 
-<div id="giris" class="giris">
-  <div class="giris-kart">
-    <div class="giris-logo">🌵 CACTUS</div>
-    <div class="giris-sub">Admin Paneli</div>
-    <label class="lbl">Kullanıcı Adı</label>
-    <input class="inp" id="gAd" placeholder="admin" onkeydown="if(event.key==='Enter')giris()">
-    <label class="lbl">Şifre</label>
-    <input class="inp" type="password" id="gSifre" placeholder="••••" onkeydown="if(event.key==='Enter')giris()">
-    <button class="giris-btn" onclick="giris()">Giriş Yap</button>
-    <div class="giris-hata" id="gHata">Kullanıcı adı veya şifre hatalı.</div>
-  </div>
-</div>
+<!-- Eski admin/1234 giriş formu kaldırıldı — giriş artık token tabanlı (sayfa başındaki koruma scripti) -->
+
 
 <div id="admin" style="display:none">
   <nav class="nav">
@@ -951,7 +941,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
 <script>
 const REPO='cactuscafes/cactus-kafe', BRANCH='main';
-const U='admin', P='1234';
+// (Eski sabit admin/1234 kaldırıldı — giriş token tabanlı)
 
 const KAT_V=[
   {id:'sicak',label:'☕ Sıcak İçecekler',tip:'ic'},
@@ -1143,14 +1133,7 @@ function oncuNormalize(){
 oncuNormalize();
 let aktifKat=KAT[0]?.id||'sicak';
 
-function giris(){
-  if(document.getElementById('gAd').value===U&&document.getElementById('gSifre').value===P){
-    localStorage.setItem('ca','1');
-    document.getElementById('giris').style.display='none';
-    basla();
-  } else { document.getElementById('gHata').style.display='block'; }
-}
-function cikis(){ localStorage.removeItem('ca'); location.reload(); }
+function cikis(){ try{localStorage.removeItem('cactus_yonetim_token');}catch(e){} localStorage.removeItem('ca'); location.reload(); }
 // ─── Adisyon (kasiyer) KV'sinden menü çekme ─────────────────────────────
 // adisyon_fsm / adisyon_podyum KV'leri TEK KAYNAK — kasiyerin ekranıyla aynı.
 function _adminMenuUygula(data, kaynak){
@@ -2385,8 +2368,7 @@ async function yayinla(){
 }
 
 /* BAŞLAT */
-if(localStorage.getItem('ca')==='1' || (function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null');return !!(t&&t.token&&t.exp>Date.now());}catch(e){return false;}})()){
-  document.getElementById('giris').style.display='none';
+if((function(){try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null');return !!(t&&t.token&&t.exp>Date.now());}catch(e){return false;}})()){
   basla();
   // badge for applications
   setTimeout(function(){

@@ -911,7 +911,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)modalKapat()">
   <div class="modal">
     <div class="modal-ttl">🚀 Siteyi Yayınla</div>
-    <div class="modal-sub">Menü değişikliklerini canlı siteye uygula. GitHub token gereklidir (tek seferlik).</div>
+    <div class="modal-sub">Aşağıdaki ürün değişiklikleri canlı menüye ve adisyona uygulanır.</div>
+    <div class="modal-degisiklik" id="modalDegisiklik" style="text-align:left;margin:6px 0 12px;"></div>
     <div class="modal-durum" id="modalDurum"></div>
     <div class="modal-btns">
       <button class="modal-ok" id="modalOkBtn" onclick="yayinla()">✅ Yayınla</button>
@@ -2320,11 +2321,56 @@ async function canliMasaYukle(){
 }
 
 /* YAYINLA */
-function modalAc(){
+async function modalAc(){
   document.getElementById('modalBg').classList.add('on');
   document.getElementById('modalDurum').classList.remove('on');
   document.getElementById('modalOkBtn').disabled=false;
   document.getElementById('modalOkBtn').textContent='✅ Yayınla';
+  // Yayınlanacak ürün değişikliklerini göster: buluttaki yayınlı menü ↔ düzenlenen menü
+  var dEl=document.getElementById('modalDegisiklik');
+  if(!dEl) return;
+  dEl.innerHTML='<div style="color:var(--mist);font-size:12px;padding:6px 0;">⏳ Değişiklikler hesaplanıyor…</div>';
+  try{
+    var r=await fetch(RAPOR_API+'/menu/cek?sube=adisyon_'+AKTIF_SUBE+'&t='+Date.now());
+    var eskiPer = r.ok ? (await r.json()||{}) : {};
+    var yeniPer = {}; KAT.forEach(function(k){ yeniPer[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]}; });
+    dEl.innerHTML = _yayinDiffHTML(eskiPer, yeniPer);
+  }catch(e){
+    dEl.innerHTML='<div style="font-size:12px;color:var(--mist);">Değişiklik özeti alınamadı (yayın yine de yapılabilir).</div>';
+  }
+}
+function _dEsc(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+function _yayinDiffHTML(eski, yeni){
+  function flat(per){
+    var m={};
+    Object.keys(per||{}).forEach(function(cid){
+      var c=per[cid]; if(!c) return;
+      var urunler=Array.isArray(c)?c:(c.urunler||[]);
+      var clabel=(c&&c.label)||cid;
+      (urunler||[]).forEach(function(u){ if(u&&u.id!=null) m[u.id]={u:u,kat:clabel}; });
+    });
+    return m;
+  }
+  var o=flat(eski), n=flat(yeni), rows=[];
+  Object.keys(n).forEach(function(id){
+    var nu=n[id].u, kat=n[id].kat;
+    if(!o[id]){ rows.push({t:'add',kat:kat,html:'<b>'+_dEsc(nu.ad)+'</b> eklendi'+(nu.fiyat?' — '+nu.fiyat+'₺':'')}); return; }
+    var ou=o[id].u, d=[];
+    if((ou.ad||'')!==(nu.ad||'')) d.push('ad: “'+_dEsc(ou.ad)+'” → “'+_dEsc(nu.ad)+'”');
+    if(Number(ou.fiyat||0)!==Number(nu.fiyat||0)) d.push('fiyat: '+(ou.fiyat||0)+'₺ → <b>'+(nu.fiyat||0)+'₺</b>');
+    if((!!ou.gizli)!==(!!nu.gizli)) d.push(nu.gizli?'gizlendi':'satışa açıldı');
+    if((!!ou.tukendi)!==(!!nu.tukendi)) d.push(nu.tukendi?'tükendi işaretlendi':'stoğa eklendi');
+    if(d.length) rows.push({t:'mod',kat:kat,html:'<b>'+_dEsc(nu.ad)+'</b> — '+d.join(', ')});
+  });
+  Object.keys(o).forEach(function(id){ if(!n[id]) rows.push({t:'del',kat:o[id].kat,html:'<b>'+_dEsc(o[id].u.ad)+'</b> kaldırıldı'}); });
+  if(!rows.length) return '<div style="font-size:13px;color:var(--mist);padding:6px 0;">Değişiklik yok — yayınlanacak fark bulunamadı.</div>';
+  var ico={add:'🟢',mod:'✏️',del:'🔴'};
+  var sira={add:0,mod:1,del:2}; rows.sort(function(a,b){return sira[a.t]-sira[b.t];});
+  var html='<div style="font-size:12px;color:var(--mist);margin:2px 0 6px;"><b>'+rows.length+'</b> değişiklik yayınlanacak ('+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+'):</div>';
+  html+='<div style="max-height:230px;overflow:auto;border:1px solid var(--stone);border-radius:8px;padding:8px 10px;background:#fff;">';
+  rows.forEach(function(r){ html+='<div style="font-size:12.5px;padding:3px 0;line-height:1.45;border-bottom:1px solid #f3f0eb;">'+ico[r.t]+' '+r.html+' <span style="color:var(--mist);font-size:11px;">· '+_dEsc(r.kat)+'</span></div>'; });
+  html+='</div>';
+  return html;
 }
 function modalKapat(){ document.getElementById('modalBg').classList.remove('on'); }
 async function yayinla(){

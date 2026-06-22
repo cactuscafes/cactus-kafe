@@ -2053,7 +2053,19 @@ function _rebuildMasalar(){
     if(sa!==sb) return sa-sb;
     return String(a.id).localeCompare(String(b.id));
   });
-  for(var j=0;j<sirali.length;j++) _applyEvent(nyu, sirali[j]);
+  // BAYAT GÜN KORUMASI: son 04:00 sıfırlama noktasından eski olayları uygulama.
+  // Cihaz 04:00'te kapalıysa log'a MASA_CLEAR yazılmaz; imleç sıfırlanınca (PWA/SW
+  // reset, yeni cihaz) eski masalar replay'le geri gelmesin diye replay'i iş günüyle
+  // sınırla. SANITY GUARD: reset noktası mantıksızsa filtre uygulanmaz (taze veri korunur).
+  var _resetMs=_resetNoktasiMs(), _now=Date.now();
+  var _resetGecerli=(_resetMs>0 && _resetMs<_now && (_now-_resetMs)<25*3600000);
+  for(var j=0;j<sirali.length;j++){
+    if(_resetGecerli){
+      var _ets=Number(sirali[j].server_ts||sirali[j].ts||0);
+      if(_ets>0 && _ets<_resetMs) continue;
+    }
+    _applyEvent(nyu, sirali[j]);
+  }
   masalar=nyu;
   try{localStorage.setItem(LK.mas, JSON.stringify(masalar));}catch(e){}
 }

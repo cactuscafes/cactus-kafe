@@ -408,34 +408,6 @@ footer{padding:40px 20px 24px;}
   .quiz-hero-cta{font-size:13px;padding:10px 16px;width:100%;margin-top:4px;flex-basis:100%;text-align:center;}
 }
 
-/* ═══ Kahve Falı Mini Kartı (menüde direkt erişim) ═══ */
-.fal-mini{margin:0 16px 22px;padding:14px 18px;border-radius:18px;background:radial-gradient(ellipse at top left,#2a1e0f 0%,#15110a 100%);border:1px solid rgba(220,189,128,.25);box-shadow:0 8px 24px rgba(20,15,8,.35);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .3s cubic-bezier(.2,.7,.2,1);position:relative;overflow:hidden;}
-.fal-mini::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(220,189,128,.12) 0%,transparent 50%),radial-gradient(circle at 10% 90%,rgba(168,136,74,.08) 0%,transparent 45%);pointer-events:none;}
-.fal-mini:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(20,15,8,.5);border-color:rgba(220,189,128,.45);}
-.fal-mini-icon{flex-shrink:0;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#3a2818,#1f1409);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:inset 0 -3px 8px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.3);position:relative;z-index:2;animation:falMiniFloat 3.2s ease-in-out infinite;}
-@keyframes falMiniFloat{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-2px) rotate(4deg);}}
-.fal-mini-icon::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:18px;height:6px;background:radial-gradient(ellipse,rgba(255,255,255,.45) 0%,transparent 70%);border-radius:50%;filter:blur(2px);}
-.fal-mini-text{flex:1;min-width:0;position:relative;z-index:2;}
-.fal-mini-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:1.8px;color:#c8a86a;text-transform:uppercase;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
-.fal-mini-eyebrow::after{content:'';width:18px;height:1px;background:linear-gradient(90deg,#c8a86a,transparent);}
-.fal-mini-title{font-family:'Playfair Display',serif;font-size:17px;color:#fdfaf3;font-weight:700;letter-spacing:-.2px;line-height:1.2;}
-.fal-mini-title em{font-style:italic;color:#dcbd80;font-weight:600;}
-.fal-mini-sub{font-size:11.5px;color:rgba(244,236,216,.6);margin-top:3px;letter-spacing:.2px;}
-.fal-mini-arrow{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#dcbd80,#a8884a);color:#1a3010;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;box-shadow:0 4px 12px rgba(220,189,128,.35);transition:transform .25s;position:relative;z-index:2;}
-.fal-mini:hover .fal-mini-arrow{transform:translateX(4px);}
-@media(max-width:600px){.fal-mini{margin:0 14px 20px;padding:12px 14px;gap:12px;}.fal-mini-icon{width:48px;height:48px;font-size:24px;}.fal-mini-title{font-size:15.5px;}.fal-mini-sub{font-size:11px;}.fal-mini-arrow{width:30px;height:30px;font-size:14px;}}
-
-/* ═══ Saat & Hava Durumu Banner ═══ */
-.day-banner{margin:16px 16px 4px;padding:14px 18px;border-radius:18px;background:linear-gradient(135deg,#fdfaf3 0%,#f4ecd8 100%);border:1px solid rgba(168,136,74,.18);box-shadow:0 4px 14px rgba(168,136,74,.1);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;}
-.day-banner:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(168,136,74,.18);}
-.day-banner-icon{font-size:30px;line-height:1;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08));animation:dbFloat 4s ease-in-out infinite;}
-@keyframes dbFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-3px) rotate(4deg);}}
-.day-banner-text{flex:1;min-width:0;}
-.day-banner-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:1.6px;color:#c8a86a;text-transform:uppercase;margin-bottom:2px;}
-.day-banner-msg{font-size:14px;font-weight:700;color:#2d5a27;line-height:1.35;letter-spacing:-.2px;}
-.day-banner-msg em{font-style:normal;color:#a8884a;font-weight:800;}
-.day-banner-temp{font-size:12px;color:#888;margin-top:2px;}
-@media(max-width:600px){.day-banner{margin:14px 14px 4px;padding:12px 14px;gap:12px;}.day-banner-icon{font-size:26px;}.day-banner-msg{font-size:13px;}}
 
 /* ═══ Podyumpark Kampanya Pop-up (modal) ═══ */
 .kampanya-bg{position:fixed;inset:0;background:rgba(26,48,16,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .35s;}
@@ -519,7 +491,6 @@ footer{padding:40px 20px 24px;}
 .product-servis{position:absolute;bottom:8px;right:8px;background:rgba(26,48,16,.86);color:#fdfaf3;font-size:10px;font-weight:700;padding:4px 9px;border-radius:8px;letter-spacing:.3px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.25);border:1px solid rgba(220,189,128,.35);line-height:1.2;}
 @media(max-width:600px){.product-servis{font-size:9px;padding:3px 7px;bottom:6px;right:6px;}}
 
-/* (Quiz FAB kaldırıldı — sağ altta sadece müzik butonu kalır, hero banner yukarıda var.) */
 
 .quiz-bg{position:fixed;inset:0;background:rgba(20,20,20,.65);backdrop-filter:blur(10px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .3s;}
 .quiz-bg.on{display:flex;opacity:1;}
@@ -1024,7 +995,6 @@ async function init() {
     altKatBarGuncelle();
     gozlemUrunler();
     altKatBarOto();
-    if(typeof _dayBannerBaslat==='function') _dayBannerBaslat();
     if(typeof _sadakatBaslat==='function')   _sadakatBaslat();
     if(typeof _welcomeBaslat==='function')   _welcomeBaslat();
   },50);
@@ -1188,101 +1158,6 @@ function _qSonuc(){
   document.getElementById('qrDesc').textContent=sec.desc;
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// SAAT & HAVA DURUMUNA GÖRE DİNAMİK ÖNERİ BANNER
-// ═══════════════════════════════════════════════════════════════════════
-function _saatDilim(){
-  var h=new Date().getHours();
-  if(h>=6 && h<11)  return {key:'sabah',     ad:'SABAH',          icon:'🌅'};
-  if(h>=11 && h<14) return {key:'oglen',     ad:'ÖĞLEN',          icon:'☀️'};
-  if(h>=14 && h<17) return {key:'oglenden',  ad:'ÖĞLEDEN SONRA',  icon:'🌤'};
-  if(h>=17 && h<21) return {key:'aksam',     ad:'AKŞAM',          icon:'🌇'};
-  return {key:'gece', ad:'GECE', icon:'🌙'};
-}
-function _havaDurum(code){
-  if(code==null) return {key:'normal', icon:'', etiket:''};
-  if(code===0||code===1) return {key:'gunesli', icon:'☀️', etiket:'Güneşli'};
-  if(code===2||code===3) return {key:'bulutlu', icon:'⛅', etiket:'Bulutlu'};
-  if(code>=51 && code<=67) return {key:'yagmurlu', icon:'🌧', etiket:'Yağışlı'};
-  if(code>=71 && code<=77) return {key:'karli',    icon:'❄️', etiket:'Karlı'};
-  if(code>=80 && code<=86) return {key:'yagmurlu', icon:'🌦', etiket:'Sağanak'};
-  if(code>=95) return {key:'firtina', icon:'⛈', etiket:'Fırtınalı'};
-  if(code===45||code===48) return {key:'sisli', icon:'🌫', etiket:'Sisli'};
-  return {key:'normal', icon:'', etiket:''};
-}
-function _oneriMesaj(saat, temp, hava){
-  // Sıcaklığa göre öncelik
-  var sicakHedef='Latte', sogukHedef='Ice Caramel Latte', cay='Ihlamur';
-  if(temp!=null && temp>=27){
-    return {icon:'🧊', em:'YAZ SICAĞI', mesaj:'Hava sıcak — <em>Frozen</em> ya da <em>Ice Caramel Latte</em> tam zamanı', scrollTo:'soguk'};
-  }
-  if(temp!=null && temp<=8){
-    return {icon:'❄️', em:'SOĞUK GÜN', mesaj:'<em>Sıcak Çikolata</em> veya <em>Salep</em> seni ısıtsın', scrollTo:'sicak'};
-  }
-  if(hava.key==='yagmurlu'){
-    return {icon:'🌧', em:'YAĞMURLU GÜN', mesaj:'<em>Türk Kahvesi</em> + <em>Cevizli Kurabiye</em> mükemmel uyum', scrollTo:'sicak'};
-  }
-  if(hava.key==='karli'){
-    return {icon:'❄️', em:'KARLI GÜN', mesaj:'<em>Salep</em> ile sarın, kar manzarasını izle', scrollTo:'sicak'};
-  }
-  switch(saat.key){
-    case 'sabah':    return {icon:'🌅', em:'GÜNE BAŞLA', mesaj:'<em>Latte</em> veya <em>Flat White</em> ile güne enerjik başla', scrollTo:'sicak'};
-    case 'oglen':    return {icon:'☕', em:'ÖĞLE MOLASI', mesaj:'Klasik <em>Cappucino</em> veya ferah <em>Cool Lime</em>', scrollTo:'sicak'};
-    case 'oglenden': return {icon:'🌤', em:'ÖĞLEDEN SONRA', mesaj:'<em>Mocha</em> ile tatlı bir mola — yanına <em>kurabiye</em>?', scrollTo:'sicak'};
-    case 'aksam':    return {icon:'🌇', em:'AKŞAM KEYFİ', mesaj:'<em>Ihlamur</em> ile sakinleş — günü güzel kapat', scrollTo:'cay'};
-    case 'gece':     return {icon:'🌙', em:'GECE SAKİNLİĞİ', mesaj:'Geceyi tatlandır — <em>Ice Latte</em> yanında <em>Spoonful</em>', scrollTo:'tatli'};
-  }
-  return {icon:'☕', em:'BUGÜN', mesaj:'<em>Sana özel</em> içeceği keşfet', scrollTo:''};
-}
-var _dayBannerHedef='';
-function _dayBannerCiz(temp, weatherCode){
-  var saat=_saatDilim();
-  var hava=_havaDurum(weatherCode);
-  var oneri=_oneriMesaj(saat, temp, hava);
-  var b=document.getElementById('dayBanner');
-  if(!b) return;
-  document.getElementById('dbIcon').textContent=oneri.icon || saat.icon;
-  document.getElementById('dbEyebrow').textContent=oneri.em;
-  document.getElementById('dbMsg').innerHTML=oneri.mesaj;
-  var tempTxt='';
-  if(temp!=null){ tempTxt=hava.icon+' '+Math.round(temp)+'°C'+(hava.etiket?' · '+hava.etiket:''); }
-  document.getElementById('dbTemp').textContent=tempTxt;
-  _dayBannerHedef=oneri.scrollTo;
-  b.style.display='flex';
-}
-function _dayBannerScroll(){
-  // İlk eşleşen kategoriye scroll et
-  if(!_dayBannerHedef) return;
-  var aktifSube=document.querySelector('.sube-tab.on');
-  var sube=(aktifSube && aktifSube.textContent.toLowerCase().indexOf('fsm')>=0)?'fsm':'podyum';
-  var pattern={
-    sicak:['sicak','sıcak','kahve'],
-    soguk:['soguk','soğuk','ice'],
-    cay:['cay','çay','tea','herbal','bitki'],
-    tatli:['tatli','tatlı','dessert','kek','pasta','waffle','spoonful','brownie','kurabiye'],
-  }[_dayBannerHedef]||[];
-  var cats=document.querySelectorAll('#cat-list-'+sube+' .cat-section');
-  for(var i=0;i<cats.length;i++){
-    var ad=(cats[i].dataset.kat||'').toLowerCase();
-    var match=pattern.some(function(p){return ad.indexOf(p)>=0;});
-    if(match){
-      if(!cats[i].classList.contains('open')) cats[i].classList.add('open');
-      setTimeout(function(c){return function(){c.scrollIntoView({behavior:'smooth',block:'start'});};}(cats[i]),100);
-      return;
-    }
-  }
-}
-function _dayBannerBaslat(){
-  // Önce saat-based banner göster (hava beklemeden)
-  _dayBannerCiz(null, null);
-  // Sonra hava durumunu çek (FSM/Podyumpark her ikisi de İstanbul içi)
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=41.06&longitude=28.95&current=temperature_2m,weather_code&timezone=Europe/Istanbul')
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(d){
-      if(!d||!d.current) return;
-      _dayBannerCiz(d.current.temperature_2m, d.current.weather_code);
-    }).catch(function(){});
-}
 
 // ═══════════════════════════════════════════════════════════════════════
 // SADAKAT KART CANLI BANNER — telefon varsa API'den çek + sk-banner güncelle
@@ -1590,7 +1465,7 @@ function subeGoster(sube,btn) {
   setTimeout(function(){altKatBarGuncelle();},20);
   _subeOzelGoruntule(sube);
 }
-// FSM'e özel elementleri (dayBanner, quiz-hero, fal-mini) Podyum'da gizle
+// FSM'e özel elementleri (quiz-hero) Podyum'da gizle
 // + Podyumpark kampanya pop-up'ını sadece Podyum sekmesinde göster (oturumda 1 kez)
 function _subeOzelGoruntule(sube){
   var fsmOnly=document.querySelectorAll('[data-fsm-only]');
@@ -1599,17 +1474,7 @@ function _subeOzelGoruntule(sube){
       el.dataset.prevDisplay = el.style.display || '';
       el.style.display='none';
     } else {
-      // FSM: orijinal display'i geri ver (dayBanner JS ile show'a alınıyor, ona dokunma)
-      if(el.id==='dayBanner'){
-        // dayBanner sadece veri geldiğinde gösterilir; gizle/aç JS'ine bırak
-        if(el.dataset.prevDisplay==='none' || el.dataset.prevDisplay===undefined){
-          // dokunma
-        } else {
-          el.style.display='';
-        }
-      } else {
-        el.style.display='';
-      }
+      el.style.display='';
     }
   });
   if(sube==='podyum'){

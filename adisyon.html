@@ -960,6 +960,13 @@ if('serviceWorker' in navigator){
       <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">📅 <span id="har-ay-etiket">Bu Ay</span> Toplam Gider</span>
       <span id="har-aylik" style="font-size:18px;font-weight:700;color:var(--al2);font-family:'Lato',sans-serif;">₺0</span>
     </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:8px 12px;box-shadow:var(--sh);flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--k2);text-transform:uppercase;white-space:nowrap;">📄 Gider PDF</span>
+      <input type="date" id="gider-pdf-bas" style="flex:1;min-width:120px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
+      <span style="color:var(--kr3);font-weight:700;">→</span>
+      <input type="date" id="gider-pdf-bit" style="flex:1;min-width:120px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
+      <button onclick="giderPdfRaporu()" style="padding:8px 16px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">PDF Oluştur</button>
+    </div>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:6px 10px;box-shadow:var(--sh);">
       <span style="font-size:14px;color:var(--k2);padding:0 2px;">🔍</span>
       <input type="text" id="har-ara" placeholder="Ay genelinde ürün ara (örn: süt, limon, kaşar)..." oninput="harAraUygula()" style="flex:1;padding:8px 6px;border:none;outline:none;font-size:14px;font-family:'Lato',sans-serif;color:var(--k1);background:transparent;">
@@ -3013,6 +3020,69 @@ function harBugunSec(){
   harYukleEtiket();
   harYukle();
   harAylikYukle();
+}
+// ── GİDER PDF RAPORU — seçilen tarih aralığı, ürün (açıklama) bazında ──
+function _giderFmt(v){return Number(v||0).toLocaleString('tr-TR');}
+function _giderEsc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+async function giderPdfRaporu(){
+  var bas=(document.getElementById('gider-pdf-bas')||{}).value;
+  var bit=(document.getElementById('gider-pdf-bit')||{}).value;
+  if(!bas){var dd=new Date();bas=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-01';}
+  if(!bit) bit=_harBugun();
+  if(bas>bit){var tmp=bas;bas=bit;bit=tmp;}
+  var gunler=[],d0=new Date(bas+'T12:00:00'),d1=new Date(bit+'T12:00:00');
+  while(d0<=d1){ gunler.push(d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0')); d0.setDate(d0.getDate()+1); }
+  if(gunler.length>186){ try{toast('Aralık çok geniş (en fazla ~6 ay)');}catch(e){} return; }
+  try{toast('⏳ Gider raporu hazırlanıyor…');}catch(e){}
+  var prefix='harcama_'+SUBE+'_', kayitlar=[];
+  await Promise.all(gunler.map(function(t){
+    return fetch(HAR_API+'/menu/cek?sube='+prefix+t).then(function(r){return r.ok?r.json():null;}).then(function(o){
+      if(o&&Array.isArray(o.kayitlar)) o.kayitlar.forEach(function(k){kayitlar.push(k);});
+    }).catch(function(){});
+  }));
+  var grup={};
+  kayitlar.forEach(function(k){
+    var ad=(String(k.aciklama||'').trim())||'Diğer';
+    if(!grup[ad]) grup[ad]={ad:ad,adet:0,tutar:0,islem:0};
+    grup[ad].adet+=Number(k.adet)||0;
+    grup[ad].tutar+=Number(k.tutar)||0;
+    grup[ad].islem++;
+  });
+  var satir=Object.keys(grup).map(function(k){return grup[k];}).sort(function(a,b){return b.tutar-a.tutar;});
+  var topTutar=satir.reduce(function(s,x){return s+x.tutar;},0);
+  var topAdet=satir.reduce(function(s,x){return s+x.adet;},0);
+  var topIslem=satir.reduce(function(s,x){return s+x.islem;},0);
+  var subeAd=(SUBE==='fsm')?'FSM':'Podyumpark';
+  function trT(s){return new Date(s+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'});}
+  var now=new Date().toLocaleString('tr-TR');
+  var rows=satir.map(function(x,i){return '<tr><td class="n">'+(i+1)+'</td><td>'+_giderEsc(x.ad)+'</td><td class="r">'+_giderFmt(x.adet)+'</td><td class="r">'+x.islem+'</td><td class="r b">₺'+_giderFmt(x.tutar)+'</td></tr>';}).join('');
+  if(!satir.length) rows='<tr><td colspan="5" style="text-align:center;padding:34px;color:#999;">Bu tarih aralığında gider kaydı yok.</td></tr>';
+  var html='<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Cactus Gider Raporu</title><style>'
+    +'*{box-sizing:border-box}body{font-family:-apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a;margin:0;padding:28px 30px}'
+    +'.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1a3010;padding-bottom:14px;margin-bottom:18px}'
+    +'.logo{font-family:Georgia,serif;font-size:26px;letter-spacing:7px;color:#1a3010;text-transform:uppercase}'
+    +'.sub{font-size:10px;letter-spacing:2px;color:#b8965a;text-transform:uppercase;margin-top:4px}'
+    +'.meta{text-align:right;font-size:12px;color:#666;line-height:1.7}'
+    +'.cards{display:flex;gap:12px;margin-bottom:20px}.card{flex:1;background:#f5f3ec;border-radius:8px;padding:12px 14px;text-align:center}'
+    +'.card .lbl{font-size:9px;letter-spacing:1.5px;color:#888;text-transform:uppercase}.card .val{font-size:21px;font-weight:700;color:#1a3010;margin-top:4px}'
+    +'table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#999;border-bottom:1.5px solid #ddd;padding:8px 10px}'
+    +'td{padding:8px 10px;border-bottom:1px solid #f0ede8}td.r,th.r{text-align:right}td.n{color:#bbb;width:30px}td.b{font-weight:700;color:#c0392b}'
+    +'tfoot td{border-top:2px solid #1a3010;font-weight:700;font-size:14px;padding-top:10px}.ft{margin-top:22px;font-size:10px;color:#aaa;text-align:center}'
+    +'@media print{body{padding:0}@page{margin:15mm}}</style></head><body onload="setTimeout(function(){window.print();},120)">'
+    +'<div class="hd"><div><div class="logo">Cactus</div><div class="sub">Gider Raporu &middot; Ürün Bazında</div></div>'
+    +'<div class="meta">'+subeAd+' Şubesi<br>'+trT(bas)+' — '+trT(bit)+'<br>Oluşturma: '+now+'</div></div>'
+    +'<div class="cards">'
+    +'<div class="card"><div class="lbl">Toplam Gider</div><div class="val">₺'+_giderFmt(topTutar)+'</div></div>'
+    +'<div class="card"><div class="lbl">Ürün Çeşidi</div><div class="val">'+satir.length+'</div></div>'
+    +'<div class="card"><div class="lbl">Toplam Adet</div><div class="val">'+_giderFmt(topAdet)+'</div></div>'
+    +'<div class="card"><div class="lbl">Gün</div><div class="val">'+gunler.length+'</div></div></div>'
+    +'<table><thead><tr><th class="n">#</th><th>Ürün / Açıklama</th><th class="r">Adet</th><th class="r">İşlem</th><th class="r">Toplam</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'<tfoot><tr><td></td><td>TOPLAM</td><td class="r">'+_giderFmt(topAdet)+'</td><td class="r">'+topIslem+'</td><td class="r">₺'+_giderFmt(topTutar)+'</td></tr></tfoot></table>'
+    +'<div class="ft">Cactus Coffee &middot; '+subeAd+' &middot; cactuscafes.com</div></body></html>';
+  var w=window.open('','_blank');
+  if(!w){ try{toast('Pop-up engellendi — tarayıcıdan izin ver');}catch(e){} return; }
+  w.document.open(); w.document.write(html); w.document.close();
 }
 function harYukle(){
   fetch(HAR_API+'/menu/cek?sube='+_harKey())

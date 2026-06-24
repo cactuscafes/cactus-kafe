@@ -1104,7 +1104,7 @@ function renderMenu(sube) {
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
       c+='<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
-      c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+(u.emoji||'')+' '+u.ad+'</div>';
+      c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+u.ad+'</div>';
       c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
       return c;
     }).join('');
@@ -1124,7 +1124,7 @@ function renderMenu(sube) {
       else if(u.mevsim) rozet='<span class="product-badge badge-mevsim">🌸 Mevsim</span>';
       var h='<div class="product-card'+(u.tukendi?' tukendi':'')+'"'+(u.tukendi?'':' onclick="upopAc('+pidx+')"')+'>';
       h+='<div class="product-img-wrap">'+rozet+img+'</div>';
-      h+='<div class="product-name">'+(u.emoji||'')+' '+u.ad+'</div>';
+      h+='<div class="product-name">'+u.ad+'</div>';
       if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
       return h;
@@ -1787,7 +1787,7 @@ function upopAc(idx) {
     imgDiv.className = '';
     imgDiv.innerHTML = '<div class="upop-emoji">'+(u.emoji||'☕')+'</div>';
   }
-  document.getElementById('upopAd').textContent = (u.emoji ? u.emoji+' ' : '') + u.ad;
+  document.getElementById('upopAd').textContent = u.ad;
   document.getElementById('upopAciklama').textContent = u.aciklama || '';
   document.getElementById('upopAciklama').style.display = u.aciklama ? '' : 'none';
   document.getElementById('upopFiyat').textContent = u.fiyat ? u.fiyat+' TL' : '';

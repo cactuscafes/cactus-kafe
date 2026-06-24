@@ -940,11 +940,12 @@ if('serviceWorker' in navigator){
       <span id="har-aylik" style="font-size:18px;font-weight:700;color:var(--al2);font-family:'Lato',sans-serif;">₺0</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:8px 12px;box-shadow:var(--sh);flex-wrap:wrap;">
-      <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--k2);text-transform:uppercase;white-space:nowrap;">📄 Gider PDF</span>
-      <input type="date" id="gider-pdf-bas" style="flex:1;min-width:120px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--k2);text-transform:uppercase;white-space:nowrap;">📄 PDF</span>
+      <input type="date" id="gider-pdf-bas" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
       <span style="color:var(--kr3);font-weight:700;">→</span>
-      <input type="date" id="gider-pdf-bit" style="flex:1;min-width:120px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
-      <button onclick="giderPdfRaporu()" style="padding:8px 16px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">PDF Oluştur</button>
+      <input type="date" id="gider-pdf-bit" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Lato',sans-serif;">
+      <button onclick="giderPdfRaporu()" style="padding:8px 13px;background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Gider</button>
+      <button onclick="birlesikPdfRaporu()" style="padding:8px 13px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Genel Özet</button>
     </div>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:6px 10px;box-shadow:var(--sh);">
       <span style="font-size:14px;color:var(--k2);padding:0 2px;">🔍</span>
@@ -2839,6 +2840,94 @@ async function giderPdfRaporu(){
     +'<tbody>'+rows+'</tbody>'
     +'<tfoot><tr><td></td><td>TOPLAM</td><td class="r">'+_giderFmt(topAdet)+'</td><td class="r">'+topIslem+'</td><td class="r">₺'+_giderFmt(topTutar)+'</td></tr></tfoot></table>'
     +'<div class="ft">Cactus Coffee &middot; '+subeAd+' &middot; cactuscafes.com</div></body></html>';
+  var w=window.open('','_blank');
+  if(!w){ try{toast('Pop-up engellendi — tarayıcıdan izin ver');}catch(e){} return; }
+  w.document.open(); w.document.write(html); w.document.close();
+}
+// ── GENEL ÖZET PDF — Ciro + Satış + Gider bir arada (seçilen tarih aralığı) ──
+async function birlesikPdfRaporu(){
+  var bas=(document.getElementById('gider-pdf-bas')||{}).value;
+  var bit=(document.getElementById('gider-pdf-bit')||{}).value;
+  if(!bas){var dd=new Date();bas=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-01';}
+  if(!bit) bit=_harBugun();
+  if(bas>bit){var tmp=bas;bas=bit;bit=tmp;}
+  var gunler=[],d0=new Date(bas+'T12:00:00'),d1=new Date(bit+'T12:00:00');
+  while(d0<=d1){ gunler.push(d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0')); d0.setDate(d0.getDate()+1); }
+  if(gunler.length>186){ try{toast('Aralık çok geniş (en fazla ~6 ay)');}catch(e){} return; }
+  try{toast('⏳ Genel özet hazırlanıyor…');}catch(e){}
+  // 1) İŞLEMLER — ciro + satış (rapor ekranıyla aynı kaynak: /islem/listele)
+  var islemler=[];
+  try{ var r=await fetch(HAR_API+'/islem/listele?sube='+SUBE+'&baslangic='+bas+'&bitis='+bit); if(r.ok) islemler=await r.json(); }catch(e){}
+  islemler=(typeof _islemDeduplica==='function')?_islemDeduplica(islemler||[]):(islemler||[]);
+  function _nk(s){ if(s.nakit_tutar||s.kart_tutar) return s.nakit_tutar||0; return (s.odeme_tipi||'').toLowerCase()==='nakit'?(s.toplam||0):0; }
+  function _kt(s){ if(s.nakit_tutar||s.kart_tutar) return s.kart_tutar||0; var t=(s.odeme_tipi||'').toLowerCase(); return (t.indexOf('kart')>=0||t.indexOf('kredi')>=0)?(s.toplam||0):0; }
+  var ciro=islemler.reduce(function(a,s){return a+(s.toplam||0);},0);
+  var ic=islemler.reduce(function(a,s){return a+(s.icecek_toplam||0);},0);
+  var yi=islemler.reduce(function(a,s){return a+(s.yiyecek_toplam||0);},0);
+  var nakit=islemler.reduce(function(a,s){return a+_nk(s);},0);
+  var kart=islemler.reduce(function(a,s){return a+_kt(s);},0);
+  var islemAdet=islemler.length;
+  var sayac={};
+  islemler.forEach(function(s){
+    var det=s.urun_detay||s.urunDetay;
+    if(Array.isArray(det)){ det.forEach(function(u){ if(u&&u.ad){ sayac[u.ad]=(sayac[u.ad]||0)+(Number(u.adet)||0); } }); }
+    else if(s.urunler){ String(s.urunler).split(',').forEach(function(p){ p=p.trim(); if(!p)return; var m=p.match(/^(.*?)\s*[x×]\s*(\d+)$/i); if(m){ sayac[m[1].trim()]=(sayac[m[1].trim()]||0)+parseInt(m[2],10); } else { sayac[p]=(sayac[p]||0)+1; } }); }
+  });
+  var enCok=Object.keys(sayac).map(function(k){return {ad:k,adet:sayac[k]};}).filter(function(u){return u.ad&&u.ad!=='Satış';}).sort(function(a,b){return b.adet-a.adet;});
+  var satisAdet=enCok.reduce(function(s,x){return s+x.adet;},0);
+  // 2) GİDERLER — açıklama (ürün) bazında
+  var prefix='harcama_'+SUBE+'_', gkayit=[];
+  await Promise.all(gunler.map(function(t){
+    return fetch(HAR_API+'/menu/cek?sube='+prefix+t).then(function(r){return r.ok?r.json():null;}).then(function(o){ if(o&&Array.isArray(o.kayitlar)) o.kayitlar.forEach(function(k){gkayit.push(k);}); }).catch(function(){});
+  }));
+  var ggrup={};
+  gkayit.forEach(function(k){ var ad=(String(k.aciklama||'').trim())||'Diğer'; if(!ggrup[ad]) ggrup[ad]={ad:ad,adet:0,tutar:0}; ggrup[ad].adet+=Number(k.adet)||0; ggrup[ad].tutar+=Number(k.tutar)||0; });
+  var gsatir=Object.keys(ggrup).map(function(k){return ggrup[k];}).sort(function(a,b){return b.tutar-a.tutar;});
+  var giderTop=gsatir.reduce(function(s,x){return s+x.tutar;},0);
+  var net=ciro-giderTop;
+  // 3) PDF
+  var subeAd=(SUBE==='fsm')?'FSM':'Podyumpark';
+  function trT(s){return new Date(s+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'});}
+  var now=new Date().toLocaleString('tr-TR');
+  var satisRows=enCok.slice(0,20).map(function(x,i){return '<tr><td class="n">'+(i+1)+'</td><td>'+_giderEsc(x.ad)+'</td><td class="r b2">'+_giderFmt(x.adet)+'</td></tr>';}).join('');
+  if(!enCok.length) satisRows='<tr><td colspan="3" style="text-align:center;padding:24px;color:#999;">Bu dönemde satış kaydı yok.</td></tr>';
+  var giderRows=gsatir.map(function(x,i){return '<tr><td class="n">'+(i+1)+'</td><td>'+_giderEsc(x.ad)+'</td><td class="r">'+_giderFmt(x.adet)+'</td><td class="r b">₺'+_giderFmt(x.tutar)+'</td></tr>';}).join('');
+  if(!gsatir.length) giderRows='<tr><td colspan="4" style="text-align:center;padding:24px;color:#999;">Bu dönemde gider kaydı yok.</td></tr>';
+  var netRenk=net>=0?'#1a7a45':'#c0392b';
+  var html='<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Cactus Genel Özet</title><style>'
+    +'*{box-sizing:border-box}body{font-family:-apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a;margin:0;padding:26px 30px}'
+    +'.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1a3010;padding-bottom:13px;margin-bottom:16px}'
+    +'.logo{font-family:Georgia,serif;font-size:25px;letter-spacing:7px;color:#1a3010;text-transform:uppercase}'
+    +'.sub{font-size:10px;letter-spacing:2px;color:#b8965a;text-transform:uppercase;margin-top:4px}'
+    +'.meta{text-align:right;font-size:12px;color:#666;line-height:1.7}'
+    +'.cards{display:flex;gap:10px;margin-bottom:12px}.card{flex:1;background:#f5f3ec;border-radius:8px;padding:11px 12px;text-align:center}'
+    +'.card .lbl{font-size:9px;letter-spacing:1.2px;color:#888;text-transform:uppercase}.card .val{font-size:20px;font-weight:700;color:#1a3010;margin-top:3px}'
+    +'.mini{display:flex;gap:10px;margin-bottom:22px;font-size:11px}.mini div{flex:1;background:#fafaf7;border:1px solid #eee;border-radius:7px;padding:8px 10px;text-align:center}'
+    +'.mini .l{color:#999;text-transform:uppercase;letter-spacing:1px;font-size:9px}.mini .v{font-weight:700;color:#333;margin-top:2px;font-size:13px}'
+    +'h3{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#1a3010;border-bottom:1.5px solid #e6e1d6;padding-bottom:6px;margin:0 0 8px}'
+    +'.two{display:flex;gap:26px;align-items:flex-start}.two>div{flex:1}'
+    +'table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#999;border-bottom:1.5px solid #ddd;padding:6px 8px}'
+    +'td{padding:6px 8px;border-bottom:1px solid #f0ede8}td.r,th.r{text-align:right}td.n{color:#bbb;width:26px}td.b{font-weight:700;color:#c0392b}td.b2{font-weight:700;color:#1a3010}'
+    +'tfoot td{border-top:2px solid #1a3010;font-weight:700;font-size:13px;padding-top:8px}.ft{margin-top:20px;font-size:10px;color:#aaa;text-align:center}'
+    +'@media print{body{padding:0}@page{margin:14mm}.two{break-inside:avoid}}</style></head><body onload="setTimeout(function(){window.print();},150)">'
+    +'<div class="hd"><div><div class="logo">Cactus</div><div class="sub">Genel Özet &middot; Ciro &middot; Satış &middot; Gider</div></div>'
+    +'<div class="meta">'+subeAd+' Şubesi<br>'+trT(bas)+' — '+trT(bit)+'<br>Oluşturma: '+now+'</div></div>'
+    +'<div class="cards">'
+    +'<div class="card"><div class="lbl">Toplam Ciro</div><div class="val">₺'+_giderFmt(ciro)+'</div></div>'
+    +'<div class="card"><div class="lbl">Toplam Gider</div><div class="val" style="color:#c0392b">₺'+_giderFmt(giderTop)+'</div></div>'
+    +'<div class="card"><div class="lbl">Net</div><div class="val" style="color:'+netRenk+'">₺'+_giderFmt(net)+'</div></div>'
+    +'<div class="card"><div class="lbl">İşlem</div><div class="val">'+islemAdet+'</div></div></div>'
+    +'<div class="mini">'
+    +'<div><div class="l">Nakit</div><div class="v">₺'+_giderFmt(nakit)+'</div></div>'
+    +'<div><div class="l">Kredi Kartı</div><div class="v">₺'+_giderFmt(kart)+'</div></div>'
+    +'<div><div class="l">İçecek</div><div class="v">₺'+_giderFmt(ic)+'</div></div>'
+    +'<div><div class="l">Yiyecek</div><div class="v">₺'+_giderFmt(yi)+'</div></div>'
+    +'<div><div class="l">Satılan Adet</div><div class="v">'+_giderFmt(satisAdet)+'</div></div></div>'
+    +'<div class="two">'
+    +'<div><h3>En Çok Satılan Ürünler</h3><table><thead><tr><th class="n">#</th><th>Ürün</th><th class="r">Adet</th></tr></thead><tbody>'+satisRows+'</tbody></table></div>'
+    +'<div><h3>Giderler (Ürün Bazında)</h3><table><thead><tr><th class="n">#</th><th>Açıklama</th><th class="r">Adet</th><th class="r">Tutar</th></tr></thead><tbody>'+giderRows+'</tbody>'
+    +'<tfoot><tr><td></td><td>TOPLAM</td><td class="r"></td><td class="r">₺'+_giderFmt(giderTop)+'</td></tr></tfoot></table></div></div>'
+    +'<div class="ft">Cactus Coffee &middot; '+subeAd+' &middot; cactuscafes.com &middot; Ciro/satış verisi işlem kayıtlarından (POS) alınmıştır.</div></body></html>';
   var w=window.open('','_blank');
   if(!w){ try{toast('Pop-up engellendi — tarayıcıdan izin ver');}catch(e){} return; }
   w.document.open(); w.document.write(html); w.document.close();

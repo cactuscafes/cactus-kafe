@@ -1041,11 +1041,12 @@ function renderMenu(sube) {
   } else if (spotlightEl) { spotlightEl.style.display='none'; }
   catListEl.innerHTML = katData.map(function(kat) {
     var urunler=(kat.urunler||[]).filter(function(u){ return !u.gizli; });
+    var katEmoji=(String(kat.label||'').match(/^([\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}️‍]+)/u)||['',''])[1].trim();
     if (!urunler.length) return '';
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||''});
-      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||'')+'</div>';
+      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(katEmoji||u.emoji||'')+'</div>';
       // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
       var rozet='';
       if(u.tukendi) rozet='<span class="product-badge badge-tukendi">⛔ Tükendi</span>';

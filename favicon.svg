@@ -1,18 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!-- Arkaplan -->
-  <rect width="32" height="32" rx="7" fill="#0e1f08"/>
-  <!-- Kaktüs gövdesi -->
-  <rect x="13" y="7" width="6" height="18" rx="3" fill="#c8a86a"/>
-  <!-- Sol kol yatay -->
-  <rect x="6" y="13" width="9" height="4" rx="2" fill="#c8a86a"/>
-  <!-- Sol kol dikey -->
-  <rect x="6" y="9" width="4" height="8" rx="2" fill="#c8a86a"/>
-  <!-- Sağ kol yatay -->
-  <rect x="17" y="11" width="9" height="4" rx="2" fill="#c8a86a"/>
-  <!-- Sağ kol dikey -->
-  <rect x="22" y="7" width="4" height="8" rx="2" fill="#c8a86a"/>
-  <!-- Saksı kenar -->
-  <rect x="11" y="23" width="10" height="2.5" rx="1.2" fill="#c8a86a"/>
-  <!-- Saksı gövde -->
-  <rect x="12.5" y="25" width="7" height="4" rx="1.5" fill="#c8a86a"/>
+  <rect width="32" height="32" rx="7" fill="#14271d"/>
+  <!-- Çizgisel kaktüs (marka altını) -->
+  <g fill="none" stroke="#c8a86a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Gövde -->
+    <path d="M13.4,27 L13.4,12 Q13.4,8.2 16,8.2 Q18.6,8.2 18.6,12 L18.6,27"/>
+    <!-- Sol kol -->
+    <path d="M13.4,18 L11,18 Q8.6,18 8.6,15.4 L8.6,13.2"/>
+    <!-- Sağ kol -->
+    <path d="M18.6,20 L21,20 Q23.4,20 23.4,17.4 L23.4,15.2"/>
+    <!-- Saksı -->
+    <path d="M12,26.6 L20,26.6 L19,30.4 L13,30.4 Z" stroke-width="1.8"/>
+  </g>
 </svg>

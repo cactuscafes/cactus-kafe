@@ -1046,7 +1046,7 @@ function renderMenu(sube) {
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
       POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||''});
-      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(katEmoji||u.emoji||'')+'</div>';
+      var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||katEmoji||'')+'</div>';
       // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
       var rozet='';
       if(u.tukendi) rozet='<span class="product-badge badge-tukendi">⛔ Tükendi</span>';

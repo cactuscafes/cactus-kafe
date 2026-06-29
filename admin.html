@@ -633,6 +633,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div class="kat-tabs" id="katTabs"></div>
         <div class="urun-grid" id="urunGrid"></div>
       </div>
+<!-- Emoji seçici (fotoğrafsız ürünler için) -->
+<div id="emojiPicker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)emojiPickerKapat()">
+  <div style="background:#fff;border-radius:12px;max-width:340px;width:100%;max-height:74vh;overflow:auto;padding:18px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:14px;">Emoji seç</b><button type="button" onclick="emojiPickerKapat()" style="border:none;background:none;font-size:22px;cursor:pointer;line-height:1;color:#999;">×</button></div>
+    <div style="font-size:11px;color:#999;margin-bottom:12px;">Fotoğrafı olmayan üründe menüde bu ikon görünür.</div>
+    <div id="emojiPickerGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
+    <button type="button" onclick="emojiPickerSec('')" style="margin-top:14px;width:100%;padding:9px;border:1px solid #e0e0e0;border-radius:8px;background:#faf8f2;cursor:pointer;font-family:inherit;font-size:12px;">✕ Temizle — kategori emojisini kullan</button>
+  </div>
+</div>
 
       <!-- KATEGORİ -->
       <div class="panel" id="panel-kategori">
@@ -1320,6 +1329,7 @@ function renderKatTabs(){
 }
 function renderUrunler(){
   const ul=MENU[aktifKat]||[];
+  var katEmoji=(function(){var c=(typeof KAT!=='undefined'?KAT:[]).find(function(x){return x.id===aktifKat;});if(!c)return'';var m=String(c.label||'').match(/^([\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}️‍]+)/u);return m?m[1].trim():'';})();
   document.getElementById('urunGrid').innerHTML=!ul.length?'<div style="color:var(--mist);font-size:13px;padding:20px 0;">Bu kategoride ürün yok.</div>':
   ul.map(function(u,i){
     var isOncu=(ONCU||[]).some(function(x){return (x.id&&u.id&&x.id===u.id)||(u.ad&&x.ad===u.ad);});
@@ -1337,6 +1347,13 @@ function renderUrunler(){
         <div><label class="lbl">Ad</label><input class="yi" value="${u.ad}" oninput="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
         <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" oninput="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value)||0)"></div>
         <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" oninput="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
+        <div><label class="lbl">Emoji <span style="color:var(--mist);font-weight:400;text-transform:none;letter-spacing:0;">${u.foto?'(fotoğraf var — gizli)':'(fotoğrafsız ürünlerde menüde görünür)'}</span></label>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input class="yi" style="width:54px;text-align:center;font-size:18px;flex:none;" value="${u.emoji||''}" maxlength="4" placeholder="${katEmoji}" oninput="guncelle('${aktifKat}',${i},'emoji',this.value)">
+            <button type="button" class="foto-btn" onclick="emojiPickerAc('${aktifKat}',${i})">😀 Seç</button>
+            ${u.emoji?`<button type="button" class="foto-btn" onclick="emojiTemizle('${aktifKat}',${i})">✕ Kategori</button>`:`<span style="font-size:11px;color:var(--mist);">→ ${katEmoji||'kategori'} kullanılıyor</span>`}
+          </div>
+        </div>
       </div>
       <button class="uk-oncu${isOncu?' on':''}" onclick="urunOncuToggle('${aktifKat}',${i})">${isOncu?'⭐ Öne Çıkanda':'☆ Öne Çıkar'}</button>
       <div class="uk-btns">
@@ -1366,6 +1383,18 @@ function urunOncuToggle(k,i){
   if(typeof renderOncuGrid==='function') renderOncuGrid();
 }
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
+/* Fotoğrafsız ürünler için emoji seçici */
+var SECILEBILIR_EMOJI=['☕','🍵','🧊','🥛','🥤','🍹','🍰','🧁','🍪','🍫','🍩','🍮','🍦','🍯','🍋','🍓','🍉','🍊','🥪','🧀','🥩','🌭','🧇','🥗','🌿','🍃','🌵','🌾','💧','🫧','⭐','✨','🌸','🔔','🥐','🍞'];
+var _emojiHedef=null;
+function emojiPickerAc(k,i){
+  _emojiHedef={k:k,i:i};
+  var g=document.getElementById('emojiPickerGrid');
+  if(g) g.innerHTML=SECILEBILIR_EMOJI.map(function(e){return '<button type="button" onclick="emojiPickerSec(\''+e+'\')" style="font-size:24px;padding:8px 0;border:1px solid #eee;border-radius:8px;background:#fff;cursor:pointer;line-height:1;">'+e+'</button>';}).join('');
+  var m=document.getElementById('emojiPicker'); if(m) m.style.display='flex';
+}
+function emojiPickerKapat(){ var m=document.getElementById('emojiPicker'); if(m) m.style.display='none'; _emojiHedef=null; }
+function emojiPickerSec(e){ if(_emojiHedef && MENU[_emojiHedef.k] && MENU[_emojiHedef.k][_emojiHedef.i]){ MENU[_emojiHedef.k][_emojiHedef.i].emoji=e; menuKaydet(); renderUrunler(); toast(e?('Emoji: '+e):'Kategori emojisi kullanılacak'); } emojiPickerKapat(); }
+function emojiTemizle(k,i){ if(MENU[k]&&MENU[k][i]){ MENU[k][i].emoji=''; menuKaydet(); renderUrunler(); toast('Kategori emojisi kullanılacak'); } }
 function urunGizle(k,i){ MENU[k][i].gizli=!MENU[k][i].gizli; menuKaydet(); renderUrunler(); toast(MENU[k][i].gizli?'🙈 Gizlendi':'👁 Gösterildi'); }
 function urunTukendi(k,i){
   MENU[k][i].tukendi=!MENU[k][i].tukendi; menuKaydet(); renderUrunler();

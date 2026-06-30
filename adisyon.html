@@ -1075,6 +1075,10 @@ if('serviceWorker' in navigator){
       <button class="odeme-opt" id="opt-bol" onclick="odemeSecim('bolunmus')"><span class="oi">✂️</span>Böl</button>
       <button class="odeme-opt" id="opt-kisi" onclick="odemeSecim('kisi')"><span class="oi">👥</span>Kişi</button>
     </div>
+    <div class="paraustu-wrap" id="paraustu-wrap" style="display:none;margin-bottom:14px;">
+      <div class="bolme-row"><label>💵 Verilen</label><input type="number" id="paraustu-verilen" min="0" inputmode="decimal" oninput="paraUstuHesapla()" placeholder="Müşterinin verdiği"></div>
+      <div class="bolme-kalan" id="paraustu-sonuc"></div>
+    </div>
     <div class="bolme-wrap" id="bolme-wrap" style="display:none;">
       <div class="bolme-row">
         <label>💵 Nakit</label>
@@ -2533,9 +2537,20 @@ function odemeSecim(tip){
     document.getElementById('bolme-kalan').textContent='Kalan: ₺'+_bolmeTop;
     setTimeout(()=>document.getElementById('bolme-nakit').focus(),50);
   } else { wrap.style.display='none'; }
+  var pwrap=document.getElementById('paraustu-wrap');
+  if(pwrap){ if(tip==='nakit'){ pwrap.style.display='block'; var _pv=document.getElementById('paraustu-verilen'); if(_pv)_pv.value=''; var _ps=document.getElementById('paraustu-sonuc'); if(_ps)_ps.textContent=''; } else { pwrap.style.display='none'; } }
   const kwrap=document.getElementById('kisi-wrap');
   if(tip==='kisi'){ kwrap.style.display='block'; kisiGuncelle(); }
   else { kwrap.style.display='none'; }
+}
+function paraUstuHesapla(){
+  var pv=document.getElementById('paraustu-verilen'); if(!pv) return;
+  var v=parseFloat(pv.value)||0, top=_bolmeTop||0;
+  var el=document.getElementById('paraustu-sonuc'); if(!el) return;
+  if(!v){ el.textContent=''; return; }
+  var u=Math.round((v-top)*100)/100;
+  if(u<0){ el.style.color='#e67e22'; el.textContent='Eksik: ₺'+Math.abs(u); }
+  else { el.style.color='#1f5c38'; el.textContent='Para üstü: ₺'+u; }
 }
 function kisiSay(d){_kisiAdet=Math.max(2,_kisiAdet+d);kisiGuncelle();}
 function kisiTahsilat(t){_kisiTahsilat=t;document.getElementById('kt-nakit').classList.toggle('on',t==='nakit');document.getElementById('kt-kart').classList.toggle('on',t==='kart');}

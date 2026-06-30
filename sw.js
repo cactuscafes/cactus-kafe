@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v16'; // v16: ana sayfa logo + hero gerçek mekan fotosu + Bursa meta/title + "şu an açık" hero şeridi
+const VERSION = 'cactus-v17'; // v17: hero eski görsele döndü + logo şeffaf arka plan (logo-trans.png)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

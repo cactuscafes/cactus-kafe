@@ -732,56 +732,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <div class="panel" id="panel-rapor">
         <div class="pttl">📊 Raporlar</div>
         <div class="psub">Şubelere göre satış verileri. &nbsp;·&nbsp; <a class="canli-link" href="rapor.html" target="_blank" rel="noopener">↗ Detaylı rapor sayfası</a></div>
-
-        <!-- Tarih Filtresi (ortaklaşılan) -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
-          <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:148px;"></div>
-          <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:148px;"></div>
-          <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">📊 Getir</button>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
-          <button onclick="rapHizliFiltre('buay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Bu Ay</button>
-          <button onclick="rapHizliFiltre('gecenay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Geçen Ay</button>
-          <button onclick="rapHizliFiltre('7gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 7 Gün</button>
-          <button onclick="rapHizliFiltre('30gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 30 Gün</button>
-        </div>
-
-        <!-- Şube Sekmeleri -->
-        <div class="rap-tabs">
-          <button id="rtab-p" class="rap-tab on-p" onclick="rapSekme('p')">🟢 Podyumpark</button>
-          <button id="rtab-f" class="rap-tab" onclick="rapSekme('f')">🟠 FSM</button>
-        </div>
-
-        <!-- Podyumpark Sekmesi -->
-        <div class="rap-sek on" id="rsek-p">
-          <div class="rap-grid" id="rOzet-p">
-            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
-          </div>
-          <div class="rap-nakit-grid" id="rNakit-p"></div>
-          <div class="rap-sek-ttl" id="rUrunTtl-p" style="display:none;">En Çok Satanlar</div>
-          <div class="rap-sek-tablo" id="rUrun-p" style="margin-bottom:20px;"></div>
-          <div class="rap-sek-ttl">Günlük Özet</div>
-          <div class="rap-sek-tablo" id="rGunluk-p" style="margin-bottom:20px;"></div>
-          <div class="rap-sek-ttl">İşlem Detayları</div>
-          <div class="rap-sek-tablo" id="rTablo-p"></div>
-        </div>
-
-        <!-- FSM Sekmesi -->
-        <div class="rap-sek" id="rsek-f">
-          <div class="rap-grid" id="rOzet-f">
-            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
-          </div>
-          <div class="rap-nakit-grid" id="rNakit-f"></div>
-          <div class="rap-sek-ttl" id="rUrunTtl-f" style="display:none;">En Çok Satanlar</div>
-          <div class="rap-sek-tablo" id="rUrun-f" style="margin-bottom:20px;"></div>
-          <div class="rap-sek-ttl">Günlük Özet</div>
-          <div class="rap-sek-tablo" id="rGunluk-f" style="margin-bottom:20px;"></div>
-          <div class="rap-sek-ttl">İşlem Detayları</div>
-          <div class="rap-sek-tablo" id="rTablo-f"></div>
-        </div>
-
         <!-- E-POSTA RAPORU -->
-        <div style="margin-top:32px;border-top:1.5px solid var(--stone);padding-top:24px;">
+        <div style="margin-bottom:28px;border-bottom:1.5px solid var(--stone);padding-bottom:24px;">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px;">📧 Otomatik E-posta Raporları</div>
           <div style="display:flex;align-items:center;gap:10px;background:#f0faf4;border:1px solid #b7dfc5;padding:10px 14px;border-radius:6px;margin-bottom:12px;">
             <span style="font-size:18px;">✅</span>
@@ -833,10 +785,62 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             3. Gelen API key'i ve telefon numaranı (905XXXXXXXXX) terminale gir:<br>
             <code style="background:#dcfce7;padding:2px 6px;border-radius:3px;display:block;margin-top:4px;">npx wrangler secret put WA_PHONE<br>npx wrangler secret put WA_APIKEY</code>
           </div>
+          <div style="max-width:300px;margin-bottom:10px;">
+            <label class="lbl">Alıcı WhatsApp numarası (boş = kayıtlı numaran)</label>
+            <input id="waAlici" class="yi" type="tel" inputmode="numeric" placeholder="905XXXXXXXXX" style="width:100%;">
+          </div>
           <button onclick="waTest()" id="waTestBtn" style="padding:9px 18px;background:#25d366;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">💬 WhatsApp Test Gönder</button>
-          <button onclick="waTestFsm()" id="waTestFsmBtn" style="padding:9px 18px;background:#c67000;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;margin-left:8px;">🟠 FSM Raporu Test (bana)</button>
+          <button onclick="waTestFsm()" id="waTestFsmBtn" style="padding:9px 18px;background:#c67000;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;margin-left:8px;">🟠 FSM Raporu Gönder</button>
           <div id="waSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
         </div>
+
+        <!-- Tarih Filtresi (ortaklaşılan) -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
+          <div><label class="lbl">Başlangıç</label><input type="date" id="rBas" class="yi" style="width:148px;"></div>
+          <div><label class="lbl">Bitiş</label><input type="date" id="rBit" class="yi" style="width:148px;"></div>
+          <button onclick="rapGoster()" style="padding:9px 20px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">📊 Getir</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <button onclick="rapHizliFiltre('buay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Bu Ay</button>
+          <button onclick="rapHizliFiltre('gecenay')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Geçen Ay</button>
+          <button onclick="rapHizliFiltre('7gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 7 Gün</button>
+          <button onclick="rapHizliFiltre('30gun')" style="padding:5px 12px;background:#fff;border:1.5px solid var(--stone);font-size:11px;cursor:pointer;font-family:inherit;">Son 30 Gün</button>
+        </div>
+
+        <!-- Şube Sekmeleri -->
+        <div class="rap-tabs">
+          <button id="rtab-p" class="rap-tab on-p" onclick="rapSekme('p')">🟢 Podyumpark</button>
+          <button id="rtab-f" class="rap-tab" onclick="rapSekme('f')">🟠 FSM</button>
+        </div>
+
+        <!-- Podyumpark Sekmesi -->
+        <div class="rap-sek on" id="rsek-p">
+          <div class="rap-grid" id="rOzet-p">
+            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
+          </div>
+          <div class="rap-nakit-grid" id="rNakit-p"></div>
+          <div class="rap-sek-ttl" id="rUrunTtl-p" style="display:none;">En Çok Satanlar</div>
+          <div class="rap-sek-tablo" id="rUrun-p" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">Günlük Özet</div>
+          <div class="rap-sek-tablo" id="rGunluk-p" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">İşlem Detayları</div>
+          <div class="rap-sek-tablo" id="rTablo-p"></div>
+        </div>
+
+        <!-- FSM Sekmesi -->
+        <div class="rap-sek" id="rsek-f">
+          <div class="rap-grid" id="rOzet-f">
+            <div style="color:var(--mist);font-size:13px;padding:16px 0;">📅 Tarih seçip Getir'e basın.</div>
+          </div>
+          <div class="rap-nakit-grid" id="rNakit-f"></div>
+          <div class="rap-sek-ttl" id="rUrunTtl-f" style="display:none;">En Çok Satanlar</div>
+          <div class="rap-sek-tablo" id="rUrun-f" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">Günlük Özet</div>
+          <div class="rap-sek-tablo" id="rGunluk-f" style="margin-bottom:20px;"></div>
+          <div class="rap-sek-ttl">İşlem Detayları</div>
+          <div class="rap-sek-tablo" id="rTablo-f"></div>
+        </div>
+
       </div>
 
       <!-- YOĞUN SAATLER -->
@@ -3149,6 +3153,7 @@ async function gunlukEmailGonder(){
 }
 
 /* ══════════ WHATSAPP TEST ══════════ */
+function _waNorm(v){ v=(v||'').replace(/\D/g,''); if(!v) return ''; if(v.slice(0,2)==='90') return v; if(v[0]==='0') return '90'+v.slice(1); if(v.length===10) return '90'+v; return v; }
 async function waTest(){
   var sonuc = document.getElementById('waSonuc');
   var btn   = document.getElementById('waTestBtn');
@@ -3156,7 +3161,7 @@ async function waTest(){
   sonuc.textContent = '';
   try {
     var r = await fetch(RAPOR_API+'/rapor/wa-test', {
-      method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({phone:_waNorm((document.getElementById('waAlici')||{}).value)})
     });
     var d = await r.json();
     if(d.ok){
@@ -3179,7 +3184,7 @@ async function waTestFsm(){
   sonuc.textContent = '';
   try {
     var r = await fetch(RAPOR_API+'/rapor/wa-test', {
-      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({sube:'fsm'})
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({sube:'fsm', phone:_waNorm((document.getElementById('waAlici')||{}).value)})
     });
     var d = await r.json();
     if(d.ok){

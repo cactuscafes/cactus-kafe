@@ -3485,6 +3485,7 @@ function kartFilterSec(deger, btn){
   kartListeRender();
 }
 
+function _kartTarihSaat(t){ if(!t) return '-'; var d=new Date(t); if(isNaN(d.getTime())) return '-'; return d.toLocaleString('tr-TR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'}); }
 function kartListeRender(){
   var listEl = document.getElementById('kartListesi');
   if(!listEl) return;
@@ -3517,7 +3518,7 @@ function kartListeRender(){
     listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'
       + data.map(function(m){
           var bedava = m.pul >= 7;
-          var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+          var sonIslem = m.son_islem ? _kartTarihSaat(m.son_islem) : '-';
           var pulBar = '';
           for(var i=0;i<7;i++){
             pulBar += '<span style="display:inline-block;width:11px;height:11px;border-radius:50%;margin:2px;background:'+(i<(m.pul%7)?'var(--gold)':'#e8e4de')+';"></span>';
@@ -3535,7 +3536,7 @@ function kartListeRender(){
               + '</div>'
             + '</div>'
             + '<div style="margin-bottom:8px;">'+ pulBar +'</div>'
-            + '<div style="font-size:11px;color:var(--mist);margin-bottom:12px;">Toplam '+(m.toplam_kazanilan||0)+' pul · Son: '+sonIslem+'</div>'
+            + '<div style="font-size:11px;color:var(--mist);margin-bottom:12px;line-height:1.7;">Toplam '+(m.toplam_kazanilan||0)+' pul<br>Kayıt: '+_kartTarihSaat(m.kayit_tarih)+'<br>Son işlem: '+sonIslem+'</div>'
             + '<div style="display:flex;gap:8px;">'
               + (bedava
                 ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="flex:1;padding:10px 8px;background:var(--gold);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border-radius:4px;">✓ Bedavayı Kullandı</button>'
@@ -3552,11 +3553,11 @@ function kartListeRender(){
   // ── Masaüstü: tablo görünümü ──
   listEl.innerHTML = '<table><thead><tr>'
     + '<th>Telefon</th><th>Ad</th><th style="text-align:center">Pul</th>'
-    + '<th style="text-align:center">Toplam Kazanılan</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'
+    + '<th style="text-align:center">Toplam Kazanılan</th><th>Kayıt</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'
     + '</tr></thead><tbody>'
     + data.map(function(m){
         var bedava = m.pul >= 7;
-        var sonIslem = m.son_islem ? new Date(m.son_islem).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+        var sonIslem = m.son_islem ? _kartTarihSaat(m.son_islem) : '-';
         var pulBar = '';
         for(var i=0;i<7;i++){
           pulBar += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:1px;background:'+(i<(m.pul%7)?'var(--gold)':'#e0dbd3')+';"></span>';
@@ -3570,7 +3571,8 @@ function kartListeRender(){
             + '<div>' + pulBar + '</div>'
           + '</td>'
           + '<td style="text-align:center;color:var(--mist);">' + (m.toplam_kazanilan||0) + '</td>'
-          + '<td style="color:var(--mist);font-size:12px;">' + sonIslem + '</td>'
+          + '<td style="color:var(--mist);font-size:11px;">' + _kartTarihSaat(m.kayit_tarih) + '</td>'
+          + '<td style="color:var(--mist);font-size:11px;">' + sonIslem + '</td>'
           + '<td style="color:var(--mist);font-size:11px;">' + (m.sube||'—') + '</td>'
           + '<td style="white-space:nowrap;text-align:center;">'
             + (bedava

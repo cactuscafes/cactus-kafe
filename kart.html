@@ -67,8 +67,9 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .hero-sub{font-size:13px;color:rgba(245,234,216,.55);line-height:1.8;margin-bottom:24px;font-weight:300;}
 
 /* Pul önizleme satırı */
-.hero-pullar{display:flex;gap:10px;justify-content:center;margin-bottom:28px;flex-wrap:wrap;}
-.hero-pul{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .2s;}
+.hero-pullar{display:flex;gap:6px;justify-content:center;margin-bottom:28px;flex-wrap:nowrap;}
+.hero-pul{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .2s;flex:none;}
+@media(max-width:380px){.hero-pullar{gap:4px;}.hero-pul{width:30px;height:30px;font-size:13px;}}
 .hero-pul.d{background:linear-gradient(135deg,var(--amber),var(--amber3));box-shadow:0 4px 16px rgba(200,168,106,.3);}
 .hero-pul.b{background:rgba(255,255,255,.05);border:1.5px solid rgba(200,168,106,.2);}
 .hero-pul.gift{background:linear-gradient(135deg,#d4b87a,var(--amber));box-shadow:0 4px 20px rgba(200,168,106,.45);font-size:20px;}
@@ -213,7 +214,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         <div class="hero-pul d">⭐</div>
         <div class="hero-pul d">⭐</div>
         <div class="hero-pul d">⭐</div>
-        <div class="hero-pul gift">🎁</div>
+        <div class="hero-pul gift"><svg viewBox="0 0 48 48" fill="none" stroke="#1a3010" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;"><path d="M18,6 Q21,10 18,14 M26,6 Q29,10 26,14" stroke-width="2.2"/><path d="M10,18 L38,18 L35,38 Q35,42 31,42 L17,42 Q13,42 13,38 Z"/><path d="M38,22 Q45,23 45,30 Q45,37 37,37"/></svg></div>
       </div>
       <!-- Form -->
       <div class="giris-kart">

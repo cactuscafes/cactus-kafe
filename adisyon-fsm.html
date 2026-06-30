@@ -693,16 +693,6 @@ if('serviceWorker' in navigator){
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">
   <!-- AÇILIŞ KASASI BANNER — sabah girilmediyse otomatik görünür -->
-  <div class="acilis-bar" id="acilisBar" style="display:none;">
-    <div class="acilis-bar-ic">🌅</div>
-    <div class="acilis-bar-lbl">
-      <div class="acilis-bar-ttl">Sabah Açılış Kasası</div>
-      <div class="acilis-bar-sub">Kasadaki bozuk para + açılış nakit (Z raporu için)</div>
-    </div>
-    <input type="number" class="acilis-bar-input" id="acilisBarInput" placeholder="₺ tutar" inputmode="decimal" min="0" step="any" onkeydown="if(event.key==='Enter')acilisHizliKaydet()">
-    <button class="acilis-bar-btn" onclick="acilisHizliKaydet()">Kasayı Aç</button>
-    <button class="acilis-bar-x" onclick="acilisBarKapat()" title="Şimdilik kapat">×</button>
-  </div>
   <div class="kas-wrap">
     <div class="masa-pnl" id="masa-pnl">
       <div class="masa-pnl-hdr">
@@ -783,7 +773,6 @@ if('serviceWorker' in navigator){
     <div class="gun-ciro-wrap">
       <div class="gun-ciro-hdr">
         <div class="gun-ciro-ttl"><span class="canli-pulse"></span>Günün Cirosu</div>
-        <button class="gun-zrapor-btn" onclick="zRaporHizli()" title="Kasa Mutabakatı + Z Raporu">🔐 Z Raporu</button>
         <div class="gun-ciro-tarih" id="gun-tarih-lbl"></div>
       </div>
       <div class="gun-krt-satir">
@@ -810,45 +799,6 @@ if('serviceWorker' in navigator){
       <!-- Açık masalar listesi -->
       <div class="gun-acik-baslik">Açık Masalar</div>
       <div class="canli-masalar" id="c-masalar"><div class="canli-bos">Şu an açık masa yok</div></div>
-    </div>
-
-    <!-- KASA MUTABAKATI / Z RAPORU -->
-    <div class="kasa-wrap">
-      <div class="kasa-hdr">
-        <div class="kasa-ttl">🔐 Kasa Mutabakatı / Z Raporu</div>
-        <div class="kasa-tar" id="kasa-tarih">—</div>
-      </div>
-      <div class="kasa-grid">
-        <div class="kasa-krt acilis">
-          <div class="kasa-lbl">🌅 Açılış Kasası</div>
-          <input type="number" id="kasa-acilis" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
-          <div class="kasa-sub">Gün başında kasadaki nakit</div>
-        </div>
-        <div class="kasa-krt cikis">
-          <div class="kasa-lbl">📤 Kasadan Alınan</div>
-          <input type="number" id="kasa-cikis" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
-          <div class="kasa-sub">Gece bankaya/sahibe teslim edilen</div>
-        </div>
-        <div class="kasa-krt beklenen">
-          <div class="kasa-lbl">📊 Beklenen Nakit</div>
-          <div class="kasa-val" id="kasa-beklenen">₺0</div>
-          <div class="kasa-sub" id="kasa-beklenen-alt">Açılış + Nakit ciro − Gider − Çıkış</div>
-        </div>
-        <div class="kasa-krt gercek">
-          <div class="kasa-lbl">💰 Gerçek Sayım</div>
-          <input type="number" id="kasa-gercek" class="kasa-input" placeholder="0" inputmode="decimal" min="0" step="any" onchange="kasaHesapla()">
-          <div class="kasa-sub">Gün sonunda kasada bulunan</div>
-        </div>
-      </div>
-      <div class="kasa-mutabakat bekliyor" id="kasa-mutabakat">
-        <span id="kasa-mutabakat-msg">Açılış ve sayımı girin → mutabakat hesaplanır</span>
-        <span class="kasa-mutabakat-tut" id="kasa-mutabakat-tut">—</span>
-      </div>
-      <div class="kasa-btn-row">
-        <button class="kasa-btn kasa-btn-primary" onclick="kasaZRapor()">📋 Z Raporu Oluştur</button>
-        <button class="kasa-btn kasa-btn-sec" onclick="kasaKaydet()">💾 Kasayı Kaydet</button>
-      </div>
-      <div class="kasa-z-ozet" id="kasa-z-ozet"></div>
     </div>
 
     <!-- Periyot tabs -->
@@ -3312,136 +3262,6 @@ function gunCiroYukle(){
     if(typeof kasaYukle==='function') kasaYukle();
   }).catch(function(){});
   gunCiroTarihGoster();
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// AÇILIŞ KASASI HIZLI GİRİŞ BANNER (Kasiyer ekranı üstü)
-// ═══════════════════════════════════════════════════════════════════════
-function acilisBarKontrol(){
-  var skipKey='cactus_acilis_skip_'+SUBE+'_'+((typeof isGunu==='function')?isGunu(0):trTarih(0));
-  try{if(localStorage.getItem(skipKey)==='1'){document.getElementById('acilisBar').style.display='none';return;}}catch(e){}
-  fetch(KASA_API+'/menu/cek?sube='+_kasaKey()).then(function(r){return r.ok?r.json():null;}).then(function(d){
-    var b=document.getElementById('acilisBar');
-    if(!b) return;
-    if(d && Number(d.acilis)>0){b.style.display='none';} else {b.style.display='flex';}
-  }).catch(function(){});
-}
-function acilisHizliKaydet(){
-  var inp=document.getElementById('acilisBarInput');
-  var v=parseFloat(inp.value)||0;
-  if(v<=0){toast('₺ tutar gir');inp.focus();return;}
-  var body={sube:_kasaKey(),menu:{tarih:(typeof isGunu==='function')?isGunu(0):trTarih(0),sube_kod:SUBE,acilis:v,acilis_zamani:Date.now()}};
-  fetch(KASA_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.ok?r.json():null;}).then(function(d){
-    if(d&&d.ok){
-      toast('✅ Açılış kasası: ₺'+v.toLocaleString('tr-TR'));
-      document.getElementById('acilisBar').style.display='none';
-      var ac=document.getElementById('kasa-acilis');
-      if(ac){ac.value=v;if(typeof kasaHesapla==='function') kasaHesapla();}
-    } else toast('⚠️ Kayıt başarısız');
-  }).catch(function(){toast('⚠️ Bağlantı hatası');});
-}
-function acilisBarKapat(){
-  document.getElementById('acilisBar').style.display='none';
-  var skipKey='cactus_acilis_skip_'+SUBE+'_'+((typeof isGunu==='function')?isGunu(0):trTarih(0));
-  try{localStorage.setItem(skipKey,'1');}catch(e){}
-}
-setTimeout(function(){if(typeof acilisBarKontrol==='function') acilisBarKontrol();}, 1500);
-
-// ═══════════════════════════════════════════════════════════════════════
-// KASA MUTABAKATI / Z RAPORU
-// ═══════════════════════════════════════════════════════════════════════
-var KASA_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
-var _kasaGiderTop=0;
-function _kasaKey(t){
-  var tarih=t||((typeof isGunu==='function')?isGunu(0):trTarih(0));
-  return 'kasa_'+SUBE+'_'+tarih;
-}
-function _kasaTarih(){
-  var t=(typeof isGunu==='function')?isGunu(0):trTarih(0);
-  var d=new Date(t+'T12:00:00Z');
-  return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'});
-}
-function kasaHesapla(){
-  var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
-  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
-  var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
-  var nakitCiro=Number(_gunNakit)||0;
-  var beklenen=ac+nakitCiro-_kasaGiderTop-cikis;
-  document.getElementById('kasa-beklenen').textContent='₺'+Math.round(beklenen).toLocaleString('tr-TR');
-  document.getElementById('kasa-beklenen-alt').textContent='₺'+Math.round(ac).toLocaleString('tr-TR')+' + ₺'+Math.round(nakitCiro).toLocaleString('tr-TR')+' − ₺'+Math.round(_kasaGiderTop).toLocaleString('tr-TR')+' − ₺'+Math.round(cikis).toLocaleString('tr-TR');
-  var mut=document.getElementById('kasa-mutabakat');
-  var msg=document.getElementById('kasa-mutabakat-msg');
-  var tut=document.getElementById('kasa-mutabakat-tut');
-  mut.className='kasa-mutabakat';
-  if(!gercek && !ac){mut.classList.add('bekliyor');msg.textContent='Açılış ve sayımı girin → mutabakat hesaplanır';tut.textContent='—';return;}
-  if(!gercek){mut.classList.add('bekliyor');msg.textContent='Gün sonunda kasayı sayıp "Gerçek Sayım" alanına gir';tut.textContent='Bekleniyor';return;}
-  var fark=gercek-beklenen;
-  var farkAbs=Math.abs(fark);
-  if(farkAbs<1){mut.classList.add('ok');msg.textContent='✅ Mutabakat tam — kasa eksiksiz';tut.textContent='₺0';}
-  else if(fark<0){mut.classList.add('eksik');msg.textContent='⚠️ Kasada EKSİK var';tut.textContent='−₺'+Math.round(farkAbs).toLocaleString('tr-TR');}
-  else {mut.classList.add('fazla');msg.textContent='ℹ️ Kasada FAZLA var';tut.textContent='+₺'+Math.round(farkAbs).toLocaleString('tr-TR');}
-}
-function kasaGiderYukle(){
-  var tarih=(typeof isGunu==='function')?isGunu(0):trTarih(0);
-  fetch(KASA_API+'/menu/cek?sube=harcama_'+SUBE+'_'+tarih).then(function(r){return r.ok?r.json():null;}).then(function(d){
-    var top=0;
-    if(d&&Array.isArray(d.kayitlar)){d.kayitlar.forEach(function(k){top+=Number(k.tutar)||0;});}
-    _kasaGiderTop=top;
-    kasaHesapla();
-  }).catch(function(){});
-}
-function kasaYukle(){
-  document.getElementById('kasa-tarih').textContent=_kasaTarih();
-  kasaGiderYukle();
-  fetch(KASA_API+'/menu/cek?sube='+_kasaKey()).then(function(r){return r.ok?r.json():null;}).then(function(d){
-    if(!d) return;
-    var acEl=document.getElementById('kasa-acilis');
-    var ciEl=document.getElementById('kasa-cikis');
-    var geEl=document.getElementById('kasa-gercek');
-    if(d.acilis!=null && acEl) acEl.value=Number(d.acilis)||'';
-    if(d.cikis!=null && ciEl) ciEl.value=Number(d.cikis)||'';
-    if(d.gercek!=null && geEl) geEl.value=Number(d.gercek)||'';
-    kasaHesapla();
-  }).catch(function(){});
-}
-function kasaKaydet(){
-  var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
-  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
-  var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
-  var body={sube:_kasaKey(),menu:{tarih:(typeof isGunu==='function')?isGunu(0):trTarih(0),sube_kod:SUBE,acilis:ac,cikis:cikis,gercek:gercek,beklenen:ac+(_gunNakit||0)-_kasaGiderTop-cikis,nakit_ciro:_gunNakit||0,kart_ciro:_gunKart||0,toplam_ciro:_gunKapandiCiro||0,gider:_kasaGiderTop,kayit_zamani:Date.now()}};
-  fetch(KASA_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.ok?r.json():null;}).then(function(d){
-    if(d&&d.ok) toast('✅ Kasa kaydedildi'); else toast('⚠️ Kayıt başarısız');
-  }).catch(function(){toast('⚠️ Bağlantı hatası');});
-}
-function zRaporHizli(){
-  var kasa=document.querySelector('.kasa-wrap');
-  if(kasa){
-    kasa.scrollIntoView({behavior:'smooth',block:'start'});
-    setTimeout(function(){
-      var ac=document.getElementById('kasa-acilis');
-      var gercek=document.getElementById('kasa-gercek');
-      if(ac && !parseFloat(ac.value)){ac.focus();toast('🌅 Önce "Açılış Kasası"nı gir');return;}
-      if(gercek && !parseFloat(gercek.value)){gercek.focus();toast('💰 "Gerçek Sayım"ı gir, sonra Z Raporu üretilir');return;}
-      kasaZRapor();
-    },450);
-  }
-}
-function kasaZRapor(){
-  var ac=parseFloat(document.getElementById('kasa-acilis').value)||0;
-  var cikis=parseFloat((document.getElementById('kasa-cikis')||{}).value)||0;
-  var gercek=parseFloat(document.getElementById('kasa-gercek').value)||0;
-  var nakit=Number(_gunNakit)||0, kart=Number(_gunKart)||0, ciro=Number(_gunKapandiCiro)||0, gider=Number(_kasaGiderTop)||0;
-  var beklenen=ac+nakit-gider-cikis, fark=gercek-beklenen, net=ciro-gider;
-  var subeAd=SUBE==='podyum'?'Podyumpark':'FSM';
-  var fmt=function(v){return '₺'+Math.round(v).toLocaleString('tr-TR');};
-  var ln=function(l,v){return l.padEnd(28,' ')+v.padStart(16,' ');};
-  var dur=fark<-1?'EKSİK '+fmt(Math.abs(fark)):(fark>1?'FAZLA '+fmt(Math.abs(fark)):'TAM ✓');
-  var metin='═══════════════════════════════\n       Z RAPORU — CACTUS ☕\n═══════════════════════════════\nŞube: '+subeAd+'\nTarih: '+_kasaTarih()+'\nSaat: '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+'\n─────────────────── CİRO ────\n'+ln('Toplam Ciro',fmt(ciro))+'\n'+ln('   ▸ Nakit',fmt(nakit))+'\n'+ln('   ▸ Kart',fmt(kart))+'\n'+ln('İşlem Sayısı',String(_gunKapandiAdet||0)+' adet')+'\n────────────────── GİDER ────\n'+ln('Günlük Gider',fmt(gider))+'\n───────────────── NET KÂR ───\n'+ln('Ciro − Gider',fmt(net))+'\n────────── KASA MUTABAKATI ──\n'+ln('🌅 Açılış Kasası',fmt(ac))+'\n'+ln('+ Nakit Ciro',fmt(nakit))+'\n'+ln('− Nakit Gider',fmt(gider))+'\n'+ln('📤 Kasadan Alınan',fmt(cikis))+'\n'+ln('= Beklenen',fmt(beklenen))+'\n'+ln('💰 Gerçek Sayım',fmt(gercek))+'\n─────────────────────────────\n'+ln('Sonuç',dur)+'\n═════════════════════════════\n  Cactus Cafe — '+SUBE.toUpperCase()+'\n';
-  var el=document.getElementById('kasa-z-ozet');
-  el.textContent=metin; el.classList.add('on');
-  if(navigator.clipboard){navigator.clipboard.writeText(metin).then(function(){toast('📋 Z Raporu panoya kopyalandı');}).catch(function(){});}
-  kasaKaydet();
-  setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'});},100);
 }
 
 function renderCanliCiro(){

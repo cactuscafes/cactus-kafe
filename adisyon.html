@@ -2400,13 +2400,30 @@ function delItem(id){
   _pushEvent('ITEM_DEL', aktifMasa, {urunId:id});
 }
 
+var _undoTimer;
+function undoToast(msg, undoFn){
+  try{
+    var oldt=document.getElementById('undoToast'); if(oldt) oldt.remove();
+    var t=document.createElement('div'); t.id='undoToast';
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10000;background:#1f2d23;color:#fff;padding:11px 14px;border-radius:12px;display:flex;align-items:center;gap:14px;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.35);max-width:92vw;';
+    var sp=document.createElement('span'); sp.textContent=msg; t.appendChild(sp);
+    var btn=document.createElement('button'); btn.textContent='\u21A9 Geri Al';
+    btn.style.cssText='background:var(--al);color:#1a3010;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;flex:none;min-height:40px;';
+    btn.onclick=function(){ try{ undoFn(); }catch(e){} t.remove(); clearTimeout(_undoTimer); };
+    t.appendChild(btn); document.body.appendChild(t);
+    clearTimeout(_undoTimer); _undoTimer=setTimeout(function(){ if(t.parentNode) t.remove(); }, 6000);
+  }catch(e){ toast(msg); }
+}
 function masayiTemizle(){
   if(!aktifMasa)return;
-  if(!confirm('Masa '+aktifMasa+' adisyonu temizlensin mi?'))return;
   var _hedef=aktifMasa;
-  // EVENT-SOURCED v11
+  var _yedek=JSON.parse(JSON.stringify(masalar[_hedef]||[]));
+  if(!_yedek.length){ toast('Masa zaten bo\u015f'); return; }
   _pushEvent('MASA_CLEAR', _hedef, {});
-  toast('🗑 Masa '+_hedef+' temizlendi');
+  undoToast('\uD83D\uDDD1 Masa '+_hedef+' temizlendi', function(){
+    _yedek.forEach(function(it){ if(it&&it.id&&Number(it.adet)>0) _pushEvent('ITEM_ADD', _hedef, {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:Number(it.adet)}); });
+    toast('\u21A9 Masa '+_hedef+' geri al\u0131nd\u0131');
+  });
 }
 
 function siparisiGonder(){

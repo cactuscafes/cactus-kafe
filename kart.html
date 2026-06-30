@@ -64,7 +64,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .hero-eyebrow::before,.hero-eyebrow::after{content:'';width:32px;height:1px;background:rgba(232,160,48,.4);}
 .hero-title{font-family:'Fraunces',serif;font-size:clamp(40px,7vw,68px);font-weight:300;color:var(--latte);line-height:.95;margin-bottom:10px;letter-spacing:-1px;}
 .hero-title em{font-style:italic;color:var(--amber);display:block;}
-.hero-sub{font-size:13px;color:rgba(245,234,216,.55);line-height:1.8;margin-bottom:24px;font-weight:300;}
+.hero-sub{font-size:13px;color:rgba(245,234,216,.72);line-height:1.8;margin-bottom:24px;font-weight:300;}
 
 /* Pul önizleme satırı */
 .hero-pullar{display:flex;gap:6px;justify-content:center;margin-bottom:28px;flex-wrap:nowrap;}
@@ -77,7 +77,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 /* Giriş formu */
 .giris-kart{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1px solid rgba(232,160,48,.18);border-radius:20px;padding:36px 32px;width:100%;max-width:400px;margin:0 auto;}
 .giris-kart-baslik{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:var(--latte);text-align:center;margin-bottom:6px;}
-.giris-kart-alt{font-size:11px;color:rgba(245,234,216,.45);text-align:center;margin-bottom:28px;letter-spacing:1px;}
+.giris-kart-alt{font-size:11px;color:rgba(245,234,216,.65);text-align:center;margin-bottom:28px;letter-spacing:1px;}
 .giris-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.07);border:1.5px solid rgba(232,160,48,.2);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;color:var(--latte);outline:none;transition:border-color .2s;margin-bottom:12px;}
 .giris-input::placeholder{color:rgba(245,234,216,.3);}
 .giris-input:focus{border-color:var(--amber);background:rgba(255,255,255,.08);}
@@ -87,6 +87,10 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .giris-hata{font-size:12px;color:#ff8c6e;text-align:center;padding:8px;min-height:32px;}
 .giris-tesvik{font-size:12px;color:var(--amber);text-align:center;margin:2px 0 12px;letter-spacing:.3px;}
 .giris-tesvik b{color:var(--latte);font-weight:600;}
+.giris-kvkk{font-size:10.5px;color:rgba(245,234,216,.62);text-align:center;margin-top:12px;line-height:1.55;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.giris-alt-link{text-align:center;margin-top:14px;}
+.giris-alt-link a{font-size:12px;color:rgba(245,234,216,.65);text-decoration:none;}
+.giris-alt-link a b{color:var(--amber);}
 .kart-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);padding:13px 22px;border-radius:12px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:.3px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:99999;transition:transform .4s cubic-bezier(.22,1,.36,1);max-width:90vw;text-align:center;}
 .kart-toast.on{transform:translateX(-50%) translateY(0);}
 
@@ -102,7 +106,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .dk-logo{font-family:'Fraunces',serif;font-size:20px;letter-spacing:6px;color:var(--latte);text-transform:uppercase;font-weight:400;}
 .dk-tip{font-size:8px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-top:3px;}
 .dk-ikon{font-size:22px;opacity:.6;}
-.dk-ad{font-size:12px;color:rgba(245,234,216,.45);letter-spacing:1px;margin-bottom:18px;font-weight:300;}
+.dk-ad{font-size:12px;color:rgba(245,234,216,.65);letter-spacing:1px;margin-bottom:18px;font-weight:300;}
 
 /* Pul ızgarası — 7 pul */
 .pul-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:22px;}
@@ -120,7 +124,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .dk-pul-say{font-family:'Fraunces',serif;font-size:32px;font-weight:300;color:var(--latte);}
 .dk-pul-lbl{font-size:8px;color:rgba(232,160,48,.5);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
 .dk-hediye-no{font-size:12px;color:var(--amber);letter-spacing:1px;font-weight:500;}
-.dk-hediye-txt{font-size:8px;color:rgba(245,234,216,.35);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.dk-hediye-txt{font-size:8px;color:rgba(245,234,216,.6);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
 
 /* Bedava banner */
 .bedava-banner{background:linear-gradient(135deg,#2c5a1a,#1e3d10);border:1px solid rgba(200,168,106,.35);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 4px 24px rgba(44,90,26,.3);}
@@ -132,7 +136,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .stat-krt{background:rgba(255,255,255,.04);border:1px solid rgba(200,168,106,.1);border-radius:14px;padding:18px;text-align:center;}
 .stat-val{font-family:'Fraunces',serif;font-size:32px;font-weight:300;color:var(--latte);}
-.stat-lbl{font-size:9px;color:rgba(245,234,216,.4);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.stat-lbl{font-size:9px;color:rgba(245,234,216,.62);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
 
 /* Kaydırmalı avantajlar */
 .kaydirma-baslik{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(240,236,228,.35);margin-bottom:12px;padding:0 2px;}
@@ -145,25 +149,25 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .avantaj-acik{font-size:11px;color:rgba(240,236,228,.45);line-height:1.5;font-weight:300;}
 
 /* Geçmiş */
-.gecmis-baslik{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(245,234,216,.35);margin-bottom:10px;padding:0 2px;}
+.gecmis-baslik{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(245,234,216,.6);margin-bottom:10px;padding:0 2px;}
 .gecmis-item{background:rgba(255,255,255,.04);border:1px solid rgba(200,168,106,.08);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
 .gecmis-ikon{font-size:20px;flex-shrink:0;}
 .gecmis-bilgi{flex:1;}
 .gecmis-acik{font-size:12px;color:var(--latte);font-weight:400;opacity:.85;}
-.gecmis-tarih{font-size:10px;color:rgba(245,234,216,.35);margin-top:2px;}
+.gecmis-tarih{font-size:10px;color:rgba(245,234,216,.6);margin-top:2px;}
 .gecmis-miktar{font-size:13px;font-weight:600;}
 .gecmis-miktar.pos{color:#7ecb8a;}
 .gecmis-miktar.neg{color:#ff8c6e;}
 
 /* Çıkış */
-.cikis-btn{display:block;width:100%;padding:13px;background:none;border:1.5px solid rgba(232,160,48,.2);color:rgba(245,234,216,.4);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:10px;margin-top:10px;transition:all .2s;}
+.cikis-btn{display:block;width:100%;padding:13px;background:none;border:1.5px solid rgba(232,160,48,.2);color:rgba(245,234,216,.62);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:10px;margin-top:10px;transition:all .2s;}
 .cikis-btn:hover{border-color:rgba(232,160,48,.5);color:var(--amber);}
 
 /* Yükleniyor */
 .yukl-ekran{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--espresso);gap:20px;}
 .yukl-spinner{width:48px;height:48px;border:3px solid rgba(232,160,48,.15);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.yukl-txt{font-size:11px;color:rgba(245,234,216,.4);letter-spacing:3px;text-transform:uppercase;}
+.yukl-txt{font-size:11px;color:rgba(245,234,216,.62);letter-spacing:3px;text-transform:uppercase;}
 
 /* Gizle/Göster */
 .sayfa{display:none;}.sayfa.on{display:block;}
@@ -220,13 +224,15 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
       <div class="giris-kart">
         <div class="giris-kart-baslik">Kartını Oluştur</div>
         <div class="giris-kart-alt">Ad soyad ve telefonun yeterli — uygulama yok, üyelik yok</div>
-        <input class="giris-input" id="telInput" type="tel" placeholder="05XX XXX XX XX"
+        <input class="giris-input" id="telInput" type="tel" placeholder="05XX XXX XX XX" aria-label="Telefon numarası"
           inputmode="numeric" maxlength="11" oninput="telFormat(this)" onkeydown="if(event.key==='Enter')girisYap()">
-        <input class="giris-input" id="adInput" type="text" placeholder="Adın Soyadın" autocomplete="name"
+        <input class="giris-input" id="adInput" type="text" placeholder="Adın Soyadın" autocomplete="name" aria-label="Ad soyad"
           oninput="kartFormCheck()" onkeydown="if(event.key==='Enter')girisYap()">
         <div class="giris-tesvik">🎁 İlk kez mi? <b>İlk yıldızın bizden.</b></div>
         <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Oluştur →</button>
         <div class="giris-hata" id="girisHata"></div>
+        <div class="giris-kvkk">🔒 Numaran yalnızca sadakat puanların için kullanılır, kimseyle paylaşılmaz.</div>
+        <div class="giris-alt-link"><a href="javascript:void(0)" id="girisModLink" onclick="girisModuDegis()">Zaten kartın var mı? <b>Telefonla gör</b></a></div>
       </div>
     </div>
   </div>
@@ -266,7 +272,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         <div class="bedava-ikon">🎉</div>
         <div class="bedava-txt">
           <div class="bedava-baslik">Bedava içecek hakkın var!</div>
-          <div class="bedava-alt">Kasiyere göster, içeceğini seç.</div>
+          <div class="bedava-alt">📲 Kasada bu ekranı göster — içeceğini seç, ödemeyi bırak bize.</div>
         </div>
       </div>
 
@@ -351,7 +357,7 @@ function kartFormCheck(){
   var tel=(document.getElementById('telInput').value||'').replace(/\D/g,'');
   var ad=(document.getElementById('adInput').value||'').trim();
   var btn=document.getElementById('girisBtn');
-  if(btn) btn.disabled=!(tel.length===11 && ad.length>=2);
+  if(btn) btn.disabled = _viewMode ? (tel.length!==11) : !(tel.length===11 && ad.length>=2);
 }
 
 function sayfa(id){
@@ -359,11 +365,44 @@ function sayfa(id){
   document.getElementById(id).classList.add('on');
 }
 
+var _viewMode=false;
+function girisModuDegis(){
+  _viewMode=!_viewMode;
+  var ad=document.getElementById('adInput'), btn=document.getElementById('girisBtn'),
+      baslik=document.querySelector('.giris-kart-baslik'), alt=document.querySelector('.giris-kart-alt'),
+      tesvik=document.querySelector('.giris-tesvik'), link=document.getElementById('girisModLink'),
+      hata=document.getElementById('girisHata');
+  if(hata) hata.textContent='';
+  if(_viewMode){
+    ad.style.display='none'; ad.value='';
+    if(baslik) baslik.textContent='Kartını Gör';
+    if(alt) alt.textContent='Telefonunu gir, yıldızlarını gör';
+    if(tesvik) tesvik.style.display='none';
+    btn.textContent='Kartımı Gör →';
+    if(link) link.innerHTML='Yeni misin? <b>Kart oluştur</b>';
+  } else {
+    ad.style.display='';
+    if(baslik) baslik.textContent='Kartını Oluştur';
+    if(alt) alt.textContent='Ad soyad ve telefonun yeterli — uygulama yok, üyelik yok';
+    if(tesvik) tesvik.style.display='';
+    btn.textContent='Kartımı Oluştur →';
+    if(link) link.innerHTML='Zaten kartın var mı? <b>Telefonla gör</b>';
+  }
+  kartFormCheck();
+}
 function girisYap(){
   var tel=document.getElementById('telInput').value.replace(/\D/g,'');
   var ad=document.getElementById('adInput').value.trim();
   var hata=document.getElementById('girisHata');
   if(tel.length!==11||!tel.startsWith('0')){hata.textContent='Lütfen 11 haneli numaranı gir (05XX XXX XX XX).';return;}
+  if(_viewMode){
+    hata.textContent=''; document.getElementById('girisBtn').disabled=true; sayfa('sayfaYukl');
+    fetch(API+'/kart/bak?telefon='+tel).then(function(r){return r.json();}).then(function(d){
+      if(d.ok && d.musteri){ localStorage.setItem('cactus_kart_tel',tel); kartGoster(d.musteri); gecmisRender(d.gecmis||[]); }
+      else { sayfa('sayfaGiris'); document.getElementById('girisHata').textContent='Bu numarayla kart bulunamadı — yeni kart oluşturabilirsin.'; document.getElementById('girisBtn').disabled=false; }
+    }).catch(function(){ sayfa('sayfaGiris'); document.getElementById('girisHata').textContent='Bağlantı hatası. Tekrar dene.'; document.getElementById('girisBtn').disabled=false; });
+    return;
+  }
   if(!ad||ad.length<2){hata.textContent='Lütfen ad soyad girin.';return;}
   hata.textContent='';
   document.getElementById('girisBtn').disabled=true;
@@ -430,7 +469,7 @@ function kartGoster(m){
 function gecmisRender(gecmis){
   var liste=document.getElementById('gecmisListe');
   if(!gecmis.length){
-    liste.innerHTML='<div style="font-size:12px;color:rgba(245,234,216,.35);text-align:center;padding:24px;">Henüz işlem yok.</div>';
+    liste.innerHTML='<div style="font-size:12px;color:rgba(245,234,216,.6);text-align:center;padding:24px;">Henüz işlem yok.</div>';
     return;
   }
   liste.innerHTML=gecmis.map(function(g){

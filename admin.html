@@ -2177,15 +2177,19 @@ async function bugunYukle(){
     document.getElementById('bg-sube-p').innerHTML=subeKart('🟢 Podyumpark','#2d7a4f',oP,yP);
     document.getElementById('bg-sube-f').innerHTML=subeKart('🟠 FSM','#c67000',oF,yF);
 
-    // Nakit / Kredi (iki şube birleşik)
-    var nakit=0,kredi=0;
-    [oP,oF].forEach(function(o){ ((o&&o.odeme)||[]).forEach(function(x){
-      var t=(x.odeme_tipi||'').toLowerCase();
-      if(t==='nakit') nakit+=x.ciro||0; else if(t==='kredi') kredi+=x.ciro||0;
-    });});
+    // Nakit / Kredi — şube bazında (Podyum | FSM | Toplam)
+    function _nkOde(o){ var n=0,k=0; ((o&&o.odeme)||[]).forEach(function(x){ var t=(x.odeme_tipi||'').toLowerCase(); if(t==='nakit') n+=x.ciro||0; else if(t==='kredi') k+=x.ciro||0; }); return {n:n,k:k}; }
+    var nkP=_nkOde(oP), nkF=_nkOde(oF);
+    var nakitT=nkP.n+nkF.n, krediT=nkP.k+nkF.k;
+    var _th='padding:9px 8px;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;border-bottom:1.5px solid var(--stone);';
+    var _td='padding:9px 8px;text-align:right;font-variant-numeric:tabular-nums;';
+    var _bt='border-top:1px solid #f0ede8;';
     document.getElementById('bg-nakit').innerHTML=
-      '<div class="rap-nakit-krt nakit"><div class="rap-lbl">💵 Nakit</div><div class="rap-val">'+_bgFmt(nakit)+'</div>'+(cToplam?'<div class="rap-sub">'+Math.round(nakit/cToplam*100)+'%</div>':'')+'</div>'+
-      '<div class="rap-nakit-krt kredi"><div class="rap-lbl">💳 Kredi Kartı</div><div class="rap-val">'+_bgFmt(kredi)+'</div>'+(cToplam?'<div class="rap-sub">'+Math.round(kredi/cToplam*100)+'%</div>':'')+'</div>';
+      '<table style="grid-column:1/-1;width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1.5px solid var(--stone);border-radius:10px;overflow:hidden;">'+
+      '<thead><tr><th style="'+_th+'text-align:left;color:var(--mist);"></th><th style="'+_th+'text-align:right;color:#2d7a4f;">🟢 Podyum</th><th style="'+_th+'text-align:right;color:#c67000;">🟠 FSM</th><th style="'+_th+'text-align:right;color:var(--ink);">Toplam</th></tr></thead><tbody>'+
+      '<tr><td style="padding:9px 8px;font-weight:600;">💵 Nakit</td><td style="'+_td+'">'+_bgFmt(nkP.n)+'</td><td style="'+_td+'">'+_bgFmt(nkF.n)+'</td><td style="'+_td+'font-weight:700;color:#1a6b3c;">'+_bgFmt(nakitT)+'</td></tr>'+
+      '<tr><td style="padding:9px 8px;font-weight:600;'+_bt+'">💳 Kredi Kartı</td><td style="'+_td+_bt+'">'+_bgFmt(nkP.k)+'</td><td style="'+_td+_bt+'">'+_bgFmt(nkF.k)+'</td><td style="'+_td+_bt+'font-weight:700;color:#1a4b8c;">'+_bgFmt(krediT)+'</td></tr>'+
+      '</tbody></table>';
 
     // Bugün en çok satanlar (birleşik)
     var birlesik={};

@@ -115,6 +115,9 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .pul{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(232,160,48,.2);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .35s;background:rgba(255,255,255,.03);}
 .pul.dolu{background:linear-gradient(135deg,var(--amber),var(--amber3));border-color:transparent;box-shadow:0 3px 12px rgba(200,168,106,.35);}
 .pul.dolu::after{content:'⭐';}
+@keyframes pulPop{0%{transform:scale(.3);opacity:.4;}60%{transform:scale(1.28);}100%{transform:scale(1);opacity:1;}}
+.pul.pop{animation:pulPop .55s cubic-bezier(.2,1.3,.4,1);}
+.dk-nudge{font-size:11.5px;font-weight:600;color:var(--amber);text-align:center;letter-spacing:.2px;margin:-8px 0 16px;}
 .pul.next{border-color:rgba(200,168,106,.6);background:rgba(200,168,106,.08);animation:pulseNext 1.4s ease-in-out infinite;}
 @keyframes pulseNext{0%,100%{border-color:rgba(200,168,106,.3);box-shadow:none;}50%{border-color:var(--amber);box-shadow:0 0 12px rgba(200,168,106,.3);}}
 
@@ -258,6 +261,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         <div class="dk-ad" id="dkAd">Üye</div>
         <div class="pul-grid" id="pulGrid"></div>
         <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+        <div class="dk-nudge" id="dkNudge"></div>
         <div class="dk-alt">
           <div>
             <div class="dk-pul-say" id="dkPulSay">0/7</div>
@@ -291,35 +295,6 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         </div>
       </div>
 
-      <!-- Kaydırmalı avantajlar -->
-      <div class="kaydirma-baslik">Avantajların</div>
-      <div class="kaydirma-sef">
-        <div class="avantaj-krt">
-          <span class="avantaj-ikon">☕</span>
-          <div class="avantaj-baslik">7'de 1 Bedava</div>
-          <div class="avantaj-acik">Her içecekte yıldız kazan, 7 dolunca bedava içecek</div>
-        </div>
-        <div class="avantaj-krt">
-          <span class="avantaj-ikon">📱</span>
-          <div class="avantaj-baslik">Uygulama Yok</div>
-          <div class="avantaj-acik">Sadece telefon numaran — kart veya uygulama gerekmez</div>
-        </div>
-        <div class="avantaj-krt">
-          <span class="avantaj-ikon">⚡</span>
-          <div class="avantaj-baslik">Anında Eklenir</div>
-          <div class="avantaj-acik">Kasiyere numaranı söyle, yıldız otomatik eklenir</div>
-        </div>
-        <div class="avantaj-krt">
-          <span class="avantaj-ikon">🎁</span>
-          <div class="avantaj-baslik">İstediğin İçecek</div>
-          <div class="avantaj-acik">Bedava hakkını menüdeki her içeceğe kullanabilirsin</div>
-        </div>
-        <div class="avantaj-krt">
-          <span class="avantaj-ikon">🔒</span>
-          <div class="avantaj-baslik">Güvenli</div>
-          <div class="avantaj-acik">Yıldızların kaybolmaz — telefon numarana bağlı, her zaman erişilebilir</div>
-        </div>
-      </div>
 
       <!-- Geçmiş -->
       <div class="gecmis-baslik">Son İşlemler</div>
@@ -439,12 +414,16 @@ function kartGecmisCek(tel){
     .catch(function(){});
 }
 
-function kartGoster(m){
+var _kartTel=null, _kartPul=0, _kartPoll=null, _kartPollKuruldu=false;
+function kartGoster(m, oncekiGoster){
   sayfa('sayfaKart');
   var pul=m.pul||0;
   var topKaz=m.toplam_kazanilan||0;
   var bedavaHak=Math.floor(pul/ESIK);
   var gosterPul=pul%ESIK;
+
+  _kartTel=(m.telefon||'').replace(/\D/g,'')||_kartTel;
+  _kartPul=pul;
 
   document.getElementById('dkAd').textContent=m.ad||('05**'+( m.telefon||'').slice(-4));
   document.getElementById('dkPulSay').textContent=gosterPul+'/'+ESIK;
@@ -453,20 +432,49 @@ function kartGoster(m){
   document.getElementById('statToplam').textContent=topKaz;
   document.getElementById('bedavaBanner').style.display=bedavaHak>0?'flex':'none';
 
+  // Dürtü: bedavaya kaç kaldı
+  var nudge=document.getElementById('dkNudge'), kalan=ESIK-gosterPul;
+  if(nudge) nudge.textContent = kalan===1 ? '🎯 Son 1 yıldız — bedava çok yakın!' : ('🎯 Bedavaya '+kalan+' yıldız kaldı');
+
   // Progress bar
   var pct = Math.round((gosterPul/ESIK)*100);
   setTimeout(function(){document.getElementById('progressBar').style.width=pct+'%';},100);
 
-  // Pul ızgarası
+  // Pul ızgarası (yeni eklenenlere pop animasyonu)
   var grid=document.getElementById('pulGrid');
   grid.innerHTML='';
   for(var i=0;i<ESIK;i++){
     var div=document.createElement('div');
-    if(i<gosterPul) div.className='pul dolu';
+    if(i<gosterPul){ div.className='pul dolu'; if(oncekiGoster!=null && i>=oncekiGoster) div.className+=' pop'; }
     else if(i===gosterPul&&gosterPul<ESIK) div.className='pul next';
     else div.className='pul';
     grid.appendChild(div);
   }
+  kartPollBasla();
+}
+function kartPollBasla(){
+  if(_kartPollKuruldu) return;
+  _kartPollKuruldu=true;
+  _kartPoll=setInterval(kartPollCek, 6000);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) kartPollCek(); });
+}
+function kartPollDur(){ if(_kartPoll){ clearInterval(_kartPoll); _kartPoll=null; } _kartPollKuruldu=false; }
+function kartPollCek(){
+  if(!_kartTel || !document.getElementById('sayfaKart').classList.contains('on')) return;
+  fetch(API+'/kart/bak?telefon='+_kartTel).then(function(r){return r.json();}).then(function(d){
+    if(!d.ok||!d.musteri) return;
+    var yeni=d.musteri.pul||0;
+    if(yeni===_kartPul) return;
+    var delta=yeni-_kartPul;
+    var oncekiGoster=_kartPul%ESIK;
+    var oncekiHak=Math.floor(_kartPul/ESIK), yeniHak=Math.floor(yeni/ESIK);
+    kartGoster(d.musteri, delta>0?oncekiGoster:null);
+    gecmisRender(d.gecmis||[]);
+    if(delta>0){
+      if(yeniHak>oncekiHak) kartToast('🎉 Bedava içecek hakkın var — kasada göster!');
+      else kartToast('✨ +'+delta+' yıldız eklendi!');
+    }
+  }).catch(function(){});
 }
 
 function gecmisRender(gecmis){
@@ -492,6 +500,7 @@ function gecmisRender(gecmis){
 }
 
 function cikisYap(){
+  kartPollDur();
   localStorage.removeItem('cactus_kart_tel');
   sayfa('sayfaGiris');
   document.getElementById('telInput').value='';

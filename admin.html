@@ -2014,11 +2014,14 @@ async function yogunlukYukle(){
   document.getElementById('yog-gun').innerHTML=''; document.getElementById('yog-heat').innerHTML=''; document.getElementById('yog-happy').innerHTML='';
   var q='baslangic='+bas.value+'&bitis='+bit.value;
   try{
+    // GÜVENİLİR KAYNAK: /islem/listele (islemler) — yogRender'ın beklediği
+    // {created_at, tarih, toplam} alanlarını işlem verisinden üret.
+    function _yogMap(a){ return (Array.isArray(a)?a:[]).map(function(s){ return {created_at:(s.tarih_iso||'')+'T'+(s.saat||'00:00')+':00', tarih:s.tarih_iso||'', toplam:Number(s.toplam)||0}; }); }
     var res=await Promise.all([
-      fetch(_RAP_API+'/rapor/listele?'+q+'&sube=podyum').then(function(r){return r.json();}),
-      fetch(_RAP_API+'/rapor/listele?'+q+'&sube=fsm').then(function(r){return r.json();})
+      fetch(_RAP_API+'/islem/listele?'+q+'&sube=podyum').then(function(r){return r.json();}),
+      fetch(_RAP_API+'/islem/listele?'+q+'&sube=fsm').then(function(r){return r.json();})
     ]);
-    _yogData={podyum:res[0]||[], fsm:res[1]||[]};
+    _yogData={podyum:_yogMap(res[0]), fsm:_yogMap(res[1])};
     yogRender();
   }catch(e){
     document.getElementById('yog-saat').innerHTML='<div style="color:var(--rd);font-size:13px;padding:16px 0;">⚠️ Yüklenemedi: '+e.message+'</div>';

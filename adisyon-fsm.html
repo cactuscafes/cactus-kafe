@@ -579,6 +579,7 @@ input,select{font-family:'Inter',sans-serif;}
 .gun-zrapor-btn:active{transform:translateY(0);}
 @media(max-width:480px){.gun-zrapor-btn{padding:6px 10px;font-size:10px;letter-spacing:.5px;}}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.4);}70%{box-shadow:0 0 0 8px rgba(74,222,128,0);}100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}}
+@keyframes artiBirAnim{0%{opacity:0;transform:translate(-50%,6px) scale(.6);}25%{opacity:1;transform:translate(-50%,-2px) scale(1.12);}100%{opacity:0;transform:translate(-50%,-24px) scale(1);}}
 .canli-ozet{display:flex;gap:10px;margin-bottom:14px;}
 .canli-ozet-krt{flex:1;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;text-align:center;}
 .canli-ozet-krt .cok-lbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;}
@@ -686,6 +687,7 @@ if('serviceWorker' in navigator){
 </div>
 <!-- SÜRÜM ROZETİ: bu cihaz güncel mi? Dokun → zorla güncelle (cache-bust). Eski tarih görürsen o cihaz eski kodda. -->
 <div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:var(--k2);background:rgba(255,255,255,.92);border:1px solid var(--kr2);padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;"><span id="surum-txt">✓ Güncel</span></div>
+<div id="baglanti-rozet" style="position:fixed;left:6px;bottom:30px;z-index:9998;font-size:10px;font-weight:700;color:#fff;background:rgba(31,92,56,.92);padding:3px 8px;border-radius:8px;line-height:1;display:flex;align-items:center;gap:5px;user-select:none;"><span id="bgl-dot" style="width:7px;height:7px;border-radius:50%;background:#5fe08a;display:inline-block;flex:none;"></span><span id="bgl-txt">Bağlı</span></div>
 <script>(function(){var b=document.getElementById('surum-rozet');if(b)b.style.color='#2d5a27';})();</script>
 
 <!-- KASİYER -->
@@ -2073,6 +2075,9 @@ function renderUrunler(){
   });
 }
 
+function _artiBir(el){ try{ if(!el||el===document.body||!el.appendChild) return; if(el.classList&&!el.classList.contains('ukrt')&&el.tagName!=='BUTTON') return; var b=document.createElement('span'); b.textContent='+1'; b.style.cssText='position:absolute;top:4px;left:50%;background:var(--k1);color:#fff;font-size:13px;font-weight:800;padding:2px 9px;border-radius:11px;pointer-events:none;z-index:30;animation:artiBirAnim .7s ease forwards;'; var cs=getComputedStyle(el); if(cs.position==='static') el.style.position='relative'; el.appendChild(b); setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); },720); }catch(e){} }
+function baglantiGuncelle(){ var r=document.getElementById('baglanti-rozet'); if(!r) return; var d=document.getElementById('bgl-dot'), t=document.getElementById('bgl-txt'); if(navigator.onLine){ r.style.background='rgba(31,92,56,.92)'; if(d)d.style.background='#5fe08a'; if(t)t.textContent='Bağlı'; } else { r.style.background='rgba(139,26,26,.95)'; if(d)d.style.background='#ff7a7a'; if(t)t.textContent='Çevrimdışı — kaydediliyor'; } }
+try{ window.addEventListener('online',baglantiGuncelle); window.addEventListener('offline',baglantiGuncelle); baglantiGuncelle(); }catch(e){}
 function urunEkle(u,el){
   if(!aktifMasa){
     document.getElementById('uyari').classList.add('on');
@@ -2081,6 +2086,7 @@ function urunEkle(u,el){
   }
   el.style.transform='scale(.93)';
   setTimeout(()=>el.style.transform='',200);
+  _artiBir(el); try{ navigator.vibrate && navigator.vibrate(15); }catch(e){}
   const a=masalar[aktifMasa];
   const ex=a.find(x=>x.id===u.id);
   // EVENT-SOURCED v11

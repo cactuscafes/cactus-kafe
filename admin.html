@@ -53,14 +53,14 @@
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>Cactus Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--ink:#14271d;--gold:#b8965a;--paper:#f5f3ec;--stone:#e6e1d6;--mist:#9a9488;--rd:#e74c3c;}
-body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
 .giris{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);}
 .giris-kart{background:#fff;padding:48px;width:min(420px,95vw);}
-.giris-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:3px;margin-bottom:4px;}
+.giris-logo{font-family:'Fraunces',serif;font-size:28px;font-weight:300;letter-spacing:3px;margin-bottom:4px;}
 .giris-sub{font-size:11px;color:var(--mist);letter-spacing:2px;margin-bottom:32px;}
 .lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:6px;}
 .inp{width:100%;border:1.5px solid var(--stone);padding:11px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:16px;}
@@ -68,7 +68,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .giris-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;font-size:12px;font-weight:500;letter-spacing:2px;cursor:pointer;font-family:inherit;}
 .giris-hata{font-size:12px;color:var(--rd);text-align:center;margin-top:10px;display:none;}
 .nav{position:fixed;top:0;left:0;right:0;height:52px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:#fff;letter-spacing:2px;}
+.nav-logo{font-family:'Fraunces',serif;font-size:18px;color:#fff;letter-spacing:2px;}
 .nav-btn{padding:7px 16px;font-size:11px;font-weight:500;letter-spacing:1px;border:none;cursor:pointer;font-family:inherit;}
 .btn-yayinla{background:var(--gold);color:var(--ink);}
 .btn-cikis{background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);}
@@ -81,7 +81,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
 .main{padding:32px;}
 .panel{display:none;}
 .panel.on{display:block;}
-.pttl{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:4px;}
+.pttl{font-family:'Fraunces',serif;font-size:28px;font-weight:300;margin-bottom:4px;}
 .psub{font-size:12px;color:var(--mist);margin-bottom:24px;}
 .yi{width:100%;border:1.5px solid var(--stone);padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;}
 .yi:focus{border-color:var(--ink);}
@@ -222,7 +222,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
 .admin-sube-bar{position:sticky;top:54px;z-index:99;background:linear-gradient(135deg,#1a3010 0%,#2d5a27 100%);color:#f4ecd8;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 22px;border-bottom:2px solid #c8a86a;box-shadow:0 4px 14px rgba(0,0,0,.15);flex-wrap:wrap;}
 .asb-info{display:flex;align-items:center;gap:10px;}
 .asb-eyebrow{font-size:9.5px;letter-spacing:2px;color:rgba(244,236,216,.62);text-transform:uppercase;font-weight:700;}
-.asb-current{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#dcbd80;letter-spacing:.5px;}
+.asb-current{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:#dcbd80;letter-spacing:.5px;}
 .asb-tabs{display:flex;gap:6px;background:rgba(0,0,0,.25);padding:4px;border-radius:100px;}
 .asb-tab{padding:7px 16px;border-radius:100px;background:transparent;color:rgba(244,236,216,.7);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.4px;font-family:inherit;transition:all .25s;white-space:nowrap;}
 .asb-tab:hover{color:#f4ecd8;}
@@ -315,7 +315,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 /* ŞUBE BAR — koyu yeşil yerine sade açık şerit */
 .admin-sube-bar{background:var(--paper);color:var(--ink);border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:none;padding:12px 26px;}
 .asb-eyebrow{color:var(--mist);}
-.asb-current{font-family:'Cormorant Garamond',serif;color:var(--ink);font-weight:400;}
+.asb-current{font-family:'Fraunces',serif;color:var(--ink);font-weight:400;}
 .asb-tabs{background:#fff;border:1px solid var(--line);}
 .asb-tab{color:var(--mist);}
 .asb-tab:hover{color:var(--ink);}
@@ -347,8 +347,6 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 
 /* Klavye erişilebilirliği — net odak halkası */
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px;}
-/* Müzik switch'i için görünür odak (gizli checkbox → track'e ring) */
-#mz-enabled:focus-visible + #mz-toggle{outline:2px solid var(--gold);outline-offset:2px;}
 
 /* Sidebar dış-bağlantı satırı */
 .sb-ext{font-size:9px;color:var(--mist);letter-spacing:1px;vertical-align:middle;margin-left:4px;}
@@ -481,7 +479,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
       <button class="sb-btn" onclick="panelAc('galeri',this)">🖼 Galeri</button>
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
-      <button class="sb-btn" onclick="panelAc('muzik',this)">🎵 Müzik</button>
     </div>
     <div class="main">
 
@@ -587,52 +584,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       </div>
 
       <!-- MÜZİK AYARLARI -->
-      <div class="panel" id="panel-muzik" style="max-width:600px;">
-        <div class="pttl">🎵 Arka Plan Müziği</div>
-        <div class="psub">Ana sayfada alçak sesli arka plan müziği ayarları.</div>
-        <div class="kart">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
-            <span style="font-size:13px;font-weight:600;">Müzik Aktif</span>
-            <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
-              <input type="checkbox" id="mz-enabled" aria-label="Müzik aktif" onchange="muzikOnizle()" style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2;">
-              <span id="mz-toggle" style="position:absolute;inset:0;background:#ccc;border-radius:26px;transition:.3s;pointer-events:none;"></span>
-              <span id="mz-knob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3);pointer-events:none;"></span>
-            </label>
-          </div>
-
-          <div style="margin-bottom:18px;">
-            <label class="lbl">Müzik URL (mp3, ogg, wav)</label>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <input class="yi" id="mz-url" placeholder="https://... veya R2 linki" style="flex:1;" oninput="muzikOnizle()">
-              <input type="file" id="mz-file" accept="audio/*" style="display:none" onchange="muzikDosyaYukle(this)">
-              <button type="button" onclick="document.getElementById('mz-file').click()" style="padding:9px 14px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:13px;">🎵 Yükle</button>
-            </div>
-            <div id="mz-upload-st" style="font-size:12px;color:#888;margin-top:6px;"></div>
-          </div>
-
-          <div style="margin-bottom:22px;">
-            <label class="lbl">Ses Seviyesi — <span id="mz-vol-lbl">18%</span></label>
-            <input type="range" id="mz-vol" min="1" max="60" value="18" style="width:100%;accent-color:#2d5a27;cursor:pointer;" oninput="muzikVolGun(this.value)">
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px;"><span>Sessiz</span><span>Orta</span><span>Yüksek</span></div>
-          </div>
-
-          <!-- Önizleme oynatıcı -->
-          <div id="mz-preview-box" style="display:none;background:#f8f6f2;border-radius:10px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
-            <button type="button" id="mz-play-btn" onclick="muzikTestToggle()" style="width:44px;height:44px;border-radius:50%;background:#2d5a27;color:#fff;border:none;cursor:pointer;font-size:18px;flex-shrink:0;">▶</button>
-            <div style="flex:1;">
-              <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Önizleme</div>
-              <div id="mz-preview-name" style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;"></div>
-            </div>
-          </div>
-          <audio id="mz-audio" style="display:none;"></audio>
-
-          <div style="display:flex;justify-content:flex-end;">
-            <button type="button" class="btn-primary" onclick="muzikKaydet()">🚀 Kaydet & Yayınla</button>
-          </div>
-          <div id="mz-st" style="font-size:13px;color:#888;text-align:right;margin-top:10px;"></div>
-        </div>
-      </div>
-
       <!-- İLETİŞİM SAYFA EDİTÖRÜ -->
       <div class="panel" id="panel-iletisim" style="max-width:1200px;">
         <div class="pttl">📬 İletişim Sayfası</div>
@@ -1291,7 +1242,6 @@ function panelAc(id,el){
   if(id==='yogunluk') yogunlukYukle();
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
-  if(id==='muzik'){setTimeout(function(){muzikYukle();},150);}
 
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
   if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}
@@ -2799,152 +2749,6 @@ async function asYayinla(){
   }catch(e){st.textContent='❌ '+e.message;console.error(e);}
 }
 
-/* ===== MÜZİK AYARLARI ===== */
-var _mzAudio=null,_mzPlaying=false;
-
-async function muzikYukle(){
-  var st=document.getElementById('mz-st');
-  st.textContent='⏳ Yükleniyor...';
-  var url='',enabled=false,vol=18;
-  try{
-    // ÖNCE worker/KV (token'sız yayın buraya yazıyor)
-    var rk=await fetch(RAPOR_API+'/menu/cek?sube=muzik_cfg&t='+Date.now());
-    var dk=await rk.json();
-    if(dk && typeof dk.url!=='undefined'){
-      url=dk.url||'';
-      enabled=(dk.enabled===true||dk.enabled==='1'||dk.enabled===1);
-      vol=Math.round((parseFloat(dk.vol)||0.18)*100);
-    }else{
-      // KV boş → mevcut index.html'den oku (ilk geçiş)
-      var r=await fetch('https://api.github.com/repos/cactuscafes/cactus-kafe/contents/index.html',{'User-Agent':'cactus-admin'});
-      var d=await r.json();
-      if(d.content){
-        var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-        var doc=new DOMParser().parseFromString(html,'text/html');
-        var cfg=doc.getElementById('music-cfg');
-        if(cfg){ url=cfg.dataset.url||''; enabled=cfg.dataset.enabled==='1'; vol=parseInt((parseFloat(cfg.dataset.vol||'0.18')*100).toFixed(0)); }
-      }
-    }
-    document.getElementById('mz-url').value=url;
-    document.getElementById('mz-enabled').checked=enabled;
-    document.getElementById('mz-vol').value=vol;
-    muzikVolGun(vol);
-    muzikToggleUI(enabled);
-    muzikOnizle();
-    st.textContent=url?'✅ Yüklendi':'URL girilmemiş';
-  }catch(e){
-    st.textContent='❌ '+e.message;
-    console.error(e);
-  }
-}
-
-function muzikVolGun(v){
-  document.getElementById('mz-vol-lbl').textContent=v+'%';
-  if(_mzAudio)_mzAudio.volume=v/100;
-}
-
-function muzikToggleUI(enabled){
-  var knob=document.getElementById('mz-knob');
-  var toggle=document.getElementById('mz-toggle');
-  if(enabled){
-    toggle.style.background='#2d5a27';
-    knob.style.left='25px';
-  }else{
-    toggle.style.background='#ccc';
-    knob.style.left='3px';
-  }
-}
-
-function muzikOnizle(){
-  var url=document.getElementById('mz-url').value.trim();
-  var enabled=document.getElementById('mz-enabled').checked;
-  muzikToggleUI(enabled);
-  var box=document.getElementById('mz-preview-box');
-  var nameEl=document.getElementById('mz-preview-name');
-  if(url){
-    box.style.display='flex';
-    nameEl.textContent=url.split('/').pop()||url;
-    if(_mzAudio&&_mzAudio.src!==url){
-      _mzAudio.pause();_mzPlaying=false;
-      document.getElementById('mz-play-btn').textContent='▶';
-    }
-  }else{
-    box.style.display='none';
-    if(_mzAudio){_mzAudio.pause();_mzPlaying=false;}
-  }
-}
-
-function muzikTestToggle(){
-  var url=document.getElementById('mz-url').value.trim();
-  var vol=parseInt(document.getElementById('mz-vol').value)/100;
-  if(!url)return;
-  var btn=document.getElementById('mz-play-btn');
-  if(!_mzAudio||_mzAudio.getAttribute('data-src')!==url){
-    if(_mzAudio){_mzAudio.pause();}
-    _mzAudio=document.getElementById('mz-audio');
-    _mzAudio.src=url;
-    _mzAudio.setAttribute('data-src',url);
-    _mzAudio.volume=vol;
-    _mzAudio.loop=true;
-    _mzPlaying=false;
-  }
-  if(_mzPlaying){
-    _mzAudio.pause();
-    _mzPlaying=false;
-    btn.textContent='▶';
-  }else{
-    _mzAudio.volume=vol;
-    _mzAudio.play().then(function(){
-      _mzPlaying=true;
-      btn.textContent='⏸';
-    }).catch(function(e){
-      document.getElementById('mz-st').textContent='❌ Oynatılamadı: '+e.message;
-    });
-  }
-}
-
-async function muzikKaydet(){
-  // TOKEN'SIZ: müzik ayarı GitHub'a değil worker/KV'ye yazılır. index.html KV'den okur.
-  var st=document.getElementById('mz-st');
-  st.textContent='⏳ Kaydediliyor...';
-  try{
-    var url=document.getElementById('mz-url').value.trim();
-    var enabled=document.getElementById('mz-enabled').checked;
-    var vol=parseFloat((parseInt(document.getElementById('mz-vol').value)/100).toFixed(2))||0.18;
-    var r=await fetch(RAPOR_API+'/menu/kaydet',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:'muzik_cfg',menu:{url:url,enabled:enabled,vol:vol}})
-    });
-    if(r.ok){
-      st.textContent='✅ Yayınlandı! Anasayfada anında etkili.';
-      toast('✅ Müzik ayarları kaydedildi');
-    }else{
-      st.textContent='❌ Kaydedilemedi (ağ?). Tekrar deneyin.';
-    }
-  }catch(e){st.textContent='❌ '+e.message;console.error(e);}
-}
-
-function muzikDosyaYukle(input){
-  var file=input.files[0];if(!file)return;
-  var stEl=document.getElementById('mz-upload-st');
-  stEl.textContent='⏳ Yükleniyor...';
-  var worker=R2_WORKER;
-  var fd=new FormData();
-  fd.append('file',file,file.name);
-  fetch(worker+'upload',{method:'POST',body:fd})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(data.url){
-        document.getElementById('mz-url').value=data.url;
-        stEl.textContent='✅ Yüklendi';
-        muzikOnizle();
-      }else{
-        stEl.textContent='❌ '+(data.error||'Hata');
-      }
-    })
-    .catch(function(e){stEl.textContent='❌ '+e.message;});
-}
-
 /* ===== IS BASVURULARI ===== */
 var BASVURU_API=RAPOR_API;
 async function basvuruYukle(){
@@ -3390,7 +3194,7 @@ async function kartListeYukle(){
       {label:'Toplam Kazanılan Pul', val: toplamPul}
     ].map(function(k){
       return '<div class="kart" style="text-align:center;'+(k.hl?'border-color:var(--gold);':'')+'">'
-        +'<div style="font-size:24px;font-weight:700;font-family:\'Cormorant Garamond\',serif;color:'+(k.hl?'var(--gold)':'var(--ink)')+'">' + k.val + '</div>'
+        +'<div style="font-size:24px;font-weight:700;font-family:\'Fraunces\',serif;color:'+(k.hl?'var(--gold)':'var(--ink)')+'">' + k.val + '</div>'
         +'<div style="font-size:11px;color:var(--mist);letter-spacing:1px;margin-top:2px;">' + k.label + '</div>'
         +'</div>';
     }).join('');
@@ -3428,7 +3232,7 @@ function kartAnalitik(){
   // İstatistik kartları
   var stat = function(val, lbl, hl){
     return '<div class="kart" style="text-align:center;'+(hl?'border-color:var(--gold);':'')+'">'
-      +'<div style="font-size:24px;font-weight:700;font-family:\'Cormorant Garamond\',serif;color:'+(hl?'var(--gold)':'var(--ink)')+'">'+val+'</div>'
+      +'<div style="font-size:24px;font-weight:700;font-family:\'Fraunces\',serif;color:'+(hl?'var(--gold)':'var(--ink)')+'">'+val+'</div>'
       +'<div style="font-size:11px;color:var(--mist);letter-spacing:.5px;margin-top:2px;">'+lbl+'</div></div>';
   };
   var kartlar = '<div style="font-size:13px;font-weight:600;color:#555;margin:0 0 10px;">📊 Analitik</div>'

@@ -834,6 +834,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <code style="background:#dcfce7;padding:2px 6px;border-radius:3px;display:block;margin-top:4px;">npx wrangler secret put WA_PHONE<br>npx wrangler secret put WA_APIKEY</code>
           </div>
           <button onclick="waTest()" id="waTestBtn" style="padding:9px 18px;background:#25d366;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">💬 WhatsApp Test Gönder</button>
+          <button onclick="waTestFsm()" id="waTestFsmBtn" style="padding:9px 18px;background:#c67000;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;margin-left:8px;">🟠 FSM Raporu Test (bana)</button>
           <div id="waSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
         </div>
       </div>
@@ -3170,6 +3171,29 @@ async function waTest(){
     sonuc.textContent = '✗ ' + e.message;
   }
   btn.disabled = false; btn.textContent = '💬 WhatsApp Test Gönder';
+}
+async function waTestFsm(){
+  var sonuc = document.getElementById('waSonuc');
+  var btn   = document.getElementById('waTestFsmBtn');
+  btn.disabled = true; btn.textContent = '⏳ Gönderiliyor...';
+  sonuc.textContent = '';
+  try {
+    var r = await fetch(RAPOR_API+'/rapor/wa-test', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({sube:'fsm'})
+    });
+    var d = await r.json();
+    if(d.ok){
+      sonuc.style.color = '#166534';
+      sonuc.textContent = '✓ FSM raporu WhatsApp\'a gönderildi → ' + d.phone + ' (' + d.tarih + ')';
+    } else {
+      sonuc.style.color = 'var(--rd)';
+      sonuc.textContent = '✗ ' + (d.error || 'Hata');
+    }
+  } catch(e){
+    sonuc.style.color = 'var(--rd)';
+    sonuc.textContent = '✗ ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '🟠 FSM Raporu Test (bana)';
 }
 
 // Rapor email cloud sync — admin paneli ortak ayar, tüm cihazlara yansır

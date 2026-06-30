@@ -1917,6 +1917,32 @@ function rapSubeRender(k, ozet, detay) {
   }
 }
 
+// /islem/listele (işlem bazlı, güvenilir) → rapSubeRender'ın beklediği {ozet,detay}
+function _islemToRapor(islemler){
+  islemler = Array.isArray(islemler) ? islemler : [];
+  var gunMap={}, nakit=0, kredi=0, urunMap={}, detay=[];
+  islemler.forEach(function(s){
+    var top=Number(s.toplam)||0;
+    var iso=s.tarih_iso||'', disp=s.tarih||iso;
+    if(s.nakit_tutar||s.kart_tutar){ nakit+=Number(s.nakit_tutar)||0; kredi+=Number(s.kart_tutar)||0; }
+    else { var t=(s.odeme_tipi||'').toLowerCase(); if(t.indexOf('nakit')>=0&&t.indexOf('kart')<0) nakit+=top; else if(t.indexOf('kart')>=0||t.indexOf('kredi')>=0) kredi+=top; }
+    var det=s.urun_detay; if(!Array.isArray(det)&&s.urun_detay_json){ try{det=JSON.parse(s.urun_detay_json);}catch(e){det=[];} }
+    if(!Array.isArray(det)) det=[];
+    var gunAdet=0;
+    det.forEach(function(u){
+      if(!u||!u.ad) return;
+      var ad=Number(u.adet)||0, fi=Number(u.fiyat)||0; gunAdet+=ad;
+      if(!urunMap[u.ad]) urunMap[u.ad]={urun_adi:u.ad,toplam_adet:0,ciro:0};
+      urunMap[u.ad].toplam_adet+=ad; urunMap[u.ad].ciro+=fi*ad;
+      if(detay.length<400) detay.push({tarih:disp,urun_adi:u.ad,kategori:(u.tip==='icecek'||u.tip==='ic')?'İçecek':(u.tip==='yiyecek'||u.tip==='yi')?'Yiyecek':'-',adet:ad,birim_fiyat:fi,toplam:fi*ad,odeme_tipi:s.odeme_tipi||'',sube:s.sube});
+    });
+    if(!gunMap[iso]) gunMap[iso]={tarih:disp,_iso:iso,ciro:0,adet:0};
+    gunMap[iso].ciro+=top; gunMap[iso].adet+=gunAdet;
+  });
+  var gunler=Object.keys(gunMap).map(function(k){return gunMap[k];}).sort(function(a,b){return (b._iso||'').localeCompare(a._iso||'');});
+  var en_cok=Object.keys(urunMap).map(function(k){return urunMap[k];}).filter(function(u){return u.urun_adi&&u.urun_adi!=='Satış';}).sort(function(a,b){return b.toplam_adet-a.toplam_adet;}).slice(0,10);
+  return {ozet:{gunler:gunler,odeme:[{odeme_tipi:'nakit',ciro:nakit},{odeme_tipi:'kredi',ciro:kredi}],en_cok:en_cok}, detay:detay};
+}
 async function rapGoster() {
   var now = new Date();
   var pad = function(n){ return String(n).padStart(2,'0'); };
@@ -1940,15 +1966,15 @@ async function rapGoster() {
     var paramP = 'baslangic='+bas+'&bitis='+bit+'&sube=podyum';
     var paramF = 'baslangic='+bas+'&bitis='+bit+'&sube=fsm';
 
-    var [ozetP, detayP, ozetF, detayF] = await Promise.all([
-      fetch(_RAP_API+'/rapor/ozet?'+paramP).then(function(r){ return r.json(); }),
-      fetch(_RAP_API+'/rapor/listele?'+paramP).then(function(r){ return r.json(); }),
-      fetch(_RAP_API+'/rapor/ozet?'+paramF).then(function(r){ return r.json(); }),
-      fetch(_RAP_API+'/rapor/listele?'+paramF).then(function(r){ return r.json(); })
+    // GÜVENİLİR KAYNAK: /islem/listele (islemler tablosu) — eski /rapor/* 'satis'
+    // tablosunu okuyordu, Podyum'da ciroyu ~3 kat eksik gösteriyordu.
+    var [arrP, arrF] = await Promise.all([
+      fetch(_RAP_API+'/islem/listele?'+paramP).then(function(r){ return r.json(); }),
+      fetch(_RAP_API+'/islem/listele?'+paramF).then(function(r){ return r.json(); })
     ]);
-
-    rapSubeRender('p', ozetP, detayP);
-    rapSubeRender('f', ozetF, detayF);
+    var rP=_islemToRapor(arrP), rF=_islemToRapor(arrF);
+    rapSubeRender('p', rP.ozet, rP.detay);
+    rapSubeRender('f', rF.ozet, rF.detay);
 
   } catch(e) {
     ['p','f'].forEach(function(k){

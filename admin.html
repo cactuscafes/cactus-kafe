@@ -2404,6 +2404,7 @@ async function modalAc(){
   }
 }
 function _dEsc(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+function _kis(s,n){ s=String(s==null?'':s); return s.length>n? s.slice(0,n)+'…' : s; }
 function _yayinDiffHTML(eski, yeni){
   function flat(per){
     var m={};
@@ -2424,6 +2425,13 @@ function _yayinDiffHTML(eski, yeni){
     if(Number(ou.fiyat||0)!==Number(nu.fiyat||0)) d.push('fiyat: '+(ou.fiyat||0)+'₺ → <b>'+(nu.fiyat||0)+'₺</b>');
     if((!!ou.gizli)!==(!!nu.gizli)) d.push(nu.gizli?'gizlendi':'satışa açıldı');
     if((!!ou.tukendi)!==(!!nu.tukendi)) d.push(nu.tukendi?'tükendi işaretlendi':'stoğa eklendi');
+    if((ou.aciklama||'').trim()!==(nu.aciklama||'').trim()){
+      if(!(ou.aciklama||'').trim()) d.push('açıklama eklendi: “'+_dEsc(_kis(nu.aciklama,45))+'”');
+      else if(!(nu.aciklama||'').trim()) d.push('açıklama silindi');
+      else d.push('açıklama: “'+_dEsc(_kis(ou.aciklama,32))+'” → “'+_dEsc(_kis(nu.aciklama,32))+'”');
+    }
+    if((ou.emoji||'')!==(nu.emoji||'')) d.push('emoji: '+_dEsc(ou.emoji||'—')+' → '+_dEsc(nu.emoji||'—'));
+    if((ou.foto||'')!==(nu.foto||'')) d.push(nu.foto?(ou.foto?'fotoğraf değişti':'fotoğraf eklendi'):'fotoğraf kaldırıldı');
     if(d.length) rows.push({t:'mod',kat:kat,html:'<b>'+_dEsc(nu.ad)+'</b> — '+d.join(', ')});
   });
   Object.keys(o).forEach(function(id){ if(!n[id]) rows.push({t:'del',kat:o[id].kat,html:'<b>'+_dEsc(o[id].u.ad)+'</b> kaldırıldı'}); });

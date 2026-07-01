@@ -278,6 +278,9 @@ input,select{font-family:'Inter',sans-serif;}
 .ai-zaman{font-size:10px;font-weight:600;color:rgba(255,255,255,.55);background:var(--k2);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;letter-spacing:.3px;}
 .ai-sil{background:none;border:none;font-size:19px;color:var(--kr3);transition:color .15s;padding:6px 8px;min-width:32px;}
 .ai-sil:hover{color:var(--rd);}
+.ai-not{background:none;border:none;font-size:18px;cursor:pointer;padding:6px 6px;opacity:.6;line-height:1;transition:opacity .15s;-webkit-tap-highlight-color:transparent;}
+.ai-not:hover,.ai-not:active{opacity:1;}
+.ai-not-txt{font-size:11px;color:#e67e22;font-weight:700;margin-top:3px;white-space:normal;}
 .adis-ozet{background:#fff;border-top:2px solid var(--kr2);padding:12px 14px;flex-shrink:0;}
 .oz-row{display:flex;justify-content:space-between;font-size:12px;color:var(--k2);margin-bottom:3px;}
 .oz-top{display:flex;justify-content:space-between;align-items:center;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--k1);padding-top:8px;border-top:1.5px solid var(--kr2);margin:5px 0 10px;}
@@ -1981,7 +1984,7 @@ function renderAdisyon(){
   const bosHTML='<div class="adis-bos"><div class="bi">🍽️</div><p>Masa seçip ürün ekleyin</p></div>';
   let itemsHTML='';
   if(!bos){
-    a.forEach(item=>{
+    a.forEach((item,idx)=>{
       const sub=item.fiyat*item.adet;
       if(item.tip==='icecek') topIc+=sub; else topYi+=sub;
       const gAdet=item.gonderilenAdet||0;
@@ -1992,13 +1995,16 @@ function renderAdisyon(){
         : (kismiGonderildi
           ? `<span style="color:#e67e22;font-size:11px;font-weight:700;margin-left:6px;">⏳ ${gAdet}/${item.adet} gönderildi</span>`
           : '');
+      const _nv=(typeof window._notAl==='function')?window._notAl(aktifMasa+'_'+idx):'';
+      const _nvEsc=_nv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
       itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}"${tumGonderildi?' style="opacity:.78;"':''}>
-        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}${item.zaman?`<span class="ai-zaman">${item.zaman}</span>`:''}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div></div>
+        <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}${item.zaman?`<span class="ai-zaman">${item.zaman}</span>`:''}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div>${_nv?`<div class="ai-not-txt">📝 ${_nvEsc}</div>`:''}</div>
         <div class="ai-ctrl">
           <button onclick="chAdet('${item.id}',-1)">−</button>
           <span class="ai-adet">${item.adet}</span>
           <button onclick="chAdet('${item.id}',1)">+</button>
         </div>
+        <button class="ai-not" onclick="notEkle(${aktifMasa},${idx})" title="${_nv?_nvEsc:'Not ekle'}">${_nv?'📝':'✏️'}</button>
         <button class="ai-sil" onclick="delItem('${item.id}')">×</button>
       </div>`;
     });
@@ -3522,6 +3528,7 @@ setInterval(function(){gunCiroYukle();},60000);
   window.notCipToggle = notCipToggle;
   window.notKaydet = notKaydet;
   window.notModalKapat = notModalKapat;
+  window._notAl = function(k){ return _notlar[k] || ''; };
 
   /* ===== 3. MASA TASIMA ===== */
   function masaTasi() {
@@ -3672,19 +3679,7 @@ setInterval(function(){gunCiroYukle();},60000);
       if (origRender && !origRender._patched) {
         window.renderAdisyon = function() {
           origRender.apply(this, arguments);
-          /* Not ikonları ekle */
-          if (window.aktifMasa) {
-            document.querySelectorAll('.adis-item, [class*="adis-item"]').forEach(function(item, idx) {
-              if (item.querySelector('.not-ico')) return;
-              var notBtn = document.createElement('span');
-              notBtn.className = 'not-ico';
-              notBtn.textContent = _notlar[window.aktifMasa + '_' + idx] ? '📝' : '✏️';
-              notBtn.title = _notlar[window.aktifMasa + '_' + idx] || 'Not ekle';
-              notBtn.style.cssText = 'cursor:pointer;margin-left:4px;font-size:14px;opacity:0.7;';
-              notBtn.onclick = function(e) { e.stopPropagation(); notEkle(window.aktifMasa, idx); };
-              item.appendChild(notBtn);
-            });
-          }
+          /* Not butonu artık renderAdisyon içinde her ürüne doğrudan ekleniyor (.ai-not) */
         };
         window.renderAdisyon._patched = true;
       }

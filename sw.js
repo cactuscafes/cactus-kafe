@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v25'; // v25: sipariş notu çipleri ürüne göre (Türk kahvesi→şeker düzeyi, sütlü→süt tipi) + grup tekli seçim
+const VERSION = 'cactus-v26'; // v26: not butonu (✏️) sepette görünmüyordu (yanlış class) — her ürüne eklendi + kayıtlı not satır içi
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

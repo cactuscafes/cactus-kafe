@@ -341,7 +341,7 @@ td{border-bottom:1px solid var(--line);padding:11px 8px;}
 /* Nav Yayınla → marka yeşili + bekleyen değişiklik noktası */
 .btn-yayinla{background:var(--brand);color:#fff;position:relative;}
 .btn-yayinla:hover{filter:brightness(1.09);}
-.nav-dot{display:none;position:absolute;top:-3px;right:-3px;width:11px;height:11px;background:#e74c3c;border:2px solid var(--surface);border-radius:50%;}
+.nav-dot{display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;background:#e74c3c;border:2px solid var(--surface);border-radius:10px;font-size:11px;font-weight:700;color:#fff;line-height:14px;text-align:center;box-sizing:border-box;}
 .btn-yayinla.pending .nav-dot{display:block;animation:dotPulse 1.6s infinite;}
 @keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
 
@@ -481,7 +481,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
     </div>
     <div class="main">
-      <div id="pendingBar" style="display:none;background:linear-gradient(90deg,#b8965a,#c8a86a);color:#1a3010;padding:10px 18px;border-radius:8px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(184,150,90,.25);"><span style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;"><span style="width:9px;height:9px;border-radius:50%;background:#1a3010;display:inline-block;animation:dotPulse 1.4s infinite;flex:none;"></span>Yayınlanmamış değişiklikler var — canlı menüye/adisyona uygulamak için Yayınla'ya bas.</span><button onclick="modalAc()" style="background:#1a3010;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex:none;">🚀 Yayınla</button></div>
+      <div id="pendingBar" style="display:none;background:linear-gradient(90deg,#b8965a,#c8a86a);color:#1a3010;padding:10px 18px;border-radius:8px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(184,150,90,.25);"><span style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;"><span style="width:9px;height:9px;border-radius:50%;background:#1a3010;display:inline-block;animation:dotPulse 1.4s infinite;flex:none;"></span><span id="pendingBarTxt">Yayınlanmamış değişiklikler var — canlı menüye/adisyona uygulamak için Yayınla'ya bas.</span></span><button onclick="modalAc()" style="background:#1a3010;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex:none;">🚀 Yayınla</button></div>
 
       <!-- BUGÜN — GÜNLÜK ÖZET / DASHBOARD -->
       <div class="panel on" id="panel-bugun" style="max-width:1100px;">
@@ -1183,6 +1183,12 @@ function _adminMenuUygula(data, kaynak){
   });
   if(!kat.length) return false;
   KAT=kat; MENU=menu;
+  // Yayınlı anlık görüntü: adisyon KV'den gelen = canlıdaki hal → rozet sayacının referansı
+  try{
+    var _snap={}; kat.forEach(function(k){ _snap[k.id]={id:k.id,label:k.label,urunler:menu[k.id]||[]}; });
+    _YAYIN_SNAP[AKTIF_SUBE]=JSON.parse(JSON.stringify(_snap));
+    _pendingBadgeGuncelle();
+  }catch(e){}
   localStorage.setItem(_menuKeyFor(AKTIF_SUBE),JSON.stringify(MENU));
   localStorage.setItem(KEYS.kat,JSON.stringify(KAT));
   aktifKat=KAT[0]?.id||'sicak';
@@ -1278,11 +1284,31 @@ function mobTab(id,btn){
   if(hedef) hedef.click();
 }
 // Bekleyen (yayınlanmamış) menü değişikliği göstergesi
+// _YAYIN_SNAP: şube başına son bilinen YAYINLI menü (adisyon KV'den yüklenen / yayınlanan).
+// Rozet sayısı = bu anlık görüntü ile düzenlenen menü arasındaki diff satır sayısı.
+var _YAYIN_SNAP={};
+function _pendingSay(){
+  try{
+    var snap=_YAYIN_SNAP[AKTIF_SUBE];
+    if(!snap) return 0; // anlık görüntü yok → sayı gösterme, nokta yeterli
+    var yeni={}; KAT.forEach(function(k){ yeni[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]}; });
+    return _yayinDiffRows(snap,yeni).length;
+  }catch(e){ return 0; }
+}
+function _pendingBadgeGuncelle(){
+  var b=document.getElementById('navYayinlaBtn'); if(!b) return;
+  var d=b.querySelector('.nav-dot');
+  var n=b.classList.contains('pending')?_pendingSay():0;
+  if(d) d.textContent = n>0 ? (n>99?'99+':String(n)) : '';
+  var pt=document.getElementById('pendingBarTxt');
+  if(pt) pt.textContent=(n>0 ? n+' yayınlanmamış değişiklik var' : 'Yayınlanmamış değişiklikler var')+" — canlı menüye/adisyona uygulamak için Yayınla'ya bas.";
+}
 function pendingSet(v){
   var b=document.getElementById('navYayinlaBtn');
   if(b) b.classList.toggle('pending', !!v);
   var pb=document.getElementById('pendingBar');
   if(pb) pb.style.display = v ? 'flex' : 'none';
+  _pendingBadgeGuncelle();
 }
 
 let _tt;
@@ -2435,15 +2461,17 @@ async function modalAc(){
   try{
     var r=await fetch(RAPOR_API+'/menu/cek?sube=adisyon_'+AKTIF_SUBE+'&t='+Date.now());
     var eskiPer = r.ok ? (await r.json()||{}) : {};
+    if(r.ok && eskiPer && Object.keys(eskiPer).length){ _YAYIN_SNAP[AKTIF_SUBE]=eskiPer; } // rozet sayacına taze referans
     var yeniPer = {}; KAT.forEach(function(k){ yeniPer[k.id]={id:k.id,label:k.label,urunler:MENU[k.id]||[]}; });
     dEl.innerHTML = _yayinDiffHTML(eskiPer, yeniPer);
+    _pendingBadgeGuncelle();
   }catch(e){
     dEl.innerHTML='<div style="font-size:12px;color:var(--mist);">Değişiklik özeti alınamadı (yayın yine de yapılabilir).</div>';
   }
 }
 function _dEsc(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
 function _kis(s,n){ s=String(s==null?'':s); return s.length>n? s.slice(0,n)+'…' : s; }
-function _yayinDiffHTML(eski, yeni){
+function _yayinDiffRows(eski, yeni){
   function flat(per){
     var m={};
     Object.keys(per||{}).forEach(function(cid){
@@ -2473,9 +2501,13 @@ function _yayinDiffHTML(eski, yeni){
     if(d.length) rows.push({t:'mod',kat:kat,html:'<b>'+_dEsc(nu.ad)+'</b> — '+d.join(', ')});
   });
   Object.keys(o).forEach(function(id){ if(!n[id]) rows.push({t:'del',kat:o[id].kat,html:'<b>'+_dEsc(o[id].u.ad)+'</b> kaldırıldı'}); });
+  var sira={add:0,mod:1,del:2}; rows.sort(function(a,b){return sira[a.t]-sira[b.t];});
+  return rows;
+}
+function _yayinDiffHTML(eski, yeni){
+  var rows=_yayinDiffRows(eski, yeni);
   if(!rows.length) return '<div style="font-size:13px;color:var(--mist);padding:6px 0;">Değişiklik yok — yayınlanacak fark bulunamadı.</div>';
   var ico={add:'🟢',mod:'✏️',del:'🔴'};
-  var sira={add:0,mod:1,del:2}; rows.sort(function(a,b){return sira[a.t]-sira[b.t];});
   var html='<div style="font-size:12px;color:var(--mist);margin:2px 0 6px;"><b>'+rows.length+'</b> değişiklik yayınlanacak ('+(AKTIF_SUBE==='fsm'?'FSM':'Podyumpark')+'):</div>';
   html+='<div style="max-height:230px;overflow:auto;border:1px solid var(--stone);border-radius:8px;padding:8px 10px;background:#fff;">';
   rows.forEach(function(r){ html+='<div style="font-size:12.5px;padding:3px 0;line-height:1.45;border-bottom:1px solid #f3f0eb;">'+ico[r.t]+' '+r.html+' <span style="color:var(--mist);font-size:11px;">· '+_dEsc(r.kat)+'</span></div>'; });
@@ -2526,6 +2558,7 @@ async function yayinla(){
     if(res.every(function(r){return r&&r.ok;})){
       dur.textContent='✅ Yayınlandı! '+(aktif==='fsm'?'FSM':'Podyumpark')+' menüsü güncellendi (diğer şube korundu).';
       btn.textContent='✅ Tamamlandı';
+      try{ _YAYIN_SNAP[aktif]=JSON.parse(JSON.stringify(aktifPer)); }catch(e){} // yeni yayınlı hal = referans
       pendingSet(false);
       toast('🚀 Yayınlandı!');
     } else {

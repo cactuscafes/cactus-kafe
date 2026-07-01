@@ -137,8 +137,6 @@ input,select{font-family:'Inter',sans-serif;}
 .htab:hover{color:var(--kr);background:rgba(255,255,255,.05);}
 .htab.on{color:var(--al2);border-bottom-color:var(--al2);background:rgba(201,168,76,.1);}
 .htab .tico{font-size:16px;}
-.tbadge{background:var(--rd2);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:none;align-items:center;justify-content:center;}
-.tbadge.on{display:flex;}
 .hdr-time{padding:10px 14px;border-left:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;justify-content:center;align-items:flex-end;flex-shrink:0;}
 .hdr-time .ts{font-family:'Fraunces',serif;font-size:18px;color:var(--kr);line-height:1;}
 .hdr-time .td{font-size:10px;color:var(--kr3);margin-top:2px;}
@@ -299,47 +297,9 @@ input,select{font-family:'Inter',sans-serif;}
 .adis-ozet{background:#fff;border-top:2px solid var(--kr2);padding:12px 14px;flex-shrink:0;}
 .oz-row{display:flex;justify-content:space-between;font-size:12px;color:var(--k2);margin-bottom:3px;}
 .oz-top{display:flex;justify-content:space-between;align-items:center;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--k1);padding-top:8px;border-top:1.5px solid var(--kr2);margin:5px 0 10px;}
-.btn-gonder{width:100%;padding:14px;min-height:48px;border:none;border-radius:9px;margin-bottom:6px;background:linear-gradient(135deg,var(--bl),var(--bl2));color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
-.btn-gonder:hover{opacity:.9;transform:translateY(-1px);}
-.btn-gonder:disabled{opacity:.35;cursor:not-allowed;transform:none;}
-/* Bar/Mutfak (KDS) sekmeleri ve "Sipariş Gönder" gizlendi — akış: ürün ekle → ödeme al.
-   Geri açmak için aşağıdaki satırı sil. JS kodu yerinde, uykuda. */
-#tab-bar,#tab-mut,#d-gonder,#m-gonder{display:none!important;}
 .btn-odeme{width:100%;padding:15px;min-height:52px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--k1),var(--k2));color:var(--kr);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
 .btn-odeme:hover{opacity:.9;transform:translateY(-1px);}
 .btn-odeme:disabled{opacity:.35;cursor:not-allowed;transform:none;}
-
-/* ══════════ BAR / MUTFAK ══════════ */
-.bm-wrap{padding:16px;max-width:1200px;margin:0 auto;}
-.bm-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
-.bm-ttl{font-family:'Fraunces',serif;font-size:20px;font-weight:700;}
-.bm-temizle{background:none;border:1.5px solid var(--kr2);border-radius:7px;padding:7px 12px;font-size:12px;color:var(--k2);transition:all .2s;}
-.bm-temizle:hover{border-color:var(--rd);color:var(--rd);}
-.sip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
-.skrt{background:#fff;border:2px solid var(--kr2);border-radius:12px;overflow:hidden;box-shadow:var(--sh);animation:kg .3s ease;}
-@keyframes kg{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.skrt.done{opacity:.42;}
-.skrt-hdr{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
-.skrt-hdr.ic{background:linear-gradient(135deg,var(--bl),var(--bl2));}
-.skrt-hdr.yi{background:linear-gradient(135deg,var(--or),var(--or2));}
-.skrt-masa{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:#fff;}
-.skrt-saat{font-size:11px;color:rgba(255,255,255,.7);}
-.yeni-rz{background:rgba(255,255,255,.25);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:1px;}
-.skrt-body{padding:10px 14px;}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--kr2);font-size:13px;}
-.srow:last-child{border:none;}
-.srow-ad{font-weight:700;color:var(--k1);}
-.srow-adet{background:var(--kr2);color:var(--k2);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.skrt-ftr{padding:10px 14px;background:var(--kr);border-top:1px solid var(--kr2);}
-.hzr-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:700;transition:all .2s;}
-.hzr-btn.ic{background:var(--bl2);color:#fff;}
-.hzr-btn.ic:hover{background:var(--bl);}
-.hzr-btn.yi{background:var(--or2);color:#fff;}
-.hzr-btn.yi:hover{background:var(--or);}
-.hzr-btn.done{background:var(--gr2);color:#fff;cursor:default;}
-.bm-bos{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--kr3);}
-.bm-bos .bi{font-size:48px;opacity:.35;margin-bottom:10px;}
-.bm-bos p{font-size:14px;line-height:1.6;}
 
 /* ══════════ YÖNET EKRANI ══════════ */
 .yon-wrap{padding:16px;max-width:900px;margin:0 auto;}
@@ -469,7 +429,7 @@ input,select{font-family:'Inter',sans-serif;}
   .hdr-time{display:none;}
   .urun-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
   .htab{font-size:10px;min-width:70px;}
-  .bm-wrap,.yon-wrap{padding:12px;}
+  .yon-wrap{padding:12px;}
   /* Mobil kategori bar — kompakt */
   .kat-bar{padding:7px 10px;gap:6px;background:linear-gradient(180deg,var(--kr2),var(--wh));}
   .ktab{padding:7px 12px;font-size:12px;letter-spacing:0;}
@@ -700,8 +660,6 @@ if('serviceWorker' in navigator){
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
     <button class="htab" onclick="kartYildizAc()"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="zRapTab(this)"><span class="tico">🔐</span>Z Raporu</button>
-    <button class="htab" onclick="goTo('bar',this)" id="tab-bar"><span class="tico">🥤</span>İçecek Barı<span class="tbadge" id="bdg-bar">0</span></button>
-    <button class="htab" onclick="goTo('mut',this)" id="tab-mut"><span class="tico">🍳</span>Mutfak<span class="tbadge" id="bdg-mut">0</span></button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
     <button class="htab" onclick="goTo('har',this);harGoster();"><span class="tico">💸</span>Gider</button>
     <button class="htab" onclick="goTo('yon',this)"><span class="tico">⚙️</span>Yönet</button>
@@ -756,38 +714,9 @@ if('serviceWorker' in navigator){
         <div class="oz-row"><span>İçecek</span><span id="d-ic">₺0</span></div>
         <div class="oz-row"><span>Yiyecek</span><span id="d-yi">₺0</span></div>
         <div class="oz-top"><span>Toplam</span><span id="d-top">₺0</span></div>
-        <button class="btn-gonder" id="d-gonder" onclick="siparisiGonder()" disabled>📤 Siparişi Onayla & Gönder</button>
         <button class="btn-odeme" id="d-odeme" onclick="odemeAl()" disabled>💳 Ödeme Al</button>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- BAR -->
-<div class="scr" id="scr-bar">
-  <div class="bm-wrap">
-    <div class="bm-topbar">
-      <div><div class="bm-ttl" style="color:var(--bl)">🥤 İçecek Barı</div><div style="font-size:12px;color:var(--kr3);margin-top:2px">Gelen içecek siparişleri</div></div>
-      <div style="display:flex;gap:6px;">
-        <button class="bm-temizle" onclick="clearDone('bar')">✓ Tamamlananları Temizle</button>
-        <button class="bm-temizle" onclick="clearAll('bar')" style="border-color:#c0392b;color:#c0392b;">🗑 Tümünü Temizle</button>
-      </div>
-    </div>
-    <div class="sip-grid" id="bar-grid"></div>
-  </div>
-</div>
-
-<!-- MUTFAK -->
-<div class="scr" id="scr-mut">
-  <div class="bm-wrap">
-    <div class="bm-topbar">
-      <div><div class="bm-ttl" style="color:var(--or)">🍳 Mutfak</div><div style="font-size:12px;color:var(--kr3);margin-top:2px">Gelen yiyecek siparişleri</div></div>
-      <div style="display:flex;gap:6px;">
-        <button class="bm-temizle" onclick="clearDone('mut')">✓ Tamamlananları Temizle</button>
-        <button class="bm-temizle" onclick="clearAll('mut')" style="border-color:#c0392b;color:#c0392b;">🗑 Tümünü Temizle</button>
-      </div>
-    </div>
-    <div class="sip-grid" id="mut-grid"></div>
   </div>
 </div>
 
@@ -1002,7 +931,6 @@ if('serviceWorker' in navigator){
     <div class="oz-row"><span>İçecek</span><span id="m-ic">₺0</span></div>
     <div class="oz-row"><span>Yiyecek</span><span id="m-yi">₺0</span></div>
     <div class="oz-top"><span>Toplam</span><span id="m-top">₺0</span></div>
-    <button class="btn-gonder" id="m-gonder" onclick="siparisiGonder()" disabled>📤 Siparişi Onayla & Gönder</button>
     <button class="btn-odeme" id="m-odeme" onclick="odemeAl()" disabled>💳 Ödeme Al</button>
   </div>
 </div>
@@ -1211,7 +1139,7 @@ try{
   }
 }catch(e){}
 
-const LK={mas:'cactus_masalar',bar:'cactus_bar_podyum',mut:'cactus_mut_podyum',menu:'cactus_menu_podyum'};
+const LK={mas:'cactus_masalar',menu:'cactus_menu_podyum'};
 var _menuYazmaZamani=0; // menuKaydet'in son çalışma zamanı — polling'in üzerine yazmasını engeller
 // Şube otomatik tespit: title'da 'fsm' geçerse FSM, aksi halde Podyum.
 const SUBE=(document.title||'').toLowerCase().includes('fsm')?'fsm':'podyum';
@@ -1246,8 +1174,6 @@ window._menuMigrasyon=function(){
 };
 window._menuMigrasyon();
 let masalar={};
-let barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');
-let mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');
 let aktifMasa=null;
 let aktifKat='__fav__'; // Açılışta Favoriler karşılasın
 let yonKat=Object.keys(MENU)[0];
@@ -1383,12 +1309,6 @@ for(let i=1;i<=34;i++){
   });
 }
 if(_migrated){try{localStorage.setItem(LK.mas,JSON.stringify(masalar));}catch(e){}}
-// barSip ve mutSip için de migrate
-[['bar',barSip],['mut',mutSip]].forEach(([k,arr])=>{
-  let chg=false;
-  arr.forEach(s=>{(s.items||[]).forEach(it=>{if(it&&it.tip&&it.tip!=='icecek'&&it.tip!=='yiyecek'){it.tip=_normTip(it.tip);chg=true;}});});
-  if(chg)try{localStorage.setItem(LK[k],JSON.stringify(arr));}catch(e){}
-});
 
 function tickTime(){
   const n=new Date();
@@ -1512,8 +1432,6 @@ function goTo(id,el){
   document.querySelectorAll('.htab').forEach(t=>t.classList.remove('on'));
   document.getElementById('scr-'+id).classList.add('on');
   el.classList.add('on');
-  if(id==='bar'){barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');renderBar();}
-  if(id==='mut'){mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');renderMut();}
   if(id==='yon'){menuGuncelleAnlik();renderYon();}
   if(id==='rap'){renderCanliCiro();gunCiroYukle();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
 }
@@ -2331,13 +2249,11 @@ function renderAdisyon(){
   document.getElementById('d-ic').textContent='₺'+topIc;
   document.getElementById('d-yi').textContent='₺'+topYi;
   document.getElementById('d-top').textContent='₺'+top;
-  document.getElementById('d-gonder').disabled=dis;
   document.getElementById('d-odeme').disabled=dis;
   document.getElementById('adis-items-mob').innerHTML=bos?bosHTML:itemsHTML;
   document.getElementById('m-ic').textContent='₺'+topIc;
   document.getElementById('m-yi').textContent='₺'+topYi;
   document.getElementById('m-top').textContent='₺'+top;
-  document.getElementById('m-gonder').disabled=dis;
   document.getElementById('m-odeme').disabled=dis;
   updateMobBadge();
 }
@@ -2397,42 +2313,6 @@ function masayiTemizle(){
     _yedek.forEach(function(it){ if(it&&it.id&&Number(it.adet)>0) _pushEvent('ITEM_ADD', _hedef, {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:Number(it.adet)}); });
     toast('\u21A9 Masa '+_hedef+' geri al\u0131nd\u0131');
   });
-}
-
-function siparisiGonder(){
-  if(!aktifMasa||!masalar[aktifMasa].length)return;
-  const a=masalar[aktifMasa];
-  // Sadece gönderilmemiş yeni adetleri gönder (gonderilenAdet < adet olanlar)
-  const yeniler=a.filter(x=>x.adet>(x.gonderilenAdet||0))
-                 .map(x=>({...x,adet:x.adet-(x.gonderilenAdet||0)}));
-  if(!yeniler.length){toast('ℹ️ Yeni ürün yok, hepsi gönderildi');return;}
-  const saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  const ic=yeniler.filter(x=>x.tip==='icecek');
-  const yi=yeniler.filter(x=>x.tip==='yiyecek');
-  const _API='https://cactus-rapor-api.batuhanbulut.workers.dev';
-  const now=Date.now();
-  // Global benzersiz taban: aynı ms'de iki cihaz gönderse bile çakışmasın
-  const _uid=now+'_'+SUBE+'_'+aktifMasa+'_'+Math.random().toString(36).slice(2,7);
-  const d1Sip=[];
-  if(ic.length){
-    const s={id:'i_'+_uid,masa:aktifMasa,saat,items:ic,hazirlandi:false,_d1:true};
-    barSip.push(s);localStorage.setItem(LK.bar,JSON.stringify(barSip));
-    d1Sip.push({id:s.id,masa:aktifMasa,tip:'bar',items:ic,zaman:now});
-  }
-  if(yi.length){
-    const s={id:'y_'+_uid,masa:aktifMasa,saat,items:yi,hazirlandi:false,_d1:true};
-    mutSip.push(s);localStorage.setItem(LK.mut,JSON.stringify(mutSip));
-    d1Sip.push({id:s.id,masa:aktifMasa,tip:'mutfak',items:yi,zaman:now});
-  }
-  // Anlık D1'e gönder — tüm cihazlar ~1.5 saniyede görür
-  if(d1Sip.length){
-    fetch(_API+'/siparis/gonder',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sube:SUBE,siparisler:d1Sip})}).catch(function(){});
-  }
-  // Tüm item'ları "tamamı gönderildi" olarak işaretle — masada kalmaya devam etsinler
-  a.forEach(x=>{x.gonderilenAdet=x.adet;});
-  saveMasalar();updateBadges();if(typeof renderAdisyon==="function")renderAdisyon();renderMasalar();
-  toast('📤 Sipariş bar'+(yi.length?' ve mutfağa':'')+' gönderildi!');
 }
 
 /* ✅ DÜZELTME: toggleMasa fonksiyonu — CSS .kapali class'ı ile çalışıyor */
@@ -2670,75 +2550,6 @@ function transferYap(){
   document.getElementById('adis-masa-mob').textContent='Masa '+hedef;
   renderMasalar();renderAdisyon();
   toast('⇄ Masa '+onceki+' → Masa '+hedef+' aktarıldı');
-}
-
-function renderBar(){
-  const g=document.getElementById('bar-grid');
-  if(!barSip.length){g.innerHTML='<div class="bm-bos"><div class="bi">🥤</div><p>Henüz içecek siparişi yok.</p></div>';return;}
-  g.innerHTML='';
-  [...barSip].sort((a,b)=>(a.hazirlandi?1:0)-(b.hazirlandi?1:0)).forEach(s=>g.appendChild(sipKart(s,'bar')));
-}
-function renderMut(){
-  const g=document.getElementById('mut-grid');
-  if(!mutSip.length){g.innerHTML='<div class="bm-bos"><div class="bi">🍳</div><p>Henüz yiyecek siparişi yok.</p></div>';return;}
-  g.innerHTML='';
-  [...mutSip].sort((a,b)=>(a.hazirlandi?1:0)-(b.hazirlandi?1:0)).forEach(s=>g.appendChild(sipKart(s,'mut')));
-}
-function sipKart(s,tip){
-  const ic=tip==='bar';
-  const d=document.createElement('div');
-  d.className='skrt'+(s.hazirlandi?' done':'');
-  d.innerHTML=`<div class="skrt-hdr ${ic?'ic':'yi'}"><div class="skrt-masa">Masa ${s.masa}</div><div style="display:flex;align-items:center;gap:6px;"><span class="skrt-saat">${s.saat}</span>${!s.hazirlandi?'<span class="yeni-rz">YENİ</span>':''}</div></div><div class="skrt-body">${s.items.map(it=>`<div class="srow"><span class="srow-ad">${it.emoji} ${it.ad}</span><span class="srow-adet">${it.adet} adet</span></div>`).join('')}</div><div class="skrt-ftr">${s.hazirlandi?'<button class="hzr-btn done" disabled>✓ Hazırlandı</button>':`<button class="hzr-btn ${ic?'ic':'yi'}" onclick="hazirlandiMark('${s.id}','${tip}')">✓ Hazırlandı</button>`}<button class="tmz-btn" onclick="siparisSil('${s.id}','${tip}')" style="margin-left:6px;padding:6px 12px;background:#c0392b;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">🗑 Temizle</button></div>`;
-  return d;
-}
-function hazirlandiMark(id,tip){
-  if(tip==='bar'){barSip=barSip.map(x=>x.id===id?{...x,hazirlandi:true}:x);localStorage.setItem(LK.bar,JSON.stringify(barSip));renderBar();}
-  else{mutSip=mutSip.map(x=>x.id===id?{...x,hazirlandi:true}:x);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}
-  // D1'e hazırlandı bildir — sayfa yenilenince sipariş geri gelmez
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
-  updateBadges();toast('✓ Hazırlandı olarak işaretlendi');
-}
-function siparisSil(id, tip) {
-  var lk = tip === 'bar' ? LK.bar : LK.mut;
-  var siparisler = JSON.parse(localStorage.getItem(lk) || '[]');
-  siparisler = siparisler.filter(function(s){ return s.id !== id; });
-  localStorage.setItem(lk, JSON.stringify(siparisler));
-  if(tip === 'bar') { if(typeof renderBar==='function') renderBar(); }
-  else { if(typeof renderMut==='function') renderMut(); }
-  if(typeof updateBadges==='function') updateBadges();
-  // D1'e de hazırlandı olarak işaretle
-  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({id: id})
-  }).catch(function(){});
-}
-
-function clearAll(tip){
-  if(!confirm((tip==='bar'?'Bar':'Mutfak')+' — tüm siparişler silinsin mi?'))return;
-  const _api='https://cactus-rapor-api.batuhanbulut.workers.dev';
-  const liste=tip==='bar'?barSip:mutSip;
-  liste.forEach(function(s){
-    fetch(_api+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});
-  });
-  if(tip==='bar'){barSip=[];localStorage.setItem(LK.bar,'[]');renderBar();}
-  else{mutSip=[];localStorage.setItem(LK.mut,'[]');renderMut();}
-  updateBadges();
-  toast('🗑 '+(tip==='bar'?'Bar':'Mutfak')+' temizlendi');
-}
-function clearDone(tip){
-  // Henüz D1'e bildirilmemiş hazırlanmış siparişleri önce D1'e gönder
-  const hazirlar=tip==='bar'?barSip.filter(x=>x.hazirlandi):mutSip.filter(x=>x.hazirlandi);
-  hazirlar.forEach(function(s){fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
-  if(tip==='bar'){barSip=barSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.bar,JSON.stringify(barSip));renderBar();}
-  else{mutSip=mutSip.filter(x=>!x.hazirlandi);localStorage.setItem(LK.mut,JSON.stringify(mutSip));renderMut();}
-  updateBadges();toast('🗑 Temizlendi');
-}
-function updateBadges(){
-  const bi=barSip.filter(x=>!x.hazirlandi).length;
-  const mi=mutSip.filter(x=>!x.hazirlandi).length;
-  const bb=document.getElementById('bdg-bar'),bm=document.getElementById('bdg-mut');
-  bb.textContent=bi;bm.textContent=mi;
-  bb.classList.toggle('on',bi>0);bm.classList.toggle('on',mi>0);
 }
 
 function renderYon(){
@@ -3688,8 +3499,6 @@ function toast(msg){
 }
 
 window.addEventListener('storage',e=>{
-  if(e.key===LK.bar){barSip=JSON.parse(e.newValue||'[]');if(document.getElementById('scr-bar').classList.contains('on'))renderBar();updateBadges();}
-  if(e.key===LK.mut){mutSip=JSON.parse(e.newValue||'[]');if(document.getElementById('scr-mut').classList.contains('on'))renderMut();updateBadges();}
   if(e.key===LK.mas){const s=JSON.parse(e.newValue||'{}');for(let i=1;i<=30;i++)masalar[i]=s[i]||[];renderMasalar();renderAdisyon();}
 });
 
@@ -3698,8 +3507,7 @@ if(window.innerWidth<=640){
   const btn=document.getElementById('toggle-btn');
   if(pnl&&btn){pnl.classList.add('kapali');btn.textContent='▶';}
 }
-renderMasalar();renderKatBar();renderUrunler();renderAdisyon();updateBadges();
-setInterval(()=>{barSip=JSON.parse(localStorage.getItem(LK.bar)||'[]');mutSip=JSON.parse(localStorage.getItem(LK.mut)||'[]');updateBadges();},4000);
+renderMasalar();renderKatBar();renderUrunler();renderAdisyon();
 // ═══ OTOMATİK GÜNCELLEME ═══ Açık sekme yeni deploy'u fark edince BOŞTAYKEN kendini yeniler.
 // Cihazları elle yenilemeye gerek kalmaz → "eski kod çalışıyor" sorunu biter.
 (function(){
@@ -3856,72 +3664,14 @@ setInterval(function(){gunCiroYukle();},60000);
   function masalarTamCek(){
     // ── MASALAR — per-masa LWW (yeni motor) ──
     if(typeof _masalarSyncCek==='function') _masalarSyncCek();
-    // ── SİPARİŞLER (bar/mutfak) — son 12 saatteki bekleyenleri yükle ──
-    var sipSince=Date.now()-(12*60*60*1000);
-    fetch(API+'/sync/durum?sube='+SUBE+'&since=0')
-      .then(function(r){return r.json();})
-      .then(function(data){
-        if(data.siparisler&&data.siparisler.length){
-          var lkBar=getLkBar(); var lkMut=getLkMut();
-          var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
-          var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
-          var barIds=bar.map(function(s){return s.id;});
-          var mutIds=mut.map(function(s){return s.id;});
-          var bc=false,mc=false;
-          data.siparisler.forEach(function(s){
-            if(s.zaman<sipSince)return; // 12 saatten eski → atla
-            if(s.hazirlandi===1){
-              bar.forEach(function(b){if(b.id===s.id&&!b.hazirlandi){b.hazirlandi=true;bc=true;}});
-              mut.forEach(function(m){if(m.id===s.id&&!m.hazirlandi){m.hazirlandi=true;mc=true;}});
-              return;
-            }
-            if(s.tip==='bar'&&!barIds.includes(s.id)){
-              bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
-              barIds.push(s.id);bc=true;
-            }
-            if(s.tip==='mutfak'&&!mutIds.includes(s.id)){
-              mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
-              mutIds.push(s.id);mc=true;
-            }
-          });
-          if(bc){localStorage.setItem(lkBar,JSON.stringify(bar));if(typeof barSip!=='undefined')barSip.splice(0,barSip.length,...bar);if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
-          if(mc){localStorage.setItem(lkMut,JSON.stringify(mut));if(typeof mutSip!=='undefined')mutSip.splice(0,mutSip.length,...mut);if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
-        }
-      }).catch(function(){});
   }
 
   function init(){
-    hookHazirlandiButtons();
     setInterval(syncFromD1,4000); // 1.5s→4s: Cloudflare worker/D1 günlük limitini doldurmamak için (çok cihaz × sık polling limiti aşıyordu)
     syncFromD1();
   }
 
-  function getLkMut(){
-    // LK.mut değerini runtime'dan al
-    if(typeof LK!=='undefined'&&LK.mut) return LK.mut;
-    return 'cactus_mut_podyum';
-  }
-  function getLkBar(){
-    if(typeof LK!=='undefined'&&LK.bar) return LK.bar;
-    return 'cactus_bar_podyum';
-  }
-
-  // pushMasalar, hookSaveMasalar, hookSiparisiGonder kaldırıldı — push artık ilgili fonksiyonlar içinde direkt yapılıyor
-
-  function hookHazirlandiButtons(){
-    document.addEventListener('click',function(e){
-      var btn=e.target.closest('.haz-btn,[class*="hazir"],.tmz-btn');
-      if(!btn)return;
-      // tmz-btn kendi onclick'ini handle ediyor
-      if(btn.classList.contains('tmz-btn'))return;
-      var id=btn.dataset.id||(btn.closest('[data-id]')&&btn.closest('[data-id]').dataset.id);
-      if(id){
-        fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
-      }
-    });
-  }
-
-  // Gece 04:00 sıfırlaması — bar, mutfak ve masalar temizlenir (TR saati UTC+3)
+  // Gece 04:00 sıfırlaması — masalar temizlenir (TR saati UTC+3)
   // Worker'daki cron da 04:00'te D1'i sıfırlıyor; bu lokal sıfırlama açık duran cihazlar için.
   function geceKontrolu(){
     var now=new Date();
@@ -3931,17 +3681,7 @@ setInterval(function(){gunCiroYukle();},60000);
     var trTarih=new Date(now.getTime()+3*3600000).toISOString().split('T')[0];
     if(localStorage.getItem('cactus_gece_sifir')===trTarih) return; // zaten yapıldı
     localStorage.setItem('cactus_gece_sifir',trTarih);
-    var lkBar=getLkBar(),lkMut=getLkMut();
-    var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
-    var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
-    // D1'deki bekleyen siparişleri hazırlandı olarak işaretle
-    bar.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
-    mut.forEach(function(s){if(!s.hazirlandi) fetch(API+'/siparis/hazir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:s.id})}).catch(function(){});});
-    // Lokal temizle — bar, mutfak ve masalar
-    localStorage.setItem(lkBar,'[]'); localStorage.setItem(lkMut,'[]');
-    if(typeof barSip!=='undefined') barSip.splice(0,barSip.length);
-    if(typeof mutSip!=='undefined') mutSip.splice(0,mutSip.length);
-    // Masaları da sıfırla (worker D1'i 04:00'te sildi, lokali de senkronize et)
+    // Masaları sıfırla (worker D1'i 04:00'te sildi, lokali de senkronize et)
     var lkMas=typeof LK!=='undefined'&&LK.mas?LK.mas:'cactus_masalar';
     if(typeof masalar!=='undefined'){
       for(var mi=1;mi<=34;mi++) if(masalar[mi]) masalar[mi]=[];
@@ -3951,12 +3691,9 @@ setInterval(function(){gunCiroYukle();},60000);
     }
     // Per-masa versiyon haritasını da sıfırla (yeni gün döngüsü)
     if(typeof _mvSifirla==='function'){_mvSifirla();} else {try{localStorage.setItem(lkMas+'_mv','{}');}catch(e){}}
-    if(typeof renderBar==='function') renderBar();
-    if(typeof renderMut==='function') renderMut();
     if(typeof renderMasalar==='function') renderMasalar();
     if(typeof renderAdisyon==='function') renderAdisyon();
-    if(typeof updateBadges==='function') updateBadges();
-    if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Bar, Mutfak ve Masalar temizlendi');
+    if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Masalar temizlendi');
   }
 
   var _syncInFlight=false;
@@ -3974,40 +3711,6 @@ setInterval(function(){gunCiroYukle();},60000);
     fetch(API+'/sync/durum?sube='+SUBE+'&since='+since,{signal:ctrl?ctrl.signal:undefined})
       .then(function(r){if(toId)clearTimeout(toId);return r.json();})
       .then(function(data){
-
-        // SİPARİŞLER — sadece yeni gelenleri ekle
-        if(data.siparisler&&data.siparisler.length){
-          var lkBar=getLkBar();
-          var lkMut=getLkMut();
-          var bar=JSON.parse(localStorage.getItem(lkBar)||'[]');
-          var mut=JSON.parse(localStorage.getItem(lkMut)||'[]');
-          var barIds=bar.map(function(s){return s.id;});
-          var mutIds=mut.map(function(s){return s.id;});
-          var bc=false,mc=false;
-
-          data.siparisler.forEach(function(s){
-            if(s.hazirlandi===1){
-              // Hazırlandı işaretini güncelle
-              bar.forEach(function(b){if(b.id===s.id&&!b.hazirlandi){b.hazirlandi=true;bc=true;}});
-              mut.forEach(function(m){if(m.id===s.id&&!m.hazirlandi){m.hazirlandi=true;mc=true;}});
-              return;
-            }
-            if(s.tip==='bar'&&!barIds.includes(s.id)){
-              bar.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
-              barIds.push(s.id);
-              bc=true;
-            }
-            if(s.tip==='mutfak'&&!mutIds.includes(s.id)){
-              mut.push({id:s.id,masa:s.masa,saat:new Date(s.zaman).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),items:s.items,hazirlandi:false,_d1:true});
-              mutIds.push(s.id);
-              mc=true;
-            }
-          });
-
-          if(bc){localStorage.setItem(lkBar,JSON.stringify(bar));if(typeof barSip!=='undefined')barSip.splice(0,barSip.length,...bar);if(typeof renderBar==='function')renderBar();if(typeof updateBadges==='function')updateBadges();}
-          if(mc){localStorage.setItem(lkMut,JSON.stringify(mut));if(typeof mutSip!=='undefined')mutSip.splice(0,mutSip.length,...mut);if(typeof renderMut==='function')renderMut();if(typeof updateBadges==='function')updateBadges();}
-        }
-
         _lastSync=data.zaman||Date.now();
       }).catch(function(){if(toId)clearTimeout(toId);}).finally(function(){_syncInFlight=false;});
   }
@@ -4197,11 +3900,7 @@ setInterval(function(){gunCiroYukle();},60000);
   /* ===== 5. MASA RENGI ===== */
   function masaRenkGuncelle() {
     var masalar = JSON.parse(localStorage.getItem(LK.mas) || '{}');
-    var bar = JSON.parse(localStorage.getItem(LK.bar) || '[]');
-    var mut = JSON.parse(localStorage.getItem(LK.mut) || '[]');
     var bekleyenMasalar = {};
-    bar.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
-    mut.filter(function(s){return !s.hazirlandi;}).forEach(function(s){bekleyenMasalar[s.masa]=true;});
 
     document.querySelectorAll('.masa-btn, [class*="m-btn"]').forEach(function(btn) {
       var num = parseInt(btn.dataset.masa || btn.textContent);
@@ -4221,18 +3920,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
   /* ===== 6. BEKLEME SURESI ===== */
   function sureGuncelle() {
-    var bar = JSON.parse(localStorage.getItem(LK.bar) || '[]');
-    var mut = JSON.parse(localStorage.getItem(LK.mut) || '[]');
-    var simdi = Date.now();
     var bekleyenler = {};
-    bar.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){
-      var dk = Math.floor((simdi - s.zaman) / 60000);
-      bekleyenler[s.masa] = Math.max(bekleyenler[s.masa]||0, dk);
-    });
-    mut.filter(function(s){return !s.hazirlandi && s.zaman;}).forEach(function(s){
-      var dk = Math.floor((simdi - s.zaman) / 60000);
-      bekleyenler[s.masa] = Math.max(bekleyenler[s.masa]||0, dk);
-    });
     document.querySelectorAll('.masa-sure').forEach(function(el) {
       var btn = el.parentElement;
       var num = parseInt(btn.dataset.masa || btn.textContent);

@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v23'; // v23: adisyon gizli Bar/Mutfak (KDS) kodu tamamen kaldırıldı (FSM + Podyum)
+const VERSION = 'cactus-v24'; // v24: adisyon "Z Raporu" sekmesi kaldırıldı (FSM + Podyum)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

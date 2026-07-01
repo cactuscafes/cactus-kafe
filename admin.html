@@ -477,7 +477,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <div class="sb-ttl">Site İçeriği</div>
       <button class="sb-btn" onclick="panelAc('anasayfa',this)">🏠 Ana Sayfa</button>
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
-      <button class="sb-btn" onclick="panelAc('galeri',this)">🖼 Galeri</button>
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
     </div>
     <div class="main">
@@ -593,17 +592,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="il-st" style="font-size:13px;color:#888;">-</span>
           <button class="btn-primary" onclick="seYayinla('iletisim.html','il-wrap','il-st','İletişim sayfası güncellendi')">🚀 Yayınla</button>
-        </div>
-      </div>
-
-      <!-- GALERİ SAYFA EDİTÖRÜ -->
-      <div class="panel" id="panel-galeri" style="max-width:1200px;">
-        <div class="pttl">🖼 Galeri Sayfası</div>
-        <div class="psub">Elementin üzerine gelin → 📷 veya ✏️ ikonuna tıklayın → düzenleyin → Yayınla &nbsp;·&nbsp; <a class="canli-link" href="galeri.html" target="_blank" rel="noopener">↗ Canlı sayfayı aç</a></div>
-        <div id="gl-wrap" style="position:relative;min-height:300px;border:1px solid var(--stone);background:#fff;"></div>
-        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
-          <span id="gl-st" style="font-size:13px;color:#888;">-</span>
-          <button class="btn-primary" onclick="seYayinla('galeri.html','gl-wrap','gl-st','Galeri sayfası güncellendi')">🚀 Yayınla</button>
         </div>
       </div>
 
@@ -1258,7 +1246,6 @@ function panelAc(id,el){
   if(id==='kategori'||id==='katPage'){setTimeout(function(){katSeciciDoldur&&katSeciciDoldur();},200);}
   if(id==='anasayfa'){setTimeout(function(){if(typeof asLoad==='function')asLoad();},150);}
   if(id==='iletisim'){setTimeout(function(){seLoad('https://cactuscafes.com/iletisim.html','iletisim.html','il-wrap','il-st');},200);}
-  if(id==='galeri'){setTimeout(function(){seLoad('https://cactuscafes.com/galeri.html','galeri.html','gl-wrap','gl-st');},200);}
   if(id==='menusayfa'){setTimeout(function(){seLoad('https://cactuscafes.com/menu.html','menu.html','mn-wrap','mn-st',['.menu-header-eyebrow','.menu-header-title','.menu-header-sub']);},200);}
 }
 // Şube barı sadece şubeye-bağlı panellerde anlamlı → diğerlerinde gizle
@@ -2925,8 +2912,6 @@ var _seEl=null,_seImg=false,_seStId=null;
 var SE_TEXT_SELECTORS=[
   /* İletişim */
   '.sk-ad','.sk-tur','.sk-info-txt','.sec-label','.sec-title','.form-intro p',
-  /* Galeri */
-  '.galeri-ttl','.galeri-sub','.galeri-caption',
   /* Genel */
   '.page-title','.page-eyebrow','.section-eyebrow',
   '.footer-brand','.footer-desc',

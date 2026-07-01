@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tatlı Kampanyası — Cactus Coffee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#2a2a2a;display:flex;justify-content:center;align-items:flex-start;padding:24px;font-family:'Montserrat',sans-serif;}
+  .poster{position:relative;width:1080px;height:1500px;overflow:hidden;color:#f5efe2;background:
+      radial-gradient(ellipse at 26% 14%, rgba(200,168,106,.20) 0%, transparent 42%),
+      radial-gradient(ellipse at 82% 90%, rgba(45,90,39,.5) 0%, transparent 52%),
+      linear-gradient(160deg,#173318 0%,#0e2410 50%,#0a1b0b 100%);}
+  .frame{position:absolute;inset:32px;border:1.5px solid rgba(200,168,106,.45);border-radius:10px;pointer-events:none;}
+  .frame:before{content:'';position:absolute;inset:9px;border:1px solid rgba(200,168,106,.18);border-radius:5px;}
+  .wrap{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;padding:72px 76px 66px;text-align:center;}
+
+  .brand{display:flex;align-items:center;gap:12px;font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;letter-spacing:11px;color:#f3ead7;text-transform:uppercase;}
+  .brand .leaf{font-size:32px;}
+  .rule{width:80px;height:1px;background:rgba(200,168,106,.6);margin:18px 0 16px;}
+  .eyebrow{font-size:16px;letter-spacing:9px;text-transform:uppercase;color:#c8a86a;font-weight:600;}
+  .title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:104px;line-height:.95;margin:10px 0 8px;color:#fbf5e9;}
+  .title em{font-style:italic;color:#e3c486;}
+  .subtitle{font-size:22px;letter-spacing:2px;color:rgba(245,239,226,.85);font-weight:400;}
+
+  .grid{margin:42px 0 0;display:flex;flex-direction:column;gap:22px;align-items:center;}
+  .row{display:flex;gap:22px;justify-content:center;}
+  .card{position:relative;border-radius:16px;overflow:hidden;border:2px solid rgba(200,168,106,.5);box-shadow:0 16px 38px rgba(0,0,0,.42);}
+  .card img{display:block;width:100%;height:100%;object-fit:cover;}
+  .card .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 13px;text-align:left;
+      background:linear-gradient(to top,rgba(7,16,7,.94) 0%,rgba(7,16,7,.5) 60%,transparent 100%);
+      font-size:18px;font-weight:600;letter-spacing:.4px;color:#f6efe0;}
+  .card .tag{position:absolute;top:13px;left:13px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      background:rgba(200,168,106,.95);color:#1a2e12;padding:4px 11px;border-radius:20px;}
+  .d{width:288px;height:288px;}
+  .b{width:333px;height:196px;}
+
+  .deal{margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .combo{font-size:15px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;font-weight:600;}
+  .seal{width:312px;height:312px;border-radius:50%;
+      background:radial-gradient(circle at 38% 30%,#ecd49d 0%,#cbac6f 45%,#a8843f 100%);
+      border:4px solid rgba(255,247,228,.55);box-shadow:0 16px 40px rgba(0,0,0,.5),inset 0 3px 10px rgba(255,255,255,.4);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;color:#243309;}
+  .seal .pre{font-size:22px;font-weight:700;letter-spacing:7px;text-transform:uppercase;margin-bottom:-10px;}
+  .seal .amt{font-family:'Cormorant Garamond',serif;font-size:170px;font-weight:600;line-height:.86;}
+  .seal .cur{font-size:34px;font-weight:700;letter-spacing:3px;margin-top:-2px;}
+
+  .foot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:9px;}
+  .branches{font-size:18px;letter-spacing:5px;text-transform:uppercase;color:#f3ead7;font-weight:500;}
+  .branches span{color:#c8a86a;margin:0 12px;}
+  .ig{font-size:14px;letter-spacing:2px;color:rgba(245,239,226,.6);}
+</style>
+</head>
+<body>
+  <div class="poster">
+    <div class="frame"></div>
+    <div class="wrap">
+      <div class="brand"><span class="leaf">🌵</span> Cactus Coffee</div>
+      <div class="rule"></div>
+      <div class="eyebrow">Özel Kampanya</div>
+      <h1 class="title">Tatlı <em>Kampanyası</em></h1>
+      <div class="subtitle">Bir tatlı + bir soğuk içecek</div>
+
+      <div class="grid">
+        <div class="row">
+          <div class="card d"><span class="tag">Tatlı</span><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781559612218-i9n9xabyvq.jpg" alt="Dubai Spoonful"><div class="cap">Dubai Spoonful</div></div>
+          <div class="card d"><span class="tag">Tatlı</span><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781559607173-qfn0k3t1l1o.jpg" alt="Spoonful"><div class="cap">Spoonful</div></div>
+          <div class="card d"><span class="tag">Tatlı</span><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1781559620737-yw749b6kd2q.jpg" alt="Lotus Pasta"><div class="cap">Lotus Pasta</div></div>
+        </div>
+        <div class="row">
+          <div class="card b"><span class="tag">Soğuk</span><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376498286-qmw9pdd6u4.jpg" alt="Ice Caramel Latte"><div class="cap">Ice Caramel Latte</div></div>
+          <div class="card b"><span class="tag">Soğuk</span><img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376465169-z20gqm8j2yg.jpg" alt="Ice Latte"><div class="cap">Ice Latte</div></div>
+        </div>
+      </div>
+
+      <div class="deal">
+        <div class="combo">Hepsi birlikte</div>
+        <div class="seal">
+          <div class="pre">Sadece</div>
+          <div class="amt">400<span style="font-size:64px;font-weight:600;">₺</span></div>
+          <div class="cur">TL</div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="branches">FSM <span>·</span> Podyumpark</div>
+        <div class="ig">@cactuscafe.tr</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

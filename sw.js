@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v21'; // v21: iletisim/og-image meta "İstanbul"→"Bursa" + iletisim/galeri footer 2025→2026
+const VERSION = 'cactus-v22'; // v22: adisyon sipariş notu — prompt yerine hızlı çip modalı (FSM + Podyum)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

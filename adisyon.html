@@ -376,6 +376,11 @@ input,select{font-family:'Inter',sans-serif;}
 .mdl-btns{display:flex;gap:8px;margin-top:6px;}
 .mdl-iptal{flex:1;padding:11px;border:1.5px solid var(--kr2);border-radius:9px;background:#fff;color:var(--k2);font-size:14px;font-weight:700;}
 .mdl-ok{flex:2;padding:11px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--k1),var(--k2));color:var(--kr);font-size:14px;font-weight:700;}
+/* Sipariş notu — hızlı çipler */
+.not-cips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px;}
+.not-cip{padding:10px 14px;border:1.5px solid var(--kr2);border-radius:100px;background:#fff;font-size:13px;font-weight:600;color:var(--k2);cursor:pointer;transition:all .12s;font-family:'Inter',sans-serif;line-height:1;-webkit-tap-highlight-color:transparent;}
+.not-cip:active{transform:scale(.94);}
+.not-cip.on{background:var(--k1);border-color:var(--k1);color:#fff;}
 .odeme-secim{display:flex;gap:8px;margin-bottom:14px;}
 .odeme-opt{flex:1;padding:15px 8px;min-height:64px;border:2px solid var(--kr2);border-radius:10px;background:#fff;color:var(--k2);font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;}
 .odeme-opt .oi{font-size:22px;}
@@ -1070,6 +1075,20 @@ if('serviceWorker' in navigator){
     <div class="mdl-btns">
       <button class="mdl-iptal" onclick="closeModal('transfer-modal')">İptal</button>
       <button class="mdl-ok" onclick="transferYap()">⇄ Aktar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SİPARİŞ NOTU MODAL — hızlı çipler + serbest metin -->
+<div class="moverlay" id="not-modal">
+  <div class="mdl">
+    <div class="mdl-ttl">📝 Sipariş Notu <span id="not-urun-ad" style="color:var(--al);font-weight:700;"></span></div>
+    <div class="mdl-sub">Çipe dokun veya kendin yaz.</div>
+    <div class="not-cips" id="not-cips"></div>
+    <input type="text" id="not-input" placeholder="Örn: az süt, ekstra shot…" autocomplete="off" onkeydown="if(event.key==='Enter')notKaydet();">
+    <div class="mdl-btns">
+      <button class="mdl-iptal" onclick="notModalKapat()">İptal</button>
+      <button class="mdl-ok" onclick="notKaydet()">✓ Kaydet</button>
     </div>
   </div>
 </div>
@@ -4043,14 +4062,62 @@ setInterval(function(){gunCiroYukle();},60000);
     setInterval(_notlarCloudCek,60000);
   });
 
+  var NOT_CIPS = ['Şekersiz','Az şeker','Az süt','Sütsüz','Yulaf sütü','Ekstra shot','Soğuk','Buzsuz','Az buz','Isıtılsın','Acısız','Yanında'];
+  var _notHedef = { masaId:null, idx:null };
+
   function notEkle(masaId, urunIdx) {
-    var not = prompt('Sipariş notu (şekersiz, az süt vb.):');
-    if (not === null) return;
+    _notHedef = { masaId:masaId, idx:urunIdx };
     var key = masaId + '_' + urunIdx;
-    if(not.trim()==='') delete _notlar[key]; else _notlar[key] = not;
-    _notlarKaydet();
-    renderAdisyon();
+    var mevcut = _notlar[key] || '';
+    // ürün adı (başlıkta göster)
+    var ad = '';
+    try { var arr = (JSON.parse(localStorage.getItem('cactus_masalar')||'{}')[masaId]||[]); if(arr[urunIdx]) ad = '— ' + (arr[urunIdx].ad||''); } catch(e){}
+    var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = ad;
+    var inp = document.getElementById('not-input'); if(inp) inp.value = mevcut;
+    // çipleri render et — mevcut nottaki parçalar seçili görünsün
+    var cont = document.getElementById('not-cips');
+    if(cont){
+      cont.innerHTML = '';
+      var mevcutParts = mevcut.split(',').map(function(s){return s.trim().toLowerCase();});
+      NOT_CIPS.forEach(function(c){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'not-cip' + (mevcutParts.indexOf(c.toLowerCase())>=0?' on':'');
+        b.textContent = c;
+        b.onclick = function(){ notCipToggle(c, b); };
+        cont.appendChild(b);
+      });
+    }
+    var m = document.getElementById('not-modal'); if(m) m.classList.add('on');
+    setTimeout(function(){ if(inp) inp.focus(); }, 60);
   }
+
+  function notCipToggle(c, btn){
+    var inp = document.getElementById('not-input'); if(!inp) return;
+    var parts = inp.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var i = parts.map(function(s){return s.toLowerCase();}).indexOf(c.toLowerCase());
+    if(i>=0){ parts.splice(i,1); if(btn) btn.classList.remove('on'); }
+    else { parts.push(c); if(btn) btn.classList.add('on'); }
+    inp.value = parts.join(', ');
+  }
+
+  function notKaydet(){
+    if(_notHedef.masaId==null) { notModalKapat(); return; }
+    var key = _notHedef.masaId + '_' + _notHedef.idx;
+    var val = ((document.getElementById('not-input')||{}).value || '').trim();
+    if(val==='') delete _notlar[key]; else _notlar[key] = val;
+    _notlarKaydet();
+    if(typeof renderAdisyon==='function') renderAdisyon();
+    notModalKapat();
+  }
+
+  function notModalKapat(){
+    var m = document.getElementById('not-modal'); if(m) m.classList.remove('on');
+    _notHedef = { masaId:null, idx:null };
+  }
+  window.notCipToggle = notCipToggle;
+  window.notKaydet = notKaydet;
+  window.notModalKapat = notModalKapat;
 
   /* ===== 3. MASA TASIMA ===== */
   function masaTasi() {

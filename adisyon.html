@@ -344,6 +344,10 @@ input,select{font-family:'Inter',sans-serif;}
 .not-cip{padding:10px 14px;border:1.5px solid var(--kr2);border-radius:100px;background:#fff;font-size:13px;font-weight:600;color:var(--k2);cursor:pointer;transition:all .12s;font-family:'Inter',sans-serif;line-height:1;-webkit-tap-highlight-color:transparent;}
 .not-cip:active{transform:scale(.94);}
 .not-cip.on{background:var(--k1);border-color:var(--k1);color:#fff;}
+.not-birim{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px;}
+.not-birim-tab{min-width:42px;padding:9px 12px;border:1.5px solid var(--kr2);border-radius:9px;background:#fff;font-size:13px;font-weight:800;color:var(--k2);cursor:pointer;line-height:1;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.not-birim-tab.dolu:not(.on){border-color:#e67e22;color:#e67e22;}
+.not-birim-tab.on{background:var(--k1);border-color:var(--k1);color:#fff;}
 .odeme-secim{display:flex;gap:8px;margin-bottom:14px;}
 .odeme-opt{flex:1;padding:15px 8px;min-height:64px;border:2px solid var(--kr2);border-radius:10px;background:#fff;color:var(--k2);font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;}
 .odeme-opt .oi{font-size:22px;}
@@ -1010,6 +1014,7 @@ if('serviceWorker' in navigator){
   <div class="mdl">
     <div class="mdl-ttl">📝 Sipariş Notu <span id="not-urun-ad" style="color:var(--al);font-weight:700;"></span></div>
     <div class="mdl-sub">Çipe dokun veya kendin yaz.</div>
+    <div class="not-birim" id="not-birim" style="display:none;"></div>
     <div class="not-cips" id="not-cips"></div>
     <input type="text" id="not-input" placeholder="Örn: az süt, ekstra shot…" autocomplete="off" onkeydown="if(event.key==='Enter')notKaydet();">
     <div class="mdl-btns">
@@ -3764,7 +3769,7 @@ setInterval(function(){gunCiroYukle();},60000);
   var NOT_CIPS_SUT   = ['Laktozsuz süt','Yulaf sütü','Badem sütü','Az süt','Ekstra süt','Az köpük','Şekersiz','Ekstra shot','Soğuk'];
   // Aynı gruptaki çiplerden yalnızca biri seçili olabilir (şeker düzeyi / süt tipi)
   var _CIP_GRUP = {'sade':'seker','az şekerli':'seker','orta':'seker','şekerli':'seker','laktozsuz süt':'sut','yulaf sütü':'sut','badem sütü':'sut'};
-  var _notHedef = { masaId:null, idx:null };
+  var _notHedef = { masaId:null, idx:null, adet:1, adRaw:'', unit:0, birim:{} };
 
   function _lc(s){ return (s||'').toLocaleLowerCase('tr'); }
   function _notCipListesi(ad){
@@ -3774,29 +3779,62 @@ setInterval(function(){gunCiroYukle();},60000);
     return NOT_CIPS_GENEL;
   }
 
+  // Aktif birimin çiplerini render et — verilen değere göre seçili işaretle
+  function _notCiplerRender(deger){
+    var cont = document.getElementById('not-cips'); if(!cont) return;
+    cont.innerHTML = '';
+    var parts = (deger||'').split(',').map(function(s){return _lc(s.trim());});
+    _notCipListesi(_notHedef.adRaw).forEach(function(c){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'not-cip' + (parts.indexOf(_lc(c))>=0?' on':'');
+      b.textContent = c;
+      b.onclick = function(){ notCipToggle(c, b); };
+      cont.appendChild(b);
+    });
+  }
+
+  // adet>1 ise "1. · 2. · …" birim sekmelerini çiz (her fincana ayrı not)
+  function _notBirimBarRender(){
+    var bar = document.getElementById('not-birim'); if(!bar) return;
+    if(_notHedef.adet>1){
+      bar.style.display='flex'; bar.innerHTML='';
+      for(var n=0;n<_notHedef.adet;n++){ (function(n){
+        var t=document.createElement('button'); t.type='button';
+        t.className='not-birim-tab'+(n===_notHedef.unit?' on':'')+(((_notHedef.birim[n]||'').trim())?' dolu':'');
+        t.textContent=(n+1)+'.';
+        t.onclick=function(){ _notBirimSec(n); };
+        bar.appendChild(t);
+      })(n); }
+    } else { bar.style.display='none'; bar.innerHTML=''; }
+  }
+
+  function _notBirimSec(n){
+    var inp=document.getElementById('not-input');
+    if(inp) _notHedef.birim[_notHedef.unit] = inp.value.trim(); // mevcut birimi sakla
+    _notHedef.unit = n;
+    if(inp) inp.value = _notHedef.birim[n] || '';
+    _notCiplerRender(_notHedef.birim[n] || '');
+    _notBirimBarRender();
+    if(inp) inp.focus();
+  }
+
   function notEkle(masaId, urunIdx) {
-    _notHedef = { masaId:masaId, idx:urunIdx };
     var key = masaId + '_' + urunIdx;
-    var mevcut = _notlar[key] || '';
-    // ürün adı (başlıkta göster + çip setini belirle)
-    var adRaw = '';
-    try { var arr = (JSON.parse(localStorage.getItem('cactus_masalar')||'{}')[masaId]||[]); if(arr[urunIdx]) adRaw = arr[urunIdx].ad||''; } catch(e){}
-    var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = adRaw ? '— ' + adRaw : '';
-    var inp = document.getElementById('not-input'); if(inp) inp.value = mevcut;
-    // çipleri render et — ürüne göre set + mevcut nottaki parçalar seçili görünsün
-    var cont = document.getElementById('not-cips');
-    if(cont){
-      cont.innerHTML = '';
-      var mevcutParts = mevcut.split(',').map(function(s){return _lc(s.trim());});
-      _notCipListesi(adRaw).forEach(function(c){
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'not-cip' + (mevcutParts.indexOf(_lc(c))>=0?' on':'');
-        b.textContent = c;
-        b.onclick = function(){ notCipToggle(c, b); };
-        cont.appendChild(b);
-      });
-    }
+    var adRaw = '', adet = 1;
+    try { var _lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar'; var arr = (JSON.parse(localStorage.getItem(_lkMas)||'{}')[masaId]||[]); if(arr[urunIdx]){ adRaw = arr[urunIdx].ad||''; adet = Math.max(1, parseInt(arr[urunIdx].adet)||1); } } catch(e){}
+    var birim = {};
+    if(adet>1){
+      var herhangi=false;
+      for(var n=0;n<adet;n++){ var v=_notlar[key+'#u'+n]||''; birim[n]=v; if(v) herhangi=true; }
+      if(!herhangi && _notlar[key]) birim[0]=_notlar[key]; // eski tekli notu 1. birime taşı
+    } else { birim[0]=_notlar[key]||''; }
+    _notHedef = { masaId:masaId, idx:urunIdx, adet:adet, adRaw:adRaw, unit:0, birim:birim };
+    var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = adRaw ? ('— ' + adRaw + (adet>1?(' ×'+adet):'')) : '';
+    var subEl = document.querySelector('#not-modal .mdl-sub'); if(subEl) subEl.textContent = adet>1 ? 'Her fincan için ayrı not verebilirsin (1. · 2. …).' : 'Çipe dokun veya kendin yaz.';
+    var inp = document.getElementById('not-input'); if(inp) inp.value = birim[0]||'';
+    _notBirimBarRender();
+    _notCiplerRender(birim[0]||'');
     var m = document.getElementById('not-modal'); if(m) m.classList.add('on');
     setTimeout(function(){ if(inp) inp.focus(); }, 60);
   }
@@ -3823,8 +3861,20 @@ setInterval(function(){gunCiroYukle();},60000);
   function notKaydet(){
     if(_notHedef.masaId==null) { notModalKapat(); return; }
     var key = _notHedef.masaId + '_' + _notHedef.idx;
-    var val = ((document.getElementById('not-input')||{}).value || '').trim();
-    if(val==='') delete _notlar[key]; else _notlar[key] = val;
+    var inp = document.getElementById('not-input');
+    if(inp) _notHedef.birim[_notHedef.unit] = inp.value.trim(); // aktif birimi sakla
+    if(_notHedef.adet>1){
+      var parcalar=[];
+      for(var n=0;n<_notHedef.adet;n++){
+        var v=(_notHedef.birim[n]||'').trim();
+        if(v){ _notlar[key+'#u'+n]=v; parcalar.push((n+1)+') '+v); }
+        else { delete _notlar[key+'#u'+n]; }
+      }
+      if(parcalar.length) _notlar[key]=parcalar.join(' · '); else delete _notlar[key];
+    } else {
+      var val=((inp||{}).value||'').trim();
+      if(val==='') delete _notlar[key]; else _notlar[key]=val;
+    }
     _notlarKaydet();
     if(typeof renderAdisyon==='function') renderAdisyon();
     notModalKapat();
@@ -3832,7 +3882,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
   function notModalKapat(){
     var m = document.getElementById('not-modal'); if(m) m.classList.remove('on');
-    _notHedef = { masaId:null, idx:null };
+    _notHedef = { masaId:null, idx:null, adet:1, adRaw:'', unit:0, birim:{} };
   }
   window.notCipToggle = notCipToggle;
   window.notKaydet = notKaydet;

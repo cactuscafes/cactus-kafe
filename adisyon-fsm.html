@@ -3445,25 +3445,38 @@ setInterval(function(){gunCiroYukle();},60000);
     setInterval(_notlarCloudCek,60000);
   });
 
-  var NOT_CIPS = ['Şekersiz','Az şeker','Az süt','Sütsüz','Yulaf sütü','Ekstra shot','Soğuk','Buzsuz','Az buz','Isıtılsın','Acısız','Yanında'];
+  var NOT_CIPS_GENEL = ['Şekersiz','Az şeker','Az süt','Sütsüz','Yulaf sütü','Ekstra shot','Soğuk','Buzsuz','Az buz','Isıtılsın','Acısız','Yanında'];
+  var NOT_CIPS_TURK  = ['Sade','Az şekerli','Orta','Şekerli','Yanında su'];
+  var NOT_CIPS_SUT   = ['Laktozsuz süt','Yulaf sütü','Badem sütü','Az süt','Ekstra süt','Az köpük','Şekersiz','Ekstra shot','Soğuk'];
+  // Aynı gruptaki çiplerden yalnızca biri seçili olabilir (şeker düzeyi / süt tipi)
+  var _CIP_GRUP = {'sade':'seker','az şekerli':'seker','orta':'seker','şekerli':'seker','laktozsuz süt':'sut','yulaf sütü':'sut','badem sütü':'sut'};
   var _notHedef = { masaId:null, idx:null };
+
+  function _lc(s){ return (s||'').toLocaleLowerCase('tr'); }
+  function _notCipListesi(ad){
+    var a = _lc(ad);
+    if(/türk kahve|dibek|osmanlı kahve|menengi[çc]/.test(a)) return NOT_CIPS_TURK;
+    if(/latte|capp?ucc?ino|capucc?ino|mocha|mocca|macchiato|machiato|cortado|flat white|sahlep|salep|s[ıi]cak çikolata|matcha|chai/.test(a)) return NOT_CIPS_SUT;
+    return NOT_CIPS_GENEL;
+  }
 
   function notEkle(masaId, urunIdx) {
     _notHedef = { masaId:masaId, idx:urunIdx };
     var key = masaId + '_' + urunIdx;
     var mevcut = _notlar[key] || '';
-    var ad = '';
-    try { var arr = (JSON.parse(localStorage.getItem('cactus_masalar')||'{}')[masaId]||[]); if(arr[urunIdx]) ad = '— ' + (arr[urunIdx].ad||''); } catch(e){}
-    var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = ad;
+    // ürün adı (başlıkta göster + çip setini belirle)
+    var adRaw = '';
+    try { var arr = (JSON.parse(localStorage.getItem('cactus_masalar')||'{}')[masaId]||[]); if(arr[urunIdx]) adRaw = arr[urunIdx].ad||''; } catch(e){}
+    var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = adRaw ? '— ' + adRaw : '';
     var inp = document.getElementById('not-input'); if(inp) inp.value = mevcut;
     var cont = document.getElementById('not-cips');
     if(cont){
       cont.innerHTML = '';
-      var mevcutParts = mevcut.split(',').map(function(s){return s.trim().toLowerCase();});
-      NOT_CIPS.forEach(function(c){
+      var mevcutParts = mevcut.split(',').map(function(s){return _lc(s.trim());});
+      _notCipListesi(adRaw).forEach(function(c){
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'not-cip' + (mevcutParts.indexOf(c.toLowerCase())>=0?' on':'');
+        b.className = 'not-cip' + (mevcutParts.indexOf(_lc(c))>=0?' on':'');
         b.textContent = c;
         b.onclick = function(){ notCipToggle(c, b); };
         cont.appendChild(b);
@@ -3476,9 +3489,19 @@ setInterval(function(){gunCiroYukle();},60000);
   function notCipToggle(c, btn){
     var inp = document.getElementById('not-input'); if(!inp) return;
     var parts = inp.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
-    var i = parts.map(function(s){return s.toLowerCase();}).indexOf(c.toLowerCase());
+    var lc = _lc(c);
+    var grp = _CIP_GRUP[lc];
+    var i = parts.map(function(s){return _lc(s);}).indexOf(lc);
     if(i>=0){ parts.splice(i,1); if(btn) btn.classList.remove('on'); }
-    else { parts.push(c); if(btn) btn.classList.add('on'); }
+    else {
+      if(grp){ // aynı gruptaki diğer seçimleri kaldır (tek seçim)
+        parts = parts.filter(function(p){ return _CIP_GRUP[_lc(p)] !== grp; });
+        document.querySelectorAll('#not-cips .not-cip').forEach(function(b){
+          if(_CIP_GRUP[_lc(b.textContent)]===grp) b.classList.remove('on');
+        });
+      }
+      parts.push(c); if(btn) btn.classList.add('on');
+    }
     inp.value = parts.join(', ');
   }
 

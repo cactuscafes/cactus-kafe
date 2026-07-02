@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v28'; // v28: menüye kalori + alerjen (14 standart) — admin girişi, kart + detay gösterimi
+const VERSION = 'cactus-v29'; // v29: tüm ürünlere yaklaşık kalori/alerjen verisi girildi (D1) + öne çıkanlar merge'üne kalori/alerjen
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

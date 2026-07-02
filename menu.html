@@ -1094,7 +1094,9 @@ function renderMenu(sube) {
       aciklama: (live.aciklama!=null?live.aciklama:o.aciklama),
       servis: (live.servis!=null?live.servis:o.servis),
       emoji: (live.emoji!=null?live.emoji:o.emoji),
-      foto: (live.foto||o.foto)
+      foto: (live.foto||o.foto),
+      kalori: (live.kalori!=null?live.kalori:o.kalori),
+      alerjen: (live.alerjen!=null?live.alerjen:o.alerjen)
     });
   });
   var spotGridEl = document.getElementById('spotlight-grid-' + sube);

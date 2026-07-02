@@ -27,7 +27,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-07-02-kalori-pill-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-07-02-kalori-pill-r2'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -137,9 +137,10 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .product-desc{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px;font-weight:300;}
 .product-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px;}
 .product-meta .p-kcal{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:100px;background:rgba(200,168,106,.14);color:#a8894e;font-size:10.5px;font-weight:600;white-space:nowrap;line-height:1.4;}
-.product-meta .p-alerjen{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;background:rgba(176,69,69,.08);color:#b04545;font-size:10.5px;font-weight:500;line-height:1.4;}
 .upop-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px;}
 .upop-kcal{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;background:rgba(200,168,106,.14);color:#a8894e;font-size:12.5px;font-weight:600;white-space:nowrap;}
+.upop-kcal svg{width:14px;height:14px;}
+.upop-alerjen svg{width:14px;height:14px;}
 .upop-alerjen{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;background:rgba(176,69,69,.08);color:#b04545;font-size:12.5px;font-weight:500;line-height:1.5;}
 .upop-alerjen .ua-baslik{font-weight:700;}
 .upop-alerjen-not{flex-basis:100%;font-size:11px;color:#999;line-height:1.5;font-weight:300;}
@@ -1061,14 +1062,12 @@ async function init() {
 // Alerjen anahtar → etiket (Türkiye/AB standart 14)
 var ALERJEN_ET={gluten:'Gluten',sut:'Süt',yumurta:'Yumurta',kuruyemis:'Sert kabuklu yemiş',yerfistigi:'Yer fıstığı',soya:'Soya',susam:'Susam',balik:'Balık',kabuklu:'Kabuklu deniz ür.',kereviz:'Kereviz',hardal:'Hardal',sulfit:'Sülfit',lupin:'Lupin',yumusakca:'Yumuşakça'};
 function _alerjenMetin(arr){ if(!Array.isArray(arr)||!arr.length) return ''; return arr.map(function(k){return ALERJEN_ET[k]||k;}).join(', '); }
-// Kart alt bilgisi: kalori + alerjen hapları (varsa)
+// Kart alt bilgisi: sadece kalori hapı (alerjen detay pop-up'ında)
 var _ALRJ_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px;flex:none;"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6" fill="currentColor"/></svg>';
+var _KCAL_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex:none;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>';
 function _urunMetaHTML(u){
-  var kcal = u.kalori ? ('<span class="p-kcal">🔥 '+u.kalori+' kcal</span>') : '';
-  var alrj = _alerjenMetin(u.alerjen);
-  if(!kcal && !alrj) return '';
-  var alrjHTML = alrj ? '<span class="p-alerjen" title="Alerjen: '+alrj+'">'+_ALRJ_ICO+alrj+'</span>' : '';
-  return '<div class="product-meta">'+kcal+alrjHTML+'</div>';
+  if(!u.kalori) return '';
+  return '<div class="product-meta"><span class="p-kcal">'+_KCAL_ICO+u.kalori+' kcal</span></div>';
 }
 
 function renderMenu(sube) {
@@ -1692,7 +1691,7 @@ function upopAc(idx) {
   var _metaEl = document.getElementById('upopMeta');
   if(_metaEl){
     var _mh='';
-    if(u.kalori) _mh+='<div class="upop-kcal">🔥 '+u.kalori+' kcal</div>';
+    if(u.kalori) _mh+='<div class="upop-kcal">'+_KCAL_ICO+u.kalori+' kcal</div>';
     var _al=_alerjenMetin(u.alerjen);
     if(_al) _mh+='<div class="upop-alerjen">'+_ALRJ_ICO+'<span><span class="ua-baslik">İçerir:</span> '+_al+'</span></div>';
     if(u.kalori||_al) _mh+='<div class="upop-alerjen-not">Alerjiniz varsa lütfen personele danışın. Değerler yaklaşıktır.</div>';

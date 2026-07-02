@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v30'; // v30: kalori/alerjen rozetleri şık hap stiline geçti (⚠ → çizgisel ⓘ ikon, altın/gül kurusu pill)
+const VERSION = 'cactus-v31'; // v31: kalori ikonu çizgisel alev (emoji yok); alerjen karttan kalktı, sadece detay pop-up'ında
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

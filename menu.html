@@ -135,6 +135,15 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .product-emoji-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:#f8f6f2;}
 .product-name{font-family:'Fraunces',serif;font-size:17px;font-weight:400;margin-bottom:4px;line-height:1.3;}
 .product-desc{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px;font-weight:300;}
+.product-meta{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:10.5px;line-height:1.5;margin-bottom:6px;}
+.product-meta .p-kcal{color:#555;font-weight:600;white-space:nowrap;}
+.product-meta .pm-sep{color:#ccc;}
+.product-meta .p-alerjen{color:#b04545;font-weight:500;}
+.upop-meta{margin-bottom:16px;}
+.upop-kcal{font-size:13px;font-weight:600;color:#444;margin-bottom:8px;}
+.upop-alerjen{font-size:13px;color:#b04545;line-height:1.6;font-weight:400;}
+.upop-alerjen .ua-baslik{font-weight:700;}
+.upop-alerjen-not{font-size:11px;color:#999;line-height:1.5;margin-top:6px;font-weight:300;}
 .product-price{font-size:13px;font-weight:500;color:var(--dark);}
 
 /* ÜRÜN POPUP */
@@ -955,6 +964,7 @@ footer{padding:40px 20px 24px;}
     <div class="upop-body">
       <div class="upop-name" id="upopAd"></div>
       <div class="upop-desc" id="upopAciklama"></div>
+      <div class="upop-meta" id="upopMeta"></div>
       <div class="upop-price" id="upopFiyat"></div>
     </div>
   </div>
@@ -1014,7 +1024,7 @@ async function init() {
           id: katKey,
           label: kat.label||katKey,
           urunler: (kat.urunler||[]).map(function(u){
-            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli, tukendi:!!u.tukendi};
+            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli, tukendi:!!u.tukendi, kalori:(u.kalori||''), alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])};
           })
         };
       });
@@ -1049,6 +1059,19 @@ async function init() {
   },50);
 }
 
+// Alerjen anahtar → etiket (Türkiye/AB standart 14)
+var ALERJEN_ET={gluten:'Gluten',sut:'Süt',yumurta:'Yumurta',kuruyemis:'Sert kabuklu yemiş',yerfistigi:'Yer fıstığı',soya:'Soya',susam:'Susam',balik:'Balık',kabuklu:'Kabuklu deniz ür.',kereviz:'Kereviz',hardal:'Hardal',sulfit:'Sülfit',lupin:'Lupin',yumusakca:'Yumuşakça'};
+function _alerjenMetin(arr){ if(!Array.isArray(arr)||!arr.length) return ''; return arr.map(function(k){return ALERJEN_ET[k]||k;}).join(', '); }
+// Kart alt bilgisi: kalori + alerjen (varsa)
+function _urunMetaHTML(u){
+  var kcal = u.kalori ? ('<span class="p-kcal">🔥 '+u.kalori+' kcal</span>') : '';
+  var alrj = _alerjenMetin(u.alerjen);
+  if(!kcal && !alrj) return '';
+  var sep = (kcal && alrj) ? '<span class="pm-sep">·</span>' : '';
+  var alrjHTML = alrj ? '<span class="p-alerjen" title="Alerjen: '+alrj+'">⚠ '+alrj+'</span>' : '';
+  return '<div class="product-meta">'+kcal+sep+alrjHTML+'</div>';
+}
+
 function renderMenu(sube) {
   var subeData = menuData[sube];
   if (!subeData) return;
@@ -1079,7 +1102,7 @@ function renderMenu(sube) {
   if (spotItems.length > 0 && spotGridEl) {
     spotGridEl.innerHTML = spotItems.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
       c+='<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+u.ad+'</div>';
@@ -1093,7 +1116,7 @@ function renderMenu(sube) {
     if (!urunler.length) return '';
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||''});
+      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
       var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||katEmoji||'')+'</div>';
       // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
       var rozet='';
@@ -1105,6 +1128,7 @@ function renderMenu(sube) {
       h+='<div class="product-img-wrap">'+rozet+img+'</div>';
       h+='<div class="product-name">'+u.ad+'</div>';
       if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
+      h+=_urunMetaHTML(u);
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
       return h;
     }).join('');
@@ -1664,6 +1688,16 @@ function upopAc(idx) {
   document.getElementById('upopAd').textContent = u.ad;
   document.getElementById('upopAciklama').textContent = u.aciklama || '';
   document.getElementById('upopAciklama').style.display = u.aciklama ? '' : 'none';
+  var _metaEl = document.getElementById('upopMeta');
+  if(_metaEl){
+    var _mh='';
+    if(u.kalori) _mh+='<div class="upop-kcal">🔥 '+u.kalori+' kcal</div>';
+    var _al=_alerjenMetin(u.alerjen);
+    if(_al) _mh+='<div class="upop-alerjen"><span class="ua-baslik">⚠ İçerir:</span> '+_al+'</div>';
+    if(u.kalori||_al) _mh+='<div class="upop-alerjen-not">Alerjiniz varsa lütfen personele danışın. Değerler yaklaşıktır.</div>';
+    _metaEl.innerHTML=_mh;
+    _metaEl.style.display=_mh?'':'none';
+  }
   document.getElementById('upopFiyat').textContent = u.fiyat ? u.fiyat+' TL' : '';
   document.getElementById('upopBg').classList.add('on');
   document.body.style.overflow = 'hidden';

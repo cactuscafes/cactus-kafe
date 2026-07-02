@@ -108,6 +108,7 @@
 }
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
+<script src="site-ayarlar.js?v=1" defer></script>
 </head>
 <body>
 
@@ -159,11 +160,11 @@
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">🕐</span>
-          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Her gün 11:00 – 00:00</div>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong><span data-ayar="saat-fsm">Her gün 11:00 – 00:00</span></div>
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">📞</span>
-          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;">0538 014 66 00</a></div>
+          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -184,11 +185,11 @@
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">🕐</span>
-          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</div>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong><span data-ayar="saat-podyum">Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</span></div>
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">📞</span>
-          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;">0538 014 66 00</a></div>
+          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -209,11 +210,11 @@
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">🕐</span>
-          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong>Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</div>
+          <div class="sk-info-txt"><strong>Çalışma Saatleri</strong><span data-ayar="saat-podyum">Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</span></div>
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico">📞</span>
-          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;">0538 014 66 00</a></div>
+          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -449,6 +450,7 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
     return false;
   }
   function render(){
+    if(window.__ayarRozetAktif) return; // site-ayarlar.js devrede — çakışma
     document.querySelectorAll('.acik-rozet[data-branch]').forEach(function(el){
       var a=acikMi(el.getAttribute('data-branch'));
       el.textContent=a?'Şu an açık':'Şu an kapalı';

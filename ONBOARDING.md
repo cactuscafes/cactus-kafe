@@ -16,7 +16,8 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
 
 ## Backend
 - **Worker:** `https://cactus-rapor-api.batuhanbulut.workers.dev`
-- **ÖNEMLİ:** Worker kaynağı bu repoda **DEĞİL** — ayrı deploy edilmiş, düzenlenemiyor.
+- **Kaynak:** `~/Desktop/cactus-rapor-api` (bu repoda değil; `npx wrangler deploy` ile yayınlanır)
+- `GET /ayar/cek` (public) & `POST /ayar/kaydet` → site ayarları (saatler, kampanya, şerit, puanlar, telefon); sayfalar `site-ayarlar.js` ile uygular, admin "⚙️ Site Ayarları" paneli yönetir. Kullanıcı rehberi: `YONETIM.md`
 - Endpointler:
   - `GET /sync/durum?sube=<sube>&since=0` → masalar + siparişler
   - `POST /sync/masalar` `{sube, masalar}` → masalar blob'unu **last-write-wins** saklar

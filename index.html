@@ -371,6 +371,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 }
 </script>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
+<script src="site-ayarlar.js?v=1" defer></script>
 </head>
 <body>
 
@@ -666,7 +667,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       <div class="branch-meta">
         <div class="branch-meta-top">
           <span class="acik-rozet" data-branch="fsm"></span>
-          <span class="branch-saat">Her gün <b>11:00 – 00:00</b></span>
+          <span class="branch-saat" data-ayar="saat-fsm">Her gün <b>11:00 – 00:00</b></span>
         </div>
         <div class="branch-actions">
           <a href="tel:+905380146600" class="bmini ara">📞 Ara</a>
@@ -685,7 +686,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       <div class="branch-meta">
         <div class="branch-meta-top">
           <span class="acik-rozet" data-branch="podyum"></span>
-          <span class="branch-saat">Hafta içi <b>16:00–01:00</b> · Hafta sonu <b>14:00–02:00</b></span>
+          <span class="branch-saat" data-ayar="saat-podyum">Hafta içi <b>16:00–01:00</b> · Hafta sonu <b>14:00–02:00</b></span>
         </div>
         <div class="branch-actions">
           <a href="tel:+905380146600" class="bmini ara">📞 Ara</a>
@@ -734,14 +735,14 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <a href="iletisim.html#basvuru" class="about-btn fade-up fade-up-d3" style="background:#c8a86a;color:#2a0808;">Hemen Başvur</a>
     <div class="kariyer-puan fade-up fade-up-d4">
       <a class="gpuan" href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener">
-        <span class="gpuan-skor">4.8</span>
+        <span class="gpuan-skor" data-ayar="puan-fsm">4.8</span>
         <span class="gpuan-yildiz">★★★★★</span>
-        <span class="gpuan-alt">FSM · 218 Google yorumu</span>
+        <span class="gpuan-alt">FSM · <span data-ayar="yorum-fsm">218 Google yorumu</span></span>
       </a>
       <a class="gpuan" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener">
-        <span class="gpuan-skor">4.5</span>
+        <span class="gpuan-skor" data-ayar="puan-podyum">4.5</span>
         <span class="gpuan-yildiz">★★★★★</span>
-        <span class="gpuan-alt">Podyumpark · 54 Google yorumu</span>
+        <span class="gpuan-alt">Podyumpark · <span data-ayar="yorum-podyum">54 Google yorumu</span></span>
       </a>
     </div>
   </div>
@@ -768,9 +769,9 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div>
       <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">FSM Şubesi</h4>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Fatih Sultan Mehmet Cad.<br>Nilüfer, Bursa</p>
-      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Her gün 11:00 – 00:00</p>
+      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;" data-ayar="saat-fsm">Her gün 11:00 – 00:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="tel:+905380146600" style="font-size:11px;color:#666;text-decoration:none;font-family:'Inter',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📞 0538 014 66 00</a>
+        <a href="tel:+905380146600" style="font-size:11px;color:#666;text-decoration:none;font-family:'Inter',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'" data-ayar="tel">📞 0538 014 66 00</a>
         <a href="https://share.google/mhU7p1kX5MocaCvLF" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Inter',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
         <a href="https://g.page/r/CQQuHm0-DVGYEAE/review" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Inter',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
         <a href="https://instagram.com/cactuscafe.fsm" target="_blank" rel="noopener" style="font-size:11px;color:#666;text-decoration:none;font-family:'Inter',sans-serif;transition:color .2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.fsm</a>
@@ -781,9 +782,9 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <div>
       <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Podyumpark</h4>
       <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Podyumpark AVM<br>Nilüfer, Bursa</p>
-      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;">Hafta içi 16:00 – 01:00<br>Hafta sonu 14:00 – 02:00</p>
+      <p style="font-size: 12px; color: rgb(119, 119, 119); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;" data-ayar="saat-podyum">Hafta içi 16:00 – 01:00<br>Hafta sonu 14:00 – 02:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="tel:+905380146600" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📞 0538 014 66 00</a>
+        <a href="tel:+905380146600" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'" data-ayar="tel">📞 0538 014 66 00</a>
         <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">📍 Google Maps'te Gör</a>
         <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">★ Yorum Yaz</a>
         <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(102, 102, 102); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#666'">@cactuscafe.tr</a>
@@ -1276,6 +1277,7 @@ function toggleMainNav(){
     return false;
   }
   function render(){
+    if(window.__ayarRozetAktif) return; // site-ayarlar.js devrede — çakışma
     document.querySelectorAll('.acik-rozet[data-branch]').forEach(function(el){
       var a=acikMi(el.getAttribute('data-branch'));
       el.textContent=a?'Şu an açık':'Şu an kapalı';

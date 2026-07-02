@@ -478,6 +478,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('anasayfa',this)">🏠 Ana Sayfa</button>
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
+      <button class="sb-btn" onclick="panelAc('ayarlar',this)">⚙️ Site Ayarları</button>
     </div>
     <div class="main">
       <div id="pendingBar" style="display:none;background:linear-gradient(90deg,#b8965a,#c8a86a);color:#1a3010;padding:10px 18px;border-radius:8px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(184,150,90,.25);"><span style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;"><span style="width:9px;height:9px;border-radius:50%;background:#1a3010;display:inline-block;animation:dotPulse 1.4s infinite;flex:none;"></span><span id="pendingBarTxt">Yayınlanmamış değişiklikler var — canlı menüye/adisyona uygulamak için Yayınla'ya bas.</span></span><button onclick="modalAc()" style="background:#1a3010;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex:none;">🚀 Yayınla</button></div>
@@ -603,6 +604,73 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
           <span id="mn-st" style="font-size:13px;color:#888;">-</span>
           <button class="btn-primary" onclick="seYayinla('menu.html','mn-wrap','mn-st','Menü sayfası güncellendi')">🚀 Yayınla</button>
+        </div>
+      </div>
+
+      <!-- SİTE AYARLARI -->
+      <div class="panel" id="panel-ayarlar" style="max-width:880px;">
+        <div class="pttl">⚙️ Site Ayarları</div>
+        <div class="psub">Saatler, kampanyalar, duyuru şeridi, Google puanları ve telefon. <b>Kaydet</b>'e basınca anında canlıya geçer — menüdeki Yayınla'dan bağımsızdır.</div>
+
+        <div class="kart">
+          <div style="font-weight:600;font-size:14px;margin-bottom:14px;">🕐 Çalışma Saatleri</div>
+          <div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:10px;align-items:center;max-width:560px;">
+            <div></div><span class="lbl" style="margin:0;">Hafta içi (açılış – kapanış)</span><span class="lbl" style="margin:0;">Hafta sonu (açılış – kapanış)</span>
+            <b style="font-size:13px;">FSM</b>
+            <div style="display:flex;gap:6px;"><input class="yi" type="time" id="ay-fsm-hiac"><input class="yi" type="time" id="ay-fsm-hikap"></div>
+            <div style="display:flex;gap:6px;"><input class="yi" type="time" id="ay-fsm-hsac"><input class="yi" type="time" id="ay-fsm-hskap"></div>
+            <b style="font-size:13px;">Podyum</b>
+            <div style="display:flex;gap:6px;"><input class="yi" type="time" id="ay-podyum-hiac"><input class="yi" type="time" id="ay-podyum-hikap"></div>
+            <div style="display:flex;gap:6px;"><input class="yi" type="time" id="ay-podyum-hsac"><input class="yi" type="time" id="ay-podyum-hskap"></div>
+          </div>
+          <div class="psub" style="margin:10px 0 0;">Ana sayfa, iletişim sayfası, "şu an açık/kapalı" rozetleri ve Google'ın gördüğü saat bilgisi buradan beslenir. Gece yarısını geçen kapanış (ör. 01:00) doğru hesaplanır.</div>
+        </div>
+
+        <div class="kart">
+          <div style="font-weight:600;font-size:14px;margin-bottom:14px;">📢 Duyuru Şeridi <span style="font-weight:400;color:var(--mist);font-size:12px;">(menü sayfalarının üstünde kayan yazı)</span></div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;"><input type="checkbox" id="ay-serit-fsm-acik" style="width:16px;height:16px;"> <b>FSM</b> şeridi açık</label>
+          <input class="yi" id="ay-serit-fsm-metin" placeholder="FSM şerit metni" style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;"><input type="checkbox" id="ay-serit-podyum-acik" style="width:16px;height:16px;"> <b>Podyumpark</b> şeridi açık</label>
+          <input class="yi" id="ay-serit-podyum-metin" placeholder="Podyumpark şerit metni">
+        </div>
+
+        <div class="kart">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px;">🎁 FSM Açılış Popup'ı <span style="font-weight:400;color:var(--mist);font-size:12px;">(ör. "tatlıya çay ikram")</span></div>
+          <div class="psub" style="margin:0 0 12px;">Biçim: <code>*kelime*</code> = altın italik, <code>**kelime**</code> = kalın, satır sonu = alt satır.</div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;"><input type="checkbox" id="ay-pf-acik" style="width:16px;height:16px;"> Popup açık (oturum başına bir kez gösterilir)</label>
+          <span class="lbl">Üst etiket</span><input class="yi" id="ay-pf-eyebrow" style="margin-bottom:10px;">
+          <span class="lbl">Başlık</span><textarea class="yi" id="ay-pf-baslik" rows="2" style="margin-bottom:10px;resize:vertical;"></textarea>
+          <span class="lbl">Metin</span><textarea class="yi" id="ay-pf-metin" rows="2" style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="kart">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px;">🏷 Podyumpark Kampanya Popup'ı</div>
+          <div class="psub" style="margin:0 0 12px;">Bitiş tarihi girersen o günün sonunda popup kendiliğinden kapanır (şerit metnini ayrıca güncellemeyi unutma).</div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;"><input type="checkbox" id="ay-pp-acik" style="width:16px;height:16px;"> Popup açık</label>
+          <div style="display:grid;grid-template-columns:1fr 120px 150px;gap:10px;margin-bottom:10px;">
+            <div><span class="lbl">Üst etiket</span><input class="yi" id="ay-pp-eyebrow"></div>
+            <div><span class="lbl">Fiyat (₺)</span><input class="yi" type="number" id="ay-pp-fiyat" min="0"></div>
+            <div><span class="lbl">Bitiş tarihi</span><input class="yi" type="date" id="ay-pp-bitis"></div>
+          </div>
+          <span class="lbl">Başlık</span><input class="yi" id="ay-pp-baslik" style="margin-bottom:10px;">
+          <span class="lbl">Metin</span><textarea class="yi" id="ay-pp-metin" rows="2" style="margin-bottom:10px;resize:vertical;"></textarea>
+          <span class="lbl">Alt not</span><input class="yi" id="ay-pp-not">
+        </div>
+
+        <div class="kart">
+          <div style="font-weight:600;font-size:14px;margin-bottom:14px;">⭐ Google Puanları &nbsp;·&nbsp; 📞 Telefon</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:560px;margin-bottom:12px;">
+            <div><span class="lbl">FSM puan</span><input class="yi" id="ay-puan-fsm" placeholder="4.8"></div>
+            <div><span class="lbl">FSM yorum sayısı</span><input class="yi" type="number" id="ay-yorum-fsm"></div>
+            <div><span class="lbl">Podyum puan</span><input class="yi" id="ay-puan-podyum" placeholder="4.5"></div>
+            <div><span class="lbl">Podyum yorum sayısı</span><input class="yi" type="number" id="ay-yorum-podyum"></div>
+          </div>
+          <span class="lbl">Telefon (tüm sayfalardaki ara linkleri)</span><input class="yi" id="ay-telefon" placeholder="0538 014 66 00" style="max-width:270px;">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button class="btn-primary" onclick="ayarKaydet()">💾 Kaydet ve Yayınla</button>
+          <span id="ayarSt" style="font-size:13px;color:var(--mist);"></span>
         </div>
       </div>
 
@@ -1234,6 +1302,7 @@ function panelAc(id,el){
   mobSbKapat(); // mobilde drawer'ı kapat
   if(_canliTimer){ clearInterval(_canliTimer); _canliTimer=null; }
   if(id==='bugun') bugunYukle();
+  if(id==='ayarlar') ayarYukle();
   if(id==='canli'){ canliMasaYukle(); _canliTimer=setInterval(canliMasaYukle,30000); }
   if(id==='kategori') renderKatListe();
   if(id==='tukendi') renderTukendi();
@@ -2904,6 +2973,59 @@ async function sikayetSil(id){
   if(!confirm('Bu kayıt silinsin mi?'))return;
   await fetch(SIKAYET_API+'/sikayet/sil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).catch(function(){});
   sikayetYukle();
+}
+
+/* ===== SİTE AYARLARI ===== */
+function _av(id){ return document.getElementById(id); }
+async function ayarYukle(){
+  var st=_av('ayarSt'); if(st)st.textContent='⏳ Yükleniyor…';
+  try{
+    var r=await fetch(RAPOR_API+'/ayar/cek?t='+Date.now());
+    var a=await r.json();
+    ['fsm','podyum'].forEach(function(b){
+      var sa=(a.saatler&&a.saatler[b])||{};
+      _av('ay-'+b+'-hiac').value=sa.hi_ac||''; _av('ay-'+b+'-hikap').value=sa.hi_kap||'';
+      _av('ay-'+b+'-hsac').value=sa.hs_ac||''; _av('ay-'+b+'-hskap').value=sa.hs_kap||'';
+      var sr=(a.serit&&a.serit[b])||{};
+      _av('ay-serit-'+b+'-acik').checked=sr.acik!==false;
+      _av('ay-serit-'+b+'-metin').value=sr.metin||'';
+      var pu=(a.puan&&a.puan[b])||{};
+      _av('ay-puan-'+b).value=pu.puan||''; _av('ay-yorum-'+b).value=pu.yorum||'';
+    });
+    var pf=a.popup_fsm||{};
+    _av('ay-pf-acik').checked=pf.acik!==false;
+    _av('ay-pf-eyebrow').value=pf.eyebrow||''; _av('ay-pf-baslik').value=pf.baslik||''; _av('ay-pf-metin').value=pf.metin||'';
+    var pp=a.popup_podyum||{};
+    _av('ay-pp-acik').checked=pp.acik!==false;
+    _av('ay-pp-eyebrow').value=pp.eyebrow||''; _av('ay-pp-baslik').value=pp.baslik||'';
+    _av('ay-pp-fiyat').value=pp.fiyat||''; _av('ay-pp-metin').value=pp.metin||'';
+    _av('ay-pp-not').value=pp.not||''; _av('ay-pp-bitis').value=pp.bitis||'';
+    _av('ay-telefon').value=a.telefon||'';
+    if(st)st.textContent='';
+  }catch(e){ if(st)st.textContent='❌ Yüklenemedi: '+e.message; }
+}
+async function ayarKaydet(){
+  var st=_av('ayarSt');
+  var a={saatler:{},serit:{},puan:{}};
+  ['fsm','podyum'].forEach(function(b){
+    a.saatler[b]={hi_ac:_av('ay-'+b+'-hiac').value||'00:00',hi_kap:_av('ay-'+b+'-hikap').value||'00:00',
+                  hs_ac:_av('ay-'+b+'-hsac').value||'00:00',hs_kap:_av('ay-'+b+'-hskap').value||'00:00'};
+    a.serit[b]={acik:_av('ay-serit-'+b+'-acik').checked,metin:_av('ay-serit-'+b+'-metin').value.trim()};
+    a.puan[b]={puan:_av('ay-puan-'+b).value.trim(),yorum:parseInt(_av('ay-yorum-'+b).value,10)||0};
+  });
+  a.popup_fsm={acik:_av('ay-pf-acik').checked,eyebrow:_av('ay-pf-eyebrow').value.trim(),
+               baslik:_av('ay-pf-baslik').value.trim(),metin:_av('ay-pf-metin').value.trim()};
+  a.popup_podyum={acik:_av('ay-pp-acik').checked,eyebrow:_av('ay-pp-eyebrow').value.trim(),
+                  baslik:_av('ay-pp-baslik').value.trim(),fiyat:parseInt(_av('ay-pp-fiyat').value,10)||0,
+                  metin:_av('ay-pp-metin').value.trim(),not:_av('ay-pp-not').value.trim(),bitis:_av('ay-pp-bitis').value};
+  a.telefon=_av('ay-telefon').value.trim();
+  if(st)st.textContent='⏳ Kaydediliyor…';
+  try{
+    var r=await fetch(RAPOR_API+'/ayar/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ayar:a})});
+    var d=await r.json();
+    if(d&&d.ok){ if(st)st.textContent='✅ Yayında — sayfalar yeni açılışta bu değerleri gösterir.'; toast('⚙️ Site ayarları yayınlandı'); }
+    else throw new Error((d&&d.error)||'Kaydedilemedi');
+  }catch(e){ if(st)st.textContent='❌ '+e.message; }
 }
 
 /* ===== GENERIC SAYFA EDİTÖRÜ ===== */

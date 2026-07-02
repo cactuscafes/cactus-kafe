@@ -137,6 +137,10 @@ input,select{font-family:'Inter',sans-serif;}
 .htab:hover{color:var(--kr);background:rgba(255,255,255,.05);}
 .htab.on{color:var(--al2);border-bottom-color:var(--al2);background:rgba(201,168,76,.1);}
 .htab .tico{font-size:16px;}
+/* Yıldız sekme değil EYLEM: ekran değiştirmez, panel açar — sekmelerden görsel olarak ayrık altın hap */
+.htab-eylem{flex:0 0 auto;align-self:center;margin:0 8px;padding:8px 14px;min-height:42px;border-radius:12px;background:linear-gradient(135deg,var(--al2),var(--al));color:#1a3010;font-weight:800;border-bottom:none;}
+.htab-eylem:hover{filter:brightness(1.05);color:#1a3010;background:linear-gradient(135deg,var(--al2),var(--al));}
+.htab-eylem .tico{font-size:15px;}
 .hdr-time{padding:10px 14px;border-left:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;justify-content:center;align-items:flex-end;flex-shrink:0;}
 .hdr-time .ts{font-family:'Fraunces',serif;font-size:18px;color:var(--kr);line-height:1;}
 .hdr-time .td{font-size:10px;color:var(--kr3);margin-top:2px;}
@@ -678,6 +682,10 @@ input,select{font-family:'Inter',sans-serif;}
 .rap-ara-btn{min-height:44px;}
 .kasa-btn{min-height:44px;}
 .acilis-bar-x{padding:8px 12px;}
+
+/* Al-Git / Waffle tezgah satışları (31-34) — masalardan görsel ayrım */
+.mbtn.algit{border-style:dashed;border-color:rgba(201,168,76,.55);}
+.mbtn.algit .ml{color:var(--al);}
 </style>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
@@ -737,7 +745,7 @@ if('serviceWorker' in navigator){
   </div>
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
-    <button class="htab" onclick="kartYildizAc()"><span class="tico">⭐</span>Yıldız</button>
+    <button class="htab htab-eylem" onclick="kartYildizAc()" title="Masadaki içecekler için sadakat yıldızı ekle"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
     <button class="htab" onclick="goTo('har',this);harGoster();"><span class="tico">💸</span>Gider</button>
     <button class="htab" onclick="goTo('yon',this)"><span class="tico">⚙️</span>Yönet</button>
@@ -967,7 +975,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="yon-sec">
       <div class="yon-sec-ttl">📊 Google Sheets Entegrasyonu</div>
-      <p style="font-size:13px;color:var(--k2);margin-bottom:12px;line-height:1.6;">Ödeme alındığında verileri otomatik olarak Google Sheets'e göndermek için webhook URL'nizi buraya girin.</p>
+      <p style="font-size:13px;color:var(--k2);margin-bottom:12px;line-height:1.6;">Her ödeme bu adrese de gönderilir (Google E-Tablo yedeği). <b>Boş kaydederseniz gönderim tamamen kapanır</b> — raporlar bundan etkilenmez.</p>
       <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--k2);margin-bottom:5px;display:block;">Webhook URL</label>
       <input id="webhook-input" type="url" placeholder="https://script.google.com/macros/s/..." style="width:100%;padding:10px;border:1.5px solid var(--kr2);border-radius:8px;font-size:13px;color:var(--k1);margin-bottom:10px;background:#fff;">
       <button onclick="webhookKaydet()" class="kaydet-btn" style="background:linear-gradient(135deg,var(--gr),var(--gr2));">💾 Webhook URL'yi Kaydet</button>
@@ -1023,7 +1031,7 @@ if('serviceWorker' in navigator){
     <div class="iskonto-satir">
       <label>₺ İskonto</label>
       <div class="iskonto-girdi">
-        <input type="number" id="iskonto-tl" min="0" step="1" placeholder="0" oninput="iskontoGuncelle()">
+        <input type="number" id="iskonto-tl" min="0" step="1" placeholder="0" inputmode="numeric" onwheel="this.blur()" oninput="iskontoGuncelle()">
         <span>₺</span>
         <span class="iskonto-indirim" id="iskonto-indirim-txt"></span>
       </div>
@@ -1037,17 +1045,17 @@ if('serviceWorker' in navigator){
       <button class="odeme-opt" id="opt-kisi" onclick="odemeSecim('kisi')"><span class="oi">👥</span>Kişi</button>
     </div>
     <div class="paraustu-wrap" id="paraustu-wrap" style="display:none;margin-bottom:14px;">
-      <div class="bolme-row"><label>💵 Verilen</label><input type="number" id="paraustu-verilen" min="0" inputmode="decimal" oninput="paraUstuHesapla()" placeholder="Müşterinin verdiği"></div>
+      <div class="bolme-row"><label>💵 Verilen</label><input type="number" id="paraustu-verilen" min="0" inputmode="decimal" onwheel="this.blur()" oninput="paraUstuHesapla()" placeholder="Müşterinin verdiği"></div>
       <div class="bolme-kalan" id="paraustu-sonuc"></div>
     </div>
     <div class="bolme-wrap" id="bolme-wrap" style="display:none;">
       <div class="bolme-row">
         <label>💵 Nakit</label>
-        <input type="number" id="bolme-nakit" min="0" oninput="bolmeHesapla('nakit')" placeholder="0">
+        <input type="number" id="bolme-nakit" min="0" inputmode="decimal" onwheel="this.blur()" oninput="bolmeHesapla('nakit')" placeholder="0">
       </div>
       <div class="bolme-row">
         <label>💳 Kredi Kartı</label>
-        <input type="number" id="bolme-kart" min="0" oninput="bolmeHesapla('kart')" placeholder="0">
+        <input type="number" id="bolme-kart" min="0" inputmode="decimal" onwheel="this.blur()" oninput="bolmeHesapla('kart')" placeholder="0">
       </div>
       <div class="bolme-kalan" id="bolme-kalan"></div>
     </div>
@@ -1261,7 +1269,7 @@ for(let i=1;i<=34;i++) masalar[i]=[];
 const saved=JSON.parse(localStorage.getItem(LK.mas)||'null');
 // Açılışta bozuk veriyi temizle: negatif/sıfır/geçersiz adetli item'lar düşürülür
 // (eski/cache'li sürümlerden kalma "₺x × -1" hayalet kayıtları self-heal olur)
-if(saved) for(let i=1;i<=30;i++) masalar[i]=(saved[i]||[]).filter(it=>it&&typeof it.adet==='number'&&it.adet>0);
+if(saved) for(let i=1;i<=34;i++) masalar[i]=(saved[i]||[]).filter(it=>it&&typeof it.adet==='number'&&it.adet>0);
 
 // ─── GECE 04:00 RESET — STALE GÜN KONTROLÜ ───
 // Sorun: gece 04:00 worker cron D1'i sıfırlıyor AMA cihaz o saatte kapalıysa
@@ -1563,7 +1571,7 @@ function renderMasalar(){
   if(!g) return;
   let sureMap={}; try{ sureMap=masaBaslangiclariniGuncelle()||{}; }catch(e){ sureMap={}; }
   g.innerHTML='';
-  for(let i=1;i<=30;i++){
+  for(let i=1;i<=34;i++){
     try{
       // KURŞUNGEÇİRMEZ: bozuk veri (undefined dizi / null ürün) bir masayı render'da kaybetmesin
       let a=masalar[i];
@@ -1574,7 +1582,7 @@ function renderMasalar(){
       const adet=a.reduce((s,x)=>s+(Number(x.adet)||0),0);
       const b=document.createElement('button');
       const uyariCls=adet>0?masaUyariSinifi(sureMap[i]):'';
-      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'')+(uyariCls?' '+uyariCls:'');
+      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'')+(uyariCls?' '+uyariCls:'')+(i>=31?' algit':'');
       b.onclick=()=>masaSec(i);
       const sureStr=adet>0?masaSureMetin(sureMap[i]):'';
       b.innerHTML=(adet>0?`<div class="mbdg">${adet}</div>`:'')+
@@ -1598,13 +1606,13 @@ function _masaGridGaranti(){
     var g=document.getElementById('masa-grid'); if(!g) return;
     var mevcut={};
     g.querySelectorAll('.mbtn .mn').forEach(function(s){ mevcut[s.textContent.trim()]=true; });
-    for(var i=1;i<=30;i++){
+    for(var i=1;i<=34;i++){
       if(mevcut[String(i)]) continue;             // hücre var → atla
       var arr=(typeof masalar!=='undefined'&&Array.isArray(masalar[i]))?masalar[i]:[];
       var adet=0, top=0;
       for(var k=0;k<arr.length;k++){ var x=arr[k]; if(x){ adet+=(Number(x.adet)||0); top+=(Number(x.fiyat)||0)*(Number(x.adet)||0); } }
       var b=document.createElement('button');
-      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'');
+      b.className='mbtn'+(aktifMasa===i?' on':'')+(adet>0?' dolu':'')+(i>=31?' algit':'');
       (function(n){ b.onclick=function(){ if(typeof masaSec==='function') masaSec(n); }; })(i);
       b.innerHTML=(adet>0?'<div class="mbdg">'+adet+'</div>':'')+'<span class="mn">'+i+'</span><span class="ml">Masa</span>'+(top>0?'<span class="mf">₺'+top.toLocaleString('tr-TR')+'</span>':'');
       var ref=null, cells=g.querySelectorAll('.mbtn');               // sırayı koru: ilk büyük numaranın önüne
@@ -1619,12 +1627,14 @@ setInterval(function(){if(document.getElementById('scr-kas').classList.contains(
 // GARANTİ AĞI: 4 sn'de bir eksik masa hücresi var mı bak, varsa geri ekle (render'dan bağımsız)
 setInterval(function(){ try{ _masaGridGaranti(); }catch(e){} },4000);
 
+// Masa görünen adı — 31-34 Al-Git/Waffle tezgah satışları
+function masaAdi(n){ return ({31:'Al-Git 31',32:'Al-Git 32',33:'Waffle 33',34:'Waffle 34'})[n]||('Masa '+n); }
 function masaSec(no){
   aktifMasa=no;
   renderMasalar();renderAdisyon();
   document.getElementById('uyari').classList.remove('on');
-  document.getElementById('adis-masa-no').textContent='Masa '+no;
-  document.getElementById('adis-masa-mob').textContent='Masa '+no;
+  document.getElementById('adis-masa-no').textContent=masaAdi(no);
+  document.getElementById('adis-masa-mob').textContent=masaAdi(no);
 }
 
 var _pushMasalarTimer=null;
@@ -2304,7 +2314,7 @@ function renderAdisyon(){
         : (kismiGonderildi
           ? `<span style="color:#e67e22;font-size:11px;font-weight:700;margin-left:6px;">⏳ ${gAdet}/${item.adet} gönderildi</span>`
           : '');
-      const _nv=(typeof window._notAl==='function')?window._notAl(aktifMasa+'_'+idx):'';
+      const _nv=(typeof window._notAl==='function')?window._notAl(aktifMasa+'_'+item.id):'';
       const _nvEsc=_nv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
       itemsHTML+=`<div class="aitem ${item.tip==='icecek'?'ic':'yi'}"${tumGonderildi?' style="opacity:.78;"':''}>
         <div class="ai-info"><div class="ai-ad">${item.emoji} ${item.ad}${rozet}${item.zaman?`<span class="ai-zaman">${item.zaman}</span>`:''}</div><div class="ai-fiyat">₺${item.fiyat} × ${item.adet} = ₺${sub}</div>${_nv?`<div class="ai-not-txt">📝 ${_nvEsc}</div>`:''}</div>
@@ -2313,7 +2323,7 @@ function renderAdisyon(){
           <span class="ai-adet">${item.adet}</span>
           <button onclick="chAdet('${item.id}',1)">+</button>
         </div>
-        <button class="ai-not" onclick="notEkle(${aktifMasa},${idx})" title="${_nv?_nvEsc:'Not ekle'}">${_nv?'📝':'✏️'}</button>
+        <button class="ai-not" onclick="notEkle(${aktifMasa},'${item.id}')" title="${_nv?_nvEsc:'Not ekle'}">${_nv?'📝':'✏️'}</button>
         <button class="ai-sil" onclick="delItem('${item.id}')">×</button>
       </div>`;
     });
@@ -2351,7 +2361,7 @@ function chAdet(id,d){
   } else {
     var yeniAdet=(Number(it.adet)||0)+d;
     if(yeniAdet<=0){
-      _pushEvent('ITEM_DEL', aktifMasa, {urunId:id});
+      delItem(id); // geri alınabilir silme
     } else {
       _pushEvent('ITEM_SUB', aktifMasa, {urunId:id, delta:d});
     }
@@ -2360,8 +2370,17 @@ function chAdet(id,d){
 
 function delItem(id){
   if(!aktifMasa)return;
-  // EVENT-SOURCED v11: ITEM_DEL event'i
-  _pushEvent('ITEM_DEL', aktifMasa, {urunId:id});
+  var _hedef=aktifMasa;
+  var _it=(masalar[_hedef]||[]).find(function(x){return x&&x.id===id;});
+  _pushEvent('ITEM_DEL', _hedef, {urunId:id});
+  // Yanlış satır silmek yoğun serviste rutin kazadır — masa temizlemedeki gibi 6 sn geri alma
+  if(_it){
+    var _yedek={id:_it.id,ad:_it.ad,fiyat:_it.fiyat,tip:_it.tip,emoji:_it.emoji,adet:Number(_it.adet)||1};
+    undoToast('\uD83D\uDDD1 '+_yedek.ad+' silindi', function(){
+      _pushEvent('ITEM_ADD', _hedef, {urun:{id:_yedek.id,ad:_yedek.ad,fiyat:_yedek.fiyat,tip:_yedek.tip,emoji:_yedek.emoji}, adet:_yedek.adet});
+      toast('\u21A9 '+_yedek.ad+' geri eklendi');
+    });
+  }
 }
 
 var _undoTimer;
@@ -2383,9 +2402,11 @@ function masayiTemizle(){
   var _hedef=aktifMasa;
   var _yedek=JSON.parse(JSON.stringify(masalar[_hedef]||[]));
   if(!_yedek.length){ toast('Masa zaten bo\u015f'); return; }
+  var _notYedek=(typeof window._notMasaTemizle==='function')?window._notMasaTemizle(_hedef):null;
   _pushEvent('MASA_CLEAR', _hedef, {});
   undoToast('\uD83D\uDDD1 Masa '+_hedef+' temizlendi', function(){
     _yedek.forEach(function(it){ if(it&&it.id&&Number(it.adet)>0) _pushEvent('ITEM_ADD', _hedef, {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:Number(it.adet)}); });
+    if(typeof window._notGeriYukle==='function') window._notGeriYukle(_notYedek);
     toast('\u21A9 Masa '+_hedef+' geri al\u0131nd\u0131');
   });
 }
@@ -2404,7 +2425,7 @@ let _kisiAdet=2,_kisiTahsilat='nakit';
 
 function renderKalemSecim(){
   _secKalemler=(masalar[aktifMasa]||[]).map((x,i)=>({i,id:x.id,ad:x.ad,fiyat:x.fiyat,tip:x.tip,emoji:x.emoji||'',max:x.adet,sec:x.adet}));
-  document.getElementById('odeme-masa-no').textContent='Masa '+aktifMasa;
+  document.getElementById('odeme-masa-no').textContent=masaAdi(aktifMasa);
   kalemGuncelle();
 }
 function _iskontoHesapla(){
@@ -2554,7 +2575,9 @@ function odemeOnayla(){
   var _odemeUrunler=_secKalemler.filter(k=>k.sec>0).map(k=>({id:k.id, adet:k.sec}));
   const odTipLabel=efektifTip==='nakit'?'Nakit':efektifTip==='kart'?'Kredi Kartı':'Nakit+Kart (₺'+nakitTutar+' / ₺'+kartTutar+')';
   const VARSAYILAN_WEBHOOK='https://script.google.com/macros/s/AKfycbyjh6acppP7P1sUO48ovi1YaTK9zOQgICcV3QO0y4f51uyz-hRH3RcYD_z0d6-VETIy/exec';
-  const webhookUrl=localStorage.getItem('cactus_webhook')||VARSAYILAN_WEBHOOK;
+  // Anahtar hiç YOKSA varsayılan kullanılır; BOŞ kaydedildiyse gönderim bilinçli olarak KAPALIDIR
+  var _whSaklanan=localStorage.getItem('cactus_webhook');
+  const webhookUrl=(_whSaklanan===null?VARSAYILAN_WEBHOOK:_whSaklanan).trim();
   if(webhookUrl){
     const now=new Date();
     fetch(webhookUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarih:now.toLocaleDateString('tr-TR'),saat:now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),masa:'Masa '+oncekiMasa,odeme_tipi:odTipLabel,nakit_tutar:nakitTutar,kart_tutar:kartTutar,urunler:secilen.map(k=>k.ad+' x'+k.sec).join(', '),icecek_toplam:ic,yiyecek_toplam:yi,toplam:top})}).catch(()=>{});
@@ -2568,6 +2591,11 @@ function odemeOnayla(){
     tutar: top, ic: ic, yi: yi,
     odemeTipi: efektifTip, nakitTutar: nakitTutar, kartTutar: kartTutar,
   });
+  // Ödenen ürünlerin notlarını düş; masa tamamen kapandıysa masadaki tüm notları süpür
+  try{
+    _secKalemler.forEach(function(k){ if(k.sec>0 && k.sec>=k.max && typeof window._notUrunTemizle==='function') window._notUrunTemizle(oncekiMasa, k.id); });
+    if((!masalar[oncekiMasa]||!masalar[oncekiMasa].length) && typeof window._notMasaTemizle==='function') window._notMasaTemizle(oncekiMasa);
+  }catch(e){}
   closeModal('odeme-modal');
   if(!masalar[aktifMasa]||!masalar[aktifMasa].length){
     closeDrawer();aktifMasa=null;
@@ -2600,11 +2628,11 @@ function openTransfer(){
   document.getElementById('transfer-sub').textContent='Masa '+aktifMasa+' adisyonu hangi masaya taşınsın?';
   const sel=document.getElementById('transfer-hedef');
   sel.innerHTML='';
-  for(let i=1;i<=30;i++){
+  for(let i=1;i<=34;i++){
     if(i===aktifMasa)continue;
     const opt=document.createElement('option');
     const top=masalar[i].reduce((s,x)=>s+x.fiyat*x.adet,0);
-    opt.value=i;opt.textContent='Masa '+i+(top>0?' (₺'+top+' dolu)':'');
+    opt.value=i;opt.textContent=masaAdi(i)+(top>0?' (₺'+top+' dolu)':'');
     sel.appendChild(opt);
   }
   document.getElementById('transfer-modal').classList.add('on');
@@ -2613,16 +2641,23 @@ function transferYap(){
   const hedef=parseInt(document.getElementById('transfer-hedef').value);
   if(!hedef||!aktifMasa)return;
   const onceki=aktifMasa;
+  // Dolu hedefe aktarım iki hesabı birleştirir — kazara olmasın
+  const _hArr=masalar[hedef]||[];
+  if(_hArr.length){
+    const _hTop=_hArr.reduce((s,x)=>s+x.fiyat*x.adet,0);
+    if(!confirm(masaAdi(hedef)+' dolu — ₺'+_hTop+' açık hesap var.\n\n'+masaAdi(onceki)+' adisyonu ÜSTÜNE eklensin mi?')) return;
+  }
   // EVENT-SOURCED v11: doğrudan masalar mutasyonu rebuild'de geri alınıyordu.
   // Hedefe ITEM_ADD (id eşleşirse adet birikir) + kaynağa MASA_CLEAR event'i.
   (masalar[onceki]||[]).slice().forEach(item=>{
     _pushEvent('ITEM_ADD', hedef, {urun:{id:item.id,ad:item.ad,fiyat:item.fiyat,tip:item.tip,emoji:item.emoji}, adet:item.adet});
   });
   _pushEvent('MASA_CLEAR', onceki, {});
+  if(typeof window._notMasaTasi==='function') window._notMasaTasi(onceki,hedef);
   closeModal('transfer-modal');
   aktifMasa=hedef;
-  document.getElementById('adis-masa-no').textContent='Masa '+hedef;
-  document.getElementById('adis-masa-mob').textContent='Masa '+hedef;
+  document.getElementById('adis-masa-no').textContent=masaAdi(hedef);
+  document.getElementById('adis-masa-mob').textContent=masaAdi(hedef);
   renderMasalar();renderAdisyon();
   toast('⇄ Masa '+onceki+' → Masa '+hedef+' aktarıldı');
 }
@@ -2647,7 +2682,7 @@ function renderYon(){
   });
   ['aktar-kaynak','aktar-hedef'].forEach(id=>{
     const sel=document.getElementById(id);sel.innerHTML='';
-    for(let i=1;i<=30;i++){const opt=document.createElement('option');const top=masalar[i].reduce((s,x)=>s+x.fiyat*x.adet,0);opt.value=i;opt.textContent='Masa '+i+(top>0?' — ₺'+top:'');sel.appendChild(opt);}
+    for(let i=1;i<=34;i++){const opt=document.createElement('option');const top=masalar[i].reduce((s,x)=>s+x.fiyat*x.adet,0);opt.value=i;opt.textContent=masaAdi(i)+(top>0?' — ₺'+top:'');sel.appendChild(opt);}
   });
   document.getElementById('aktar-hedef').selectedIndex=1;
   const wi=document.getElementById('webhook-input');
@@ -2683,8 +2718,13 @@ function masaAktar(){
   const h=parseInt(document.getElementById('aktar-hedef').value);
   if(k===h){toast('⚠️ Aynı masayı seçtiniz');return;}
   if(!masalar[k].length){toast('⚠️ Masa '+k+' boş');return;}
+  if(masalar[h].length){
+    const _ht=masalar[h].reduce((s,x)=>s+x.fiyat*x.adet,0);
+    if(!confirm(masaAdi(h)+' dolu — ₺'+_ht+' açık hesap var.\n\n'+masaAdi(k)+' adisyonu ÜSTÜNE eklensin mi?')) return;
+  }
   masalar[k].forEach(item=>{const ex=masalar[h].find(x=>x.id===item.id);if(ex) ex.adet+=item.adet;else masalar[h].push({...item});});
   masalar[k]=[];saveMasalar();
+  if(typeof window._notMasaTasi==='function') window._notMasaTasi(k,h);
   if(aktifMasa===k){aktifMasa=h;document.getElementById('adis-masa-no').textContent='Masa '+h;document.getElementById('adis-masa-mob').textContent='Masa '+h;}
   renderMasalar();renderAdisyon();renderYon();
   toast('⇄ Masa '+k+' → Masa '+h+' aktarıldı');
@@ -3270,11 +3310,14 @@ function harEkleAc(){
   try{toast('✓ Harcama eklendi'+hedefEtk);}catch(e){}
 }
 function harSil(id){
-  if(!confirm('Bu harcama kaydı silinsin mi?')) return;
-  _harKayitlar=_harKayitlar.filter(function(k){return k.id!==id;});
-  harSunucuKaydet();
-  harRender();
-  harAylikYukle(); // aylık toplamı yenile
+  // Gider silmek kasa mutabakatını sessizce oynatabilir — yönetici şifresi + onay ister
+  sifreSor('Gider Silme', function(){
+    if(!confirm('Bu harcama kaydı silinsin mi?')) return;
+    _harKayitlar=_harKayitlar.filter(function(k){return k.id!==id;});
+    harSunucuKaydet();
+    harRender();
+    harAylikYukle(); // aylık toplamı yenile
+  });
 }
 function harSunucuKaydet(){
   // Seçili tarihe yaz (geçmiş güne de ekleme olabilir)
@@ -3574,7 +3617,7 @@ function toast(msg){
 }
 
 window.addEventListener('storage',e=>{
-  if(e.key===LK.mas){const s=JSON.parse(e.newValue||'{}');for(let i=1;i<=30;i++)masalar[i]=s[i]||[];renderMasalar();renderAdisyon();}
+  if(e.key===LK.mas){const s=JSON.parse(e.newValue||'{}');for(let i=1;i<=34;i++)masalar[i]=s[i]||[];renderMasalar();renderAdisyon();}
 });
 
 if(window.innerWidth<=640){
@@ -3632,46 +3675,7 @@ setInterval(function(){gunCiroYukle();},60000);
 
 
 
-<script id="masa-isim-patch">
-(function(){
-  var ISIM={31:'☕ Al-Git',32:'☕ Al-Git',33:'🧇 Waffle Al-Git',34:'🧇 Waffle Al-Git'};
-  // localStorage ve global masalar objesine ekle
-  var m=JSON.parse(localStorage.getItem('cactus_masalar')||'{}');
-  [31,32,33,34].forEach(function(n){if(!m[n])m[n]=[];});
-  localStorage.setItem('cactus_masalar',JSON.stringify(m));
-
-  window.addEventListener('load',function(){
-    setTimeout(function(){
-      if(typeof masalar!=='undefined')[31,32,33,34].forEach(function(n){if(!masalar[n])masalar[n]=[];});
-      var orig=window.renderMasalar;
-      if(!orig||orig._ekstra)return;
-      window.renderMasalar=function(){
-        orig.apply(this,arguments);
-        var grid=document.querySelector('.masa-grid');
-        if(!grid)return;
-        [31,32,33,34].forEach(function(num){
-          if(grid.querySelector('[data-ekstra="'+num+'"]'))return;
-          var btn=document.createElement('button');
-          btn.className='mbtn';
-          btn.dataset.ekstra=String(num);
-          var urunler=(typeof masalar!=='undefined'&&masalar[num])||[];
-          var adet=urunler.length;
-          var top=urunler.reduce(function(s,u){return s+u.fiyat*u.adet;},0);
-          if(adet>0)btn.classList.add('dolu');
-          btn.innerHTML=(adet>0?'<div class="mbdg">'+adet+'</div>':'')+
-            '<span class="mn">'+num+'</span>'+
-            '<span class="ml">'+ISIM[num]+'</span>'+
-            (top>0?'<span class="mf">₺'+top+'</span>':'');
-          btn.onclick=(function(n){return function(){masaSec(n);};})(num);
-          grid.appendChild(btn);
-        });
-      };
-      window.renderMasalar._ekstra=true;
-      window.renderMasalar();
-    },1500);
-  });
-})();
-</script>
+<!-- masa-isim-patch kaldırıldı: 31-34 Al-Git artık renderMasalar/garanti/aktarma döngülerinde yerli (çift hücre çiziyordu) -->
 
 
 
@@ -3808,6 +3812,27 @@ setInterval(function(){gunCiroYukle();},60000);
 
   /* ===== 2. SIPARIS NOTU — cloud sync (cihazlar arası) ===== */
   var _notlar = JSON.parse(localStorage.getItem('cactus_notlar') || '{}');
+  // ── NOT ANAHTARI v2 GEÇİŞİ ── eski 'masa_indeks' anahtarları ürün id'sine çevrilir.
+  // (İndeks anahtarı, aradan ürün silinince notların alttaki ürüne kaymasına yol açıyordu.)
+  function _notlarIdGecir(){
+    try{
+      var _lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar';
+      var mas=JSON.parse(localStorage.getItem(_lkMas)||'{}');
+      var degisti=false;
+      Object.keys(_notlar).forEach(function(k){
+        var m=k.match(/^(\d+)_(\d{1,2})(#u\d+)?$/); if(!m) return; // yalnız eski sayısal-indeks biçimi
+        var arr=mas[m[1]]||[]; var it=arr[parseInt(m[2],10)];
+        if(!it||!it.id){ delete _notlar[k]; degisti=true; return; } // eşleşmeyen bayat not
+        var yeni=m[1]+'_'+it.id+(m[3]||'');
+        if(!(yeni in _notlar)) _notlar[yeni]=_notlar[k];
+        delete _notlar[k]; degisti=true;
+      });
+      if(degisti) localStorage.setItem('cactus_notlar', JSON.stringify(_notlar));
+    }catch(e){}
+  }
+  // Geçiş, masa durumu OTURDUKTAN sonra çalışmalı — açılıştaki event-rebuild masaları
+  // henüz yazmamışken çalışırsa açık masaların notlarını "bayat" sanıp silebilir.
+  window.addEventListener('load',function(){ setTimeout(_notlarIdGecir,1200); });
   var _NOT_CLOUD_KEY = 'cactus_adisyon_notlar_' + (typeof SUBE !== 'undefined' ? SUBE : 'podyum');
   var _NOT_API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
   var _notlarYazmaZamani = 0;
@@ -3830,6 +3855,7 @@ setInterval(function(){gunCiroYukle();},60000);
         var gelen=JSON.stringify(d.notlar);
         if(simdiki!==gelen){
           _notlar=d.notlar;
+          _notlarIdGecir();
           try{localStorage.setItem('cactus_notlar',JSON.stringify(_notlar));}catch(e){}
           if(typeof renderAdisyon==='function') renderAdisyon();
         }
@@ -3895,17 +3921,18 @@ setInterval(function(){gunCiroYukle();},60000);
     if(inp) inp.focus();
   }
 
-  function notEkle(masaId, urunIdx) {
-    var key = masaId + '_' + urunIdx;
+  function notEkle(masaId, urunId) {
+    // NOT ANAHTARI v2: indeks yerine ürün id'si — araya silme girince notlar alttaki ürüne kaymaz
+    var key = masaId + '_' + urunId;
     var adRaw = '', adet = 1;
-    try { var _lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar'; var arr = (JSON.parse(localStorage.getItem(_lkMas)||'{}')[masaId]||[]); if(arr[urunIdx]){ adRaw = arr[urunIdx].ad||''; adet = Math.max(1, parseInt(arr[urunIdx].adet)||1); } } catch(e){}
+    try { var _lkMas=(typeof LK!=='undefined'&&LK.mas)?LK.mas:'cactus_masalar'; var arr = (JSON.parse(localStorage.getItem(_lkMas)||'{}')[masaId]||[]); var _it=null; for(var _q=0;_q<arr.length;_q++){ if(arr[_q]&&arr[_q].id===urunId){_it=arr[_q];break;} } if(_it){ adRaw = _it.ad||''; adet = Math.max(1, parseInt(_it.adet)||1); } } catch(e){}
     var birim = {};
     if(adet>1){
       var herhangi=false;
       for(var n=0;n<adet;n++){ var v=_notlar[key+'#u'+n]||''; birim[n]=v; if(v) herhangi=true; }
       if(!herhangi && _notlar[key]) birim[0]=_notlar[key]; // eski tekli notu 1. birime taşı
     } else { birim[0]=_notlar[key]||''; }
-    _notHedef = { masaId:masaId, idx:urunIdx, adet:adet, adRaw:adRaw, unit:0, birim:birim };
+    _notHedef = { masaId:masaId, idx:urunId, adet:adet, adRaw:adRaw, unit:0, birim:birim };
     var adEl = document.getElementById('not-urun-ad'); if(adEl) adEl.textContent = adRaw ? ('— ' + adRaw + (adet>1?(' ×'+adet):'')) : '';
     var subEl = document.querySelector('#not-modal .mdl-sub'); if(subEl) subEl.textContent = adet>1 ? 'Her fincan için ayrı not verebilirsin (1. · 2. …).' : 'Çipe dokun veya kendin yaz.';
     var inp = document.getElementById('not-input'); if(inp) inp.value = birim[0]||'';
@@ -3960,6 +3987,33 @@ setInterval(function(){gunCiroYukle();},60000);
     var m = document.getElementById('not-modal'); if(m) m.classList.remove('on');
     _notHedef = { masaId:null, idx:null, adet:1, adRaw:'', unit:0, birim:{} };
   }
+  // ── NOT BAKIMI ── notlar ürünle birlikte yaşar: ödemede düşer, temizlemede yedeklenir, aktarmada taşınır
+  window._notUrunTemizle=function(masaId,urunId){
+    var on=masaId+'_'+urunId, degisti=false;
+    Object.keys(_notlar).forEach(function(k){ if(k===on||k.indexOf(on+'#u')===0){ delete _notlar[k]; degisti=true; } });
+    if(degisti) _notlarKaydet();
+  };
+  window._notMasaTemizle=function(masaId){
+    var on=masaId+'_', yedek={}, degisti=false;
+    Object.keys(_notlar).forEach(function(k){ if(k.indexOf(on)===0){ yedek[k]=_notlar[k]; delete _notlar[k]; degisti=true; } });
+    if(degisti) _notlarKaydet();
+    return yedek;
+  };
+  window._notGeriYukle=function(yedek){
+    if(!yedek) return;
+    var say=0; Object.keys(yedek).forEach(function(k){ _notlar[k]=yedek[k]; say++; });
+    if(say) _notlarKaydet();
+  };
+  window._notMasaTasi=function(kaynak,hedef){
+    var on=kaynak+'_', degisti=false;
+    Object.keys(_notlar).forEach(function(k){
+      if(k.indexOf(on)!==0) return;
+      var yeni=hedef+'_'+k.slice(on.length);
+      if(!(yeni in _notlar)) _notlar[yeni]=_notlar[k];
+      delete _notlar[k]; degisti=true;
+    });
+    if(degisti) _notlarKaydet();
+  };
   window.notCipToggle = notCipToggle;
   window.notKaydet = notKaydet;
   window.notModalKapat = notModalKapat;
@@ -4225,6 +4279,20 @@ setInterval(function(){gunCiroYukle();},60000);
 })();
 </script>
 
+<script>
+/* Başlık yüksekliği (sekme sarması vb.) değişirse kasiyer paneli taşmasın — 62px sabiti yerine ölçüm */
+(function(){
+  function kasBoyut(){
+    try{
+      var h=document.querySelector('.hdr'), k=document.querySelector('.kas-wrap');
+      if(h&&k) k.style.height='calc(100dvh - '+h.offsetHeight+'px)';
+    }catch(e){}
+  }
+  window.addEventListener('load',kasBoyut);
+  window.addEventListener('resize',kasBoyut);
+  setTimeout(kasBoyut,400);
+})();
+</script>
 </body>
 </html>
 

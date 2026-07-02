@@ -589,6 +589,82 @@ input,select{font-family:'Inter',sans-serif;}
 .gun-odeme-pill .gopl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;}
 .gun-odeme-pill .gopv{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:#f4f1eb;}
 .gun-acik-baslik{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin:14px 0 10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
+
+/* ══════════ ERGONOMİ KATMANI ══════════
+   En sonda; üstteki kuralları ve mobil media query'leri bilinçli override eder.
+   Amaç: dokunma hedefleri ≥44px, kritik yazılar (fiyat/tutar/süre/ürün adı) ≥12px.
+   Tezgâh başında ayakta, kol mesafesinden kullanım için. */
+
+/* Masa hücresi — tutar, süre ve adet rozetleri */
+.mbtn .mn{font-size:16px;}
+.mbtn .ml{font-size:10px;}
+.mbtn .mf{font-size:12px;}
+.mbdg{font-size:10px;min-width:18px;height:18px;border-radius:9px;}
+.msure{font-size:12px;padding:1px 4px;}
+@media(max-width:480px){.msure{font-size:11px;}}
+.toggle-masa-btn{min-width:40px;min-height:40px;font-size:15px;}
+.masa-pnl-hdr .aktar-btn{min-height:40px;font-size:11px;}
+
+/* Hızlı satış barı — ad ve fiyat okunur */
+.hzbtn{min-width:92px;min-height:48px;}
+.hzbtn-ad{font-size:12px;max-width:96px;}
+.hzbtn-fiyat{font-size:12px;}
+
+/* Kategori sekmeleri */
+.ktab{min-height:44px;}
+.ktab-cnt{font-size:11px;}
+
+/* Ürün kartı — ad ve fiyat kritik */
+.ukrt .ua{font-size:13px;}
+.ukrt .uf{font-size:14px;}
+.ukrt-tukendi{font-size:10px;}
+.fav-btn{width:28px;height:28px;font-size:14px;}
+.ara-temizle{padding:10px 12px;font-size:17px;}
+
+/* Adisyon listesi — iki satır: üstte ürün bilgisi tam genişlik, altta 44px kontroller.
+   Satır boyu artar ama yanlış basma (yanlış adet/silme) riski düşer. */
+.aitem{flex-wrap:wrap;row-gap:6px;}
+.ai-info{flex:1 1 100%;}
+.ai-ad{font-size:14px;}
+.ai-fiyat{font-size:13px;}
+.ai-zaman{font-size:11px;}
+.ai-not-txt{font-size:12.5px;}
+.ai-ctrl{gap:6px;}
+.ai-ctrl button{width:44px;height:44px;font-size:20px;}
+.ai-adet{font-size:16px;min-width:30px;}
+.ai-not{margin-left:auto;min-width:44px;min-height:44px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.ai-sil{min-width:44px;min-height:44px;padding:0;font-size:22px;display:flex;align-items:center;justify-content:center;}
+.adis-act-btn{min-height:44px;font-size:13px;}
+.adis-masa small{font-size:11px;}
+.oz-row{font-size:13px;}
+
+/* Header sekmeleri */
+.htab{font-size:12px;}
+
+/* Modal kontrolleri — ödeme/not/bölüşme akışı */
+.mdl-iptal,.mdl-ok{min-height:48px;}
+.not-cip{min-height:44px;display:inline-flex;align-items:center;}
+.not-birim-tab{min-height:44px;min-width:48px;}
+.kt-opt{min-height:44px;}
+.ks-list{max-height:260px;}
+.ks-ad{font-size:14px;}
+.ks-birim{font-size:12px;}
+.ks-step button{width:44px;height:44px;font-size:20px;border-radius:9px;}
+.ks-step span{font-size:14px;min-width:40px;}
+.ks-sub{font-size:14px;}
+
+/* Yönet ekranı */
+.mktab{min-height:44px;padding:10px 16px;}
+.ul-sil{min-width:44px;min-height:44px;font-size:18px;}
+.ul-fiyat{padding:9px 8px;}
+.ekle-btn{min-height:44px;}
+.ekle-input{min-height:44px;padding:10px;}
+
+/* Raporlar & kasa */
+.rptab{min-height:44px;padding:10px 16px;}
+.rap-ara-btn{min-height:44px;}
+.kasa-btn{min-height:44px;}
+.acilis-bar-x{padding:8px 12px;}
 </style>
 <!-- PWA — FSM şubesi (kendi manifesti ile Podyum'dan ayrı) -->
 <link rel="manifest" href="/manifest-fsm.json">
@@ -894,7 +970,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="yon-sec">
       <div class="yon-sec-ttl">⚠️ Tehlikeli Bölge</div>
-      <button onclick="if(confirm('TÜM MASALAR SİLİNECEK!\n\nDevam etmek istediğinize emin misiniz?\n\nNot: Sistem zaten gece 04:00\\'te otomatik sıfırlanıyor.'))tumMasalariSifirla()" style="width:100%;padding:11px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
+      <button onclick="tumMasalariSifirla()" style="width:100%;padding:12px;min-height:44px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
     </div>
   </div>
 </div>
@@ -2484,14 +2560,28 @@ function gunSonuYap(){
   toast('🌙 Gün sonu yapıldı — '+acik.length+' masa temizlendi (ciroya yansımadı)');
 }
 function tumMasalariSifirla(){
-  if(!confirm('TÜM masalar sıfırlansın mı? Bu işlem geri alınamaz!'))return;
-  // EVENT-SOURCED v11: dolu her masaya MASA_CLEAR event'i (eski _mv/snapshot yolu ölüydü)
-  for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) _pushEvent('MASA_CLEAR', i, {}); }
+  // Eski buton onclick'indeki bozuk tırnak kaçışı (04:00\\'te) tıklamayı SyntaxError'la öldürüyordu —
+  // onay artık burada, tek yerde.
+  var doluSay=0; for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) doluSay++; }
+  if(!doluSay){ toast('Tüm masalar zaten boş'); return; }
+  if(!confirm('TÜM MASALAR SİLİNECEK! ('+doluSay+' dolu masa)\n\nNot: Sistem gece 04:00\'te zaten otomatik sıfırlanıyor.\n\nDevam edilsin mi?'))return;
+  // Geri alma yedeği: dolu masalar + notları
+  var _yedek={};
+  for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) _yedek[i]=JSON.parse(JSON.stringify(masalar[i])); }
+  var _notYedek=(typeof window._notMasaTemizle==='function')?Object.keys(_yedek).reduce(function(acc,m){var y=window._notMasaTemizle(m);Object.keys(y).forEach(function(k){acc[k]=y[k];});return acc;},{}):null;
+  // EVENT-SOURCED v11: dolu her masaya MASA_CLEAR event'i
+  Object.keys(_yedek).forEach(function(i){ _pushEvent('MASA_CLEAR', parseInt(i,10), {}); });
   aktifMasa=null;
   renderMasalar();renderAdisyon();
   document.getElementById('adis-masa-no').textContent='Seçilmedi';
   document.getElementById('adis-masa-mob').textContent='Seçilmedi';
-  toast('🗑 Tüm masalar sıfırlandı');
+  undoToast('🗑 '+doluSay+' masa sıfırlandı', function(){
+    Object.keys(_yedek).forEach(function(i){
+      _yedek[i].forEach(function(it){ if(it&&it.id&&Number(it.adet)>0) _pushEvent('ITEM_ADD', parseInt(i,10), {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:Number(it.adet)}); });
+    });
+    if(typeof window._notGeriYukle==='function') window._notGeriYukle(_notYedek);
+    toast('↩ Masalar geri yüklendi');
+  });
 }
 
 function openDrawer(){document.getElementById('drawer').classList.add('on');document.getElementById('d-overlay').classList.add('on');}

@@ -995,7 +995,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="yon-sec">
       <div class="yon-sec-ttl">⚠️ Tehlikeli Bölge</div>
-      <button onclick="if(confirm('TÜM MASALAR SİLİNECEK!\n\nDevam etmek istediğinize emin misiniz?\n\nNot: Sistem zaten gece 04:00\\'te otomatik sıfırlanıyor.'))tumMasalariSifirla()" style="width:100%;padding:11px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
+      <button onclick="tumMasalariSifirla()" style="width:100%;padding:12px;min-height:44px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
     </div>
   </div>
 </div>
@@ -2786,14 +2786,28 @@ function gunSonuYap(){
   toast('🌙 Gün sonu yapıldı — '+acik.length+' masa temizlendi (ciroya yansımadı)');
 }
 function tumMasalariSifirla(){
-  if(!confirm('TÜM masalar sıfırlansın mı? Bu işlem geri alınamaz!'))return;
-  // EVENT-SOURCED v11: dolu her masaya MASA_CLEAR event'i (eski _mv/snapshot yolu ölüydü)
-  for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) _pushEvent('MASA_CLEAR', i, {}); }
+  // Eski buton onclick'indeki bozuk tırnak kaçışı (04:00\\'te) tıklamayı SyntaxError'la öldürüyordu —
+  // onay artık burada, tek yerde.
+  var doluSay=0; for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) doluSay++; }
+  if(!doluSay){ toast('Tüm masalar zaten boş'); return; }
+  if(!confirm('TÜM MASALAR SİLİNECEK! ('+doluSay+' dolu masa)\n\nNot: Sistem gece 04:00\'te zaten otomatik sıfırlanıyor.\n\nDevam edilsin mi?'))return;
+  // Geri alma yedeği: dolu masalar + notları
+  var _yedek={};
+  for(let i=1;i<=34;i++){ if(masalar[i]&&masalar[i].length) _yedek[i]=JSON.parse(JSON.stringify(masalar[i])); }
+  var _notYedek=(typeof window._notMasaTemizle==='function')?Object.keys(_yedek).reduce(function(acc,m){var y=window._notMasaTemizle(m);Object.keys(y).forEach(function(k){acc[k]=y[k];});return acc;},{}):null;
+  // EVENT-SOURCED v11: dolu her masaya MASA_CLEAR event'i
+  Object.keys(_yedek).forEach(function(i){ _pushEvent('MASA_CLEAR', parseInt(i,10), {}); });
   aktifMasa=null;
   renderMasalar();renderAdisyon();
   document.getElementById('adis-masa-no').textContent='Seçilmedi';
   document.getElementById('adis-masa-mob').textContent='Seçilmedi';
-  toast('🗑 Tüm masalar sıfırlandı');
+  undoToast('🗑 '+doluSay+' masa sıfırlandı', function(){
+    Object.keys(_yedek).forEach(function(i){
+      _yedek[i].forEach(function(it){ if(it&&it.id&&Number(it.adet)>0) _pushEvent('ITEM_ADD', parseInt(i,10), {urun:{id:it.id,ad:it.ad,fiyat:it.fiyat,tip:it.tip,emoji:it.emoji}, adet:Number(it.adet)}); });
+    });
+    if(typeof window._notGeriYukle==='function') window._notGeriYukle(_notYedek);
+    toast('↩ Masalar geri yüklendi');
+  });
 }
 
 function openDrawer(){document.getElementById('drawer').classList.add('on');document.getElementById('d-overlay').classList.add('on');}

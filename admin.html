@@ -3048,41 +3048,40 @@ function seLoad(pageUrl, pageFile, wrapId, stId, customSelectors){
   var st=document.getElementById(stId);
   if(st) st.textContent='Yükleniyor...';
 
-  fetch(pageUrl+'?t='+Date.now())
-  .then(function(r){return r.text();})
+  // KAYNAK: GitHub raw — yayının birleştiği dosyanın kendisi (canlı site bayat olabilir).
+  fetch('https://raw.githubusercontent.com/cactuscafes/cactus-kafe/main/'+pageFile+'?t='+Date.now())
+  .then(function(r){ if(!r.ok) throw new Error('Kaynak okunamadı ('+r.status+')'); return r.text(); })
   .then(function(html){
-    // Extract styles + fonts
+    // Head stilleri + fontlar SADECE önizleme için — yayında komple atılan işaretli pakette taşınır
     var styleTags=(html.match(/<style[\s\S]*?<\/style>/g)||[]).join('');
-    var fontLinks=(html.match(/<link[^>]*googleapis[^>]*>/g)||[]).join('');
+    var fontLinks=(html.match(/<link[^>]*(?:googleapis|style\.css)[^>]*>/g)||[]).join('');
 
-    // Extract body content
+    // Body içeriği — OLDUĞU GİBİ alınır. Nav, script ve gömülü stiller SÖKÜLMEZ:
+    // innerHTML ile eklenen script'ler zaten çalışmaz, yayında ise aynen geri yazılır.
+    // (Eski sürüm bunları söküyordu → Yayınla navigasyonsuz/script'siz bozuk sayfa üretiyordu.)
     var bs=html.indexOf('<body>');
     var be=html.lastIndexOf('<\/body>');
     if(bs<0)bs=0; else bs+=6;
     var body=bs<be?html.slice(bs,be):html;
 
-    // Strip nav, mobile nav overlay, scripts
-    body=body.replace(/<nav[\s\S]*?<\/nav>/g,'');
-    body=body.replace(/<div[^>]*class="[^"]*nav-mob[^"]*"[\s\S]*?<\/div>/g,'');
-    body=body.replace(/<script[\s\S]*?<\/script>/g,'');
-
-    // Scope the page styles inside the wrap so they don't bleed into admin
-    var scopedStyle=styleTags.replace(/<style[^>]*>/g,'<style>').replace(/<\/style>/g,'</style>');
-
-    wrap.innerHTML=fontLinks+scopedStyle+body;
-
-    // Suppress full-height hero
-    wrap.querySelectorAll('.hero,.page-hero,[class*=hero]').forEach(function(el){
-      el.style.minHeight='0';
-      el.style.height='auto';
-    });
-    wrap.querySelectorAll('[class*=popup],[id*=popup]').forEach(function(el){el.style.display='none';});
+    // Önizleme CSS'i: krom (nav/popup/perde/şerit) gizle, hero'yu bastır, reveal'ları görünür yap,
+    // düzenlenebilir öğelere buton konumlandırma bağlamı ver. Hepsi CSS — DOM'a inline stil YAZILMAZ.
+    var oCss='<style>'
+      +'#'+wrapId+' nav,#'+wrapId+' #mainMobMenu,#'+wrapId+' #pt-veil,#'+wrapId+' #promoMarquee,'
+      +'#'+wrapId+' #isBasvuruPop,#'+wrapId+' .upop-bg,#'+wrapId+' .kampanya-bg,#'+wrapId+' .quiz-bg,'
+      +'#'+wrapId+' .fal-bg,#'+wrapId+' .welcome-toast,#'+wrapId+' #alt-kat-bar,#'+wrapId+' #ptr-ind'
+      +'{display:none!important;}'
+      +'#'+wrapId+' .hero,#'+wrapId+' .page-hero{min-height:0!important;height:auto!important;}'
+      +'#'+wrapId+' .reveal,#'+wrapId+' .fade-up,#'+wrapId+' .product-card,#'+wrapId+' .spotlight-card{opacity:1!important;transform:none!important;}'
+      +'#'+wrapId+' [data-se-edit],#'+wrapId+' [data-se-imgp]{position:relative!important;}'
+      +'</style>';
+    wrap.innerHTML='<div class="se-head-paket" style="display:none">'+fontLinks+styleTags+oCss+'</div>'+body;
 
     // ── IMG edit buttons
     wrap.querySelectorAll('img').forEach(function(img){
-      if(img.closest('nav'))return;
+      if(img.closest('nav')||img.closest('.se-head-paket'))return;
       var p=img.parentElement;
-      if(getComputedStyle(p).position==='static') p.style.position='relative';
+      p.setAttribute('data-se-imgp','1');
       if(p.querySelector('.se-ib'))return;
       var b=document.createElement('button');
       b.className='se-ib'; b.innerHTML='📷'; b.title='Fotoğrafı değiştir';
@@ -3095,9 +3094,9 @@ function seLoad(pageUrl, pageFile, wrapId, stId, customSelectors){
     var selectors=customSelectors||SE_TEXT_SELECTORS;
     selectors.forEach(function(sel){
       wrap.querySelectorAll(sel).forEach(function(el){
-        if(el.closest('nav'))return;
+        if(el.closest('nav')||el.closest('.se-head-paket'))return;
         if(el.querySelector('.se-eb'))return;
-        if(getComputedStyle(el).position==='static') el.style.position='relative';
+        el.setAttribute('data-se-edit','1');
         el.dataset.origText=el.innerText.replace(/✏️/g,'').trim();
         var b=document.createElement('button');
         b.className='se-eb'; b.innerHTML='✏️'; b.title='Metni düzenle';
@@ -3172,24 +3171,24 @@ async function seYayinla(pageFile, wrapId, stId, commitMsg){
     if(!gd.sha){throw new Error(gd.message||'Dosya bulunamadı');}
     var origHtml=decodeURIComponent(escape(atob(gd.content.replace(/\n/g,''))));
 
-    // Clone wrap and clean admin edit artifacts
+    // Clone wrap and clean admin edit artifacts — sayfanın kendi nav/script/stilleri KORUNUR
     var wrap=document.getElementById(wrapId).cloneNode(true);
     wrap.querySelectorAll('.se-eb,.se-ib').forEach(function(b){b.remove();});
+    wrap.querySelectorAll('.se-head-paket').forEach(function(el){el.remove();}); // önizleme paketi (head stilleri + admin CSS)
     wrap.querySelectorAll('[data-orig-text]').forEach(function(el){el.removeAttribute('data-orig-text');});
-    // Remove position:relative added dynamically (only if no other inline styles)
-    wrap.querySelectorAll('[style]').forEach(function(el){
-      el.style.removeProperty('position');
-      el.style.removeProperty('min-height');
-      el.style.removeProperty('height');
-      if(!el.getAttribute('style').trim()) el.removeAttribute('style');
-    });
-
-    // Remove scoped font/style tags we injected (they're duplicates of what's in <head>)
-    wrap.querySelectorAll('style,link').forEach(function(el){el.remove();});
+    wrap.querySelectorAll('[data-se-edit]').forEach(function(el){el.removeAttribute('data-se-edit');});
+    wrap.querySelectorAll('[data-se-imgp]').forEach(function(el){el.removeAttribute('data-se-imgp');});
 
     var newBody=wrap.innerHTML;
     var bs=origHtml.indexOf('<body>')+6;
     var be=origHtml.lastIndexOf('<\/body>');
+    // GÜVENLİK KİLİDİ: script/nav/stil sayısı orijinal body ile aynı değilse sayfa iskeleti
+    // kaybolmuş demektir — bozuk yayını engelle. (Sayfayı yeniden yükleyip tekrar denenir.)
+    var origBody=origHtml.slice(bs,be);
+    var say=function(m,re){ return (String(m).match(re)||[]).length; };
+    if(say(newBody,/<script/g)!==say(origBody,/<script/g) || say(newBody,/<nav/g)!==say(origBody,/<nav/g)){
+      throw new Error('Güvenlik kilidi: sayfa iskeleti (script/nav) eksik görünüyor — yayın iptal edildi. Sayfayı yeniden yükleyip tekrar deneyin.');
+    }
     var newHtml=origHtml.slice(0,bs)+'\n'+newBody+'\n'+origHtml.slice(be);
 
     var pr=await fetch('https://api.github.com/repos/'+repo+'/contents/'+pageFile,{

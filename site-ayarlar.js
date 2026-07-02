@@ -15,6 +15,9 @@
  *   #promoMarquee + .pm-seg       → duyuru şeridi (şube window.__INITIAL_SUBE'den)
  */
 (function () {
+  // Admin "Ana Sayfa" editörünün iframe'i içinde ÇALIŞMA: editör iframe DOM'unu
+  // GitHub'a kaydediyor — burada uygulanan canlı değerler kaynak koda pişerdi.
+  try { if (window.frameElement && window.frameElement.id === 'as-iframe') return; } catch (e) {}
   var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
 
   // Basit vurgu: *italik* → <em>, **kalın** → <strong>, satır sonu → <br> (önce HTML kaçışı)

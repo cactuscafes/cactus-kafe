@@ -27,7 +27,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-07-02-kalori-pill-r2'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-07-02-kalori-pill-r3'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -133,7 +133,7 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .upop-kcal{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;background:rgba(200,168,106,.14);color:#a8894e;font-size:12.5px;font-weight:600;white-space:nowrap;}
 .upop-kcal svg{width:14px;height:14px;}
 .upop-alerjen svg{width:14px;height:14px;}
-.upop-alerjen{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;background:rgba(176,69,69,.08);color:#b04545;font-size:12.5px;font-weight:500;line-height:1.5;}
+.upop-alerjen{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;background:rgba(45,90,39,.08);color:#557a4f;font-size:12.5px;font-weight:500;line-height:1.5;}
 .upop-alerjen .ua-baslik{font-weight:700;}
 .upop-alerjen-not{flex-basis:100%;font-size:11px;color:#999;line-height:1.5;font-weight:300;}
 .product-price{font-size:13px;font-weight:500;color:var(--dark);}

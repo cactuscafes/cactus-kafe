@@ -84,9 +84,6 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
 .pttl{font-family:'Fraunces',serif;font-size:28px;font-weight:300;margin-bottom:4px;}
 .psub{font-size:12px;color:var(--mist);margin-bottom:24px;}
 .yi{width:100%;border:1.5px solid var(--stone);padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;}
-.alerjen-grid{display:flex;flex-wrap:wrap;gap:5px;}
-.alerjen-chip{padding:6px 10px;border:1.5px solid var(--stone);background:#fff;font-size:11px;font-weight:600;color:var(--mist);cursor:pointer;font-family:inherit;border-radius:100px;transition:all .12s;}
-.alerjen-chip.on{background:#b04545;border-color:#b04545;color:#fff;}
 .yi:focus{border-color:var(--ink);}
 .kart{background:#fff;border:1.5px solid var(--stone);padding:20px;margin-bottom:16px;}
 .kat-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
@@ -1443,10 +1440,7 @@ function renderUrunler(){
         <div><label class="lbl">Ad</label><input class="yi" value="${u.ad}" oninput="guncelle('${aktifKat}',${i},'ad',this.value)"></div>
         <div><label class="lbl">Fiyat (₺)</label><input class="yi" type="number" value="${u.fiyat}" oninput="guncelle('${aktifKat}',${i},'fiyat',parseInt(this.value)||0)"></div>
         <div><label class="lbl">Açıklama</label><input class="yi" value="${u.aciklama||''}" oninput="guncelle('${aktifKat}',${i},'aciklama',this.value)"></div>
-        <div><label class="lbl">Kalori (kcal) <span style="color:var(--mist);font-weight:400;text-transform:none;letter-spacing:0;">(zorunlu)</span></label><input class="yi" type="number" min="0" value="${u.kalori||''}" placeholder="örn 320" oninput="guncelle('${aktifKat}',${i},'kalori',this.value.trim())"></div>
-        <div><label class="lbl">Alerjenler <span style="color:var(--mist);font-weight:400;text-transform:none;letter-spacing:0;">(içeriyorsa işaretle — zorunlu)</span></label>
-          <div class="alerjen-grid">${_alerjenChipsHTML(aktifKat,i,u)}</div>
-        </div>
+        <div><label class="lbl">Kalori (kcal)</label><input class="yi" type="number" min="0" value="${u.kalori||''}" placeholder="örn 320" oninput="guncelle('${aktifKat}',${i},'kalori',this.value.trim())"></div>
         <div><label class="lbl">Emoji <span style="color:var(--mist);font-weight:400;text-transform:none;letter-spacing:0;">${u.foto?'(fotoğraf var — gizli)':'(fotoğrafsız ürünlerde menüde görünür)'}</span></label>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <input class="yi" style="width:54px;text-align:center;font-size:18px;flex:none;" value="${u.emoji||''}" maxlength="4" placeholder="${katEmoji}" oninput="guncelle('${aktifKat}',${i},'emoji',this.value)">
@@ -1484,29 +1478,7 @@ function urunOncuToggle(k,i){
 }
 function guncelle(k,i,a,v){ MENU[k][i][a]=v; menuKaydet(); }
 
-/* ── Alerjenler (Türkiye/AB standart 14) ── */
-var ALERJENLER=[
-  {k:'gluten',ad:'Gluten'},{k:'sut',ad:'Süt'},{k:'yumurta',ad:'Yumurta'},
-  {k:'kuruyemis',ad:'Sert kabuklu yemiş'},{k:'yerfistigi',ad:'Yer fıstığı'},{k:'soya',ad:'Soya'},
-  {k:'susam',ad:'Susam'},{k:'balik',ad:'Balık'},{k:'kabuklu',ad:'Kabuklu deniz ür.'},
-  {k:'kereviz',ad:'Kereviz'},{k:'hardal',ad:'Hardal'},{k:'sulfit',ad:'Sülfit'},
-  {k:'lupin',ad:'Lupin'},{k:'yumusakca',ad:'Yumuşakça'}
-];
-function _alerjenChipsHTML(kat,i,u){
-  var sel=Array.isArray(u.alerjen)?u.alerjen:[];
-  return ALERJENLER.map(function(a){
-    var on=sel.indexOf(a.k)>=0;
-    return '<button type="button" class="alerjen-chip'+(on?' on':'')+'" onclick="alerjenToggle(\''+kat+'\','+i+',\''+a.k+'\')">'+a.ad+'</button>';
-  }).join('');
-}
-function alerjenToggle(kat,i,key){
-  var u=(MENU[kat]||[])[i]; if(!u) return;
-  var arr=Array.isArray(u.alerjen)?u.alerjen.slice():[];
-  var idx=arr.indexOf(key);
-  if(idx>=0) arr.splice(idx,1); else arr.push(key);
-  u.alerjen=arr; menuKaydet();
-  renderUrunler();
-}
+/* Alerjen editörü kaldırıldı — u.alerjen verisi üründe korunur, sadece düzenlenmiyor/gösterilmiyor. */
 /* Fotoğrafsız ürünler için emoji seçici */
   var CIC_MAP={
     '☕':'coffee','🍵':'tea','🧊':'ice','🥛':'milk','🥤':'juice','🧋':'juice',
@@ -2586,8 +2558,6 @@ function _yayinDiffRows(eski, yeni){
     if((ou.emoji||'')!==(nu.emoji||'')) d.push('emoji: '+_dEsc(ou.emoji||'—')+' → '+_dEsc(nu.emoji||'—'));
     if((ou.foto||'')!==(nu.foto||'')) d.push(nu.foto?(ou.foto?'fotoğraf değişti':'fotoğraf eklendi'):'fotoğraf kaldırıldı');
     if(String(ou.kalori||'')!==String(nu.kalori||'')) d.push('kalori: '+(ou.kalori||'—')+' → <b>'+(nu.kalori||'—')+'</b> kcal');
-    var _oa=(Array.isArray(ou.alerjen)?ou.alerjen:[]).slice().sort().join(','), _na=(Array.isArray(nu.alerjen)?nu.alerjen:[]).slice().sort().join(',');
-    if(_oa!==_na){ var _et=function(a){return (Array.isArray(a)&&a.length)?a.map(function(k){return (typeof ALERJENLER!=='undefined'?(ALERJENLER.find(function(x){return x.k===k;})||{}).ad:0)||k;}).join(', '):'—';}; d.push('alerjen: '+_dEsc(_et(ou.alerjen))+' → <b>'+_dEsc(_et(nu.alerjen))+'</b>'); }
     if(d.length) rows.push({t:'mod',kat:kat,html:'<b>'+_dEsc(nu.ad)+'</b> — '+d.join(', ')});
   });
   Object.keys(o).forEach(function(id){ if(!n[id]) rows.push({t:'del',kat:o[id].kat,html:'<b>'+_dEsc(o[id].u.ad)+'</b> kaldırıldı'}); });

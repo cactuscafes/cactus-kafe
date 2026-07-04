@@ -354,16 +354,16 @@ footer{padding:40px 20px 24px;}
 /* ── İŞ BAŞVURUSU POPUP — sayfa paletiyle uyumlu (açık tema, yeşil vurgu) ── */
 #isBasvuruPop{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px;pointer-events:none;opacity:0;transition:opacity .35s ease;background:rgba(13,25,8,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
 #isBasvuruPop.on{opacity:1;pointer-events:auto;}
-#isBasvuruKart{background:#fff;border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:32px 30px 28px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 30px 70px rgba(0,0,0,.4);}
+#isBasvuruKart{background:#fff;border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:32px 30px 28px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 30px 70px rgba(0,0,0,.4);text-align:center;}
 #isBasvuruPop.on #isBasvuruKart{transform:none;}
 #isBasvuruKapat{position:absolute;top:12px;right:14px;background:none;border:none;color:#bbb;font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
 #isBasvuruKapat:hover{color:var(--dark);}
-#isBasvuruPop .ib-logo{display:block;height:40px;width:auto;margin:0 0 18px;position:relative;}
+#isBasvuruPop .ib-logo{display:block;height:40px;width:auto;margin:0 auto 18px;position:relative;}
 #isBasvuruPop .ib-eyebrow{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
 #isBasvuruPop .ib-title{font-family:'Fraunces',serif;font-size:clamp(23px,5vw,31px);font-weight:300;color:var(--dark);line-height:1.15;margin-bottom:10px;}
 #isBasvuruPop .ib-title em{font-style:italic;color:var(--gold);}
 #isBasvuruPop .ib-sub{font-size:12.5px;font-weight:300;color:#777;line-height:1.7;margin-bottom:22px;}
-#isBasvuruPop .ib-actions{display:flex;gap:14px;align-items:center;}
+#isBasvuruPop .ib-actions{display:flex;gap:14px;align-items:center;justify-content:center;}
 #isBasvuruPop .ib-btn{padding:13px 28px;background:var(--gold);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s,transform .15s;flex-shrink:0;border-radius:4px;}
 #isBasvuruPop .ib-btn:hover{background:#234a1f;transform:translateY(-1px);}
 #isBasvuruPop .ib-skip{font-size:11px;color:#999;cursor:pointer;transition:color .2s;}

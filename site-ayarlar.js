@@ -116,7 +116,11 @@
           document.body.style.paddingTop = '';
         } else if (st.metin) {
           var seg = st.metin + '   ✦   ';
-          mq.querySelectorAll('.pm-seg').forEach(function (el) { el.textContent = seg; });
+          mq.querySelectorAll('.pm-seg').forEach(function (el) {
+            var logo = el.querySelector('.pm-logo'); // kayan yazıdaki logo görselini koru
+            el.textContent = seg;
+            if (logo) el.insertBefore(logo, el.firstChild);
+          });
         }
       }
       // ── FSM çay/ikram popup içeriği (görünürlük kararı sayfadaki tetikte) ──

@@ -677,15 +677,16 @@ footer{padding:40px 20px 24px;}
 <!-- 🔔 Nav'a sabit kayar duyuru şeridi (Podyumpark — Tatlı + İçecek kampanyası) -->
 <div id="promoMarquee" role="marquee" aria-label="Kampanya: Tatlı ve içecek 500 TL" style="position:fixed;left:0;right:0;top:60px;z-index:998;overflow:hidden;height:34px;display:flex;align-items:center;background:linear-gradient(90deg,#1a3010,#2d5a27);color:#fdfaf3;border-bottom:1px solid rgba(255,255,255,.10);box-shadow:0 4px 14px rgba(0,0,0,.10);">
   <div class="pm-track" style="display:flex;flex:none;white-space:nowrap;will-change:transform;animation:pmScroll 24s linear infinite;">
-    <span class="pm-seg" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🥤&nbsp;&nbsp;KAMPANYA: Tatlı + dilediğin içecek yalnızca 500₺&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;🍰&nbsp;&nbsp;İkili lezzet, tek fiyat — Tatlı &amp; içecek 500 TL&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
-    <span class="pm-seg" aria-hidden="true" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;">🥤&nbsp;&nbsp;KAMPANYA: Tatlı + dilediğin içecek yalnızca 500₺&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;🍰&nbsp;&nbsp;İkili lezzet, tek fiyat — Tatlı &amp; içecek 500 TL&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
+    <span class="pm-seg" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;"><img class="pm-logo" src="logo-light.png" alt="Cactus Kafe">🥤&nbsp;&nbsp;KAMPANYA: Tatlı + dilediğin içecek yalnızca 500₺&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;🍰&nbsp;&nbsp;İkili lezzet, tek fiyat — Tatlı &amp; içecek 500 TL&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
+    <span class="pm-seg" aria-hidden="true" style="display:inline-block;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:1.3px;"><img class="pm-logo" src="logo-light.png" alt="" aria-hidden="true">🥤&nbsp;&nbsp;KAMPANYA: Tatlı + dilediğin içecek yalnızca 500₺&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;🍰&nbsp;&nbsp;İkili lezzet, tek fiyat — Tatlı &amp; içecek 500 TL&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
   </div>
 </div>
 <style>
 @keyframes pmScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 #promoMarquee .pm-seg{text-transform:uppercase;letter-spacing:1.6px;}
+#promoMarquee .pm-logo{height:22px;width:auto;vertical-align:middle;margin:0 12px 3px 0;}
 #promoMarquee .pm-track:hover{animation-play-state:paused;}
-@media(max-width:768px){#promoMarquee{height:30px;}#promoMarquee .pm-seg{font-size:11px;letter-spacing:1px;}#promoMarquee .pm-track{animation-duration:18s;}}
+@media(max-width:768px){#promoMarquee{height:30px;}#promoMarquee .pm-seg{font-size:11px;letter-spacing:1px;}#promoMarquee .pm-logo{height:18px;margin-right:9px;}#promoMarquee .pm-track{animation-duration:18s;}}
 @media(prefers-reduced-motion:reduce){#promoMarquee .pm-track{animation-duration:80s;}}
 </style>
 <script>

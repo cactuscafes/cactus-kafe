@@ -423,6 +423,7 @@ footer{padding:40px 20px 24px;}
 .kampanya-close{position:absolute;top:14px;right:16px;width:30px;height:30px;border:none;background:none;color:#1a3010;font-size:22px;cursor:pointer;line-height:1;opacity:.45;font-weight:300;transition:opacity .2s;}
 .kampanya-close:hover{opacity:1;}
 .kampanya-brand{font-family:'Fraunces',serif;font-size:16px;letter-spacing:6px;text-transform:uppercase;color:#1a3010;font-weight:500;margin-bottom:20px;}
+.kampanya-brand .kmp-logo{display:block;height:52px;width:auto;margin:0 auto;}
 .kampanya-eyebrow{font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:3.5px;color:#b8965a;font-weight:600;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:12px;}
 .kampanya-eyebrow::before,.kampanya-eyebrow::after{content:"";width:28px;height:1px;background:#c8a86a;opacity:.55;}
 .kampanya-title{font-family:'Fraunces',serif;font-size:31px;font-weight:400;color:#1a3010;line-height:1.18;margin-bottom:0;}
@@ -808,7 +809,7 @@ footer{padding:40px 20px 24px;}
   <div class="kampanya-modal" role="dialog" aria-labelledby="kampanyaTitle">
     <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">×</button>
     <div class="kampanya-inner">
-      <div class="kampanya-brand">Cactus</div>
+      <div class="kampanya-brand"><img class="kmp-logo" src="logo-trans.png" alt="Cactus"></div>
       <div class="kampanya-eyebrow">Podyumpark'a Özel</div>
       <h2 class="kampanya-title" id="kampanyaTitle">Tatlı <em>ve</em> İçecek</h2>
       <div class="kampanya-rule"></div>

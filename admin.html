@@ -479,6 +479,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('iletisim',this)">📬 İletişim</button>
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
       <button class="sb-btn" onclick="panelAc('ayarlar',this)">⚙️ Site Ayarları</button>
+
+      <div class="sb-ttl">Finans</div>
+      <button class="sb-btn" onclick="panelAc('bordro',this)">💰 Maaş / Bordro</button>
     </div>
     <div class="main">
       <div id="pendingBar" style="display:none;background:linear-gradient(90deg,#b8965a,#c8a86a);color:#1a3010;padding:10px 18px;border-radius:8px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(184,150,90,.25);"><span style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;"><span style="width:9px;height:9px;border-radius:50%;background:#1a3010;display:inline-block;animation:dotPulse 1.4s infinite;flex:none;"></span><span id="pendingBarTxt">Yayınlanmamış değişiklikler var — canlı menüye/adisyona uygulamak için Yayınla'ya bas.</span></span><button onclick="modalAc()" style="background:#1a3010;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex:none;">🚀 Yayınla</button></div>
@@ -970,6 +973,64 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <button onclick="ziyaretYukle()" style="margin-top:16px;padding:8px 18px;background:var(--ink);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;">🔄 Yenile</button>
       </div>
 
+      <!-- MAAŞ / BORDRO -->
+      <div class="panel" id="panel-bordro" style="max-width:1080px;">
+        <style>
+        #panel-bordro .brd-tabs{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+        #panel-bordro .brd-tab{padding:8px 18px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-bordro .brd-tab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+        #panel-bordro .brd-mini{padding:7px 14px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-bordro .brd-mini:hover{background:var(--paper);}
+        #panel-bordro .brd-ozet-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+        #panel-bordro .brd-stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+        #panel-bordro .brd-stat .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--mist);font-weight:700;margin-bottom:6px;}
+        #panel-bordro .brd-stat .val{font-family:'Fraunces',serif;font-size:23px;font-weight:400;color:var(--ink);}
+        #panel-bordro .brd-stat.kalan .val{color:var(--brand);}
+        #panel-bordro .brd-ekle-personel{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;align-items:center;}
+        #panel-bordro .brd-inp{padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
+        #panel-bordro .brd-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+        #panel-bordro .brd-card-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+        #panel-bordro .brd-ad{font-family:'Fraunces',serif;font-size:19px;border:none;background:none;color:var(--ink);font-weight:400;min-width:120px;border-bottom:1px dashed transparent;padding:2px 0;}
+        #panel-bordro .brd-ad:focus{outline:none;border-bottom-color:var(--line);}
+        #panel-bordro .brd-ucret{width:92px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:inherit;}
+        #panel-bordro .brd-sil{margin-left:auto;background:none;border:none;cursor:pointer;font-size:15px;opacity:.55;}
+        #panel-bordro .brd-sil:hover{opacity:1;}
+        #panel-bordro .brd-mini-ozet{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+        #panel-bordro .brd-satir{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+        #panel-bordro .brd-satir input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--surface);color:var(--ink);}
+        #panel-bordro .brd-btn-cal{background:var(--brand);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-bordro .brd-btn-od{background:#b8965a;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-bordro .brd-kayit{display:flex;align-items:center;gap:10px;font-size:12px;padding:7px 0;border-top:1px solid var(--paper);flex-wrap:wrap;}
+        #panel-bordro .brd-kayit .tur{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:100px;}
+        #panel-bordro .brd-kayit .tur.cal{background:rgba(45,90,39,.12);color:var(--brand);}
+        #panel-bordro .brd-kayit .tur.od{background:rgba(184,150,90,.18);color:#a07d3a;}
+        #panel-bordro .brd-kayit .ksil{background:none;border:none;cursor:pointer;opacity:.5;font-size:13px;}
+        #panel-bordro .brd-kayit .ksil:hover{opacity:1;}
+        #panel-bordro .brd-bos{color:var(--mist);font-size:13px;padding:18px 0;}
+        </style>
+        <div class="pttl">💰 Maaş / Bordro</div>
+        <div class="psub">Personelin <b>saatlik ücretini</b> gir; çalışma saatinden hak ediş <b>otomatik</b> hesaplanır. Verdiğin ödemeleri işle, <b>kalan bakiyeyi</b> takip et. FSM ve Podyum ayrı tutulur. Veriler bu cihazın tarayıcısında saklanır — düzenli <b>yedek al</b>.</div>
+
+        <div class="brd-tabs">
+          <button class="brd-tab on" id="brdTabFsm" onclick="bordroSube('fsm')">🏙 FSM</button>
+          <button class="brd-tab" id="brdTabPodyum" onclick="bordroSube('podyum')">🌿 Podyumpark</button>
+          <div style="flex:1"></div>
+          <button class="brd-mini" onclick="bordroYedekAl()">⬇️ Yedek Al</button>
+          <button class="brd-mini" onclick="document.getElementById('brdYedekDosya').click()">⬆️ Yedek Yükle</button>
+          <input type="file" id="brdYedekDosya" accept="application/json" style="display:none" onchange="bordroYedekYukle(this)">
+        </div>
+
+        <div id="bordroOzet" class="brd-ozet-strip"></div>
+
+        <div class="brd-ekle-personel">
+          <input id="brdYeniAd" class="brd-inp" placeholder="Personel adı" style="min-width:180px;">
+          <input id="brdYeniUcret" class="brd-inp" type="number" min="0" step="0.01" placeholder="Saatlik ücret ₺" style="max-width:160px;">
+          <button class="btn-primary" onclick="bordroPersonelEkle()">+ Personel Ekle</button>
+        </div>
+
+        <div id="bordroListe"></div>
+      </div>
+
     </div>
   </div>
 
@@ -1309,6 +1370,7 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
   if(id==='yogunluk') yogunlukYukle();
+  if(id==='bordro'){ if(typeof bordroRender==='function') bordroRender(); }
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
 
@@ -3781,6 +3843,179 @@ if('serviceWorker' in navigator){
     setTimeout(function(){ifIdleReload(0);},3000); // 3sn güvenlik gecikmesi
   });
 }
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   MAAŞ / BORDRO — şube başına (FSM/Podyum) localStorage.
+   Personel + saatlik ücret; çalışma saatinden hak ediş OTOMATİK hesaplanır;
+   ödemeler işlenir; kalan bakiye takip edilir. Yedek al/yükle (JSON).
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  var BORDRO_SUBE=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='podyum')?'podyum':'fsm';
+  function key(s){ return 'cactus_bordro_'+s; }
+  function bid(){ return 'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function bugun(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  // type=number '.' ondalık verir; olası ',' girişini de destekle
+  function num(v){ v=String(v==null?'':v).trim().replace(',','.').replace(/[^0-9.\-]/g,''); var n=parseFloat(v); return isFinite(n)?n:0; }
+  function tl(n){ n=Math.round((n||0)*100)/100; return n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺'; }
+  function saatFmt(n){ return (Math.round((n||0)*100)/100).toLocaleString('tr-TR')+' sa'; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+  function yukle(s){
+    var d; try{ d=JSON.parse(localStorage.getItem(key(s))||'null'); }catch(e){ d=null; }
+    if(!d||typeof d!=='object') d={};
+    if(!Array.isArray(d.personel)) d.personel=[];
+    if(!Array.isArray(d.kayitlar)) d.kayitlar=[];
+    return d;
+  }
+  function kaydet(s,d){ try{ localStorage.setItem(key(s),JSON.stringify(d)); }catch(e){ toast('⚠️ Kaydedilemedi'); } }
+
+  function hesap(d,pid){
+    var hak=0,od=0;
+    d.kayitlar.forEach(function(k){
+      if(k.personelId!==pid) return;
+      if(k.tur==='calisma') hak+=num(k.tutar);
+      else if(k.tur==='odeme') od+=num(k.tutar);
+    });
+    return {hak:hak,odenen:od,kalan:hak-od};
+  }
+  function stat(lbl,val,cls){ return '<div class="brd-stat '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div></div>'; }
+
+  window.bordroSube=function(s){
+    BORDRO_SUBE=(s==='podyum')?'podyum':'fsm';
+    var f=document.getElementById('brdTabFsm'), p=document.getElementById('brdTabPodyum');
+    if(f) f.classList.toggle('on',BORDRO_SUBE==='fsm');
+    if(p) p.classList.toggle('on',BORDRO_SUBE==='podyum');
+    bordroRender();
+  };
+
+  window.bordroRender=function(){
+    var d=yukle(BORDRO_SUBE);
+    var tHak=0,tOd=0;
+    d.personel.forEach(function(p){ var h=hesap(d,p.id); tHak+=h.hak; tOd+=h.odenen; });
+    var ozet=document.getElementById('bordroOzet');
+    if(ozet) ozet.innerHTML=
+      stat('Personel', d.personel.length, '')+
+      stat('Toplam Hak Ediş', tl(tHak), '')+
+      stat('Toplam Ödenen', tl(tOd), '')+
+      stat('Kalan (Ödenecek)', tl(tHak-tOd), 'kalan');
+    var liste=document.getElementById('bordroListe'); if(!liste) return;
+    if(!d.personel.length){ liste.innerHTML='<div class="brd-bos">Henüz personel yok. Yukarıdan ekleyin.</div>'; return; }
+    liste.innerHTML=d.personel.map(function(p){ return kart(d,p); }).join('');
+  };
+
+  function kart(d,p){
+    var h=hesap(d,p.id);
+    var kys=d.kayitlar.filter(function(k){return k.personelId===p.id;})
+      .sort(function(a,b){ return String(b.tarih||'').localeCompare(String(a.tarih||'')); });
+    var kyHtml=kys.length? kys.map(function(k){
+      var isCal=k.tur==='calisma';
+      var detay=isCal? (saatFmt(k.saat)+' × '+tl(k.ucret!=null?k.ucret:p.saatlikUcret)) : 'Ödeme';
+      return '<div class="brd-kayit"><span class="tur '+(isCal?'cal':'od')+'">'+(isCal?'Çalışma':'Ödeme')+'</span>'
+        +'<span>'+esc(k.tarih||'')+'</span>'
+        +'<span style="color:var(--mist)">'+detay+'</span>'
+        +'<span style="margin-left:auto;font-weight:600">'+(isCal?'+':'−')+tl(k.tutar)+'</span>'
+        +'<button class="ksil" onclick="bordroKayitSil(\''+k.id+'\')" title="Sil">🗑</button></div>';
+    }).join('') : '<div class="brd-bos" style="padding:10px 0">Kayıt yok.</div>';
+
+    return '<div class="brd-card">'
+      +'<div class="brd-card-head">'
+        +'<input class="brd-ad" value="'+esc(p.ad)+'" onchange="bordroAdGuncelle(\''+p.id+'\',this.value)">'
+        +'<label style="font-size:12px;color:var(--mist)">Saatlik ₺ <input class="brd-ucret" type="number" min="0" step="0.01" value="'+(p.saatlikUcret||0)+'" onchange="bordroUcretGuncelle(\''+p.id+'\',this.value)"></label>'
+        +'<button class="brd-sil" onclick="bordroPersonelSil(\''+p.id+'\')" title="Personeli sil">🗑</button>'
+      +'</div>'
+      +'<div class="brd-mini-ozet">'
+        +'<span>Hak ediş: <b style="color:var(--brand)">'+tl(h.hak)+'</b></span>'
+        +'<span>Ödenen: <b>'+tl(h.odenen)+'</b></span>'
+        +'<span>Kalan: <b style="color:'+(h.kalan>0.005?'#c0392b':'var(--brand)')+'">'+tl(h.kalan)+'</b></span>'
+      +'</div>'
+      +'<div class="brd-satir">'
+        +'<input type="date" id="cal-t-'+p.id+'" value="'+bugun()+'">'
+        +'<input type="number" id="cal-s-'+p.id+'" min="0" step="0.25" placeholder="Saat" style="width:90px">'
+        +'<button class="brd-btn-cal" onclick="bordroCalismaEkle(\''+p.id+'\')">+ Çalışma</button>'
+        +'<span style="width:12px"></span>'
+        +'<input type="date" id="od-t-'+p.id+'" value="'+bugun()+'">'
+        +'<input type="number" id="od-a-'+p.id+'" min="0" step="0.01" placeholder="Ödeme ₺" style="width:112px">'
+        +'<button class="brd-btn-od" onclick="bordroOdemeEkle(\''+p.id+'\')">+ Ödeme</button>'
+      +'</div>'
+      +'<div class="brd-kayitlar">'+kyHtml+'</div>'
+    +'</div>';
+  }
+
+  window.bordroPersonelEkle=function(){
+    var adEl=document.getElementById('brdYeniAd'), ucEl=document.getElementById('brdYeniUcret');
+    var ad=(adEl.value||'').trim(); var uc=num(ucEl.value);
+    if(!ad){ toast('⚠️ İsim girin'); return; }
+    var d=yukle(BORDRO_SUBE);
+    d.personel.push({id:bid(),ad:ad,saatlikUcret:uc});
+    kaydet(BORDRO_SUBE,d); adEl.value=''; ucEl.value=''; bordroRender();
+    toast('✅ Personel eklendi');
+  };
+  window.bordroPersonelSil=function(id){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
+    if(!confirm((p?p.ad:'Personel')+' ve tüm kayıtları silinsin mi?')) return;
+    d.personel=d.personel.filter(function(x){return x.id!==id;});
+    d.kayitlar=d.kayitlar.filter(function(k){return k.personelId!==id;});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+  };
+  window.bordroAdGuncelle=function(id,val){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
+    if(p){ p.ad=(val||'').trim()||p.ad; kaydet(BORDRO_SUBE,d); }
+  };
+  window.bordroUcretGuncelle=function(id,val){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
+    if(p){ p.saatlikUcret=num(val); kaydet(BORDRO_SUBE,d); bordroRender(); }
+  };
+  window.bordroCalismaEkle=function(pid){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===pid;}); if(!p) return;
+    var t=(document.getElementById('cal-t-'+pid)||{}).value||bugun();
+    var s=num((document.getElementById('cal-s-'+pid)||{}).value);
+    if(s<=0){ toast('⚠️ Saat girin'); return; }
+    var ucret=num(p.saatlikUcret);
+    var tutar=Math.round(s*ucret*100)/100;
+    d.kayitlar.push({id:bid(),personelId:pid,tur:'calisma',tarih:t,saat:s,ucret:ucret,tutar:tutar});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+    toast('✅ '+saatFmt(s)+' → '+tl(tutar));
+  };
+  window.bordroOdemeEkle=function(pid){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===pid;}); if(!p) return;
+    var t=(document.getElementById('od-t-'+pid)||{}).value||bugun();
+    var a=num((document.getElementById('od-a-'+pid)||{}).value);
+    if(a<=0){ toast('⚠️ Tutar girin'); return; }
+    d.kayitlar.push({id:bid(),personelId:pid,tur:'odeme',tarih:t,tutar:a});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+    toast('✅ Ödeme işlendi: '+tl(a));
+  };
+  window.bordroKayitSil=function(kid){
+    var d=yukle(BORDRO_SUBE);
+    d.kayitlar=d.kayitlar.filter(function(k){return k.id!==kid;});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+  };
+  window.bordroYedekAl=function(){
+    var pack={_tip:'cactus-bordro',_tarih:new Date().toISOString(),fsm:yukle('fsm'),podyum:yukle('podyum')};
+    var blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='cactus-bordro-yedek-'+bugun()+'.json'; document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },800);
+  };
+  window.bordroYedekYukle=function(input){
+    var f=input.files&&input.files[0]; if(!f){ return; }
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var p=JSON.parse(r.result);
+        if(!p||p._tip!=='cactus-bordro'){ toast('⚠️ Geçersiz yedek dosyası'); input.value=''; return; }
+        if(!confirm('Yedek yüklenirse FSM ve Podyum bordro verileri değişecek. Devam?')){ input.value=''; return; }
+        if(p.fsm) kaydet('fsm',p.fsm);
+        if(p.podyum) kaydet('podyum',p.podyum);
+        bordroRender(); toast('✅ Yedek yüklendi');
+      }catch(e){ toast('⚠️ Dosya okunamadı'); }
+      input.value='';
+    };
+    r.readAsText(f);
+  };
+})();
 </script>
 
 </body>

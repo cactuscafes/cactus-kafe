@@ -352,9 +352,9 @@ footer{padding:40px 20px 24px;}
   .sk-img,.sk-line{animation:none!important;}
 }
 /* ── İŞ BAŞVURUSU POPUP — sayfa paletiyle uyumlu (açık tema, yeşil vurgu) ── */
-#isBasvuruPop{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px;pointer-events:none;opacity:0;transition:opacity .35s ease;background:rgba(13,25,8,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
-#isBasvuruPop.on{opacity:1;pointer-events:auto;}
-#isBasvuruKart{background:#fff;border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:32px 30px 28px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.22,1,.36,1);box-shadow:0 30px 70px rgba(0,0,0,.4);text-align:center;}
+#isBasvuruPop{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px;pointer-events:none;opacity:0;transition:opacity .4s ease,-webkit-backdrop-filter .45s ease,backdrop-filter .45s ease;background:rgba(13,25,8,.55);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);}
+#isBasvuruPop.on{opacity:1;pointer-events:auto;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+#isBasvuruKart{background:#fff;border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:32px 30px 28px;position:relative;transform:translateY(28px) scale(.965);transition:transform .58s cubic-bezier(.16,1,.3,1),box-shadow .4s;box-shadow:0 30px 70px rgba(0,0,0,.4);text-align:center;}
 #isBasvuruPop.on #isBasvuruKart{transform:none;}
 #isBasvuruKapat{position:absolute;top:12px;right:14px;background:none;border:none;color:#bbb;font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .2s;}
 #isBasvuruKapat:hover{color:var(--dark);}
@@ -387,6 +387,18 @@ footer{padding:40px 20px 24px;}
 #isBasvuruPop .ib-btn:hover{background:linear-gradient(135deg,#ecce92,#d8b87a)!important;transform:translateY(-1px);}
 #isBasvuruKapat{color:rgba(240,228,205,.5);}
 #isBasvuruKapat:hover{color:#f4ecd8;}
+/* ── İkram popup: Podyum ile kardeş iskelet + rozet + daire kapat ── */
+#isBasvuruKart{padding:0;}
+#isBasvuruPop .ib-inner{margin:6px;border:1px solid rgba(200,168,106,.42);border-radius:11px;padding:32px 28px 28px;position:relative;}
+#isBasvuruPop .pop-badge{display:inline-block;font-family:'Inter',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:100px;margin-bottom:16px;background:rgba(200,168,106,.15);color:#ecd6a4;border:1px solid rgba(200,168,106,.42);animation:popBadge 2.6s ease-in-out infinite;}
+#isBasvuruPop .ib-eyebrow{display:flex;align-items:center;justify-content:center;gap:11px;}
+#isBasvuruPop .ib-eyebrow::before,#isBasvuruPop .ib-eyebrow::after{content:"";width:24px;height:1px;background:#c8a86a;opacity:.5;}
+#isBasvuruPop .ib-rule{width:44px;height:1px;background:#c8a86a;margin:15px auto;opacity:.6;}
+#isBasvuruKapat{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;padding:0;top:13px;right:13px;border:1px solid rgba(200,168,106,.32);background:rgba(255,255,255,.04);color:rgba(240,228,205,.6);transition:background .2s,color .2s,transform .35s cubic-bezier(.2,.8,.25,1);}
+#isBasvuruKapat:hover{background:rgba(200,168,106,.2);color:#f4ecd8;transform:rotate(90deg);}
+@keyframes popBadge{0%,100%{box-shadow:0 0 0 0 rgba(200,168,106,0);}50%{box-shadow:0 0 0 5px rgba(200,168,106,.09);}}
+@media(max-width:520px){#isBasvuruPop .ib-inner{padding:26px 20px 24px;}}
+@media(prefers-reduced-motion:reduce){#isBasvuruPop .pop-badge{animation:none;}#isBasvuruKart{transition:opacity .2s;}}
 
 /* ═══ Bana Özel Kahve HERO Banner ═══ */
 .quiz-hero{position:relative;margin:20px 16px 24px;padding:0;border-radius:24px;overflow:hidden;cursor:pointer;background:linear-gradient(135deg,#1a3010 0%,#2d5a27 55%,#3d6f37 100%);box-shadow:0 12px 36px rgba(45,90,39,.32);transition:all .35s cubic-bezier(.2,.7,.2,1);}
@@ -657,15 +669,19 @@ footer{padding:40px 20px 24px;}
 <!-- ═══ /CACTUS ÖZEL İKON SETİ ═══ -->
 
 <!-- İŞ BAŞVURUSU POPUP -->
-<div id="isBasvuruPop">
+<div id="isBasvuruPop" role="dialog" aria-modal="true" aria-labelledby="ibTitle">
   <div id="isBasvuruKart">
     <button id="isBasvuruKapat" onclick="isBasvuruKapat()" aria-label="Kapat">×</button>
-    <img class="ib-logo" src="logo-marquee.png" alt="Cactus Kafe">
-    <div class="ib-eyebrow">Bugüne Özel İkram</div>
-    <div class="ib-title">Tatlı alana <em>çay</em><br>bizden ikram!</div>
-    <div class="ib-sub">Günün <strong>her saati</strong> — tatlı siparişinize sıcacık çayımız bizden. Afiyet olsun ☕</div>
-    <div class="ib-actions">
-      <span class="ib-btn" onclick="isBasvuruKapat()">Teşekkürler →</span>
+    <div class="ib-inner">
+      <span class="pop-badge">☕&nbsp; Sınırlı süre</span>
+      <img class="ib-logo" src="logo-marquee.png" alt="Cactus Kafe">
+      <div class="ib-eyebrow">Bugüne Özel İkram</div>
+      <div class="ib-title" id="ibTitle">Tatlı alana <em>çay</em><br>bizden ikram!</div>
+      <div class="ib-rule"></div>
+      <div class="ib-sub">Günün <strong>her saati</strong> — tatlı siparişinize sıcacık çayımız bizden. Afiyet olsun ☕</div>
+      <div class="ib-actions">
+        <span class="ib-btn" onclick="isBasvuruKapat()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();isBasvuruKapat();}">Teşekkürler →</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1708,10 +1724,21 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapa
 function isBasvuruKapat(){ var p=document.getElementById('isBasvuruPop'); if(p){p.classList.remove('on');} try{sessionStorage.setItem('ibk','1');}catch(e){} }
 (function(){
   try{ if(sessionStorage.getItem('ibk')) return; }catch(e){}
-  function goster(){ setTimeout(function(){ var p=document.getElementById('isBasvuruPop'); if(p) p.classList.add('on'); }, 2200); }
+  function goster(){ setTimeout(function(){ var p=document.getElementById('isBasvuruPop'); if(p){ p.classList.add('on'); var k=document.getElementById('isBasvuruKapat'); if(k) try{k.focus();}catch(e){} } }, 2200); }
   if(window.CACTUS_AYAR_P&&window.CACTUS_AYAR_P.then){
     window.CACTUS_AYAR_P.then(function(a){ if(a&&a.popup_fsm&&a.popup_fsm.acik===false) return; goster(); });
   } else goster();
+})();
+// İkram popup — açıkken odağı içeride tut (focus-trap)
+(function(){
+  var pop=document.getElementById('isBasvuruPop'); if(!pop) return;
+  pop.addEventListener('keydown', function(e){
+    if(e.key!=='Tab'||!pop.classList.contains('on')) return;
+    var els=pop.querySelectorAll('#isBasvuruKapat,.ib-btn'); if(!els.length) return;
+    var first=els[0], last=els[els.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
 })();
 
 // 16. Görsel double-tap zoom

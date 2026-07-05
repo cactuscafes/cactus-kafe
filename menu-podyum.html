@@ -415,13 +415,20 @@ footer{padding:40px 20px 24px;}
 
 
 /* ═══ Podyumpark Kampanya Pop-up (modal) ═══ */
-.kampanya-bg{position:fixed;inset:0;background:rgba(26,48,16,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .35s;}
-.kampanya-bg.on{display:flex;opacity:1;}
-.kampanya-modal{background:#fdfaf3;border:1px solid #c8a86a;border-radius:8px;max-width:430px;width:100%;text-align:center;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.34);transform:translateY(16px);opacity:0;transition:transform .5s cubic-bezier(.2,.8,.25,1),opacity .5s;}
+.kampanya-bg{position:fixed;inset:0;background:rgba(26,48,16,.55);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .4s,-webkit-backdrop-filter .45s,backdrop-filter .45s;}
+.kampanya-bg.on{display:flex;opacity:1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.kampanya-modal{background:#fdfaf3;border:1px solid #c8a86a;border-radius:8px;max-width:430px;width:100%;text-align:center;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.34);transform:translateY(28px) scale(.965);opacity:0;transition:transform .58s cubic-bezier(.16,1,.3,1),opacity .5s;}
 .kampanya-bg.on .kampanya-modal{transform:translateY(0);opacity:1;}
 .kampanya-inner{margin:6px;border:1px solid rgba(200,168,106,.5);border-radius:5px;padding:40px 34px 30px;}
-.kampanya-close{position:absolute;top:14px;right:16px;width:30px;height:30px;border:none;background:none;color:#1a3010;font-size:22px;cursor:pointer;line-height:1;opacity:.45;font-weight:300;transition:opacity .2s;}
-.kampanya-close:hover{opacity:1;}
+.kampanya-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:1px solid rgba(26,48,16,.16);background:rgba(26,48,16,.03);color:#1a3010;font-size:20px;cursor:pointer;line-height:1;opacity:.75;font-weight:300;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:opacity .2s,background .2s,transform .35s cubic-bezier(.2,.8,.25,1);}
+.kampanya-close:hover{opacity:1;background:rgba(26,48,16,.09);transform:rotate(90deg);}
+/* aciliyet rozeti */
+.kampanya-inner .pop-badge{display:inline-block;font-family:'Inter',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:100px;margin-bottom:18px;background:rgba(45,90,39,.08);color:#2d5a27;border:1px solid rgba(45,90,39,.28);animation:kmpBadge 2.6s ease-in-out infinite;}
+@keyframes kmpBadge{0%,100%{box-shadow:0 0 0 0 rgba(45,90,39,0);}50%{box-shadow:0 0 0 5px rgba(45,90,39,.08);}}
+/* fiyatta altın parıltı (sheen) */
+.kampanya-price .kmp-num{background:linear-gradient(90deg,#1a3010 0%,#1a3010 38%,#c8a86a 50%,#1a3010 62%,#1a3010 100%);background-size:230% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:kmpSheen 3.4s linear infinite;}
+@keyframes kmpSheen{0%{background-position:120% 0;}100%{background-position:-120% 0;}}
+@media(prefers-reduced-motion:reduce){.kampanya-inner .pop-badge{animation:none;}.kampanya-price .kmp-num{animation:none;background:none;-webkit-text-fill-color:#1a3010;color:#1a3010;}.kampanya-modal{transition:opacity .2s;}}
 .kampanya-brand{font-family:'Fraunces',serif;font-size:16px;letter-spacing:6px;text-transform:uppercase;color:#1a3010;font-weight:500;margin-bottom:20px;}
 .kampanya-brand .kmp-logo{display:block;height:52px;width:auto;margin:0 auto;}
 .kampanya-eyebrow{font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:3.5px;color:#b8965a;font-weight:600;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:12px;}
@@ -806,17 +813,17 @@ footer{padding:40px 20px 24px;}
 <!-- Hoşgeldin Toast -->
 <!-- Podyumpark Kampanya Pop-up -->
 <div class="kampanya-bg" id="kampanyaBg" onclick="if(event.target===this)kampanyaKapat()">
-  <div class="kampanya-modal" role="dialog" aria-labelledby="kampanyaTitle">
+  <div class="kampanya-modal" role="dialog" aria-modal="true" aria-labelledby="kampanyaTitle">
     <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">×</button>
     <div class="kampanya-inner">
+      <span class="pop-badge">⏳&nbsp; Stoklarla sınırlı</span>
       <div class="kampanya-brand"><img class="kmp-logo" src="logo-trans.png" alt="Cactus"></div>
       <div class="kampanya-eyebrow">Podyumpark'a Özel</div>
       <h2 class="kampanya-title" id="kampanyaTitle">Tatlı <em>ve</em> İçecek</h2>
       <div class="kampanya-rule"></div>
-      <div class="kampanya-price">500<small>₺</small></div>
+      <div class="kampanya-price"><span class="kmp-num">500</span><small>₺</small></div>
       <p class="kampanya-sub">Menüden dilediğiniz tatlı ile dilediğiniz içecek bir arada — tek fiyatla.</p>
       <button class="kampanya-cta" onclick="kampanyaTatlilara()">Tatlılara Bak</button>
-      <div class="kampanya-note">Kampanya stoklarla sınırlıdır</div>
     </div>
   </div>
 </div>
@@ -1525,6 +1532,7 @@ function kampanyaAc(){
     }
     bg.classList.add('on');
     document.body.style.overflow='hidden';
+    var k=bg.querySelector('.kampanya-close'); if(k) try{k.focus();}catch(e){}
   };
   if(window.CACTUS_AYAR_P&&window.CACTUS_AYAR_P.then) window.CACTUS_AYAR_P.then(go);
   else go(window.CACTUS_AYAR);
@@ -1669,7 +1677,18 @@ function upopKapat() {
   var img=document.querySelector('#upopImg.upop-img');
   if(img) img.classList.remove('zoomed');
 }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapat(); isBasvuruKapat(); } });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ upopKapat(); isBasvuruKapat(); if(typeof kampanyaKapat==='function') kampanyaKapat(); } });
+// Kampanya popup — açıkken odağı içeride tut (focus-trap)
+(function(){
+  var bg=document.getElementById('kampanyaBg'); if(!bg) return;
+  bg.addEventListener('keydown', function(e){
+    if(e.key!=='Tab'||!bg.classList.contains('on')) return;
+    var els=bg.querySelectorAll('.kampanya-close,.kampanya-cta'); if(!els.length) return;
+    var first=els[0], last=els[els.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
+})();
 
 // İş başvurusu popup — sayfa açılışında bir kez (oturum başına), 2.2sn sonra alttan kayar
 function isBasvuruKapat(){ var p=document.getElementById('isBasvuruPop'); if(p){p.classList.remove('on');} try{sessionStorage.setItem('ibk','1');}catch(e){} }

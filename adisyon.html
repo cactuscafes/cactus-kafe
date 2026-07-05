@@ -308,6 +308,26 @@ input,select{font-family:'Inter',sans-serif;}
 .btn-odeme:hover{opacity:.9;transform:translateY(-1px);}
 .btn-odeme:disabled{opacity:.35;cursor:not-allowed;transform:none;}
 
+/* ══════════ TÜKENDİ EKRANI ══════════ */
+.tuk-wrap{padding:16px;max-width:900px;margin:0 auto;}
+.tuk-ttl{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--k1);}
+.tuk-sub{font-size:12px;color:var(--kr3);margin-top:2px;line-height:1.5;}
+.tuk-ozet{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px;}
+.tuk-ozet:empty{display:none;}
+.tuk-ozet-chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:100px;background:rgba(192,57,43,.1);border:1.5px solid rgba(192,57,43,.35);color:#c0392b;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s;}
+.tuk-ozet-chip:active{transform:scale(.96);}
+.tuk-ara{width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--kr2);border-radius:10px;font-size:15px;margin:12px 0 4px;outline:none;background:#fff;color:var(--k1);font-family:inherit;}
+.tuk-ara:focus{border-color:var(--k1);}
+.tuk-kat{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--kr3);margin:18px 2px 8px;}
+.tuk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+.tuk-urun{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;min-height:58px;border:1.5px solid var(--kr2);border-radius:11px;background:#fff;cursor:pointer;text-align:left;transition:all .12s;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.tuk-urun:active{transform:scale(.97);}
+.tuk-urun .ta{font-size:13px;font-weight:700;color:var(--k1);line-height:1.25;}
+.tuk-urun .ts2{font-size:10px;font-weight:700;color:#2d7a4f;letter-spacing:.2px;}
+.tuk-urun.off{background:rgba(192,57,43,.06);border-color:rgba(192,57,43,.45);}
+.tuk-urun.off .ta{color:#8a2b22;text-decoration:line-through;opacity:.85;}
+.tuk-urun.off .ts2{color:#c0392b;}
+
 /* ══════════ YÖNET EKRANI ══════════ */
 .yon-wrap{padding:16px;max-width:900px;margin:0 auto;}
 .yon-sec{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--sh);}
@@ -746,6 +766,7 @@ if('serviceWorker' in navigator){
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
     <button class="htab htab-eylem" onclick="kartYildizAc()" title="Masadaki içecekler için sadakat yıldızı ekle"><span class="tico">⭐</span>Yıldız</button>
+    <button class="htab" onclick="goTo('tuk',this)" title="Biten ürünleri işaretle"><span class="tico">🚫</span>Tükendi</button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
     <button class="htab" onclick="goTo('har',this);harGoster();"><span class="tico">💸</span>Gider</button>
     <button class="htab" onclick="goTo('yon',this)"><span class="tico">⚙️</span>Yönet</button>
@@ -803,6 +824,17 @@ if('serviceWorker' in navigator){
         <button class="btn-odeme" id="d-odeme" onclick="odemeAl()" disabled>💳 Ödeme Al</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- TÜKENDİ -->
+<div class="scr" id="scr-tuk">
+  <div class="tuk-wrap">
+    <div class="tuk-ttl">🚫 Tükendi</div>
+    <div class="tuk-sub">Biten ürüne dokun — kasada ve tüm cihazlarda anında işaretlenir. Tekrar dokununca satışa döner.</div>
+    <div class="tuk-ozet" id="tuk-ozet"></div>
+    <input class="tuk-ara" id="tuk-ara" placeholder="🔍 Ürün ara…" autocomplete="off" oninput="renderTukendi()">
+    <div id="tuk-liste"></div>
   </div>
 </div>
 
@@ -1513,6 +1545,7 @@ function goTo(id,el){
   document.getElementById('scr-'+id).classList.add('on');
   el.classList.add('on');
   if(id==='yon'){menuGuncelleAnlik();renderYon();}
+  if(id==='tuk'){if(typeof menuGuncelleAnlik==='function')menuGuncelleAnlik();renderTukendi();}
   if(id==='rap'){renderCanliCiro();gunCiroYukle();rapGoster();rapOtomatikYenile(true);}else{rapOtomatikYenile(false);}
 }
 
@@ -2277,6 +2310,67 @@ function renderUrunler(){
     };
     g.appendChild(d);
   });
+}
+
+/* ══════════ TÜKENDİ EKRANI ══════════ */
+function _tukKaydet(){
+  _menuYazmaZamani=Date.now();
+  try{localStorage.setItem(LK.menu,JSON.stringify(MENU));}catch(e){}
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/kaydet',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sube:'adisyon_'+SUBE,menu:MENU})
+  }).catch(function(){});
+}
+function tukToggle(kat,id){
+  var v=MENU[kat]; if(!v||!Array.isArray(v.urunler)) return;
+  var u=v.urunler.find(function(x){return x&&x.id===id;}); if(!u) return;
+  u.tukendi=!u.tukendi;
+  _tukKaydet();
+  renderTukendi();
+  if(typeof renderUrunler==='function') renderUrunler();
+  toast(u.tukendi?('🚫 '+u.ad+' tükendi olarak işaretlendi'):('✅ '+u.ad+' tekrar satışta'));
+  try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}
+}
+function renderTukendi(){
+  var liste=document.getElementById('tuk-liste'); if(!liste) return;
+  var q=((document.getElementById('tuk-ara')||{}).value||'').toLocaleLowerCase('tr').trim();
+  // Üstte özet: şu an tükenenler — tek dokunuşla satışa al
+  var ozet=document.getElementById('tuk-ozet');
+  if(ozet){
+    ozet.innerHTML='';
+    Object.entries(MENU).forEach(function(ent){
+      var k=ent[0],v=ent[1];
+      if(!v||!Array.isArray(v.urunler)) return;
+      v.urunler.forEach(function(u){
+        if(!u||!u.tukendi||u.gizli) return;
+        var c=document.createElement('button');
+        c.type='button'; c.className='tuk-ozet-chip';
+        c.innerHTML='🚫 '+u.ad+' <span style="opacity:.65;font-weight:600;">→ satışa al</span>';
+        c.onclick=function(){tukToggle(k,u.id);};
+        ozet.appendChild(c);
+      });
+    });
+  }
+  // Kategori kategori tüm ürünler
+  liste.innerHTML='';
+  Object.entries(MENU).forEach(function(ent){
+    var k=ent[0],v=ent[1];
+    if(!v||!Array.isArray(v.urunler)) return;
+    var urunler=v.urunler.filter(function(u){return u&&!u.gizli&&(!q||(u.ad||'').toLocaleLowerCase('tr').indexOf(q)>=0);});
+    if(!urunler.length) return;
+    var h=document.createElement('div'); h.className='tuk-kat'; h.textContent=v.label||k;
+    liste.appendChild(h);
+    var g=document.createElement('div'); g.className='tuk-grid';
+    urunler.forEach(function(u){
+      var b=document.createElement('button');
+      b.type='button'; b.className='tuk-urun'+(u.tukendi?' off':'');
+      b.innerHTML='<span class="ta">'+(u.emoji?u.emoji+' ':'')+u.ad+'</span><span class="ts2">'+(u.tukendi?'🚫 TÜKENDİ — dokun, satışa al':'✓ Satışta')+'</span>';
+      b.onclick=function(){tukToggle(k,u.id);};
+      g.appendChild(b);
+    });
+    liste.appendChild(g);
+  });
+  if(!liste.children.length) liste.innerHTML='<div style="text-align:center;padding:40px;color:var(--kr3);font-size:13px;">Ürün bulunamadı</div>';
 }
 
 function _artiBir(el){ try{ if(!el||el===document.body||!el.appendChild) return; if(el.classList&&!el.classList.contains('ukrt')&&el.tagName!=='BUTTON') return; var b=document.createElement('span'); b.textContent='+1'; b.style.cssText='position:absolute;top:4px;left:50%;background:var(--k1);color:#fff;font-size:13px;font-weight:800;padding:2px 9px;border-radius:11px;pointer-events:none;z-index:30;animation:artiBirAnim .7s ease forwards;'; var cs=getComputedStyle(el); if(cs.position==='static') el.style.position='relative'; el.appendChild(b); setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); },720); }catch(e){} }
@@ -3716,6 +3810,8 @@ setInterval(function(){gunCiroYukle();},60000);
     }
     if(typeof renderKatBar==='function') renderKatBar();
     if(typeof renderUrunler==='function') renderUrunler();
+    // Tükendi ekranı açıksa diğer cihazdan gelen değişikliği yansıt
+    try{ var _st=document.getElementById('scr-tuk'); if(_st&&_st.classList.contains('on')&&typeof renderTukendi==='function') renderTukendi(); }catch(e){}
     // renderYon burada çağrılmıyor — polling fiyat inputlarını sıfırlıyor
     // Yönet sekmesine geçilince zaten menuGuncelleAnlik+renderYon çalışıyor
   }

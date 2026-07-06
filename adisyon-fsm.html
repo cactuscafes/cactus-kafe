@@ -1036,6 +1036,7 @@ if('serviceWorker' in navigator){
     <div class="var-card">
       <div class="var-ttl">👤 Personel</div>
       <select id="var-personel" onchange="vardiyaPersonelSec(this.value)"><option value="">— Personel seç —</option></select>
+      <input id="var-pin" type="tel" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Şifreni gir" style="width:100%;margin-top:10px;padding:13px;border:1.5px solid var(--kr2);border-radius:10px;font-size:16px;letter-spacing:4px;text-align:center;background:#fff;color:var(--k1);" />
       <div id="var-durum" style="margin-top:12px;"></div>
       <div style="display:flex;gap:10px;margin-top:14px;">
         <button id="var-giris" class="var-btn var-btn-giris" onclick="vardiyaGiris()">🟢 Giriş Yap</button>
@@ -4161,21 +4162,23 @@ setInterval(function(){gunCiroYukle();},60000);
 </script>
 
 <!-- ═══ VARDİYA & KONTROL LİSTESİ — personel giriş/çıkış + açılış/kapanış ═══
-     Config (personel + maddeler) RAPOR-API KV'den okunur; giriş/çıkış ve
-     işaretlemeler event-log'a (type vardiya/checklist, masa=null) yazılır. -->
+     Config (personel + maddeler) worker /api/vardiya'dan okunur (isim + maddeler;
+     PIN asla client'a gelmez). Giriş/çıkış worker /api/vardiya-giris'e PIN ile
+     gönderilir → server PIN'i doğrular, event kaydeder, girişte WhatsApp atar.
+     İşaretlemeler event-log'a (type checklist, masa=null) yazılır. -->
 <script>
 (function(){
-  var VAR_KEY='cactus_vardiya_'+SUBE;
   var _vconf={personel:[],acilis:[],kapanis:[]};
   var _vsel=''; try{ _vsel=localStorage.getItem('cactus_vardiya_ben_'+SUBE)||''; }catch(e){}
+  var _vbusy=false;
   function _esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function _saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
   function gunBasi(){ var d=new Date(); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
   function bugunEv(){ var gb=gunBasi(); return (window._eventLog||[]).filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; }); }
 
   window.vardiyaConfigYukle=function(cb){
-    fetch(FAV_API+'/menu/cek?sube='+VAR_KEY+'&t='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(d){
-      if(d&&typeof d==='object'){
+    fetch(EV_API+'/api/vardiya?sube='+SUBE+'&t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(d&&d.ok){
         _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[] };
       }
       if(cb)cb();
@@ -4183,9 +4186,33 @@ setInterval(function(){gunCiroYukle();},60000);
   };
 
   window.vardiyaGoster=function(){ vardiyaRender(); vardiyaConfigYukle(function(){ vardiyaRender(); }); };
-  window.vardiyaPersonelSec=function(v){ _vsel=v||''; try{localStorage.setItem('cactus_vardiya_ben_'+SUBE,_vsel);}catch(e){} vardiyaRender(); };
-  window.vardiyaGiris=function(){ if(!_vsel){alert('Önce personel seçin');return;} _pushEvent('vardiya',null,{ad:_vsel,aksiyon:'giris'}); vardiyaRender(); };
-  window.vardiyaCikis=function(){ if(!_vsel){alert('Önce personel seçin');return;} _pushEvent('vardiya',null,{ad:_vsel,aksiyon:'cikis'}); vardiyaRender(); };
+  window.vardiyaPersonelSec=function(v){ _vsel=v||''; try{localStorage.setItem('cactus_vardiya_ben_'+SUBE,_vsel);}catch(e){} var pi=document.getElementById('var-pin'); if(pi)pi.value=''; vardiyaRender(); };
+  function _vardiyaAksiyon(aksiyon){
+    if(_vbusy) return;
+    if(!_vsel){ alert('Önce personel seçin'); return; }
+    var pi=document.getElementById('var-pin'); var pin=(pi&&pi.value||'').trim();
+    if(!pin){ alert('Şifreni gir'); if(pi)pi.focus(); return; }
+    _vbusy=true;
+    var gEl=document.getElementById('var-giris'), cEl=document.getElementById('var-cikis');
+    if(gEl)gEl.disabled=true; if(cEl)cEl.disabled=true;
+    fetch(EV_API+'/api/vardiya-giris',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,ad:_vsel,pin:pin,aksiyon:aksiyon,cihaz_id:_cihazId})})
+      .then(function(r){return r.json().catch(function(){return {ok:false,error:'Sunucu hatası'};});})
+      .then(function(d){
+        _vbusy=false;
+        if(d&&d.ok){
+          if(pi)pi.value='';
+          // Yeni giriş/çıkış event'i _evSync ile gelir; senkron olunca birkaç kez tazele
+          if(typeof _evSync==='function') _evSync();
+          vardiyaRender();
+          setTimeout(function(){ if(typeof _evSync==='function')_evSync(); vardiyaRender(); }, 700);
+          setTimeout(vardiyaRender, 1600);
+        }
+        else { alert((d&&d.error)||'İşlem başarısız'); vardiyaRender(); if(pi)pi.focus(); }
+      })
+      .catch(function(){ _vbusy=false; alert('Bağlantı hatası — tekrar deneyin'); vardiyaRender(); });
+  }
+  window.vardiyaGiris=function(){ _vardiyaAksiyon('giris'); };
+  window.vardiyaCikis=function(){ _vardiyaAksiyon('cikis'); };
   window.vardiyaTik=function(tur,idx){
     if(!_vsel){ alert('Önce personel seçin'); return; }
     var madde=(_vconf[tur]||[])[idx]; if(madde==null) return;

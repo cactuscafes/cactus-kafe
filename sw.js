@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v34'; // v34: same-origin /api/* istekleri SW'yi baypas etsin (bordro D1 senkronu 'çevrimdışı' görünüyordu)
+const VERSION = 'cactus-v35'; // v35: vardiya PIN girişi + WhatsApp bildirimi (worker /api/vardiya, /api/vardiya-giris)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

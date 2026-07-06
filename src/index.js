@@ -44,6 +44,29 @@ async function verifyYonetim(token) {
   }
 }
 
+// ─── Vardiya ayar deposu (personel+PIN, checklist maddeleri, WhatsApp config) ───
+async function ensureVardiyaTable(env) {
+  await env.ADISYON_DB.prepare(
+    `CREATE TABLE IF NOT EXISTS vardiya_ayar (sube TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at INTEGER)`
+  ).run();
+}
+async function getVardiyaCfg(env, sube) {
+  try {
+    const row = await env.ADISYON_DB.prepare(`SELECT data FROM vardiya_ayar WHERE sube = ?`).bind(sube).first();
+    if (row && row.data) {
+      const d = JSON.parse(row.data);
+      return {
+        personel: Array.isArray(d.personel) ? d.personel : [],
+        acilis: Array.isArray(d.acilis) ? d.acilis : [],
+        kapanis: Array.isArray(d.kapanis) ? d.kapanis : [],
+        wa_phone: d.wa_phone || '',
+        wa_apikey: d.wa_apikey || '',
+      };
+    }
+  } catch (e) {}
+  return { personel: [], acilis: [], kapanis: [], wa_phone: '', wa_apikey: '' };
+}
+
 async function postEvent(env, evt) {
   // Şema: id (UUID), sube, type, masa, payload (JSON string), ts (client), cihaz_id
   if (!evt || !evt.id || !evt.sube || !evt.type || typeof evt.ts !== 'number' || !evt.cihaz_id) {
@@ -220,6 +243,88 @@ export default {
       }
 
       return json({ ok: false, error: 'method not allowed' }, 405);
+    }
+
+    // ─── /api/vardiya — personel/PIN + checklist + WhatsApp config ───
+    // GET  ?sube=X            → PUBLIC: { personel:[ad], acilis, kapanis } (PIN'siz)
+    // GET  ?sube=X&full=1     → AUTH (X-Cactus-Key): tam config (PIN + WhatsApp dahil)
+    // POST { sube, personel:[{ad,pin}], acilis, kapanis, wa_phone, wa_apikey } → AUTH: kaydet
+    if (url.pathname === '/api/vardiya') {
+      try {
+        await ensureVardiyaTable(env);
+        if (request.method === 'GET') {
+          const sube = url.searchParams.get('sube') || '';
+          if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+          const cfg = await getVardiyaCfg(env, sube);
+          if (url.searchParams.get('full') === '1') {
+            const token = request.headers.get('X-Cactus-Key') || '';
+            if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_apikey: cfg.wa_apikey }, 200, NO_STORE);
+          }
+          // Herkese açık: sadece isimler + maddeler (PIN ve WhatsApp asla dönmez)
+          return json({ ok: true, personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean), acilis: cfg.acilis, kapanis: cfg.kapanis }, 200, NO_STORE);
+        }
+        if (request.method === 'POST') {
+          const token = request.headers.get('X-Cactus-Key') || '';
+          if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+          const body = await request.json();
+          const sube = body.sube;
+          if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+          const cfg = {
+            personel: Array.isArray(body.personel) ? body.personel.map(function (p) { return { ad: String((p && p.ad) || '').trim(), pin: String((p && p.pin) || '').trim() }; }).filter(function (p) { return p.ad; }) : [],
+            acilis: Array.isArray(body.acilis) ? body.acilis.map(String) : [],
+            kapanis: Array.isArray(body.kapanis) ? body.kapanis.map(String) : [],
+            wa_phone: String(body.wa_phone || '').replace(/\D/g, ''),
+            wa_apikey: String(body.wa_apikey || '').trim(),
+          };
+          await env.ADISYON_DB.prepare(
+            `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES (?, ?, ?)
+             ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
+          ).bind(sube, JSON.stringify(cfg), Date.now()).run();
+          return json({ ok: true }, 200, NO_STORE);
+        }
+        return json({ ok: false, error: 'method not allowed' }, 405, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 500, NO_STORE);
+      }
+    }
+
+    // ─── /api/vardiya-giris — PIN'li giriş/çıkış (herkese açık ama PIN ile korumalı) ───
+    // POST { sube, ad, pin, aksiyon('giris'|'cikis'), cihaz_id }
+    //   → PIN doğru ise vardiya event'i kaydeder; girişte WhatsApp bildirimi gönderir
+    if (url.pathname === '/api/vardiya-giris' && request.method === 'POST') {
+      try {
+        await ensureVardiyaTable(env);
+        const body = await request.json();
+        const sube = body.sube;
+        const ad = String(body.ad || '').trim();
+        const pin = String(body.pin || '').trim();
+        const aksiyon = body.aksiyon === 'cikis' ? 'cikis' : 'giris';
+        if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+        if (!ad || !pin) return json({ ok: false, error: 'Ad ve PIN gerekli' }, 200, NO_STORE);
+        const cfg = await getVardiyaCfg(env, sube);
+        const kisi = (cfg.personel || []).find(function (p) { return p && p.ad === ad; });
+        if (!kisi) return json({ ok: false, error: 'Personel bulunamadı' }, 200, NO_STORE);
+        if (!kisi.pin || kisi.pin !== pin) return json({ ok: false, error: 'PIN hatalı' }, 200, NO_STORE);
+        const now = Date.now();
+        const evtId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v' + now + '-' + Math.round(now % 1e6));
+        await env.ADISYON_DB.prepare(
+          `INSERT OR IGNORE INTO adisyon_events (id, sube, type, masa, payload, ts, server_ts, cihaz_id)
+           VALUES (?, ?, 'vardiya', NULL, ?, ?, ?, ?)`
+        ).bind(evtId, sube, JSON.stringify({ ad: ad, aksiyon: aksiyon }), now, now, String(body.cihaz_id || 'server')).run();
+        // WhatsApp bildirimi (CallMeBot) — apikey/telefon D1'de; fire-and-forget; sadece girişte
+        if (aksiyon === 'giris' && cfg.wa_phone && cfg.wa_apikey) {
+          var subeAd = sube === 'fsm' ? 'FSM' : 'Podyumpark';
+          var saat = '';
+          try { saat = new Date(now).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }); } catch (e) { saat = ''; }
+          var msg = '🟢 ' + ad + ' vardiyaya giris yapti' + (saat ? ('\n' + subeAd + ' - ' + saat) : ('\n' + subeAd));
+          var waUrl = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(cfg.wa_phone) + '&text=' + encodeURIComponent(msg) + '&apikey=' + encodeURIComponent(cfg.wa_apikey);
+          ctx.waitUntil(fetch(waUrl).catch(function () {}));
+        }
+        return json({ ok: true, ts: now, aksiyon: aksiyon }, 200, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 400, NO_STORE);
+      }
     }
 
     // Diğer her şey → statik dosya

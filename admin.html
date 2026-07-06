@@ -480,8 +480,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('menusayfa',this)">📋 Menü Sayfası</button>
       <button class="sb-btn" onclick="panelAc('ayarlar',this)">⚙️ Site Ayarları</button>
 
-      <div class="sb-ttl">Finans</div>
+      <div class="sb-ttl">Personel</div>
       <button class="sb-btn" onclick="panelAc('bordro',this)">💰 Maaş / Bordro <span id="bordroBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
+      <button class="sb-btn" onclick="panelAc('vardiya',this)">🕒 Personel / Vardiya</button>
     </div>
     <div class="main">
       <div id="pendingBar" style="display:none;background:linear-gradient(90deg,#b8965a,#c8a86a);color:#1a3010;padding:10px 18px;border-radius:8px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(184,150,90,.25);"><span style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;"><span style="width:9px;height:9px;border-radius:50%;background:#1a3010;display:inline-block;animation:dotPulse 1.4s infinite;flex:none;"></span><span id="pendingBarTxt">Yayınlanmamış değişiklikler var — canlı menüye/adisyona uygulamak için Yayınla'ya bas.</span></span><button onclick="modalAc()" style="background:#1a3010;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex:none;">🚀 Yayınla</button></div>
@@ -1090,6 +1091,99 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div id="bordroListe"></div>
       </div>
 
+      <!-- PERSONEL / VARDİYA -->
+      <div class="panel" id="panel-vardiya" style="max-width:1080px;">
+        <style>
+        #panel-vardiya .vad-tabs{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+        #panel-vardiya .vad-tab{padding:8px 18px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-vardiya .vad-tab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+        #panel-vardiya .vad-mini{padding:7px 14px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-vardiya .vad-canli{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:16px;}
+        #panel-vardiya .vad-blok{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 17px;}
+        #panel-vardiya .vad-blok-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:11px;display:flex;align-items:center;gap:8px;}
+        #panel-vardiya .vad-say{font-size:11px;font-weight:700;color:#fff;background:var(--brand);border-radius:100px;padding:2px 9px;margin-left:auto;}
+        #panel-vardiya .vad-tag{display:inline-block;background:rgba(45,90,39,.1);border:1px solid rgba(45,90,39,.3);color:var(--brand);border-radius:100px;padding:4px 11px;font-size:12.5px;font-weight:600;margin:0 6px 6px 0;}
+        #panel-vardiya .vad-cl{display:flex;align-items:center;gap:9px;font-size:13px;padding:6px 0;border-top:1px solid var(--paper);}
+        #panel-vardiya .vad-cl:first-child{border-top:none;}
+        #panel-vardiya .vad-cl .ck{width:20px;height:20px;flex:none;border-radius:6px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}
+        #panel-vardiya .vad-cl.done .ck{background:var(--brand);border-color:var(--brand);color:#fff;}
+        #panel-vardiya .vad-cl.done .mad{color:var(--mist);}
+        #panel-vardiya .vad-cl .who{margin-left:auto;font-size:11px;color:var(--mist);white-space:nowrap;}
+        #panel-vardiya .vad-bos{color:var(--mist);font-size:12.5px;padding:6px 0;}
+        #panel-vardiya .vad-logrow{display:flex;gap:10px;align-items:center;font-size:12.5px;padding:6px 0;border-top:1px solid var(--paper);}
+        #panel-vardiya .vad-logrow:first-child{border-top:none;}
+        #panel-vardiya .vad-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:100px;}
+        #panel-vardiya .vad-badge.g{background:rgba(45,90,39,.14);color:var(--brand);}
+        #panel-vardiya .vad-badge.c{background:rgba(192,57,43,.12);color:#c0392b;}
+        #panel-vardiya .vad-ayar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+        #panel-vardiya .vad-col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
+        #panel-vardiya .vad-col-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+        #panel-vardiya .vad-list .vad-li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;background:var(--paper);}
+        #panel-vardiya .vad-list .vad-li .txt{flex:1;}
+        #panel-vardiya .vad-list .vad-li button{background:none;border:none;cursor:pointer;opacity:.5;font-size:14px;}
+        #panel-vardiya .vad-list .vad-li button:hover{opacity:1;}
+        #panel-vardiya .vad-ekle{display:flex;gap:7px;margin-top:8px;}
+        #panel-vardiya .vad-ekle input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
+        #panel-vardiya .vad-ekle button{padding:9px 14px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        @media(max-width:560px){
+          #panel-vardiya .vad-ekle input{min-height:44px;font-size:16px;}
+          #panel-vardiya .vad-tab,#panel-vardiya .vad-mini{min-height:40px;}
+        }
+        </style>
+        <div class="pttl">🕒 Personel / Vardiya</div>
+        <div class="psub">Personel listesini ve açılış/kapanış kontrol maddelerini tanımla. Personel adisyon ekranındaki <b>🕒 Vardiya</b> sekmesinden giriş/çıkış yapar ve maddeleri işaretler — burada bugünkü durumu <b>anlık</b> görürsün. FSM ve Podyum ayrı.</div>
+
+        <div class="vad-tabs">
+          <button class="vad-tab on" id="vadTabFsm" onclick="vardiyaAdminSube('fsm')">🏙 FSM</button>
+          <button class="vad-tab" id="vadTabPodyum" onclick="vardiyaAdminSube('podyum')">🌿 Podyumpark</button>
+          <span id="vadDurum" style="font-size:11.5px;color:var(--mist);margin-left:6px;white-space:nowrap;"></span>
+          <div style="flex:1"></div>
+          <button class="vad-mini" onclick="vardiyaCanliYukle()">🔄 Yenile</button>
+        </div>
+
+        <div class="vad-canli">
+          <div class="vad-blok">
+            <div class="vad-blok-ttl">🟢 Şu An Vardiyada</div>
+            <div id="vadIcerde"></div>
+          </div>
+          <div class="vad-blok">
+            <div class="vad-blok-ttl">🌅 Açılış <span id="vadAcilisSay" class="vad-say"></span></div>
+            <div id="vadAcilisCanli"></div>
+          </div>
+          <div class="vad-blok">
+            <div class="vad-blok-ttl">🌙 Kapanış <span id="vadKapanisSay" class="vad-say"></span></div>
+            <div id="vadKapanisCanli"></div>
+          </div>
+        </div>
+
+        <div class="vad-blok" style="margin-bottom:26px;">
+          <div class="vad-blok-ttl">📋 Bugün Giriş / Çıkış</div>
+          <div id="vadLog"></div>
+        </div>
+
+        <div class="pttl" style="font-size:20px;margin-bottom:2px;">⚙️ Ayarlar</div>
+        <div class="psub" style="margin-bottom:16px;">Personel adlarını ve kontrol maddelerini düzenle, sonra <b>Kaydet</b>. Değişiklik adisyon ekranlarına anında yansır.</div>
+        <div class="vad-ayar">
+          <div class="vad-col">
+            <div class="vad-col-ttl">👤 Personel Listesi</div>
+            <div id="vadPersonel" class="vad-list"></div>
+            <div class="vad-ekle"><input id="vadYeniPersonel" placeholder="İsim ekle" onkeydown="if(event.key==='Enter')vardiyaEkle('personel')"><button onclick="vardiyaEkle('personel')">+ Ekle</button></div>
+          </div>
+          <div class="vad-col">
+            <div class="vad-col-ttl">🌅 Açılış Maddeleri</div>
+            <div id="vadAcilis" class="vad-list"></div>
+            <div class="vad-ekle"><input id="vadYeniAcilis" placeholder="Madde ekle" onkeydown="if(event.key==='Enter')vardiyaEkle('acilis')"><button onclick="vardiyaEkle('acilis')">+ Ekle</button></div>
+          </div>
+          <div class="vad-col">
+            <div class="vad-col-ttl">🌙 Kapanış Maddeleri</div>
+            <div id="vadKapanis" class="vad-list"></div>
+            <div class="vad-ekle"><input id="vadYeniKapanis" placeholder="Madde ekle" onkeydown="if(event.key==='Enter')vardiyaEkle('kapanis')"><button onclick="vardiyaEkle('kapanis')">+ Ekle</button></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="vardiyaConfigKaydet()" style="margin-top:16px;">💾 Ayarları Kaydet</button>
+        <span id="vadKayitDurum" style="font-size:12px;color:var(--mist);margin-left:12px;"></span>
+      </div>
+
     </div>
   </div>
 
@@ -1430,6 +1524,7 @@ function panelAc(id,el){
   if(id==='rapor') rapGoster();
   if(id==='yogunluk') yogunlukYukle();
   if(id==='bordro'){ if(typeof bordroAc==='function') bordroAc(); }
+  if(id==='vardiya'){ if(typeof vardiyaAdminAc==='function') vardiyaAdminAc(); }
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
 
@@ -4304,6 +4399,118 @@ if('serviceWorker' in navigator){
   };
   // Sayfa açılışında sol menü rozetini yerel önbellekten hesapla
   try{ bordroBadgeGuncelle(); }catch(e){}
+})();
+</script>
+
+<script>
+/* ═══ PERSONEL / VARDİYA — admin config editörü + canlı durum ═══
+   Config (personel + açılış/kapanış maddeleri) RAPOR-API KV'ye yazılır
+   (key: cactus_vardiya_<sube>); adisyon ekranları oradan okur.
+   Canlı durum cactus-kafe worker'ının /api/events log'undan hesaplanır. */
+(function(){
+  var VAD_EV_API=(typeof _CM_EV_API!=='undefined')?_CM_EV_API:'https://cactus-kafe.batuhanbulut.workers.dev';
+  var VAD_KV_API=(typeof RAPOR_API!=='undefined')?RAPOR_API:'https://cactus-rapor-api.batuhanbulut.workers.dev';
+  var VAD_DEF_ACILIS=['Makineleri çalıştır / ısıt','Vitrini ve teşhiri hazırla','Kasayı ve para üstünü kontrol et','Zemini ve masaları sil','Müzik ve ışıkları aç','Eksik / stok kontrolü'];
+  var VAD_DEF_KAPANIS=['Kasayı say ve kapat','Kahve makinelerini temizle','Buzdolabı / vitrin kontrolü','Çöpleri çıkar','Zemini temizle','Cihazları ve ışıkları kapat','Kapıyı kilitle'];
+  var _vadSube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='fsm')?'fsm':'podyum';
+  var _vadConf={personel:[],acilis:[],kapanis:[]};
+  var _vadLastEv=null;
+  var _vadPoll=null;
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+  function gunBasi(){ var d=new Date(); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
+  function kvKey(){ return 'cactus_vardiya_'+_vadSube; }
+
+  window.vardiyaAdminAc=function(){
+    _vadSube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='fsm')?'fsm':'podyum';
+    vadTabSync();
+    vardiyaConfigYukleAdmin();
+    vardiyaCanliYukle();
+    if(_vadPoll) clearInterval(_vadPoll);
+    _vadPoll=setInterval(function(){
+      var pn=document.getElementById('panel-vardiya');
+      if(pn && pn.classList.contains('on')) vardiyaCanliYukle();
+      else { clearInterval(_vadPoll); _vadPoll=null; }
+    }, 6000);
+  };
+  window.vardiyaAdminSube=function(s){ _vadSube=(s==='fsm')?'fsm':'podyum'; vadTabSync(); vardiyaConfigYukleAdmin(); vardiyaCanliYukle(); };
+  function vadTabSync(){ var f=document.getElementById('vadTabFsm'),p=document.getElementById('vadTabPodyum'); if(f)f.classList.toggle('on',_vadSube==='fsm'); if(p)p.classList.toggle('on',_vadSube==='podyum'); }
+
+  function vardiyaConfigYukleAdmin(){
+    fetch(VAD_KV_API+'/menu/cek?sube='+kvKey()+'&t='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      var bosGeldi = !d || typeof d!=='object' || (!Array.isArray(d.personel)&&!Array.isArray(d.acilis)&&!Array.isArray(d.kapanis));
+      _vadConf={
+        personel:(d&&Array.isArray(d.personel))?d.personel:[],
+        acilis:(d&&Array.isArray(d.acilis))?d.acilis:(bosGeldi?VAD_DEF_ACILIS.slice():[]),
+        kapanis:(d&&Array.isArray(d.kapanis))?d.kapanis:(bosGeldi?VAD_DEF_KAPANIS.slice():[])
+      };
+      vardiyaEditorRender();
+      if(_vadLastEv) vardiyaCanliRender(_vadLastEv); // config gelince canlı bloğu maddelerle tazele
+    }).catch(function(){ _vadConf={personel:[],acilis:VAD_DEF_ACILIS.slice(),kapanis:VAD_DEF_KAPANIS.slice()}; vardiyaEditorRender(); if(_vadLastEv) vardiyaCanliRender(_vadLastEv); });
+  }
+  function vardiyaEditorRender(){
+    ['personel','acilis','kapanis'].forEach(function(tur){
+      var el=document.getElementById('vad'+tur.charAt(0).toUpperCase()+tur.slice(1)); if(!el) return;
+      var arr=_vadConf[tur]||[];
+      el.innerHTML=arr.length? arr.map(function(x,i){ return '<div class="vad-li"><span class="txt">'+esc(x)+'</span><button onclick="vardiyaSil(\''+tur+'\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
+    });
+  }
+  window.vardiyaEkle=function(tur){
+    var inpId='vadYeni'+tur.charAt(0).toUpperCase()+tur.slice(1);
+    var inp=document.getElementById(inpId); if(!inp) return;
+    var v=(inp.value||'').trim(); if(!v) return;
+    if(!Array.isArray(_vadConf[tur])) _vadConf[tur]=[];
+    _vadConf[tur].push(v); inp.value=''; vardiyaEditorRender(); inp.focus();
+  };
+  window.vardiyaSil=function(tur,idx){ if(Array.isArray(_vadConf[tur])){ _vadConf[tur].splice(idx,1); vardiyaEditorRender(); } };
+  window.vardiyaConfigKaydet=function(){
+    var el=document.getElementById('vadKayitDurum'); if(el){ el.textContent='Kaydediliyor…'; el.style.color='var(--mist)'; }
+    fetch(VAD_KV_API+'/menu/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:kvKey(),menu:{personel:_vadConf.personel,acilis:_vadConf.acilis,kapanis:_vadConf.kapanis,ts:Date.now()}})})
+      .then(function(r){return r.ok?r.json():null;}).then(function(j){ if(el){ el.textContent='✅ Kaydedildi — adisyona yansıdı'; el.style.color='#2d7a3a'; } if(typeof toast==='function') toast('✅ Vardiya ayarları kaydedildi'); })
+      .catch(function(){ if(el){ el.textContent='⚠️ Kaydedilemedi'; el.style.color='#c0392b'; } });
+  };
+
+  window.vardiyaCanliYukle=function(){
+    var dEl=document.getElementById('vadDurum'); if(dEl) dEl.textContent='⏳ yükleniyor…';
+    fetch(VAD_EV_API+'/api/events?sube='+_vadSube+'&since=0').then(function(r){return r.ok?r.json():null;}).then(function(j){
+      var evs=(j&&Array.isArray(j.events))?j.events:[];
+      var gb=gunBasi();
+      var bugun=evs.filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; });
+      _vadLastEv=bugun;
+      vardiyaCanliRender(bugun);
+      if(dEl){ dEl.textContent='☁️ canlı'; dEl.style.color='#2d7a3a'; }
+    }).catch(function(){ if(dEl){ dEl.textContent='⚠️ bağlantı yok'; dEl.style.color='#c0392b'; } });
+  };
+  function vardiyaCanliRender(bugun){
+    // içerde
+    var byAd={}; bugun.filter(function(e){return e.type==='vardiya'&&e.payload&&e.payload.ad;}).sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){ byAd[e.payload.ad]=e; });
+    var icerde=Object.keys(byAd).filter(function(ad){return byAd[ad].payload.aksiyon==='giris';});
+    var icEl=document.getElementById('vadIcerde');
+    if(icEl) icEl.innerHTML=icerde.length? icerde.map(function(ad){return '<span class="vad-tag">🟢 '+esc(ad)+' · '+saat(byAd[ad].ts)+'</span>';}).join('') : '<div class="vad-bos">Şu an vardiyada kimse yok.</div>';
+    // checklist blokları
+    ['acilis','kapanis'].forEach(function(tur){
+      var cont=document.getElementById('vad'+(tur==='acilis'?'Acilis':'Kapanis')+'Canli'); if(!cont) return;
+      var items=_vadConf[tur]||[];
+      var evs=bugun.filter(function(e){return e.type==='checklist'&&e.payload&&e.payload.tur===tur;});
+      var done=0;
+      cont.innerHTML=items.length? items.map(function(m){
+        var last=null; evs.forEach(function(e){ if(e.payload.madde===m&&(!last||e.ts>last.ts)) last=e; });
+        var isDone=!!(last&&last.payload.done); if(isDone) done++;
+        var who=isDone?('<span class="who">'+esc(last.payload.ad||'')+' · '+saat(last.ts)+'</span>'):'';
+        return '<div class="vad-cl'+(isDone?' done':'')+'"><span class="ck">'+(isDone?'✓':'')+'</span><span class="mad">'+esc(m)+'</span>'+who+'</div>';
+      }).join('') : '<div class="vad-bos">Madde tanımlı değil.</div>';
+      var say=document.getElementById(tur==='acilis'?'vadAcilisSay':'vadKapanisSay'); if(say) say.textContent=items.length?(done+'/'+items.length):'';
+    });
+    // log
+    var logEl=document.getElementById('vadLog');
+    if(logEl){
+      var logs=bugun.filter(function(e){return e.type==='vardiya'&&e.payload;}).sort(function(a,b){return b.ts-a.ts;});
+      logEl.innerHTML=logs.length? logs.map(function(e){
+        var g=e.payload.aksiyon==='giris';
+        return '<div class="vad-logrow"><span class="vad-badge '+(g?'g':'c')+'">'+(g?'Giriş':'Çıkış')+'</span><span style="font-weight:600">'+esc(e.payload.ad||'')+'</span><span style="color:var(--mist);margin-left:auto">'+saat(e.ts)+'</span></div>';
+      }).join('') : '<div class="vad-bos">Bugün giriş/çıkış kaydı yok.</div>';
+    }
+  }
 })();
 </script>
 

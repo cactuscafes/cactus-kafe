@@ -765,6 +765,7 @@ if('serviceWorker' in navigator){
   </div>
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
+    <button class="htab" onclick="goTo('var',this);vardiyaGoster();" title="Vardiya giriş/çıkış ve açılış/kapanış kontrol listesi"><span class="tico">🕒</span>Vardiya</button>
     <button class="htab htab-eylem" onclick="kartYildizAc()" title="Masadaki içecekler için sadakat yıldızı ekle"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="goTo('tuk',this)" title="Biten ürünleri işaretle"><span class="tico">🚫</span>Tükendi</button>
     <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
@@ -1028,6 +1029,55 @@ if('serviceWorker' in navigator){
     <div class="yon-sec">
       <div class="yon-sec-ttl">⚠️ Tehlikeli Bölge</div>
       <button onclick="tumMasalariSifirla()" style="width:100%;padding:12px;min-height:44px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff;font-size:14px;font-weight:700;">🗑 Tüm Masaları Sıfırla</button>
+    </div>
+  </div>
+</div>
+
+<!-- VARDİYA & KONTROL LİSTESİ -->
+<style>
+#scr-var .var-wrap{max-width:780px;margin:0 auto;padding:14px;}
+#scr-var .var-card{background:var(--kr);border:1px solid var(--kr2);border-radius:14px;padding:16px 18px;margin-bottom:14px;}
+#scr-var .var-ttl{font-size:15px;font-weight:800;color:var(--k1);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+#scr-var .var-say{font-size:12px;font-weight:700;color:#fff;background:var(--k2);border-radius:100px;padding:2px 9px;margin-left:auto;}
+#scr-var #var-personel{width:100%;padding:13px;border:1.5px solid var(--kr2);border-radius:10px;font-size:16px;background:#fff;color:var(--k1);}
+#scr-var .var-btn{flex:1;min-height:52px;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;color:#fff;}
+#scr-var .var-btn:disabled{opacity:.4;cursor:not-allowed;}
+#scr-var .var-btn-giris{background:linear-gradient(135deg,#2e7d32,#1f5c38);}
+#scr-var .var-btn-cikis{background:linear-gradient(135deg,#c0392b,#96271b);}
+#scr-var .var-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border:1.5px solid var(--kr2);border-radius:11px;margin-bottom:9px;cursor:pointer;background:#fff;transition:background .15s,border-color .15s;user-select:none;}
+#scr-var .var-item:active{transform:scale(.995);}
+#scr-var .var-item.done{background:#eef7ee;border-color:#9ccc9c;}
+#scr-var .var-chk{width:28px;height:28px;flex:none;border-radius:8px;border:2px solid var(--kr2);display:flex;align-items:center;justify-content:center;font-size:16px;color:#2e7d32;font-weight:900;background:#fff;}
+#scr-var .var-item.done .var-chk{background:#2e7d32;border-color:#2e7d32;color:#fff;}
+#scr-var .var-mad{flex:1;font-size:15px;color:var(--k1);font-weight:600;}
+#scr-var .var-item.done .var-mad{text-decoration:line-through;color:var(--k2);}
+#scr-var .var-who{font-size:11px;color:var(--k2);white-space:nowrap;}
+#scr-var .var-tag{display:inline-block;background:#eef7ee;border:1px solid #9ccc9c;color:#1f5c38;border-radius:100px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;}
+#scr-var #var-durum{font-size:14px;color:var(--k1);}
+</style>
+<div class="scr" id="scr-var">
+  <div class="var-wrap">
+    <div id="var-config-uyari" style="display:none;background:#fff3cd;border:1px solid #e2b25a;border-radius:12px;padding:13px 15px;margin-bottom:14px;font-size:13px;color:#7a5a1a;line-height:1.5;">Personel listesi ve kontrol maddeleri henüz tanımlanmamış. Yönetici <b>Admin → Personel / Vardiya</b> ekranından ekleyebilir.</div>
+    <div class="var-card">
+      <div class="var-ttl">👤 Personel</div>
+      <select id="var-personel" onchange="vardiyaPersonelSec(this.value)"><option value="">— Personel seç —</option></select>
+      <div id="var-durum" style="margin-top:12px;"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button id="var-giris" class="var-btn var-btn-giris" onclick="vardiyaGiris()">🟢 Giriş Yap</button>
+        <button id="var-cikis" class="var-btn var-btn-cikis" onclick="vardiyaCikis()">🔴 Çıkış Yap</button>
+      </div>
+    </div>
+    <div class="var-card">
+      <div class="var-ttl">🌅 Açılış Kontrol Listesi <span id="var-acilis-say" class="var-say"></span></div>
+      <div id="var-acilis"></div>
+    </div>
+    <div class="var-card">
+      <div class="var-ttl">🌙 Kapanış Kontrol Listesi <span id="var-kapanis-say" class="var-say"></span></div>
+      <div id="var-kapanis"></div>
+    </div>
+    <div class="var-card">
+      <div class="var-ttl">🕒 Şu An Vardiyada</div>
+      <div id="var-icerdekiler" style="font-size:13px;"></div>
     </div>
   </div>
 </div>
@@ -4401,6 +4451,84 @@ setInterval(function(){gunCiroYukle();},60000);
   window.addEventListener('load',kasBoyut);
   window.addEventListener('resize',kasBoyut);
   setTimeout(kasBoyut,400);
+})();
+</script>
+
+<!-- ═══ VARDİYA & KONTROL LİSTESİ — personel giriş/çıkış + açılış/kapanış ═══
+     Config (personel + maddeler) RAPOR-API KV'den okunur; giriş/çıkış ve
+     işaretlemeler event-log'a (type vardiya/checklist, masa=null) yazılır. -->
+<script>
+(function(){
+  var VAR_KEY='cactus_vardiya_'+SUBE;
+  var _vconf={personel:[],acilis:[],kapanis:[]};
+  var _vsel=''; try{ _vsel=localStorage.getItem('cactus_vardiya_ben_'+SUBE)||''; }catch(e){}
+  function _esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function _saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+  // İş günü sınırı: sabah 05:00. 05:00 öncesi bir önceki güne sayılır (gece kapanışı doğru sayılsın).
+  function gunBasi(){ var d=new Date(); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
+  function bugunEv(){ var gb=gunBasi(); return (window._eventLog||[]).filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; }); }
+
+  window.vardiyaConfigYukle=function(cb){
+    fetch(FAV_API+'/menu/cek?sube='+VAR_KEY+'&t='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(d&&typeof d==='object'){
+        _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[] };
+      }
+      if(cb)cb();
+    }).catch(function(){ if(cb)cb(); });
+  };
+
+  window.vardiyaGoster=function(){ vardiyaRender(); vardiyaConfigYukle(function(){ vardiyaRender(); }); };
+  window.vardiyaPersonelSec=function(v){ _vsel=v||''; try{localStorage.setItem('cactus_vardiya_ben_'+SUBE,_vsel);}catch(e){} vardiyaRender(); };
+  window.vardiyaGiris=function(){ if(!_vsel){alert('Önce personel seçin');return;} _pushEvent('vardiya',null,{ad:_vsel,aksiyon:'giris'}); vardiyaRender(); };
+  window.vardiyaCikis=function(){ if(!_vsel){alert('Önce personel seçin');return;} _pushEvent('vardiya',null,{ad:_vsel,aksiyon:'cikis'}); vardiyaRender(); };
+  window.vardiyaTik=function(tur,idx){
+    if(!_vsel){ alert('Önce personel seçin'); return; }
+    var madde=(_vconf[tur]||[])[idx]; if(madde==null) return;
+    var last=null; bugunEv().forEach(function(e){ if(e.type==='checklist'&&e.payload&&e.payload.tur===tur&&e.payload.madde===madde){ if(!last||e.ts>last.ts) last=e; } });
+    var yeni=!(last&&last.payload.done);
+    _pushEvent('checklist',null,{ad:_vsel,tur:tur,madde:madde,done:yeni});
+    vardiyaRender();
+  };
+
+  function vardiyaRender(){
+    var scr=document.getElementById('scr-var'); if(!scr) return;
+    var uy=document.getElementById('var-config-uyari');
+    var bos=!_vconf.personel.length && !_vconf.acilis.length && !_vconf.kapanis.length;
+    if(uy) uy.style.display=bos?'block':'none';
+    var sel=document.getElementById('var-personel');
+    if(sel){ sel.innerHTML='<option value="">— Personel seç —</option>'+_vconf.personel.map(function(p){return '<option value="'+_esc(p)+'"'+(p===_vsel?' selected':'')+'>'+_esc(p)+'</option>';}).join(''); }
+    vardiyaDurumRender(); vardiyaListe('acilis'); vardiyaListe('kapanis'); vardiyaIcerde();
+  }
+  function vardiyaDurumRender(){
+    var el=document.getElementById('var-durum'), gEl=document.getElementById('var-giris'), cEl=document.getElementById('var-cikis');
+    if(!el) return;
+    if(!_vsel){ el.innerHTML='<span style="color:var(--k2)">Vardiya işlemi için personel seçin.</span>'; if(gEl)gEl.disabled=true; if(cEl)cEl.disabled=true; return; }
+    var evs=bugunEv().filter(function(e){return e.type==='vardiya'&&e.payload&&e.payload.ad===_vsel;}).sort(function(a,b){return a.ts-b.ts;});
+    var last=evs[evs.length-1]; var icerde=!!(last&&last.payload.aksiyon==='giris');
+    el.innerHTML = icerde ? ('🟢 <b>'+_esc(_vsel)+'</b> — vardiyada ('+_saat(last.ts)+' giriş)')
+      : (last ? ('⚪ <b>'+_esc(_vsel)+'</b> — çıkış yapıldı ('+_saat(last.ts)+')') : ('⚪ <b>'+_esc(_vsel)+'</b> — bugün henüz giriş yok'));
+    if(gEl)gEl.disabled=icerde; if(cEl)cEl.disabled=!icerde;
+  }
+  function vardiyaListe(tur){
+    var cont=document.getElementById('var-'+tur); if(!cont) return;
+    var items=_vconf[tur]||[]; var evs=bugunEv().filter(function(e){return e.type==='checklist'&&e.payload&&e.payload.tur===tur;});
+    var done=0;
+    cont.innerHTML = items.length ? items.map(function(m,i){
+      var last=null; evs.forEach(function(e){ if(e.payload.madde===m && (!last||e.ts>last.ts)) last=e; });
+      var isDone=!!(last&&last.payload.done); if(isDone) done++;
+      var who=isDone?('<span class="var-who">'+_esc(last.payload.ad||'')+' · '+_saat(last.ts)+'</span>'):'';
+      return '<div class="var-item'+(isDone?' done':'')+'" onclick="vardiyaTik(\''+tur+'\','+i+')"><span class="var-chk">'+(isDone?'✓':'')+'</span><span class="var-mad">'+_esc(m)+'</span>'+who+'</div>';
+    }).join('') : '<div style="color:var(--k2);font-size:13px;padding:6px 0;">Madde tanımlı değil.</div>';
+    var say=document.getElementById('var-'+tur+'-say'); if(say) say.textContent=items.length?(done+'/'+items.length):'';
+  }
+  function vardiyaIcerde(){
+    var el=document.getElementById('var-icerdekiler'); if(!el) return;
+    var byAd={}; bugunEv().filter(function(e){return e.type==='vardiya'&&e.payload&&e.payload.ad;}).sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){ byAd[e.payload.ad]=e; });
+    var icerde=Object.keys(byAd).filter(function(ad){return byAd[ad].payload.aksiyon==='giris';});
+    el.innerHTML = icerde.length ? icerde.map(function(ad){return '<span class="var-tag">🟢 '+_esc(ad)+' · '+_saat(byAd[ad].ts)+'</span>';}).join('') : '<span style="color:var(--k2)">Şu an vardiyada kimse yok.</span>';
+  }
+  // Açık ekranı 3 sn'de bir tazele (diğer cihazların işaretlemeleri _evSync ile gelir)
+  setInterval(function(){ var s=document.getElementById('scr-var'); if(s && s.classList.contains('on')) vardiyaRender(); }, 3000);
 })();
 </script>
 </body>

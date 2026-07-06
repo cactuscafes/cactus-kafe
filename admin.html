@@ -1184,16 +1184,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
         <div class="vad-blok" style="margin-top:24px;">
           <div class="vad-blok-ttl">📲 WhatsApp Bildirimi</div>
-          <div class="psub" style="margin-bottom:12px;">Personel giriş yaptığında buraya bildirim gelir. <b>CallMeBot</b> ile çalışır (ücretsiz): <b>callmebot.com/blog/free-api-whatsapp-messages</b> adresindeki adımları izle — WhatsApp'tan verilen numaraya <i>"I allow callmebot to send me messages"</i> yaz, dönen API anahtarını ve kendi WhatsApp numaranı aşağı gir.</div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:180px;">
-              <label style="font-size:12px;color:var(--mist);display:block;margin-bottom:4px;">Telefon (WhatsApp)</label>
-              <input id="vadWaPhone" placeholder="905XXXXXXXXX" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid var(--line,#e0dbd3);border-radius:8px;font-size:14px;">
-            </div>
-            <div style="flex:1;min-width:180px;">
-              <label style="font-size:12px;color:var(--mist);display:block;margin-bottom:4px;">CallMeBot API Key</label>
-              <input id="vadWaApikey" placeholder="123456" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid var(--line,#e0dbd3);border-radius:8px;font-size:14px;">
-            </div>
+          <div class="psub" style="margin-bottom:10px;">Personel giriş/çıkış yaptığında telefonuna anlık WhatsApp gelir — <b>raporlarının gittiği aynı WhatsApp hattı</b> (Green API) kullanılır, ayrı bir kurulum yok.</div>
+          <div id="vadWaDurum" style="font-size:13px;font-weight:600;padding:10px 13px;border-radius:9px;margin-bottom:12px;background:#f1f5f9;color:#475569;">⏳ Durum kontrol ediliyor…</div>
+          <div style="max-width:320px;">
+            <label style="font-size:12px;color:var(--mist);display:block;margin-bottom:4px;">Bildirim numarası — bu şube için (boş = rapor numaran)</label>
+            <input id="vadWaPhone" placeholder="905XXXXXXXXX" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid var(--line,#e0dbd3);border-radius:8px;font-size:14px;">
+            <div style="font-size:11px;color:var(--mist);margin-top:5px;line-height:1.5;">Boş bırakırsan raporların gittiği numaraya gelir. FSM ve Podyum için farklı numara istersen buraya yaz.</div>
           </div>
         </div>
 
@@ -4432,7 +4428,7 @@ if('serviceWorker' in navigator){
   var VAD_DEF_ACILIS=['Makineleri çalıştır / ısıt','Vitrini ve teşhiri hazırla','Kasayı ve para üstünü kontrol et','Zemini ve masaları sil','Müzik ve ışıkları aç','Eksik / stok kontrolü'];
   var VAD_DEF_KAPANIS=['Kasayı say ve kapat','Kahve makinelerini temizle','Buzdolabı / vitrin kontrolü','Çöpleri çıkar','Zemini temizle','Cihazları ve ışıkları kapat','Kapıyı kilitle'];
   var _vadSube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='fsm')?'fsm':'podyum';
-  var _vadConf={personel:[],acilis:[],kapanis:[],wa_phone:'',wa_apikey:''};
+  var _vadConf={personel:[],acilis:[],kapanis:[],wa_phone:''};
   var _vadLastEv=null;
   var _vadPoll=null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -4469,12 +4465,23 @@ if('serviceWorker' in navigator){
         personel:(d&&d.ok)?_vadNormPersonel(d.personel):[],
         acilis:(d&&d.ok&&Array.isArray(d.acilis)&&d.acilis.length)?d.acilis:(bosGeldi?VAD_DEF_ACILIS.slice():[]),
         kapanis:(d&&d.ok&&Array.isArray(d.kapanis)&&d.kapanis.length)?d.kapanis:(bosGeldi?VAD_DEF_KAPANIS.slice():[]),
-        wa_phone:(d&&d.ok&&d.wa_phone)?String(d.wa_phone):'',
-        wa_apikey:(d&&d.ok&&d.wa_apikey)?String(d.wa_apikey):''
+        wa_phone:(d&&d.ok&&d.wa_phone)?String(d.wa_phone):''
       };
       vardiyaEditorRender();
+      vardiyaWaDurumRender(d&&d.ok?d:null);
       if(_vadLastEv) vardiyaCanliRender(_vadLastEv); // config gelince canlı bloğu maddelerle tazele
-    }).catch(function(){ _vadConf={personel:[],acilis:VAD_DEF_ACILIS.slice(),kapanis:VAD_DEF_KAPANIS.slice(),wa_phone:'',wa_apikey:''}; vardiyaEditorRender(); if(_vadLastEv) vardiyaCanliRender(_vadLastEv); });
+    }).catch(function(){ _vadConf={personel:[],acilis:VAD_DEF_ACILIS.slice(),kapanis:VAD_DEF_KAPANIS.slice(),wa_phone:''}; vardiyaEditorRender(); vardiyaWaDurumRender(null); if(_vadLastEv) vardiyaCanliRender(_vadLastEv); });
+  }
+  function vardiyaWaDurumRender(d){
+    var el=document.getElementById('vadWaDurum'); if(!el) return;
+    if(d && d.wa_ready){
+      var hedef = _vadConf.wa_phone ? _vadConf.wa_phone : (d.wa_default||'kayıtlı numaran');
+      el.style.background='#dcfce7'; el.style.color='#166534';
+      el.innerHTML='✅ Bağlı — bildirimler '+esc(hedef)+' numarasına gidecek (raporlarla aynı WhatsApp).';
+    } else {
+      el.style.background='#fef3c7'; el.style.color='#92400e';
+      el.innerHTML='⚠️ WhatsApp henüz bağlı değil. Raporların çalıştığına göre bilgiler mevcut — <b>cactus-kafe</b> worker\'ına aynı Green API secret\'larını bir kez ekle: <code style="background:#fff7d6;padding:1px 5px;border-radius:3px;">GREEN_INSTANCE</code>, <code style="background:#fff7d6;padding:1px 5px;border-radius:3px;">GREEN_TOKEN</code>, <code style="background:#fff7d6;padding:1px 5px;border-radius:3px;">WA_PHONE</code>.';
+    }
   }
   function vardiyaEditorRender(){
     var pEl=document.getElementById('vadPersonel');
@@ -4488,7 +4495,6 @@ if('serviceWorker' in navigator){
       el.innerHTML=arr.length? arr.map(function(x,i){ return '<div class="vad-li"><span class="txt">'+esc(x)+'</span><button onclick="vardiyaSil(\''+tur+'\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
     });
     var wp=document.getElementById('vadWaPhone'); if(wp) wp.value=_vadConf.wa_phone||'';
-    var wk=document.getElementById('vadWaApikey'); if(wk) wk.value=_vadConf.wa_apikey||'';
   }
   window.vardiyaEkle=function(tur){
     if(tur==='personel'){
@@ -4510,13 +4516,12 @@ if('serviceWorker' in navigator){
   window.vardiyaSil=function(tur,idx){ if(Array.isArray(_vadConf[tur])){ _vadConf[tur].splice(idx,1); vardiyaEditorRender(); } };
   window.vardiyaConfigKaydet=function(){
     var el=document.getElementById('vadKayitDurum'); if(el){ el.textContent='Kaydediliyor…'; el.style.color='var(--mist)'; }
-    var wp=document.getElementById('vadWaPhone'), wk=document.getElementById('vadWaApikey');
+    var wp=document.getElementById('vadWaPhone');
     _vadConf.wa_phone=(wp&&wp.value||'').replace(/\D/g,'');
-    _vadConf.wa_apikey=(wk&&wk.value||'').trim();
-    fetch(VAD_EV_API+'/api/vardiya',{method:'POST',headers:{'Content-Type':'application/json','X-Cactus-Key':vadToken()},body:JSON.stringify({sube:_vadSube,personel:_vadConf.personel,acilis:_vadConf.acilis,kapanis:_vadConf.kapanis,wa_phone:_vadConf.wa_phone,wa_apikey:_vadConf.wa_apikey})})
+    fetch(VAD_EV_API+'/api/vardiya',{method:'POST',headers:{'Content-Type':'application/json','X-Cactus-Key':vadToken()},body:JSON.stringify({sube:_vadSube,personel:_vadConf.personel,acilis:_vadConf.acilis,kapanis:_vadConf.kapanis,wa_phone:_vadConf.wa_phone})})
       .then(function(r){return r.json().catch(function(){return null;}).then(function(j){return {ok:r.ok,j:j};});})
       .then(function(res){
-        if(res.ok&&res.j&&res.j.ok){ if(el){ el.textContent='✅ Kaydedildi — adisyona yansıdı'; el.style.color='#2d7a3a'; } if(typeof toast==='function') toast('✅ Vardiya ayarları kaydedildi'); }
+        if(res.ok&&res.j&&res.j.ok){ if(el){ el.textContent='✅ Kaydedildi — adisyona yansıdı'; el.style.color='#2d7a3a'; } if(typeof toast==='function') toast('✅ Vardiya ayarları kaydedildi'); vardiyaConfigYukleAdmin(); }
         else { var m=(res.j&&res.j.error)||'Kaydedilemedi'; if(el){ el.textContent='⚠️ '+m; el.style.color='#c0392b'; } }
       })
       .catch(function(){ if(el){ el.textContent='⚠️ Kaydedilemedi'; el.style.color='#c0392b'; } });

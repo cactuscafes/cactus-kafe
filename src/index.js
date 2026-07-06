@@ -59,12 +59,30 @@ async function getVardiyaCfg(env, sube) {
         personel: Array.isArray(d.personel) ? d.personel : [],
         acilis: Array.isArray(d.acilis) ? d.acilis : [],
         kapanis: Array.isArray(d.kapanis) ? d.kapanis : [],
+        // Bildirim numarası (boş → env.WA_PHONE, yani raporların gittiği numara)
         wa_phone: d.wa_phone || '',
-        wa_apikey: d.wa_apikey || '',
       };
     }
   } catch (e) {}
-  return { personel: [], acilis: [], kapanis: [], wa_phone: '', wa_apikey: '' };
+  return { personel: [], acilis: [], kapanis: [], wa_phone: '' };
+}
+// WhatsApp gönderimi — raporlarla AYNI kanal: Green API (rapor-api'deki whatsappGonder ile birebir).
+// Kimlik bilgileri worker secret'larından okunur (GREEN_INSTANCE, GREEN_TOKEN, WA_PHONE) —
+// raporlar için zaten kurulu; ayrıca kurulum gerekmez. Alıcı: cfg.wa_phone varsa o, yoksa env.WA_PHONE.
+async function vardiyaWhatsapp(env, mesaj, phone) {
+  const tel = (phone || env.WA_PHONE || '').replace(/\D/g, '');
+  if (!env.GREEN_INSTANCE || !env.GREEN_TOKEN || !tel) return null;
+  const chatId = tel + '@c.us';
+  try {
+    const res = await fetch('https://api.green-api.com/waInstance' + env.GREEN_INSTANCE + '/sendMessage/' + env.GREEN_TOKEN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatId, message: mesaj }),
+    });
+    return { ok: res.ok };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
 }
 
 async function postEvent(env, evt) {
@@ -247,8 +265,8 @@ export default {
 
     // ─── /api/vardiya — personel/PIN + checklist + WhatsApp config ───
     // GET  ?sube=X            → PUBLIC: { personel:[ad], acilis, kapanis } (PIN'siz)
-    // GET  ?sube=X&full=1     → AUTH (X-Cactus-Key): tam config (PIN + WhatsApp dahil)
-    // POST { sube, personel:[{ad,pin}], acilis, kapanis, wa_phone, wa_apikey } → AUTH: kaydet
+    // GET  ?sube=X&full=1     → AUTH (X-Cactus-Key): tam config (PIN + bildirim numarası dahil)
+    // POST { sube, personel:[{ad,pin}], acilis, kapanis, wa_phone } → AUTH: kaydet
     if (url.pathname === '/api/vardiya') {
       try {
         await ensureVardiyaTable(env);
@@ -259,9 +277,11 @@ export default {
           if (url.searchParams.get('full') === '1') {
             const token = request.headers.get('X-Cactus-Key') || '';
             if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
-            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_apikey: cfg.wa_apikey }, 200, NO_STORE);
+            // wa_ready: worker'da Green API secret'ları kurulu mu (raporlarla aynı) — kurulum ipucu için
+            const waReady = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN && (cfg.wa_phone || env.WA_PHONE));
+            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_default: env.WA_PHONE ? (String(env.WA_PHONE).slice(0, 6) + '••••') : '', wa_ready: waReady }, 200, NO_STORE);
           }
-          // Herkese açık: sadece isimler + maddeler (PIN ve WhatsApp asla dönmez)
+          // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez)
           return json({ ok: true, personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean), acilis: cfg.acilis, kapanis: cfg.kapanis }, 200, NO_STORE);
         }
         if (request.method === 'POST') {
@@ -275,7 +295,6 @@ export default {
             acilis: Array.isArray(body.acilis) ? body.acilis.map(String) : [],
             kapanis: Array.isArray(body.kapanis) ? body.kapanis.map(String) : [],
             wa_phone: String(body.wa_phone || '').replace(/\D/g, ''),
-            wa_apikey: String(body.wa_apikey || '').trim(),
           };
           await env.ADISYON_DB.prepare(
             `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES (?, ?, ?)
@@ -312,14 +331,14 @@ export default {
           `INSERT OR IGNORE INTO adisyon_events (id, sube, type, masa, payload, ts, server_ts, cihaz_id)
            VALUES (?, ?, 'vardiya', NULL, ?, ?, ?, ?)`
         ).bind(evtId, sube, JSON.stringify({ ad: ad, aksiyon: aksiyon }), now, now, String(body.cihaz_id || 'server')).run();
-        // WhatsApp bildirimi (CallMeBot) — apikey/telefon D1'de; fire-and-forget; sadece girişte
-        if (aksiyon === 'giris' && cfg.wa_phone && cfg.wa_apikey) {
+        // WhatsApp bildirimi — raporlarla AYNI kanal (Green API). Alıcı: cfg.wa_phone ya da env.WA_PHONE.
+        // Girişte 🟢, çıkışta 🔴. Fire-and-forget (ctx.waitUntil).
+        if (env.GREEN_INSTANCE && env.GREEN_TOKEN && (cfg.wa_phone || env.WA_PHONE)) {
           var subeAd = sube === 'fsm' ? 'FSM' : 'Podyumpark';
           var saat = '';
           try { saat = new Date(now).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }); } catch (e) { saat = ''; }
-          var msg = '🟢 ' + ad + ' vardiyaya giris yapti' + (saat ? ('\n' + subeAd + ' - ' + saat) : ('\n' + subeAd));
-          var waUrl = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(cfg.wa_phone) + '&text=' + encodeURIComponent(msg) + '&apikey=' + encodeURIComponent(cfg.wa_apikey);
-          ctx.waitUntil(fetch(waUrl).catch(function () {}));
+          var msg = (aksiyon === 'giris' ? '🟢 ' : '🔴 ') + ad + (aksiyon === 'giris' ? ' vardiyaya giriş yaptı' : ' vardiyadan çıkış yaptı') + '\n' + subeAd + (saat ? (' — ' + saat) : '');
+          ctx.waitUntil(vardiyaWhatsapp(env, msg, cfg.wa_phone).catch(function () {}));
         }
         return json({ ok: true, ts: now, aksiyon: aksiyon }, 200, NO_STORE);
       } catch (e) {

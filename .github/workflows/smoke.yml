@@ -1,0 +1,19 @@
+name: Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checklist tamamlama smoke test
+        run: |
+          echo "POST /api/events (kapanis checklist done)"
+          curl -sS -X POST "https://cactus-kafe.batuhanbulut.workers.dev/api/events" \
+            -H "Content-Type: application/json" \
+            -d "{\"events\":[{\"id\":\"smoke-cl-$(date +%s)\",\"sube\":\"podyum\",\"type\":\"checklist\",\"masa\":null,\"payload\":{\"ad\":\"__test\",\"tur\":\"kapanis\",\"madde\":\"Test kapanış maddesi\",\"done\":true},\"ts\":$(date +%s)000,\"cihaz_id\":\"smoke-ci2\"}]}"
+          echo
+          echo "GET /api/vardiya (public, config kontrol)"
+          curl -sS "https://cactus-kafe.batuhanbulut.workers.dev/api/vardiya?sube=podyum"
+          echo

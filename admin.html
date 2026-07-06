@@ -1014,6 +1014,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div class="brd-tabs">
           <button class="brd-tab on" id="brdTabFsm" onclick="bordroSube('fsm')">🏙 FSM</button>
           <button class="brd-tab" id="brdTabPodyum" onclick="bordroSube('podyum')">🌿 Podyumpark</button>
+          <span id="brdSync" style="font-size:11.5px;color:var(--mist);margin-left:6px;white-space:nowrap;"></span>
           <div style="flex:1"></div>
           <button class="brd-mini" onclick="bordroYedekAl()">⬇️ Yedek Al</button>
           <button class="brd-mini" onclick="document.getElementById('brdYedekDosya').click()">⬆️ Yedek Yükle</button>
@@ -1370,7 +1371,7 @@ function panelAc(id,el){
   if(id==='oncu'){ doldurDropdown(); renderOncuGrid(); }
   if(id==='rapor') rapGoster();
   if(id==='yogunluk') yogunlukYukle();
-  if(id==='bordro'){ if(typeof bordroRender==='function') bordroRender(); }
+  if(id==='bordro'){ if(typeof bordroAc==='function') bordroAc(); }
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
 
@@ -3853,7 +3854,52 @@ if('serviceWorker' in navigator){
    ═══════════════════════════════════════════════════════════════════════ */
 (function(){
   var BORDRO_SUBE=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='podyum')?'podyum':'fsm';
+  var API='/api/bordro';
+  var _dirty={}; // şube → yerelde gönderilmemiş değişiklik var mı
   function key(s){ return 'cactus_bordro_'+s; }
+  function token(){ try{ var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null'); return (t&&t.token)?t.token:''; }catch(e){ return ''; } }
+  function syncDurum(st){
+    var el=document.getElementById('brdSync'); if(!el) return;
+    var map={
+      yukleniyor:['⏳ Senkronlanıyor…','var(--mist)'],
+      ok:['☁️ Senkron','#2d7a3a'],
+      cevrimdisi:['⚠️ Çevrimdışı — yerel kayıt','#c0392b'],
+      hata:['⚠️ Sunucu hatası — yerel kayıt','#c0392b'],
+      yetki:['🔒 Oturum gerekli','#c0392b']
+    };
+    var m=map[st]||['',''];
+    el.textContent=m[0]; el.style.color=m[1];
+  }
+  function push(s,d){
+    syncDurum('yukleniyor');
+    return fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Cactus-Key':token()},body:JSON.stringify({sube:s,data:d})})
+      .then(function(r){
+        if(r.status===401){ _dirty[s]=true; syncDurum('yetki'); return; }
+        return r.json().then(function(j){
+          if(j&&j.ok){ _dirty[s]=false; syncDurum('ok'); }
+          else { _dirty[s]=true; syncDurum('hata'); }
+        });
+      })
+      .catch(function(){ _dirty[s]=true; syncDurum('cevrimdisi'); });
+  }
+  function cek(s){
+    syncDurum('yukleniyor');
+    return fetch(API+'?sube='+s+'&t='+Date.now(),{cache:'no-store',headers:{'X-Cactus-Key':token()}})
+      .then(function(r){ if(r.status===401){ syncDurum('yetki'); return null; } return r.json(); })
+      .then(function(j){
+        if(!j){ return; }
+        if(!j.ok){ syncDurum('hata'); return; }
+        if(_dirty[s]){ // yerelde bekleyen değişiklik → sunucuyu ezme, tekrar gönder
+          push(s, yukle(s)); return;
+        }
+        if(j.data && (Array.isArray(j.data.personel)||Array.isArray(j.data.kayitlar))){
+          localStorage.setItem(key(s), JSON.stringify(j.data));
+        }
+        if(s===BORDRO_SUBE) bordroRender();
+        syncDurum('ok');
+      })
+      .catch(function(){ syncDurum('cevrimdisi'); });
+  }
   function bid(){ return 'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
   function bugun(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   // type=number '.' ondalık verir; olası ',' girişini de destekle
@@ -3869,7 +3915,11 @@ if('serviceWorker' in navigator){
     if(!Array.isArray(d.kayitlar)) d.kayitlar=[];
     return d;
   }
-  function kaydet(s,d){ try{ localStorage.setItem(key(s),JSON.stringify(d)); }catch(e){ toast('⚠️ Kaydedilemedi'); } }
+  function kaydet(s,d){
+    try{ localStorage.setItem(key(s),JSON.stringify(d)); }catch(e){ toast('⚠️ Yerel kayıt başarısız'); }
+    _dirty[s]=true;
+    push(s,d); // sunucuya senkron
+  }
 
   function hesap(d,pid){
     var hak=0,od=0;
@@ -3887,7 +3937,15 @@ if('serviceWorker' in navigator){
     var f=document.getElementById('brdTabFsm'), p=document.getElementById('brdTabPodyum');
     if(f) f.classList.toggle('on',BORDRO_SUBE==='fsm');
     if(p) p.classList.toggle('on',BORDRO_SUBE==='podyum');
+    bordroRender();      // önce yerel önbellekten anında göster
+    cek(BORDRO_SUBE);    // sonra sunucudan tazele
+  };
+  // Panel açılışı: anında yerelden göster + her iki şubeyi sunucudan tazele
+  window.bordroAc=function(){
     bordroRender();
+    cek(BORDRO_SUBE);
+    var diger=(BORDRO_SUBE==='fsm')?'podyum':'fsm';
+    setTimeout(function(){ cek(diger); },300); // diğer şubeyi de sessizce senkronla
   };
 
   window.bordroRender=function(){

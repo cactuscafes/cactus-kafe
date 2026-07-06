@@ -16,15 +16,32 @@
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Cactus-Key',
   'Access-Control-Max-Age': '86400',
 };
 
-function json(data, status = 200) {
+function json(data, status = 200, extraHeaders) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...CORS },
+    headers: { 'Content-Type': 'application/json', ...CORS, ...(extraHeaders || {}) },
   });
+}
+const NO_STORE = { 'Cache-Control': 'no-store, no-cache, must-revalidate' };
+
+// Yönetim doğrulama — bordro gibi gizli uçlar için.
+// rapor-api'nin auth'lı (/kart/listele) ucuna token ile proxy istek atıp
+// 200 dönerse yetkili sayarız. Herhangi bir hata/red → fail-closed (yetkisiz).
+const RAPOR_API_BASE = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+async function verifyYonetim(token) {
+  if (!token || String(token).length < 8) return false;
+  try {
+    const r = await fetch(RAPOR_API_BASE + '/kart/listele', {
+      headers: { 'X-Cactus-Key': String(token) },
+    });
+    return r.status === 200;
+  } catch (e) {
+    return false;
+  }
 }
 
 async function postEvent(env, evt) {
@@ -148,6 +165,61 @@ export default {
       } catch (e) {
         return json({ ok: false, error: String(e.message || e) }, 500);
       }
+    }
+
+    // ─── /api/bordro — maaş/bordro senkron (şube başına, auth'lı) ───
+    // GET  /api/bordro?sube=fsm|podyum   → { ok, data, updated_at }
+    // POST /api/bordro  { sube, data }   → { ok, updated_at }
+    // Kimlik: X-Cactus-Key header (yönetim token'ı). Yetkisiz → 401.
+    if (url.pathname === '/api/bordro') {
+      const token = request.headers.get('X-Cactus-Key') || '';
+      const yetkili = await verifyYonetim(token);
+      if (!yetkili) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+      try {
+        await env.ADISYON_DB.prepare(
+          `CREATE TABLE IF NOT EXISTS bordro_store (
+             sube TEXT PRIMARY KEY,
+             data TEXT NOT NULL,
+             updated_at INTEGER NOT NULL
+           )`
+        ).run();
+      } catch (e) {
+        return json({ ok: false, error: 'db init: ' + String(e && e.message || e) }, 500);
+      }
+
+      if (request.method === 'GET') {
+        const sube = url.searchParams.get('sube') || '';
+        if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400);
+        try {
+          const row = await env.ADISYON_DB.prepare(
+            `SELECT data, updated_at FROM bordro_store WHERE sube = ?`
+          ).bind(sube).first();
+          let data = null;
+          if (row && row.data) { try { data = JSON.parse(row.data); } catch (e) { data = null; } }
+          return json({ ok: true, data, updated_at: row ? row.updated_at : 0 }, 200, NO_STORE);
+        } catch (e) {
+          return json({ ok: false, error: String(e && e.message || e) }, 500);
+        }
+      }
+
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          const sube = body.sube;
+          if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400);
+          const data = (body.data && typeof body.data === 'object') ? body.data : { personel: [], kayitlar: [] };
+          const now = Date.now();
+          await env.ADISYON_DB.prepare(
+            `INSERT INTO bordro_store (sube, data, updated_at) VALUES (?, ?, ?)
+             ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
+          ).bind(sube, JSON.stringify(data), now).run();
+          return json({ ok: true, updated_at: now });
+        } catch (e) {
+          return json({ ok: false, error: String(e && e.message || e) }, 400);
+        }
+      }
+
+      return json({ ok: false, error: 'method not allowed' }, 405);
     }
 
     // Diğer her şey → statik dosya

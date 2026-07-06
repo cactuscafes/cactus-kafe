@@ -59,12 +59,14 @@ async function getVardiyaCfg(env, sube) {
         personel: Array.isArray(d.personel) ? d.personel : [],
         acilis: Array.isArray(d.acilis) ? d.acilis : [],
         kapanis: Array.isArray(d.kapanis) ? d.kapanis : [],
-        // Bildirim numarası (boş → env.WA_PHONE, yani raporların gittiği numara)
+        // Bildirim numarası (boş → genel numara: env.WA_PHONE ya da D1 '_wa_')
         wa_phone: d.wa_phone || '',
+        // Geç kalma uyarı saati "HH:MM" İstanbul (boş = kapalı)
+        gec_saat: d.gec_saat || '',
       };
     }
   } catch (e) {}
-  return { personel: [], acilis: [], kapanis: [], wa_phone: '' };
+  return { personel: [], acilis: [], kapanis: [], wa_phone: '', gec_saat: '' };
 }
 // WhatsApp gönderimi — raporlarla AYNI kanal: Green API (rapor-api'deki whatsappGonder ile birebir).
 // Kimlik bilgileri: önce worker secret'ları (GREEN_INSTANCE/GREEN_TOKEN/WA_PHONE),
@@ -103,6 +105,179 @@ async function vardiyaWhatsapp(instance, token, phone, mesaj) {
   } catch (e) {
     return { ok: false, error: e.message };
   }
+}
+
+// ─── Vardiya bildirim otomasyonu: gece özeti + geç kalma uyarısı + checklist tamam mesajı ───
+const TR_MS = 3 * 3600 * 1000; // Türkiye UTC+3 (sabit, yaz saati yok)
+function gunBasiMs(ms) {
+  // İş günü sınırı 05:00 İstanbul → bu iş gününün başlangıcı (UTC ms)
+  const d = new Date(ms + TR_MS);
+  let bas = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 5, 0, 0) - TR_MS;
+  if (ms < bas) bas -= 86400000;
+  return bas;
+}
+function isTarih(gbMs) {
+  // İş günü etiketi YYYY-MM-DD (İstanbul takvimi)
+  const d = new Date(gbMs + TR_MS);
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
+}
+function saatStr(ts) {
+  try { return new Date(ts).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }); } catch (e) { return ''; }
+}
+function subeAdi(sube) { return sube === 'fsm' ? 'FSM' : 'Podyumpark'; }
+
+// Bildirim defteri (hangi gün ne gönderildi) — vardiya_ayar '_durum_' satırı
+async function getVardiyaDurum(env) {
+  try {
+    const row = await env.ADISYON_DB.prepare(`SELECT data FROM vardiya_ayar WHERE sube = '_durum_'`).first();
+    if (row && row.data) return JSON.parse(row.data) || {};
+  } catch (e) {}
+  return {};
+}
+async function setVardiyaDurum(env, obj) {
+  await env.ADISYON_DB.prepare(
+    `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES ('_durum_', ?, ?)
+     ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
+  ).bind(JSON.stringify(obj), Date.now()).run();
+}
+
+// Günlük özet metni: kişi bazında giriş/çıkış seansları + checklist durumu
+async function vardiyaOzetOlustur(env, sube, basTs, bitTs, cfg) {
+  const rows = await env.ADISYON_DB.prepare(
+    `SELECT type, payload, ts FROM adisyon_events
+      WHERE sube = ? AND type IN ('vardiya','checklist') AND ts >= ? AND ts < ?
+      ORDER BY ts ASC`
+  ).bind(sube, basTs, bitTs).all();
+  const evs = [];
+  for (const r of (rows.results || [])) {
+    let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
+    if (p) evs.push({ type: r.type, p: p, ts: r.ts });
+  }
+  if (!evs.length) return null;
+  const d = new Date(basTs + TR_MS);
+  const tarihStr = String(d.getUTCDate()).padStart(2, '0') + '.' + String(d.getUTCMonth() + 1).padStart(2, '0');
+  const satirlar = ['📋 Vardiya özeti — ' + subeAdi(sube) + ' (' + tarihStr + ')'];
+  const kisiler = {}; const sira = [];
+  for (const e of evs) {
+    if (e.type !== 'vardiya' || !e.p.ad) continue;
+    if (!kisiler[e.p.ad]) { kisiler[e.p.ad] = []; sira.push(e.p.ad); }
+    kisiler[e.p.ad].push(e);
+  }
+  for (const ad of sira) {
+    const seg = []; let acik = null;
+    for (const e of kisiler[ad]) {
+      if (e.p.aksiyon === 'giris') { if (acik === null) acik = e.ts; }
+      else if (e.p.aksiyon === 'cikis' && acik !== null) { seg.push(saatStr(acik) + '–' + saatStr(e.ts)); acik = null; }
+    }
+    if (acik !== null) seg.push(saatStr(acik) + '–? (çıkış işaretlenmemiş ⚠️)');
+    if (seg.length) satirlar.push('👤 ' + ad + ': ' + seg.join(', '));
+  }
+  if (sira.length === 0) satirlar.push('👤 Giriş/çıkış kaydı yok.');
+  for (const tur of ['acilis', 'kapanis']) {
+    const items = (cfg && cfg[tur]) || [];
+    if (!items.length) continue;
+    const son = {};
+    for (const e of evs) { if (e.type === 'checklist' && e.p.tur === tur) son[e.p.madde] = !!e.p.done; }
+    const biten = items.filter(function (m) { return son[m]; }).length;
+    satirlar.push((tur === 'acilis' ? '🌅 Açılış: ' : '🌙 Kapanış: ') + biten + '/' + items.length + (biten === items.length ? ' ✅' : ' ⚠️'));
+  }
+  return satirlar.join('\n');
+}
+
+// Cron (10 dk'da bir): 05:00–05:30 arası dünün özeti; gec_saat geçtiyse giriş kontrolü
+async function vardiyaZamanliKontrol(env) {
+  await ensureVardiyaTable(env);
+  const now = Date.now();
+  const gb = gunBasiMs(now);
+  const tarih = isTarih(gb);
+  const ist = new Date(now + TR_MS);
+  const dakika = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+  const durum = await getVardiyaDurum(env);
+  let degisti = false;
+  for (const sube of ['fsm', 'podyum']) {
+    const cfg = await getVardiyaCfg(env, sube);
+    const wa = await resolveWa(env, cfg);
+    const hazir = !!(wa.instance && wa.token && wa.phone);
+    // 1) Gece özeti — yeni iş günü başlar başlamaz (05:00–05:30) biten günü özetle
+    if (dakika >= 300 && dakika < 330 && durum['ozet_' + sube] !== tarih) {
+      if (hazir) {
+        const msg = await vardiyaOzetOlustur(env, sube, gb - 86400000, gb, cfg);
+        if (msg) await vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg);
+      }
+      durum['ozet_' + sube] = tarih; degisti = true;
+    }
+    // 2) Geç kalma — gec_saat (İstanbul) geçti, bugün hiç vardiya kaydı yoksa uyar (günde bir kez)
+    if (cfg.gec_saat && durum['gec_' + sube] !== tarih) {
+      const m = /^(\d{1,2}):(\d{2})$/.exec(cfg.gec_saat);
+      if (m) {
+        const esik = Number(m[1]) * 60 + Number(m[2]);
+        // 05:00 öncesi eşikler iş günü sınırıyla çakışır → yok say
+        if (esik >= 300 && dakika >= esik) {
+          const giren = await env.ADISYON_DB.prepare(
+            `SELECT 1 AS v FROM adisyon_events WHERE sube = ? AND type = 'vardiya' AND ts >= ? LIMIT 1`
+          ).bind(sube, gb).first();
+          if (!giren && hazir) {
+            await vardiyaWhatsapp(wa.instance, wa.token, wa.phone,
+              '⚠️ ' + subeAdi(sube) + ' — saat ' + cfg.gec_saat + ' geçti, bugün henüz vardiya girişi yapılmadı.');
+          }
+          durum['gec_' + sube] = tarih; degisti = true;
+        }
+      }
+    }
+  }
+  if (degisti) await setVardiyaDurum(env, durum);
+}
+
+// Event kancası: gelen batch'te done=true checklist varsa liste tamamlandı mı bak (günde 1 bildirim)
+function vardiyaChecklistKancasi(env, ctx, events) {
+  const gorulen = {};
+  for (const evt of (events || [])) {
+    if (!evt || evt.type !== 'checklist') continue;
+    let p = evt.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+    if (!p || !p.done) continue;
+    const tur = (p.tur === 'kapanis' || p.tur === 'acilis') ? p.tur : '';
+    const sube = (evt.sube === 'fsm' || evt.sube === 'podyum') ? evt.sube : '';
+    if (tur && sube) gorulen[sube + ':' + tur] = true;
+  }
+  const anahtarlar = Object.keys(gorulen);
+  if (anahtarlar.length) ctx.waitUntil(vardiyaChecklistKontrol(env, anahtarlar).catch(function () {}));
+}
+async function vardiyaChecklistKontrol(env, anahtarlar) {
+  await ensureVardiyaTable(env);
+  const now = Date.now();
+  const gb = gunBasiMs(now);
+  const tarih = isTarih(gb);
+  let durum = null, degisti = false;
+  for (const k of anahtarlar) {
+    const parca = k.split(':'); const sube = parca[0], tur = parca[1];
+    const cfg = await getVardiyaCfg(env, sube);
+    const items = cfg[tur] || [];
+    if (!items.length) continue;
+    if (durum === null) durum = await getVardiyaDurum(env);
+    const dk = 'cl_' + tur + '_' + sube;
+    if (durum[dk] === tarih) continue; // bugün zaten bildirildi
+    const rows = await env.ADISYON_DB.prepare(
+      `SELECT payload, ts FROM adisyon_events WHERE sube = ? AND type = 'checklist' AND ts >= ? ORDER BY ts ASC`
+    ).bind(sube, gb).all();
+    const son = {}; let sonTs = 0; let sonAd = '';
+    for (const r of (rows.results || [])) {
+      let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
+      if (!p || p.tur !== tur) continue;
+      son[p.madde] = !!p.done;
+      if (p.done && r.ts > sonTs) { sonTs = r.ts; sonAd = p.ad || ''; }
+    }
+    if (items.filter(function (m) { return son[m]; }).length !== items.length) continue; // henüz tamam değil
+    const wa = await resolveWa(env, cfg);
+    if (wa.instance && wa.token && wa.phone) {
+      const saat = saatStr(sonTs || now);
+      const msg = (tur === 'kapanis' ? '🌙 Kapanış tamamlandı ✅' : '🌅 Açılış hazırlıkları tamam ✅')
+        + '\n' + subeAdi(sube) + ' — ' + items.length + '/' + items.length + ' madde'
+        + (sonAd ? (' (son: ' + sonAd + ')') : '') + ' — ' + saat;
+      await vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg);
+    }
+    durum[dk] = tarih; degisti = true;
+  }
+  if (degisti && durum) await setVardiyaDurum(env, durum);
 }
 
 async function postEvent(env, evt) {
@@ -147,7 +322,9 @@ export default {
     if (url.pathname === '/api/event' && request.method === 'POST') {
       try {
         const body = await request.json();
-        const res = await postEvent(env, body.event || body);
+        const evt = body.event || body;
+        const res = await postEvent(env, evt);
+        if (res.ok) vardiyaChecklistKancasi(env, ctx, [evt]);
         return json(res, res.ok ? 200 : 400);
       } catch (e) {
         return json({ ok: false, error: String(e.message || e) }, 400);
@@ -169,6 +346,7 @@ export default {
             if (res.ok && res.accepted) accepted++;
             else if (!res.ok) lastErr = res.error;
           }
+          vardiyaChecklistKancasi(env, ctx, events);
           return json({ ok: true, accepted, total: events.length, error: lastErr });
         } catch (e) {
           return json({ ok: false, error: String(e.message || e) }, 400);
@@ -304,7 +482,7 @@ export default {
             // green_set: kimlik zaten kayıtlı mı (token asla dönmez); env_wa: secret'lardan mı geliyor
             const greenSet = !!(wa.instance && wa.token);
             const envWa = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN);
-            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
+            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, gec_saat: cfg.gec_saat, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
           }
           // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez)
           return json({ ok: true, personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean), acilis: cfg.acilis, kapanis: cfg.kapanis }, 200, NO_STORE);
@@ -315,11 +493,13 @@ export default {
           const body = await request.json();
           const sube = body.sube;
           if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+          const gecSaat = String(body.gec_saat || '').trim();
           const cfg = {
             personel: Array.isArray(body.personel) ? body.personel.map(function (p) { return { ad: String((p && p.ad) || '').trim(), pin: String((p && p.pin) || '').trim() }; }).filter(function (p) { return p.ad; }) : [],
             acilis: Array.isArray(body.acilis) ? body.acilis.map(String) : [],
             kapanis: Array.isArray(body.kapanis) ? body.kapanis.map(String) : [],
             wa_phone: String(body.wa_phone || '').replace(/\D/g, ''),
+            gec_saat: /^\d{1,2}:\d{2}$/.test(gecSaat) ? gecSaat : '',
           };
           await env.ADISYON_DB.prepare(
             `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES (?, ?, ?)
@@ -391,5 +571,10 @@ export default {
 
     // Diğer her şey → statik dosya
     return env.ASSETS.fetch(request);
+  },
+
+  // Cron (wrangler.toml [triggers]): gece özeti + geç kalma uyarısı
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(vardiyaZamanliKontrol(env).catch(function () {}));
   },
 };

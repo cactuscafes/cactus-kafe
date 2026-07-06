@@ -996,10 +996,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         #panel-bordro .brd-sil{margin-left:auto;background:none;border:none;cursor:pointer;font-size:15px;opacity:.55;}
         #panel-bordro .brd-sil:hover{opacity:1;}
         #panel-bordro .brd-mini-ozet{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line);}
-        #panel-bordro .brd-satir{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+        #panel-bordro .brd-satir{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
         #panel-bordro .brd-satir input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--surface);color:var(--ink);}
-        #panel-bordro .brd-btn-cal{background:var(--brand);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
-        #panel-bordro .brd-btn-od{background:#b8965a;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-bordro .brd-satir input[type="date"]{flex:1 1 132px;min-width:120px;}
+        #panel-bordro .brd-say{flex:1 1 78px;min-width:64px;}
+        #panel-bordro .brd-grup-et{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mist);width:60px;flex:none;}
+        #panel-bordro .brd-btn-cal{background:var(--brand);color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        #panel-bordro .brd-btn-od{background:#b8965a;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
         #panel-bordro .brd-kayit{display:flex;align-items:center;gap:10px;font-size:12px;padding:7px 0;border-top:1px solid var(--paper);flex-wrap:wrap;}
         #panel-bordro .brd-kayit .tur{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:100px;}
         #panel-bordro .brd-kayit .tur.cal{background:rgba(45,90,39,.12);color:var(--brand);}
@@ -1007,6 +1010,25 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         #panel-bordro .brd-kayit .ksil{background:none;border:none;cursor:pointer;opacity:.5;font-size:13px;}
         #panel-bordro .brd-kayit .ksil:hover{opacity:1;}
         #panel-bordro .brd-bos{color:var(--mist);font-size:13px;padding:18px 0;}
+        /* ── Mobil: büyük dokunma hedefleri, net gruplar, iOS zoom engeli (16px) ── */
+        @media(max-width:560px){
+          #panel-bordro .brd-card{padding:16px 14px;}
+          #panel-bordro .brd-tab,#panel-bordro .brd-mini{min-height:42px;display:inline-flex;align-items:center;}
+          #panel-bordro .brd-ozet-strip{grid-template-columns:1fr 1fr;gap:10px;}
+          #panel-bordro .brd-ekle-personel{gap:10px;}
+          #panel-bordro .brd-ekle-personel .brd-inp{flex:1 1 100%;min-height:48px;font-size:16px;box-sizing:border-box;}
+          #panel-bordro .brd-ekle-personel .btn-primary{flex:1 1 100%;width:100%;min-height:50px;}
+          #panel-bordro .brd-satir{gap:8px;align-items:stretch;}
+          #panel-bordro .brd-grup-et{width:100%;flex:1 1 100%;margin-bottom:-2px;}
+          #panel-bordro .brd-satir input{min-height:48px;font-size:16px;box-sizing:border-box;}
+          #panel-bordro .brd-satir input[type="date"]{flex:1 1 46%;}
+          #panel-bordro .brd-say{flex:1 1 46%;}
+          #panel-bordro .brd-satir button{flex:1 1 100%;min-height:48px;font-size:15px;}
+          #panel-bordro .brd-ucret{min-height:44px;font-size:16px;width:110px;}
+          #panel-bordro .brd-sil,#panel-bordro .brd-kayit .ksil{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;}
+          #panel-bordro .brd-kayit{gap:8px 10px;font-size:12.5px;padding:10px 0;}
+          #panel-bordro .brd-mini-ozet{gap:12px 16px;font-size:13px;}
+        }
         </style>
         <div class="pttl">💰 Maaş / Bordro</div>
         <div class="psub">Personelin <b>saatlik ücretini</b> gir; çalışma saatinden hak ediş <b>otomatik</b> hesaplanır. Verdiğin ödemeleri işle, <b>kalan bakiyeyi</b> takip et. FSM ve Podyum ayrı tutulur. Veriler bu cihazın tarayıcısında saklanır — düzenli <b>yedek al</b>.</div>
@@ -3989,13 +4011,16 @@ if('serviceWorker' in navigator){
         +'<span>Kalan: <b style="color:'+(h.kalan>0.005?'#c0392b':'var(--brand)')+'">'+tl(h.kalan)+'</b></span>'
       +'</div>'
       +'<div class="brd-satir">'
+        +'<span class="brd-grup-et">Çalışma</span>'
         +'<input type="date" id="cal-t-'+p.id+'" value="'+bugun()+'">'
-        +'<input type="number" id="cal-s-'+p.id+'" min="0" step="0.25" placeholder="Saat" style="width:90px">'
-        +'<button class="brd-btn-cal" onclick="bordroCalismaEkle(\''+p.id+'\')">+ Çalışma</button>'
-        +'<span style="width:12px"></span>'
+        +'<input type="number" id="cal-s-'+p.id+'" min="0" step="0.25" placeholder="Saat" class="brd-say">'
+        +'<button class="brd-btn-cal" onclick="bordroCalismaEkle(\''+p.id+'\')">+ Ekle</button>'
+      +'</div>'
+      +'<div class="brd-satir">'
+        +'<span class="brd-grup-et">Ödeme</span>'
         +'<input type="date" id="od-t-'+p.id+'" value="'+bugun()+'">'
-        +'<input type="number" id="od-a-'+p.id+'" min="0" step="0.01" placeholder="Ödeme ₺" style="width:112px">'
-        +'<button class="brd-btn-od" onclick="bordroOdemeEkle(\''+p.id+'\')">+ Ödeme</button>'
+        +'<input type="number" id="od-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say">'
+        +'<button class="brd-btn-od" onclick="bordroOdemeEkle(\''+p.id+'\')">+ Ekle</button>'
       +'</div>'
       +'<div class="brd-kayitlar">'+kyHtml+'</div>'
     +'</div>';

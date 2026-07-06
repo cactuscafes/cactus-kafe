@@ -1013,7 +1013,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         #panel-bordro .brd-gun{width:60px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:inherit;text-align:center;}
         #panel-bordro .brd-not{flex:1 1 140px;min-width:110px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--surface);color:var(--ink);}
         #panel-bordro .brd-btn-prim{background:#3a5a9a;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        #panel-bordro .brd-btn-maas{background:#6a4c93;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        #panel-bordro .brd-btn-mesai{background:#1a8a8a;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
         #panel-bordro .brd-kayit .tur.prim{background:rgba(58,90,154,.14);color:#3a5a9a;}
+        #panel-bordro .brd-kayit .tur.maas{background:rgba(106,76,147,.15);color:#6a4c93;}
+        #panel-bordro .brd-kayit .tur.mesai{background:rgba(26,138,138,.15);color:#1a8a8a;}
+        #panel-bordro .brd-tip{padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
+        #panel-bordro select.brd-inp{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
         /* ── Maaş hatırlatıcı ── */
         #panel-bordro .brd-hatirlatma{background:linear-gradient(135deg,#fbf6ec,#f4ede0);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:20px;}
         #panel-bordro .brd-hat-baslik{font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--ink);margin-bottom:10px;}
@@ -1045,6 +1051,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           #panel-bordro .brd-mini-ozet{gap:12px 16px;font-size:13px;}
           #panel-bordro .brd-not{flex:1 1 100%;min-height:48px;font-size:16px;box-sizing:border-box;}
           #panel-bordro .brd-gun{min-height:44px;font-size:16px;width:84px;}
+          #panel-bordro .brd-tip{min-height:44px;font-size:16px;}
+          #panel-bordro select.brd-inp{flex:1 1 100%;min-height:48px;font-size:16px;}
+          #panel-bordro .brd-card-head{gap:10px 12px;}
           #panel-bordro .brd-card-head label{display:flex;align-items:center;gap:6px;}
           #panel-bordro .brd-hat-row{font-size:13px;}
           #panel-bordro .brd-hat-tut{margin-left:0;flex:1 1 100%;}
@@ -1057,6 +1066,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           <button class="brd-tab on" id="brdTabFsm" onclick="bordroSube('fsm')">🏙 FSM</button>
           <button class="brd-tab" id="brdTabPodyum" onclick="bordroSube('podyum')">🌿 Podyumpark</button>
           <span id="brdSync" style="font-size:11.5px;color:var(--mist);margin-left:6px;white-space:nowrap;"></span>
+          <button class="brd-mini" onclick="bordroSenkronla()" title="Sunucudan tazele / gönder">🔄 Senkronla</button>
           <div style="flex:1"></div>
           <button class="brd-mini" onclick="bordroYedekAl()">⬇️ Yedek Al</button>
           <button class="brd-mini" onclick="document.getElementById('brdYedekDosya').click()">⬆️ Yedek Yükle</button>
@@ -1068,8 +1078,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div id="bordroOzet" class="brd-ozet-strip"></div>
 
         <div class="brd-ekle-personel">
-          <input id="brdYeniAd" class="brd-inp" placeholder="Personel adı" style="min-width:180px;">
-          <input id="brdYeniUcret" class="brd-inp" type="number" min="0" step="0.01" placeholder="Saatlik ücret ₺" style="max-width:160px;">
+          <input id="brdYeniAd" class="brd-inp" placeholder="Personel adı" style="min-width:160px;">
+          <select id="brdYeniTip" class="brd-inp" onchange="bordroYeniTipDegis()">
+            <option value="saatlik">Saatlik</option>
+            <option value="aylik">Aylık maaşlı</option>
+          </select>
+          <input id="brdYeniUcret" class="brd-inp" type="number" min="0" step="0.01" placeholder="Saatlik ücret ₺" style="max-width:170px;">
           <button class="btn-primary" onclick="bordroPersonelEkle()">+ Personel Ekle</button>
         </div>
 
@@ -3966,14 +3980,17 @@ if('serviceWorker' in navigator){
   }
 
   function hesap(d,pid){
-    var hak=0,prim=0,od=0;
+    var calisma=0,maas=0,mesai=0,prim=0,od=0;
     d.kayitlar.forEach(function(k){
       if(k.personelId!==pid) return;
-      if(k.tur==='calisma') hak+=num(k.tutar);
+      if(k.tur==='calisma') calisma+=num(k.tutar);
+      else if(k.tur==='maas') maas+=num(k.tutar);
+      else if(k.tur==='mesai') mesai+=num(k.tutar);
       else if(k.tur==='prim') prim+=num(k.tutar);
       else if(k.tur==='odeme') od+=num(k.tutar);
     });
-    return {hak:hak,prim:prim,odenen:od,kalan:hak+prim-od};
+    var alacak=calisma+maas+mesai+prim;
+    return {calisma:calisma,maas:maas,mesai:mesai,prim:prim,alacak:alacak,odenen:od,kalan:alacak-od};
   }
   function stat(lbl,val,cls){ return '<div class="brd-stat '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div></div>'; }
   // ── Maaş günü / hatırlatıcı yardımcıları ──
@@ -4034,20 +4051,25 @@ if('serviceWorker' in navigator){
     var diger=(BORDRO_SUBE==='fsm')?'podyum':'fsm';
     setTimeout(function(){ cek(diger); },300); // diğer şubeyi de sessizce senkronla
   };
+  // Manuel senkron: bekleyen değişiklik varsa gönder, yoksa sunucudan tazele
+  window.bordroSenkronla=function(){
+    if(_dirty[BORDRO_SUBE]) push(BORDRO_SUBE, yukle(BORDRO_SUBE));
+    else cek(BORDRO_SUBE);
+    toast('🔄 Senkronlanıyor…');
+  };
 
   window.bordroRender=function(){
     var d=yukle(BORDRO_SUBE);
-    var tHak=0,tPrim=0,tOd=0;
-    d.personel.forEach(function(p){ var h=hesap(d,p.id); tHak+=h.hak; tPrim+=h.prim; tOd+=h.odenen; });
+    var tAlacak=0,tOd=0;
+    d.personel.forEach(function(p){ var h=hesap(d,p.id); tAlacak+=h.alacak; tOd+=h.odenen; });
     var hat=document.getElementById('bordroHatirlatma');
     if(hat) hat.innerHTML=hatirlatmaHtml(d);
     var ozet=document.getElementById('bordroOzet');
     if(ozet) ozet.innerHTML=
       stat('Personel', d.personel.length, '')+
-      stat('Hak Ediş', tl(tHak), '')+
-      stat('Prim', tl(tPrim), '')+
-      stat('Ödenen', tl(tOd), '')+
-      stat('Kalan (Ödenecek)', tl(tHak+tPrim-tOd), 'kalan');
+      stat('Toplam Alacak', tl(tAlacak), '')+
+      stat('Toplam Ödenen', tl(tOd), '')+
+      stat('Kalan (Ödenecek)', tl(tAlacak-tOd), 'kalan');
     var liste=document.getElementById('bordroListe');
     if(liste){
       if(!d.personel.length){ liste.innerHTML='<div class="brd-bos">Henüz personel yok. Yukarıdan ekleyin.</div>'; }
@@ -4056,67 +4078,128 @@ if('serviceWorker' in navigator){
     bordroBadgeGuncelle();
   };
 
+  var KTUR={
+    calisma:{cls:'cal',et:'Çalışma'}, maas:{cls:'maas',et:'Maaş'}, mesai:{cls:'mesai',et:'Mesai'},
+    prim:{cls:'prim',et:'Prim'}, odeme:{cls:'od',et:'Ödeme'}
+  };
   function kart(d,p){
+    var aylik=(p.tip==='aylik');
     var h=hesap(d,p.id);
     var kys=d.kayitlar.filter(function(k){return k.personelId===p.id;})
       .sort(function(a,b){ return String(b.tarih||'').localeCompare(String(a.tarih||'')); });
     var kyHtml=kys.length? kys.map(function(k){
-      var tur=(k.tur==='calisma')?'cal':(k.tur==='prim'?'prim':'od');
-      var etiket=(k.tur==='calisma')?'Çalışma':(k.tur==='prim'?'Prim':'Ödeme');
-      var detay=(k.tur==='calisma')? (saatFmt(k.saat)+' × '+tl(k.ucret!=null?k.ucret:p.saatlikUcret))
+      var m=KTUR[k.tur]||KTUR.odeme;
+      var detay=(k.tur==='calisma'||k.tur==='mesai')? (saatFmt(k.saat)+' × '+tl(k.ucret!=null?k.ucret:p.saatlikUcret))
+              : (k.tur==='maas') ? 'Aylık maaş'
               : (k.tur==='prim') ? (k.not?esc(k.not):'Prim') : 'Ödeme';
       var isart=(k.tur==='odeme')?'−':'+';
-      return '<div class="brd-kayit"><span class="tur '+tur+'">'+etiket+'</span>'
+      return '<div class="brd-kayit"><span class="tur '+m.cls+'">'+m.et+'</span>'
         +'<span>'+esc(k.tarih||'')+'</span>'
         +'<span style="color:var(--mist)">'+detay+'</span>'
         +'<span style="margin-left:auto;font-weight:600">'+isart+tl(k.tutar)+'</span>'
         +'<button class="ksil" onclick="bordroKayitSil(\''+k.id+'\')" title="Sil">🗑</button></div>';
     }).join('') : '<div class="brd-bos" style="padding:10px 0">Kayıt yok.</div>';
 
-    return '<div class="brd-card">'
-      +'<div class="brd-card-head">'
-        +'<input class="brd-ad" value="'+esc(p.ad)+'" onchange="bordroAdGuncelle(\''+p.id+'\',this.value)">'
-        +'<label style="font-size:12px;color:var(--mist)">Saatlik ₺ <input class="brd-ucret" type="number" min="0" step="0.01" value="'+(p.saatlikUcret||0)+'" onchange="bordroUcretGuncelle(\''+p.id+'\',this.value)"></label>'
-        +'<label style="font-size:12px;color:var(--mist)">Maaş günü <input class="brd-gun" type="number" min="1" max="31" placeholder="—" value="'+(p.maasGunu||'')+'" onchange="bordroGunGuncelle(\''+p.id+'\',this.value)"></label>'
-        +'<button class="brd-sil" onclick="bordroPersonelSil(\''+p.id+'\')" title="Personeli sil">🗑</button>'
-      +'</div>'
-      +'<div class="brd-mini-ozet">'
-        +'<span>Hak ediş: <b style="color:var(--brand)">'+tl(h.hak)+'</b></span>'
-        +(h.prim>0.005?'<span>Prim: <b style="color:#3a5a9a">'+tl(h.prim)+'</b></span>':'')
-        +'<span>Ödenen: <b>'+tl(h.odenen)+'</b></span>'
-        +'<span>Kalan: <b style="color:'+(h.kalan>0.005?'#c0392b':'var(--brand)')+'">'+tl(h.kalan)+'</b></span>'
+    // Başlık alanları — tipe göre
+    var tipSec='<label style="font-size:12px;color:var(--mist)">Tip '
+      +'<select class="brd-tip" onchange="bordroTipGuncelle(\''+p.id+'\',this.value)">'
+      +'<option value="saatlik"'+(aylik?'':' selected')+'>Saatlik</option>'
+      +'<option value="aylik"'+(aylik?' selected':'')+'>Aylık maaşlı</option>'
+      +'</select></label>';
+    var ucretAlan = aylik
+      ? '<label style="font-size:12px;color:var(--mist)">Aylık maaş ₺ <input class="brd-ucret" type="number" min="0" step="0.01" value="'+(p.aylikMaas||0)+'" onchange="bordroAylikGuncelle(\''+p.id+'\',this.value)"></label>'
+        +'<label style="font-size:12px;color:var(--mist)">Mesai ₺/saat <input class="brd-ucret" type="number" min="0" step="0.01" value="'+(p.saatlikUcret||0)+'" onchange="bordroUcretGuncelle(\''+p.id+'\',this.value)"></label>'
+      : '<label style="font-size:12px;color:var(--mist)">Saatlik ₺ <input class="brd-ucret" type="number" min="0" step="0.01" value="'+(p.saatlikUcret||0)+'" onchange="bordroUcretGuncelle(\''+p.id+'\',this.value)"></label>';
+
+    // Mini özet — tipin ana kalemi her zaman, diğer sıfır-olmayan kalemler de gösterilir
+    var mini='';
+    if(aylik){
+      mini+='<span>Maaş: <b style="color:#6a4c93">'+tl(h.maas)+'</b></span>';
+      if(h.calisma>0.005) mini+='<span>Çalışma: <b style="color:var(--brand)">'+tl(h.calisma)+'</b></span>';
+    } else {
+      mini+='<span>Hak ediş: <b style="color:var(--brand)">'+tl(h.calisma)+'</b></span>';
+      if(h.maas>0.005) mini+='<span>Maaş: <b style="color:#6a4c93">'+tl(h.maas)+'</b></span>';
+    }
+    if(h.mesai>0.005) mini+='<span>Mesai: <b style="color:#1a8a8a">'+tl(h.mesai)+'</b></span>';
+    if(h.prim>0.005) mini+='<span>Prim: <b style="color:#3a5a9a">'+tl(h.prim)+'</b></span>';
+    mini+='<span>Ödenen: <b>'+tl(h.odenen)+'</b></span>';
+    mini+='<span>Kalan: <b style="color:'+(h.kalan>0.005?'#c0392b':'var(--brand)')+'">'+tl(h.kalan)+'</b></span>';
+
+    // Ekleme satırları — tipe göre
+    var ekle='';
+    if(aylik){
+      ekle+='<div class="brd-satir">'
+        +'<span class="brd-grup-et">Maaş</span>'
+        +'<input type="date" id="ma-t-'+p.id+'" value="'+bugun()+'">'
+        +'<input type="number" id="ma-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say" value="'+(p.aylikMaas||'')+'">'
+        +'<button class="brd-btn-maas" onclick="bordroMaasEkle(\''+p.id+'\')">+ Ekle</button>'
       +'</div>'
       +'<div class="brd-satir">'
+        +'<span class="brd-grup-et">Mesai</span>'
+        +'<input type="date" id="me-t-'+p.id+'" value="'+bugun()+'">'
+        +'<input type="number" id="me-s-'+p.id+'" min="0" step="0.25" placeholder="Saat" class="brd-say">'
+        +'<button class="brd-btn-mesai" onclick="bordroMesaiEkle(\''+p.id+'\')">+ Ekle</button>'
+      +'</div>';
+    } else {
+      ekle+='<div class="brd-satir">'
         +'<span class="brd-grup-et">Çalışma</span>'
         +'<input type="date" id="cal-t-'+p.id+'" value="'+bugun()+'">'
         +'<input type="number" id="cal-s-'+p.id+'" min="0" step="0.25" placeholder="Saat" class="brd-say">'
         +'<button class="brd-btn-cal" onclick="bordroCalismaEkle(\''+p.id+'\')">+ Ekle</button>'
+      +'</div>';
+    }
+    ekle+='<div class="brd-satir">'
+      +'<span class="brd-grup-et">Prim</span>'
+      +'<input type="date" id="pr-t-'+p.id+'" value="'+bugun()+'">'
+      +'<input type="number" id="pr-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say">'
+      +'<input type="text" id="pr-n-'+p.id+'" placeholder="Açıklama (ops.)" class="brd-not">'
+      +'<button class="brd-btn-prim" onclick="bordroPrimEkle(\''+p.id+'\')">+ Ekle</button>'
+    +'</div>'
+    +'<div class="brd-satir">'
+      +'<span class="brd-grup-et">Ödeme</span>'
+      +'<input type="date" id="od-t-'+p.id+'" value="'+bugun()+'">'
+      +'<input type="number" id="od-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say">'
+      +'<button class="brd-btn-od" onclick="bordroOdemeEkle(\''+p.id+'\')">+ Ekle</button>'
+    +'</div>';
+
+    return '<div class="brd-card">'
+      +'<div class="brd-card-head">'
+        +'<input class="brd-ad" value="'+esc(p.ad)+'" onchange="bordroAdGuncelle(\''+p.id+'\',this.value)">'
+        +tipSec
+        +ucretAlan
+        +'<label style="font-size:12px;color:var(--mist)">Maaş günü <input class="brd-gun" type="number" min="1" max="31" placeholder="—" value="'+(p.maasGunu||'')+'" onchange="bordroGunGuncelle(\''+p.id+'\',this.value)"></label>'
+        +'<button class="brd-sil" onclick="bordroPersonelSil(\''+p.id+'\')" title="Personeli sil">🗑</button>'
       +'</div>'
-      +'<div class="brd-satir">'
-        +'<span class="brd-grup-et">Prim</span>'
-        +'<input type="date" id="pr-t-'+p.id+'" value="'+bugun()+'">'
-        +'<input type="number" id="pr-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say">'
-        +'<input type="text" id="pr-n-'+p.id+'" placeholder="Açıklama (ops.)" class="brd-not">'
-        +'<button class="brd-btn-prim" onclick="bordroPrimEkle(\''+p.id+'\')">+ Ekle</button>'
-      +'</div>'
-      +'<div class="brd-satir">'
-        +'<span class="brd-grup-et">Ödeme</span>'
-        +'<input type="date" id="od-t-'+p.id+'" value="'+bugun()+'">'
-        +'<input type="number" id="od-a-'+p.id+'" min="0" step="0.01" placeholder="Tutar ₺" class="brd-say">'
-        +'<button class="brd-btn-od" onclick="bordroOdemeEkle(\''+p.id+'\')">+ Ekle</button>'
-      +'</div>'
+      +'<div class="brd-mini-ozet">'+mini+'</div>'
+      +ekle
       +'<div class="brd-kayitlar">'+kyHtml+'</div>'
     +'</div>';
   }
 
+  window.bordroYeniTipDegis=function(){
+    var t=(document.getElementById('brdYeniTip')||{}).value;
+    var uc=document.getElementById('brdYeniUcret');
+    if(uc) uc.placeholder=(t==='aylik')?'Aylık maaş ₺':'Saatlik ücret ₺';
+  };
   window.bordroPersonelEkle=function(){
     var adEl=document.getElementById('brdYeniAd'), ucEl=document.getElementById('brdYeniUcret');
+    var tip=((document.getElementById('brdYeniTip')||{}).value==='aylik')?'aylik':'saatlik';
     var ad=(adEl.value||'').trim(); var uc=num(ucEl.value);
     if(!ad){ toast('⚠️ İsim girin'); return; }
     var d=yukle(BORDRO_SUBE);
-    d.personel.push({id:bid(),ad:ad,saatlikUcret:uc});
+    var yeni={id:bid(),ad:ad,tip:tip};
+    if(tip==='aylik') yeni.aylikMaas=uc; else yeni.saatlikUcret=uc;
+    d.personel.push(yeni);
     kaydet(BORDRO_SUBE,d); adEl.value=''; ucEl.value=''; bordroRender();
-    toast('✅ Personel eklendi');
+    toast('✅ Personel eklendi'+(tip==='aylik'?' (aylık maaşlı)':''));
+  };
+  window.bordroTipGuncelle=function(id,val){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
+    if(p){ p.tip=(val==='aylik')?'aylik':'saatlik'; kaydet(BORDRO_SUBE,d); bordroRender(); }
+  };
+  window.bordroAylikGuncelle=function(id,val){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
+    if(p){ p.aylikMaas=num(val); kaydet(BORDRO_SUBE,d); bordroRender(); }
   };
   window.bordroPersonelSil=function(id){
     var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});
@@ -4162,6 +4245,27 @@ if('serviceWorker' in navigator){
     d.kayitlar.push({id:bid(),personelId:pid,tur:'prim',tarih:t,tutar:a,not:not});
     kaydet(BORDRO_SUBE,d); bordroRender();
     toast('✅ Prim eklendi: '+tl(a));
+  };
+  window.bordroMaasEkle=function(pid){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===pid;}); if(!p) return;
+    var t=(document.getElementById('ma-t-'+pid)||{}).value||bugun();
+    var a=num((document.getElementById('ma-a-'+pid)||{}).value);
+    if(a<=0){ toast('⚠️ Maaş tutarı girin'); return; }
+    d.kayitlar.push({id:bid(),personelId:pid,tur:'maas',tarih:t,tutar:a});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+    toast('✅ Maaş tahakkuku: '+tl(a));
+  };
+  window.bordroMesaiEkle=function(pid){
+    var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===pid;}); if(!p) return;
+    var t=(document.getElementById('me-t-'+pid)||{}).value||bugun();
+    var s=num((document.getElementById('me-s-'+pid)||{}).value);
+    if(s<=0){ toast('⚠️ Mesai saati girin'); return; }
+    var ucret=num(p.saatlikUcret);
+    if(ucret<=0){ toast('⚠️ Önce mesai ₺/saat gir'); return; }
+    var tutar=Math.round(s*ucret*100)/100;
+    d.kayitlar.push({id:bid(),personelId:pid,tur:'mesai',tarih:t,saat:s,ucret:ucret,tutar:tutar});
+    kaydet(BORDRO_SUBE,d); bordroRender();
+    toast('✅ Mesai: '+saatFmt(s)+' → '+tl(tutar));
   };
   window.bordroGunGuncelle=function(id,val){
     var d=yukle(BORDRO_SUBE); var p=d.personel.find(function(x){return x.id===id;});

@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v33'; // v33: alerjen gösterimi tamamen kaldırıldı (açıklamalarda zaten yazıyor) — sadece kalori hapı
+const VERSION = 'cactus-v34'; // v34: same-origin /api/* istekleri SW'yi baypas etsin (bordro D1 senkronu 'çevrimdışı' görünüyordu)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',
@@ -31,11 +31,12 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
+  const _u = new URL(req.url);
+  // API çağrıları — service worker'a HİÇ uğramasın (same-origin /api/* dahil, tüm metodlar).
+  // Bordro D1 senkronu same-origin /api/bordro'ya gider; SW cache'i buna karışmamalı.
+  if (_u.pathname.startsWith('/api/') || _u.hostname.includes('workers.dev')) return;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-
-  // API çağrıları — service worker'a uğramasın (D1 sync gerekli)
-  if (url.hostname.includes('workers.dev')) return;
   // Same origin değilse atla
   if (url.origin !== location.origin) return;
 

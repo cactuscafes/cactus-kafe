@@ -1,0 +1,16 @@
+name: Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vardiya giris smoke test
+        run: |
+          echo "POST /api/vardiya-giris (test personeli)"
+          curl -sS -X POST "https://cactus-kafe.batuhanbulut.workers.dev/api/vardiya-giris" \
+            -H "Content-Type: application/json" \
+            -d '{"sube":"podyum","ad":"__test","pin":"9911","aksiyon":"giris","cihaz_id":"smoke-ci"}'
+          echo

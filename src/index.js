@@ -67,14 +67,34 @@ async function getVardiyaCfg(env, sube) {
   return { personel: [], acilis: [], kapanis: [], wa_phone: '' };
 }
 // WhatsApp gönderimi — raporlarla AYNI kanal: Green API (rapor-api'deki whatsappGonder ile birebir).
-// Kimlik bilgileri worker secret'larından okunur (GREEN_INSTANCE, GREEN_TOKEN, WA_PHONE) —
-// raporlar için zaten kurulu; ayrıca kurulum gerekmez. Alıcı: cfg.wa_phone varsa o, yoksa env.WA_PHONE.
-async function vardiyaWhatsapp(env, mesaj, phone) {
-  const tel = (phone || env.WA_PHONE || '').replace(/\D/g, '');
-  if (!env.GREEN_INSTANCE || !env.GREEN_TOKEN || !tel) return null;
+// Kimlik bilgileri: önce worker secret'ları (GREEN_INSTANCE/GREEN_TOKEN/WA_PHONE),
+// yoksa D1'deki genel ayar satırı (sube='_wa_'). Böylece secret kurmadan da çalışır.
+async function getWaGlobal(env) {
+  try {
+    const row = await env.ADISYON_DB.prepare(`SELECT data FROM vardiya_ayar WHERE sube = '_wa_'`).first();
+    if (row && row.data) {
+      const d = JSON.parse(row.data);
+      return { green_instance: d.green_instance || '', green_token: d.green_token || '', wa_phone: d.wa_phone || '' };
+    }
+  } catch (e) {}
+  return { green_instance: '', green_token: '', wa_phone: '' };
+}
+async function resolveWa(env, cfg) {
+  const g = await getWaGlobal(env);
+  return {
+    instance: env.GREEN_INSTANCE || g.green_instance || '',
+    token: env.GREEN_TOKEN || g.green_token || '',
+    // Alıcı: şubeye özel numara > worker secret WA_PHONE > D1 genel numara
+    phone: ((cfg && cfg.wa_phone) || env.WA_PHONE || g.wa_phone || ''),
+    defaultPhone: (env.WA_PHONE || g.wa_phone || ''),
+  };
+}
+async function vardiyaWhatsapp(instance, token, phone, mesaj) {
+  const tel = (phone || '').replace(/\D/g, '');
+  if (!instance || !token || !tel) return null;
   const chatId = tel + '@c.us';
   try {
-    const res = await fetch('https://api.green-api.com/waInstance' + env.GREEN_INSTANCE + '/sendMessage/' + env.GREEN_TOKEN, {
+    const res = await fetch('https://api.green-api.com/waInstance' + instance + '/sendMessage/' + token, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chatId, message: mesaj }),
@@ -277,9 +297,14 @@ export default {
           if (url.searchParams.get('full') === '1') {
             const token = request.headers.get('X-Cactus-Key') || '';
             if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
-            // wa_ready: worker'da Green API secret'ları kurulu mu (raporlarla aynı) — kurulum ipucu için
-            const waReady = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN && (cfg.wa_phone || env.WA_PHONE));
-            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_default: env.WA_PHONE ? (String(env.WA_PHONE).slice(0, 6) + '••••') : '', wa_ready: waReady }, 200, NO_STORE);
+            // wa_ready: Green API kimliği + alıcı numara çözülebiliyor mu (secret veya D1) — kurulum ipucu için
+            const wa = await resolveWa(env, cfg);
+            const waReady = !!(wa.instance && wa.token && wa.phone);
+            const waDefMask = wa.defaultPhone ? (String(wa.defaultPhone).replace(/\D/g, '').slice(0, 6) + '••••') : '';
+            // green_set: kimlik zaten kayıtlı mı (token asla dönmez); env_wa: secret'lardan mı geliyor
+            const greenSet = !!(wa.instance && wa.token);
+            const envWa = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN);
+            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
           }
           // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez)
           return json({ ok: true, personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean), acilis: cfg.acilis, kapanis: cfg.kapanis }, 200, NO_STORE);
@@ -300,6 +325,23 @@ export default {
             `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES (?, ?, ?)
              ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
           ).bind(sube, JSON.stringify(cfg), Date.now()).run();
+          // Green API kimliği (genel, iki şube için ortak) — verildiyse '_wa_' satırına yaz.
+          // Boş string GÖNDERİLİRSE korunur (yanlışlıkla silmeyi önlemek için sadece dolu değerler güncellenir).
+          if (typeof body.green_instance === 'string' || typeof body.green_token === 'string' || typeof body.wa_default === 'string') {
+            const g = await getWaGlobal(env);
+            const gi = String(body.green_instance || '').trim();
+            const gt = String(body.green_token || '').trim();
+            const gp = String(body.wa_default || '').replace(/\D/g, '');
+            const merged = {
+              green_instance: gi || g.green_instance,
+              green_token: gt || g.green_token,
+              wa_phone: gp || g.wa_phone,
+            };
+            await env.ADISYON_DB.prepare(
+              `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES ('_wa_', ?, ?)
+               ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
+            ).bind(JSON.stringify(merged), Date.now()).run();
+          }
           return json({ ok: true }, 200, NO_STORE);
         }
         return json({ ok: false, error: 'method not allowed' }, 405, NO_STORE);
@@ -331,14 +373,15 @@ export default {
           `INSERT OR IGNORE INTO adisyon_events (id, sube, type, masa, payload, ts, server_ts, cihaz_id)
            VALUES (?, ?, 'vardiya', NULL, ?, ?, ?, ?)`
         ).bind(evtId, sube, JSON.stringify({ ad: ad, aksiyon: aksiyon }), now, now, String(body.cihaz_id || 'server')).run();
-        // WhatsApp bildirimi — raporlarla AYNI kanal (Green API). Alıcı: cfg.wa_phone ya da env.WA_PHONE.
+        // WhatsApp bildirimi — raporlarla AYNI kanal (Green API). Kimlik: secret ya da D1 (_wa_).
         // Girişte 🟢, çıkışta 🔴. Fire-and-forget (ctx.waitUntil).
-        if (env.GREEN_INSTANCE && env.GREEN_TOKEN && (cfg.wa_phone || env.WA_PHONE)) {
+        const wa = await resolveWa(env, cfg);
+        if (wa.instance && wa.token && wa.phone) {
           var subeAd = sube === 'fsm' ? 'FSM' : 'Podyumpark';
           var saat = '';
           try { saat = new Date(now).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }); } catch (e) { saat = ''; }
           var msg = (aksiyon === 'giris' ? '🟢 ' : '🔴 ') + ad + (aksiyon === 'giris' ? ' vardiyaya giriş yaptı' : ' vardiyadan çıkış yaptı') + '\n' + subeAd + (saat ? (' — ' + saat) : '');
-          ctx.waitUntil(vardiyaWhatsapp(env, msg, cfg.wa_phone).catch(function () {}));
+          ctx.waitUntil(vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg).catch(function () {}));
         }
         return json({ ok: true, ts: now, aksiyon: aksiyon }, 200, NO_STORE);
       } catch (e) {

@@ -460,6 +460,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn on" onclick="panelAc('bugun',this)">🏠 Bugün</button>
       <button class="sb-btn" onclick="panelAc('canli',this)">🟢 Canlı Masalar</button>
       <button class="sb-btn" onclick="panelAc('tukendi',this)">🚫 Tükendi</button>
+      <button class="sb-btn" onclick="panelAc('stok',this)">📦 Stok</button>
       <button class="sb-btn" onclick="panelAc('rapor',this)">📊 Raporlar</button>
       <button class="sb-btn" onclick="panelAc('yogunluk',this)">🕐 Yoğun Saatler</button>
 
@@ -975,6 +976,38 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       </div>
 
       <!-- MAAŞ / BORDRO -->
+      <div class="panel" id="panel-stok" style="max-width:1080px;">
+        <div class="pttl">📦 Stok Takibi</div>
+        <div class="psub">Takip ettiğin ürünlerin stoğu adisyonda her <b>ödeme</b> alındığında otomatik düşer; eşiğin altına inince WhatsApp uyarısı gelir.</div>
+
+        <div class="vad-tabs">
+          <button class="vad-tab on" id="stokTabFsm" onclick="stokSube('fsm')">🏙 FSM</button>
+          <button class="vad-tab" id="stokTabPodyum" onclick="stokSube('podyum')">🌿 Podyumpark</button>
+          <span id="stokDurum" style="font-size:11.5px;color:var(--mist);margin-left:6px;"></span>
+          <div style="flex:1"></div>
+          <button class="vad-mini" onclick="stokYukleAdmin()">🔄 Yenile</button>
+        </div>
+
+        <div class="vad-blok" style="margin-bottom:20px;">
+          <div class="vad-blok-ttl">➕ Ürün Ekle / Güncelle</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:2;min-width:220px;">
+              <label class="lbl">Ürün (adisyon menüsünden)</label>
+              <select id="stokUrunSec" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit;"><option value="">— Ürün seç —</option></select>
+            </div>
+            <div style="min-width:90px;"><label class="lbl">Adet</label><input id="stokAdet" type="number" min="0" value="10" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:90px;"><label class="lbl">Uyarı Eşiği</label><input id="stokEsik" type="number" min="0" value="3" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <button class="btn-primary" onclick="stokEkleKaydet()">💾 Kaydet</button>
+          </div>
+          <div style="font-size:11px;color:var(--mist);margin-top:8px;line-height:1.5;">Zaten listede olan bir ürünü seçersen adet/eşik değerleri üzerine yazılır (sayım düzeltmek için de kullan). Takip etmek istemediğin ürünleri hiç ekleme.</div>
+        </div>
+
+        <div class="vad-blok">
+          <div class="vad-blok-ttl">📦 Takip Edilen Ürünler</div>
+          <div id="stokListe"><div class="vad-bos">Yükleniyor…</div></div>
+        </div>
+      </div>
+
       <div class="panel" id="panel-bordro" style="max-width:1080px;">
         <style>
         #panel-bordro .brd-tabs{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
@@ -1094,40 +1127,40 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <!-- PERSONEL / VARDİYA -->
       <div class="panel" id="panel-vardiya" style="max-width:1080px;">
         <style>
-        #panel-vardiya .vad-tabs{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
-        #panel-vardiya .vad-tab{padding:8px 18px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
-        #panel-vardiya .vad-tab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
-        #panel-vardiya .vad-mini{padding:7px 14px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;}
-        #panel-vardiya .vad-canli{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:16px;}
-        #panel-vardiya .vad-blok{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 17px;}
-        #panel-vardiya .vad-blok-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:11px;display:flex;align-items:center;gap:8px;}
-        #panel-vardiya .vad-say{font-size:11px;font-weight:700;color:#fff;background:var(--brand);border-radius:100px;padding:2px 9px;margin-left:auto;}
-        #panel-vardiya .vad-tag{display:inline-block;background:rgba(45,90,39,.1);border:1px solid rgba(45,90,39,.3);color:var(--brand);border-radius:100px;padding:4px 11px;font-size:12.5px;font-weight:600;margin:0 6px 6px 0;}
-        #panel-vardiya .vad-cl{display:flex;align-items:center;gap:9px;font-size:13px;padding:6px 0;border-top:1px solid var(--paper);}
-        #panel-vardiya .vad-cl:first-child{border-top:none;}
-        #panel-vardiya .vad-cl .ck{width:20px;height:20px;flex:none;border-radius:6px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}
-        #panel-vardiya .vad-cl.done .ck{background:var(--brand);border-color:var(--brand);color:#fff;}
-        #panel-vardiya .vad-cl.done .mad{color:var(--mist);}
-        #panel-vardiya .vad-cl .who{margin-left:auto;font-size:11px;color:var(--mist);white-space:nowrap;}
-        #panel-vardiya .vad-bos{color:var(--mist);font-size:12.5px;padding:6px 0;}
-        #panel-vardiya .vad-logrow{display:flex;gap:10px;align-items:center;font-size:12.5px;padding:6px 0;border-top:1px solid var(--paper);}
-        #panel-vardiya .vad-logrow:first-child{border-top:none;}
-        #panel-vardiya .vad-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:100px;}
-        #panel-vardiya .vad-badge.g{background:rgba(45,90,39,.14);color:var(--brand);}
-        #panel-vardiya .vad-badge.c{background:rgba(192,57,43,.12);color:#c0392b;}
-        #panel-vardiya .vad-ayar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
-        #panel-vardiya .vad-col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
-        #panel-vardiya .vad-col-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:10px;}
-        #panel-vardiya .vad-list .vad-li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;background:var(--paper);}
-        #panel-vardiya .vad-list .vad-li .txt{flex:1;}
-        #panel-vardiya .vad-list .vad-li button{background:none;border:none;cursor:pointer;opacity:.5;font-size:14px;}
-        #panel-vardiya .vad-list .vad-li button:hover{opacity:1;}
-        #panel-vardiya .vad-ekle{display:flex;gap:7px;margin-top:8px;}
-        #panel-vardiya .vad-ekle input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
-        #panel-vardiya .vad-ekle button{padding:9px 14px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        #panel-vardiya .vad-tabs,#panel-stok .vad-tabs{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+        #panel-vardiya .vad-tab,#panel-stok .vad-tab{padding:8px 18px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-vardiya .vad-tab.on,#panel-stok .vad-tab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+        #panel-vardiya .vad-mini,#panel-stok .vad-mini{padding:7px 14px;border-radius:100px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+        #panel-vardiya .vad-canli,#panel-stok .vad-canli{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:16px;}
+        #panel-vardiya .vad-blok,#panel-stok .vad-blok{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 17px;}
+        #panel-vardiya .vad-blok-ttl,#panel-stok .vad-blok-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:11px;display:flex;align-items:center;gap:8px;}
+        #panel-vardiya .vad-say,#panel-stok .vad-say{font-size:11px;font-weight:700;color:#fff;background:var(--brand);border-radius:100px;padding:2px 9px;margin-left:auto;}
+        #panel-vardiya .vad-tag,#panel-stok .vad-tag{display:inline-block;background:rgba(45,90,39,.1);border:1px solid rgba(45,90,39,.3);color:var(--brand);border-radius:100px;padding:4px 11px;font-size:12.5px;font-weight:600;margin:0 6px 6px 0;}
+        #panel-vardiya .vad-cl,#panel-stok .vad-cl{display:flex;align-items:center;gap:9px;font-size:13px;padding:6px 0;border-top:1px solid var(--paper);}
+        #panel-vardiya .vad-cl:first-child,#panel-stok .vad-cl:first-child{border-top:none;}
+        #panel-vardiya .vad-cl .ck,#panel-stok .vad-cl .ck{width:20px;height:20px;flex:none;border-radius:6px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}
+        #panel-vardiya .vad-cl.done .ck,#panel-stok .vad-cl.done .ck{background:var(--brand);border-color:var(--brand);color:#fff;}
+        #panel-vardiya .vad-cl.done .mad,#panel-stok .vad-cl.done .mad{color:var(--mist);}
+        #panel-vardiya .vad-cl .who,#panel-stok .vad-cl .who{margin-left:auto;font-size:11px;color:var(--mist);white-space:nowrap;}
+        #panel-vardiya .vad-bos,#panel-stok .vad-bos{color:var(--mist);font-size:12.5px;padding:6px 0;}
+        #panel-vardiya .vad-logrow,#panel-stok .vad-logrow{display:flex;gap:10px;align-items:center;font-size:12.5px;padding:6px 0;border-top:1px solid var(--paper);}
+        #panel-vardiya .vad-logrow:first-child,#panel-stok .vad-logrow:first-child{border-top:none;}
+        #panel-vardiya .vad-badge,#panel-stok .vad-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:100px;}
+        #panel-vardiya .vad-badge.g,#panel-stok .vad-badge.g{background:rgba(45,90,39,.14);color:var(--brand);}
+        #panel-vardiya .vad-badge.c,#panel-stok .vad-badge.c{background:rgba(192,57,43,.12);color:#c0392b;}
+        #panel-vardiya .vad-ayar,#panel-stok .vad-ayar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+        #panel-vardiya .vad-col,#panel-stok .vad-col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
+        #panel-vardiya .vad-col-ttl,#panel-stok .vad-col-ttl{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+        #panel-vardiya .vad-list .vad-li,#panel-stok .vad-list .vad-li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;background:var(--paper);}
+        #panel-vardiya .vad-list .vad-li .txt,#panel-stok .vad-list .vad-li .txt{flex:1;}
+        #panel-vardiya .vad-list .vad-li button,#panel-stok .vad-list .vad-li button{background:none;border:none;cursor:pointer;opacity:.5;font-size:14px;}
+        #panel-vardiya .vad-list .vad-li button:hover,#panel-stok .vad-list .vad-li button:hover{opacity:1;}
+        #panel-vardiya .vad-ekle,#panel-stok .vad-ekle{display:flex;gap:7px;margin-top:8px;}
+        #panel-vardiya .vad-ekle input,#panel-stok .vad-ekle input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);}
+        #panel-vardiya .vad-ekle button,#panel-stok .vad-ekle button{padding:9px 14px;border:none;border-radius:8px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
         @media(max-width:560px){
-          #panel-vardiya .vad-ekle input{min-height:44px;font-size:16px;}
-          #panel-vardiya .vad-tab,#panel-vardiya .vad-mini{min-height:40px;}
+          #panel-vardiya .vad-ekle input,#panel-stok .vad-ekle input{min-height:44px;font-size:16px;}
+          #panel-vardiya .vad-tab,#panel-vardiya .vad-mini,#panel-stok .vad-tab,#panel-stok .vad-mini{min-height:40px;}
         }
         </style>
         <div class="pttl">🕒 Personel / Vardiya</div>
@@ -1555,6 +1588,7 @@ function panelAc(id,el){
   if(id==='yogunluk') yogunlukYukle();
   if(id==='bordro'){ if(typeof bordroAc==='function') bordroAc(); }
   if(id==='vardiya'){ if(typeof vardiyaAdminAc==='function') vardiyaAdminAc(); }
+  if(id==='stok'){ if(typeof stokAdminAc==='function') stokAdminAc(); }
   if(id==='basvurular') basvuruYukle();
   if(id==='sikayetler') sikayetYukle();
 
@@ -4694,6 +4728,107 @@ if('serviceWorker' in navigator){
 })();
 </script>
 
+<script>
+/* ═══ STOK TAKİBİ — admin paneli ═══
+   Kayıtlar worker D1 'stok' tablosunda (GET public, POST X-Cactus-Key).
+   Ürün id'leri adisyon menüsüyle birebir; sunucu MASA_PAY event'inde düşer. */
+(function(){
+  var STOK_API=(typeof _CM_EV_API!=='undefined')?_CM_EV_API:'https://cactus-kafe.batuhanbulut.workers.dev';
+  var _stSube='fsm';
+  var _stListe=[];
+  function stok_tok(){ try{ var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null'); return (t&&t.token)?t.token:''; }catch(e){ return ''; } }
+  function stok_esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  window.stokAdminAc=function(){ stokTabSync(); stokUrunleriDoldur(); stokYukleAdmin(); };
+  window.stokSube=function(sb){ _stSube=(sb==='podyum')?'podyum':'fsm'; stokTabSync(); stokUrunleriDoldur(); stokYukleAdmin(); };
+  function stokTabSync(){ var f=document.getElementById('stokTabFsm'),p=document.getElementById('stokTabPodyum'); if(f)f.classList.toggle('on',_stSube==='fsm'); if(p)p.classList.toggle('on',_stSube==='podyum'); }
+
+  // Ürün seçici — adisyon menüsünden (id'ler ödeme event'indekilerle birebir aynı)
+  function stokUrunleriDoldur(){
+    var sel=document.getElementById('stokUrunSec'); if(!sel) return;
+    sel.innerHTML='<option value="">— Yükleniyor… —</option>';
+    fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=adisyon_'+_stSube+'&t='+Date.now())
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){
+        var ops=['<option value="">— Ürün seç —</option>'];
+        if(d&&typeof d==='object'){
+          Object.keys(d).forEach(function(k){
+            var kat=d[k]; if(!(kat&&Array.isArray(kat.urunler))) return;
+            var grup=kat.urunler.filter(function(u){return u&&u.id&&u.ad;}).map(function(u){
+              return '<option value="'+stok_esc(u.id)+'" data-ad="'+stok_esc(u.ad)+'">'+stok_esc(u.ad)+'</option>';
+            }).join('');
+            if(grup) ops.push('<optgroup label="'+stok_esc(kat.label||k)+'">'+grup+'</optgroup>');
+          });
+        }
+        sel.innerHTML=ops.length>1?ops.join(''):'<option value="">— Menü boş —</option>';
+      }).catch(function(){ sel.innerHTML='<option value="">— Menü yüklenemedi —</option>'; });
+  }
+
+  window.stokYukleAdmin=function(){
+    var dEl=document.getElementById('stokDurum'); if(dEl) dEl.textContent='⏳';
+    fetch(STOK_API+'/api/stok?sube='+_stSube+'&t='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){
+        _stListe=(d&&d.ok&&Array.isArray(d.urunler))?d.urunler:[];
+        stokRender();
+        if(dEl) dEl.textContent='☁️ '+_stListe.length+' ürün';
+      })
+      .catch(function(){ if(dEl) dEl.textContent='⚠️ bağlantı yok'; });
+  };
+  function stokRender(){
+    var el=document.getElementById('stokListe'); if(!el) return;
+    if(!_stListe.length){ el.innerHTML='<div class="vad-bos">Henüz takip edilen ürün yok — yukarıdan ekle.</div>'; return; }
+    el.innerHTML=_stListe.map(function(u){
+      var renk = u.adet<=0 ? '#c0392b' : (u.adet<=u.esik ? '#c67000' : '#2d7a3a');
+      var etiket = u.adet<=0 ? 'TÜKENDİ' : (Math.round(u.adet*100)/100)+' kaldı';
+      return '<div class="vad-logrow">'
+        +'<span style="font-weight:600;flex:1;min-width:120px;">'+stok_esc(u.ad)+'</span>'
+        +'<span style="font-weight:800;color:'+renk+';white-space:nowrap;">'+etiket+'</span>'
+        +'<span style="color:var(--mist);font-size:11px;white-space:nowrap;">eşik '+u.esik+'</span>'
+        +'<button class="vad-mini" onclick="stokArti(\''+stok_esc(u.id)+'\')" title="Stok girişi">➕ Ekle</button>'
+        +'<button class="vad-mini" onclick="stokDuzelt(\''+stok_esc(u.id)+'\')" title="Sayımı düzelt">✏️</button>'
+        +'<button class="vad-mini" onclick="stokSil(\''+stok_esc(u.id)+'\')" title="Takipten çıkar">🗑</button>'
+        +'</div>';
+    }).join('');
+  }
+  function stokPost(body, cb){
+    body.sube=_stSube;
+    fetch(STOK_API+'/api/stok',{method:'POST',headers:{'Content-Type':'application/json','X-Cactus-Key':stok_tok()},body:JSON.stringify(body)})
+      .then(function(r){return r.json().catch(function(){return null;});})
+      .then(function(d){
+        if(d&&d.ok){ if(cb)cb(); stokYukleAdmin(); }
+        else { if(typeof toast==='function') toast('⚠️ '+((d&&d.error)||'Kaydedilemedi')); }
+      })
+      .catch(function(){ if(typeof toast==='function') toast('⚠️ Bağlantı hatası'); });
+  }
+  window.stokEkleKaydet=function(){
+    var sel=document.getElementById('stokUrunSec');
+    var id=(sel&&sel.value)||'';
+    if(!id){ if(typeof toast==='function') toast('⚠️ Ürün seç'); return; }
+    var ad=(sel.options[sel.selectedIndex]&&sel.options[sel.selectedIndex].getAttribute('data-ad'))||id;
+    var adet=Number((document.getElementById('stokAdet')||{}).value)||0;
+    var esik=Number((document.getElementById('stokEsik')||{}).value)||0;
+    stokPost({islem:'kaydet',urun_id:id,ad:ad,adet:adet,esik:esik},function(){ if(typeof toast==='function') toast('✅ '+ad+' stok takibinde'); });
+  };
+  window.stokArti=function(id){
+    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
+    var v=prompt('"'+u.ad+'" için kaç adet stok girişi yapılsın?','10');
+    if(v===null) return; var delta=Number(v);
+    if(!delta){ if(typeof toast==='function') toast('⚠️ Geçerli sayı gir'); return; }
+    stokPost({islem:'ekle',urun_id:id,delta:delta},function(){ if(typeof toast==='function') toast('✅ Stok girişi: +'+delta); });
+  };
+  window.stokDuzelt=function(id){
+    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
+    var v=prompt('"'+u.ad+'" güncel sayım (mevcut: '+u.adet+'):', String(Math.max(0,Math.round(u.adet))));
+    if(v===null) return;
+    stokPost({islem:'kaydet',urun_id:id,ad:u.ad,adet:Number(v)||0,esik:u.esik},function(){ if(typeof toast==='function') toast('✅ Sayım güncellendi'); });
+  };
+  window.stokSil=function(id){
+    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
+    if(!confirm('"'+u.ad+'" stok takibinden çıkarılsın mı?')) return;
+    stokPost({islem:'sil',urun_id:id});
+  };
+})();
+</script>
 </body>
 </html>
 

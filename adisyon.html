@@ -261,6 +261,10 @@ input,select{font-family:'Inter',sans-serif;}
 .ukrt .ue{font-size:22px;display:block;margin-bottom:4px;}
 .ukrt.tukendi{opacity:.5;filter:grayscale(1);}
 .ukrt.tukendi .ue,.ukrt.tukendi .uf{opacity:.6;}
+.ukrt-stok{position:absolute;bottom:6px;left:6px;background:#2e7d32;color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.4px;padding:2px 7px;border-radius:100px;z-index:2;}
+.ukrt-stok.az{background:#c67000;}
+.ukrt-stok.yok{background:#c0392b;}
+.ukrt.stokyok .ue,.ukrt.stokyok .ua,.ukrt.stokyok .uf{opacity:.45;}
 .ukrt-tukendi{position:absolute;top:6px;left:6px;background:#5a5a5a;color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.5px;padding:2px 6px;border-radius:100px;z-index:2;}
 .ukrt .ua{font-family:'Fraunces',serif;font-size:11px;color:var(--k1);margin-bottom:3px;line-height:1.3;word-break:break-word;}
 .ukrt .uf{font-size:13px;font-weight:700;}
@@ -2372,12 +2376,13 @@ function renderUrunler(){
   urunler.forEach(u=>{
     const ic=u.tip==='icecek';
     const d=document.createElement('button');
-    d.className='ukrt '+(ic?'ic':'yi')+(u.tukendi?' tukendi':'');
+    d.className='ukrt '+(ic?'ic':'yi')+(u.tukendi?' tukendi':'')+((typeof _stokYok==='function'&&_stokYok(u.id))?' stokyok':'');
     const favOn=favSet.has(u.id);
-    d.innerHTML=`${u.tukendi?'<span class="ukrt-tukendi">TÜKENDİ</span>':''}<button class="fav-btn${favOn?' on':''}" onclick="toggleFav('${u.id}',event)" title="${favOn?'Favoriden çıkar':'Favorilere ekle'}" aria-label="Favori">${favOn?'★':'☆'}</button><span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
+    d.innerHTML=`${u.tukendi?'<span class="ukrt-tukendi">TÜKENDİ</span>':''}${typeof _stokBadge==='function'?_stokBadge(u.id):''}<button class="fav-btn${favOn?' on':''}" onclick="toggleFav('${u.id}',event)" title="${favOn?'Favoriden çıkar':'Favorilere ekle'}" aria-label="Favori">${favOn?'★':'☆'}</button><span class="ue">${u.emoji||''}</span><div class="ua">${u.ad}</div><div class="uf">₺${u.fiyat}</div>`;
     d.onclick=(e)=>{
       if(e.target&&e.target.classList&&e.target.classList.contains('fav-btn'))return;
       if(u.tukendi){ toast('🚫 '+u.ad+' tükendi'); return; }
+      if(typeof _stokYok==='function'&&_stokYok(u.id)&&!confirm('📦 '+u.ad+' stokta görünmüyor. Yine de eklensin mi?')) return;
       urunEkle(u,d);
     };
     g.appendChild(d);
@@ -2757,6 +2762,7 @@ function odemeOnayla(){
     tutar: top, ic: ic, yi: yi,
     odemeTipi: efektifTip, nakitTutar: nakitTutar, kartTutar: kartTutar,
   });
+  if(typeof _stokOdemeSonrasi==='function') _stokOdemeSonrasi(); // sunucu stok düşer, rozetleri tazele
   // Ödenen ürünlerin notlarını düş; masa tamamen kapandıysa masadaki tüm notları süpür
   try{
     _secKalemler.forEach(function(k){ if(k.sec>0 && k.sec>=k.max && typeof window._notUrunTemizle==='function') window._notUrunTemizle(oncekiMasa, k.id); });
@@ -4473,6 +4479,33 @@ setInterval(function(){gunCiroYukle();},60000);
   window.addEventListener('load',kasBoyut);
   window.addEventListener('resize',kasBoyut);
   setTimeout(kasBoyut,400);
+})();
+</script>
+
+<!-- ═══ STOK TAKİBİ — admin'de tanımlanan ürünlerin kalan adedi ═══
+     Sunucu, MASA_PAY event'inde stoğu otomatik düşer (worker /api/events kancası).
+     Burası sadece gösterim: ürün kartına kalan adet rozeti + 0'da uyarı. -->
+<script>
+(function(){
+  var _stok={}; var _sonJson='';
+  window._stokBadge=function(id){
+    var s=_stok[id]; if(!s) return '';
+    var cls=s.adet<=0?' yok':(s.adet<=s.esik?' az':'');
+    return '<span class="ukrt-stok'+cls+'">'+(s.adet<=0?'STOK YOK':Math.round(s.adet))+'</span>';
+  };
+  window._stokYok=function(id){ var s=_stok[id]; return !!(s&&s.adet<=0); };
+  function stokYukle(){
+    fetch(EV_API+'/api/stok?sube='+SUBE+'&t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(!(d&&d.ok&&Array.isArray(d.urunler))) return;
+      var yeni={}; d.urunler.forEach(function(u){ yeni[u.id]={ad:u.ad,adet:Number(u.adet),esik:Number(u.esik)}; });
+      var j=JSON.stringify(yeni); if(j===_sonJson) return; // değişmediyse re-render etme
+      _sonJson=j; _stok=yeni;
+      if(typeof renderUrunler==='function') renderUrunler();
+    }).catch(function(){});
+  }
+  window._stokOdemeSonrasi=function(){ setTimeout(stokYukle, 1500); };
+  setTimeout(stokYukle, 500);
+  setInterval(stokYukle, 60000);
 })();
 </script>
 

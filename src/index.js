@@ -147,6 +147,58 @@ async function setVardiyaDurum(env, obj) {
   ).bind(JSON.stringify(obj), Date.now()).run();
 }
 
+// ─── Stok takibi: ürün bazında adet; MASA_PAY event'inde otomatik düşer ───
+async function ensureStokTable(env) {
+  await env.ADISYON_DB.prepare(
+    `CREATE TABLE IF NOT EXISTS stok (
+       sube TEXT NOT NULL, urun_id TEXT NOT NULL, ad TEXT NOT NULL,
+       adet REAL NOT NULL DEFAULT 0, esik REAL NOT NULL DEFAULT 0,
+       updated_at INTEGER, PRIMARY KEY (sube, urun_id))`
+  ).run();
+}
+// Ödeme event'lerindeki ürünleri stoktan düş; eşik altına inenler için WhatsApp uyar.
+// SADECE kabul edilmiş (yeni) event'lerle çağrılmalı — retry'da çift düşmesin.
+async function stokDusHook(env, evts) {
+  const dusum = {}; // sube -> { urun_id -> adet }
+  for (const evt of (evts || [])) {
+    if (!evt || evt.type !== 'MASA_PAY') continue;
+    const sube = (evt.sube === 'fsm' || evt.sube === 'podyum') ? evt.sube : null;
+    if (!sube) continue;
+    let p = evt.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+    if (!p || !Array.isArray(p.urunler)) continue;
+    for (const u of p.urunler) {
+      const id = String((u && u.id) || ''); const adet = Number(u && u.adet) || 0;
+      if (!id || adet <= 0) continue;
+      (dusum[sube] = dusum[sube] || {})[id] = (dusum[sube][id] || 0) + adet;
+    }
+  }
+  const subeler = Object.keys(dusum);
+  if (!subeler.length) return;
+  await ensureStokTable(env);
+  for (const sube of subeler) {
+    const uyarilar = [];
+    for (const id of Object.keys(dusum[sube])) {
+      const row = await env.ADISYON_DB.prepare(`SELECT ad, adet, esik FROM stok WHERE sube = ? AND urun_id = ?`).bind(sube, id).first();
+      if (!row) continue; // bu ürün takip edilmiyor
+      const yeni = Number(row.adet) - dusum[sube][id];
+      await env.ADISYON_DB.prepare(`UPDATE stok SET adet = ?, updated_at = ? WHERE sube = ? AND urun_id = ?`).bind(yeni, Date.now(), sube, id).run();
+      // Eşiğin ÜSTÜnden altına inişte uyar (tekrar tekrar değil)
+      if (yeni <= Number(row.esik) && Number(row.adet) > Number(row.esik)) {
+        uyarilar.push({ ad: row.ad, kalan: yeni });
+      }
+    }
+    if (uyarilar.length) {
+      const cfg = await getVardiyaCfg(env, sube);
+      const wa = await resolveWa(env, cfg);
+      if (wa.instance && wa.token && wa.phone) {
+        const msg = '📦 Stok uyarısı — ' + subeAdi(sube) + '\n'
+          + uyarilar.map(function (u) { return '• ' + u.ad + ': ' + (u.kalan <= 0 ? 'TÜKENDİ' : (u.kalan + ' kaldı')); }).join('\n');
+        await vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg);
+      }
+    }
+  }
+}
+
 // Eksik malzemeler — son 30 günün son işaret durumu (alınınca işaret kaldırılır)
 const MALZEME_PENCERE = 30 * 86400000;
 async function eksikMalzemeler(env, sube, cfg, bitTs) {
@@ -361,6 +413,7 @@ export default {
         const evt = body.event || body;
         const res = await postEvent(env, evt);
         if (res.ok) vardiyaChecklistKancasi(env, ctx, [evt]);
+        if (res.ok && res.accepted) ctx.waitUntil(stokDusHook(env, [evt]).catch(function () {}));
         return json(res, res.ok ? 200 : 400);
       } catch (e) {
         return json({ ok: false, error: String(e.message || e) }, 400);
@@ -377,12 +430,14 @@ export default {
           if (!events.length) return json({ ok: true, accepted: 0 });
           let accepted = 0;
           let lastErr = null;
+          const kabulEdilen = []; // stok düşümü İDEMPOTENT DEĞİL → sadece yeni kaydedilenler
           for (const evt of events) {
             const res = await postEvent(env, evt);
-            if (res.ok && res.accepted) accepted++;
+            if (res.ok && res.accepted) { accepted++; kabulEdilen.push(evt); }
             else if (!res.ok) lastErr = res.error;
           }
           vardiyaChecklistKancasi(env, ctx, events);
+          if (kabulEdilen.length) ctx.waitUntil(stokDusHook(env, kabulEdilen).catch(function () {}));
           return json({ ok: true, accepted, total: events.length, error: lastErr });
         } catch (e) {
           return json({ ok: false, error: String(e.message || e) }, 400);
@@ -568,6 +623,51 @@ export default {
                ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
             ).bind(JSON.stringify(merged), Date.now()).run();
           }
+          return json({ ok: true }, 200, NO_STORE);
+        }
+        return json({ ok: false, error: 'method not allowed' }, 405, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 500, NO_STORE);
+      }
+    }
+
+    // ─── /api/stok — ürün stok takibi ───
+    // GET  ?sube=X            → PUBLIC: takip edilen ürünler {id, ad, adet, esik}
+    // POST (X-Cactus-Key)     → { sube, islem:'kaydet'|'ekle'|'sil', urun_id, ad?, adet?, esik?, delta? }
+    if (url.pathname === '/api/stok') {
+      try {
+        await ensureStokTable(env);
+        if (request.method === 'GET') {
+          const sube = url.searchParams.get('sube') || '';
+          if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+          const rows = await env.ADISYON_DB.prepare(`SELECT urun_id, ad, adet, esik, updated_at FROM stok WHERE sube = ? ORDER BY ad`).bind(sube).all();
+          return json({ ok: true, urunler: (rows.results || []).map(function (r) { return { id: r.urun_id, ad: r.ad, adet: Number(r.adet), esik: Number(r.esik), ts: r.updated_at }; }) }, 200, NO_STORE);
+        }
+        if (request.method === 'POST') {
+          const token = request.headers.get('X-Cactus-Key') || '';
+          if (!(await verifyYonetim(env, token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+          const body = await request.json();
+          const sube = body.sube;
+          if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+          const id = String(body.urun_id || '').trim();
+          if (!id) return json({ ok: false, error: 'urun_id gerekli' }, 400, NO_STORE);
+          if (body.islem === 'sil') {
+            await env.ADISYON_DB.prepare(`DELETE FROM stok WHERE sube = ? AND urun_id = ?`).bind(sube, id).run();
+            return json({ ok: true }, 200, NO_STORE);
+          }
+          if (body.islem === 'ekle') {
+            const delta = Number(body.delta) || 0;
+            const r = await env.ADISYON_DB.prepare(
+              `UPDATE stok SET adet = adet + ?, updated_at = ? WHERE sube = ? AND urun_id = ?`
+            ).bind(delta, Date.now(), sube, id).run();
+            if (!r.meta.changes) return json({ ok: false, error: 'ürün stok listesinde yok' }, 400, NO_STORE);
+            return json({ ok: true }, 200, NO_STORE);
+          }
+          // varsayılan: kaydet (upsert — mutlak adet + eşik + ad)
+          await env.ADISYON_DB.prepare(
+            `INSERT INTO stok (sube, urun_id, ad, adet, esik, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+             ON CONFLICT(sube, urun_id) DO UPDATE SET ad = excluded.ad, adet = excluded.adet, esik = excluded.esik, updated_at = excluded.updated_at`
+          ).bind(sube, id, String(body.ad || id), Number(body.adet) || 0, Number(body.esik) || 0, Date.now()).run();
           return json({ ok: true }, 200, NO_STORE);
         }
         return json({ ok: false, error: 'method not allowed' }, 405, NO_STORE);

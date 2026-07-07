@@ -1053,6 +1053,7 @@ if('serviceWorker' in navigator){
 #scr-var .var-item.done .var-mad{text-decoration:line-through;color:var(--k2);}
 #scr-var .var-item.eksik{background:#fdecec;border-color:#e6a1a1;}
 #scr-var .var-item.eksik .var-chk{background:#c0392b;border-color:#c0392b;color:#fff;}
+#scr-var .var-btn-bildir{width:100%;margin-top:10px;background:linear-gradient(135deg,#c67000,#a35a00);}
 #scr-var .var-who{font-size:11px;color:var(--k2);white-space:nowrap;}
 #scr-var .var-tag{display:inline-block;background:#eef7ee;border:1px solid #9ccc9c;color:#1f5c38;border-radius:100px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;}
 #scr-var #var-durum{font-size:14px;color:var(--k1);}
@@ -1082,6 +1083,7 @@ if('serviceWorker' in navigator){
       <div class="var-ttl">🧂 Malzeme — Eksikler <span id="var-malzeme-say" class="var-say"></span></div>
       <div style="font-size:12px;color:var(--k2);margin:-4px 0 10px;">Biten/azalan malzemeyi işaretle; alınınca işareti kaldır. (Günlük sıfırlanmaz.)</div>
       <div id="var-malzeme"></div>
+      <button id="var-malzeme-gonder" class="var-btn var-btn-bildir" onclick="malzemeBildir()" disabled>📤 Eksikleri Bildir</button>
     </div>
     <div class="var-card">
       <div class="var-ttl">🕒 Şu An Vardiyada</div>
@@ -4520,6 +4522,29 @@ setInterval(function(){gunCiroYukle();},60000);
   }
   window.vardiyaGiris=function(){ _vardiyaAksiyon('giris'); };
   window.vardiyaCikis=function(){ _vardiyaAksiyon('cikis'); };
+  function malzemeEksikleri(){
+    var items=_vconf.malzeme||[];
+    var evs=son7gunEv().filter(function(e){return e.payload&&e.payload.tur==='malzeme';});
+    return items.filter(function(m){
+      var last=null; evs.forEach(function(e){ if(e.payload.madde===m&&(!last||e.ts>last.ts)) last=e; });
+      return !!(last&&last.payload.done);
+    });
+  }
+  window.malzemeBildir=function(){
+    var btn=document.getElementById('var-malzeme-gonder');
+    var eksikler=malzemeEksikleri();
+    if(!eksikler.length){ alert('Önce eksik malzemeleri işaretle'); return; }
+    if(btn){ btn.disabled=true; btn.textContent='⏳ Gönderiliyor…'; }
+    fetch(EV_API+'/api/malzeme-bildir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,ad:_vsel,eksikler:eksikler,cihaz_id:_cihazId})})
+      .then(function(r){return r.json().catch(function(){return {ok:false,error:'Sunucu hatası'};});})
+      .then(function(d){
+        if(d&&d.ok){
+          if(btn) btn.textContent='✅ Bildirildi';
+          setTimeout(function(){ if(btn) btn.textContent='📤 Eksikleri Bildir'; vardiyaRender(); }, 2500);
+        } else { alert((d&&d.error)||'Gönderilemedi'); vardiyaRender(); }
+      })
+      .catch(function(){ alert('Bağlantı hatası — tekrar deneyin'); vardiyaRender(); });
+  };
   window.vardiyaTik=function(tur,idx){
     if(!_vsel){ alert('Önce personel seçin'); return; }
     var madde=(_vconf[tur]||[])[idx]; if(madde==null) return;
@@ -4564,6 +4589,13 @@ setInterval(function(){gunCiroYukle();},60000);
       return '<div class="var-item'+cls+'" onclick="vardiyaTik(\''+tur+'\','+i+')"><span class="var-chk">'+isaret+'</span><span class="var-mad">'+_esc(m)+'</span>'+who+'</div>';
     }).join('') : '<div style="color:var(--k2);font-size:13px;padding:6px 0;">Madde tanımlı değil.</div>';
     var say=document.getElementById('var-'+tur+'-say'); if(say) say.textContent=items.length?(eksikMi?(done?(done+' eksik'):'eksik yok'):(done+'/'+items.length)):'';
+    if(eksikMi){
+      var gBtn=document.getElementById('var-malzeme-gonder');
+      if(gBtn && gBtn.textContent.indexOf('✅')<0 && gBtn.textContent.indexOf('⏳')<0){
+        gBtn.disabled=!done;
+        gBtn.textContent='📤 Eksikleri Bildir'+(done?(' ('+done+')'):'');
+      }
+    }
   }
   function vardiyaIcerde(){
     var el=document.getElementById('var-icerdekiler'); if(!el) return;

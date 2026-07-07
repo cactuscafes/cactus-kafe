@@ -560,6 +560,41 @@ export default {
       }
     }
 
+    // ─── /api/malzeme-bildir — personel eksikleri işaretleyip Gönder'e basınca tek WhatsApp ───
+    // POST { sube, ad?, eksikler:[...], cihaz_id? } — liste config'teki malzemelerle süzülür.
+    if (url.pathname === '/api/malzeme-bildir' && request.method === 'POST') {
+      try {
+        await ensureVardiyaTable(env);
+        const body = await request.json();
+        const sube = body.sube;
+        if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+        const cfg = await getVardiyaCfg(env, sube);
+        const gecerli = {};
+        (cfg.malzeme || []).forEach(function (m) { gecerli[m] = true; });
+        const liste = Array.isArray(body.eksikler)
+          ? body.eksikler.map(String).filter(function (m, i, a) { return gecerli[m] && a.indexOf(m) === i; })
+          : [];
+        if (!liste.length) return json({ ok: false, error: 'Eksik madde seçilmedi' }, 200, NO_STORE);
+        // Spam koruması: şube başına en fazla 2 dakikada bir bildirim
+        const durum = await getVardiyaDurum(env);
+        const now = Date.now();
+        if (now - Number(durum['malzeme_ts_' + sube] || 0) < 120000) {
+          return json({ ok: false, error: 'Az önce bildirildi — 2 dk sonra tekrar deneyin' }, 200, NO_STORE);
+        }
+        const wa = await resolveWa(env, cfg);
+        if (!(wa.instance && wa.token && wa.phone)) return json({ ok: false, error: 'WhatsApp yapılandırılmamış' }, 200, NO_STORE);
+        const ad = String(body.ad || '').trim();
+        const msg = '🧂 Eksik malzeme — ' + subeAdi(sube) + '\n• ' + liste.join('\n• ') + '\n' + (ad ? (ad + ' — ') : '') + saatStr(now);
+        const sonuc = await vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg);
+        if (!(sonuc && sonuc.ok)) return json({ ok: false, error: 'Mesaj gönderilemedi' }, 200, NO_STORE);
+        durum['malzeme_ts_' + sube] = now;
+        ctx.waitUntil(setVardiyaDurum(env, durum));
+        return json({ ok: true, adet: liste.length }, 200, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 400, NO_STORE);
+      }
+    }
+
     // ─── /api/vardiya-giris — giriş/çıkış (şifre isteğe bağlı: kişide şifre varsa doğrulanır) ───
     // POST { sube, ad, pin?, aksiyon('giris'|'cikis'), cihaz_id }
     //   → kişinin şifresi varsa eşleşme zorunlu; yoksa şifresiz kabul.

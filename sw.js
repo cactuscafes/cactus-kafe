@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v38'; // v38: 🧂 malzeme eksik listesi (adisyon + admin + gece özeti)
+const VERSION = 'cactus-v39'; // v39: malzeme 'Eksikleri Bildir' butonu (tek WhatsApp mesajı)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

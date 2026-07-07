@@ -572,9 +572,10 @@ export default {
     // Diğer her şey → statik dosya
     return env.ASSETS.fetch(request);
   },
-
-  // Cron (wrangler.toml [triggers]): gece özeti + geç kalma uyarısı
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(vardiyaZamanliKontrol(env).catch(function () {}));
-  },
 };
+
+// Cron mantığı ayrı worker'dan çalışır (src/cron.js + wrangler-cron.toml):
+// assets'li worker'larda cron trigger kaydolmuyor (wrangler 3 ve 4 ile doğrulandı;
+// schedule sessizce atlanıyor). cactus-kafe-cron worker'ı aynı D1'e bağlanıp
+// bu fonksiyonu 10 dk'da bir çağırır.
+export { vardiyaZamanliKontrol };

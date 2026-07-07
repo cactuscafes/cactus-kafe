@@ -1,0 +1,20 @@
+# cactus-kafe-cron — vardiya bildirim zamanlayıcısı (ayrı worker).
+# Ana worker asset'li olduğu için cron trigger'ı kabul etmiyor; bu worker
+# aynı D1 veritabanına bağlanıp src/index.js'teki vardiyaZamanliKontrol'ü
+# 10 dakikada bir çalıştırır. Deploy: npx wrangler deploy -c wrangler-cron.toml
+name = "cactus-kafe-cron"
+compatibility_date = "2026-04-26"
+main = "src/cron.js"
+
+compatibility_flags = [ "nodejs_compat" ]
+
+[[d1_databases]]
+binding = "ADISYON_DB"
+database_name = "cactus-adisyon-events"
+database_id = "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[observability]
+enabled = true

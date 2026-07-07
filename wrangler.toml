@@ -15,10 +15,9 @@ database_id = "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
 [observability]
 enabled = true
 
-# Vardiya bildirim otomasyonu: 10 dk'da bir uyan → gece özeti (05:00-05:30 İst)
-# ve geç kalma kontrolü (admin'de ayarlanan saat). Bkz. src/index.js scheduled().
-[triggers]
-crons = ["*/10 * * * *"]
+# NOT: cron trigger'ları asset'li worker'da kaydolmuyor (wrangler 3 ve 4 ile
+# denendi, schedule sessizce atlanıyor). Vardiya zamanlayıcısı ayrı worker'da:
+# wrangler-cron.toml (cactus-kafe-cron).
 
 [env.production]
 vars = { ENVIRONMENT = "production" }

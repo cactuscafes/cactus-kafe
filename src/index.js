@@ -147,6 +147,22 @@ async function setVardiyaDurum(env, obj) {
   ).bind(JSON.stringify(obj), Date.now()).run();
 }
 
+// Eksik malzemeler — son 30 günün son işaret durumu (alınınca işaret kaldırılır)
+const MALZEME_PENCERE = 30 * 86400000;
+async function eksikMalzemeler(env, sube, cfg, bitTs) {
+  const items = (cfg && cfg.malzeme) || [];
+  if (!items.length) return [];
+  const rows = await env.ADISYON_DB.prepare(
+    `SELECT payload, ts FROM adisyon_events WHERE sube = ? AND type = 'checklist' AND ts >= ? AND ts < ? ORDER BY ts ASC`
+  ).bind(sube, bitTs - MALZEME_PENCERE, bitTs).all();
+  const son = {};
+  for (const r of (rows.results || [])) {
+    let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
+    if (p && p.tur === 'malzeme') son[p.madde] = !!p.done;
+  }
+  return items.filter(function (m) { return son[m]; });
+}
+
 // Günlük özet metni: kişi bazında giriş/çıkış seansları + checklist durumu
 async function vardiyaOzetOlustur(env, sube, basTs, bitTs, cfg) {
   const rows = await env.ADISYON_DB.prepare(
@@ -187,20 +203,9 @@ async function vardiyaOzetOlustur(env, sube, basTs, bitTs, cfg) {
     const biten = items.filter(function (m) { return son[m]; }).length;
     satirlar.push((tur === 'acilis' ? '🌅 Açılış: ' : '🌙 Kapanış: ') + biten + '/' + items.length + (biten === items.length ? ' ✅' : ' ⚠️'));
   }
-  // Eksik malzeme — günlük değil: son 7 günün son işaret durumu (alınınca kaldırılır)
-  const mItems = (cfg && cfg.malzeme) || [];
-  if (mItems.length) {
-    const mr = await env.ADISYON_DB.prepare(
-      `SELECT payload, ts FROM adisyon_events WHERE sube = ? AND type = 'checklist' AND ts >= ? AND ts < ? ORDER BY ts ASC`
-    ).bind(sube, bitTs - 7 * 86400000, bitTs).all();
-    const mSon = {};
-    for (const r of (mr.results || [])) {
-      let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
-      if (p && p.tur === 'malzeme') mSon[p.madde] = !!p.done;
-    }
-    const eksik = mItems.filter(function (m) { return mSon[m]; });
-    if (eksik.length) satirlar.push('🧂 Eksik malzeme: ' + eksik.join(', '));
-  }
+  // Eksik malzeme — günlük değil: son işaret durumu (alınınca kaldırılır)
+  const eksik = await eksikMalzemeler(env, sube, cfg, bitTs);
+  if (eksik.length) satirlar.push('🧂 Eksik malzeme: ' + eksik.join(', '));
   return satirlar.join('\n');
 }
 
@@ -225,6 +230,17 @@ async function vardiyaZamanliKontrol(env) {
         if (msg) await vardiyaWhatsapp(wa.instance, wa.token, wa.phone, msg);
       }
       durum['ozet_' + sube] = tarih; degisti = true;
+    }
+    // 3) Eksik malzeme sabah hatırlatması — 09:00–09:30 İst; eksik sürdükçe her gün
+    if (dakika >= 540 && dakika < 570 && durum['malzeme_gun_' + sube] !== tarih) {
+      if (hazir) {
+        const eksik = await eksikMalzemeler(env, sube, cfg, now);
+        if (eksik.length) {
+          await vardiyaWhatsapp(wa.instance, wa.token, wa.phone,
+            '🧂 Eksik malzeme hatırlatması — ' + subeAdi(sube) + '\n• ' + eksik.join('\n• ') + '\nMalzeme alındığında personel listedeki işareti kaldırınca bu hatırlatma durur.');
+        }
+      }
+      durum['malzeme_gun_' + sube] = tarih; degisti = true;
     }
     // 2) Geç kalma — gec_saat (İstanbul) geçti, bugün hiç vardiya kaydı yoksa uyar (günde bir kez)
     if (cfg.gec_saat && durum['gec_' + sube] !== tarih) {

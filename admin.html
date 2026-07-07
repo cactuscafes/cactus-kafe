@@ -4543,8 +4543,8 @@ if('serviceWorker' in navigator){
       var evs=(j&&Array.isArray(j.events))?j.events:[];
       var gb=gunBasi();
       var bugun=evs.filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; });
-      // Malzeme günlük sıfırlanmaz — son 7 günün son işaret durumu
-      var m7=evs.filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=Date.now()-7*86400000; });
+      // Malzeme günlük sıfırlanmaz — son 30 günün son işaret durumu (worker ile aynı pencere)
+      var m7=evs.filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=Date.now()-30*86400000; });
       _vadLastEv={bugun:bugun,m7:m7};
       vardiyaCanliRender(_vadLastEv);
       if(dEl){ dEl.textContent='☁️ canlı'; dEl.style.color='#2d7a3a'; }

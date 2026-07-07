@@ -4186,8 +4186,8 @@ setInterval(function(){gunCiroYukle();},60000);
   function _saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
   function gunBasi(){ var d=new Date(); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
   function bugunEv(){ var gb=gunBasi(); return (window._eventLog||[]).filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; }); }
-  // Malzeme günlük sıfırlanmaz — son 7 günün son işaret durumu geçerli
-  function son7gunEv(){ var sinir=Date.now()-7*86400000; return (window._eventLog||[]).filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=sinir; }); }
+  // Malzeme günlük sıfırlanmaz — son 30 günün son işaret durumu geçerli (worker ile aynı pencere)
+  function son7gunEv(){ var sinir=Date.now()-30*86400000; return (window._eventLog||[]).filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=sinir; }); }
   function turEv(tur){ return tur==='malzeme' ? son7gunEv() : bugunEv(); }
 
   window.vardiyaConfigYukle=function(cb){

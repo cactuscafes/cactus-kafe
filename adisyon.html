@@ -1092,6 +1092,18 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<!-- VARDİYA AÇILIŞ POP-UP — sayfa açıldığında kimse içerde değilse giriş hatırlat -->
+<div id="vpop" style="display:none;position:fixed;inset:0;z-index:99990;background:rgba(14,27,8,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;max-width:360px;width:100%;padding:24px 22px;box-shadow:0 24px 60px rgba(0,0,0,.35);">
+    <div style="font-size:19px;font-weight:800;color:#1a3010;margin-bottom:6px;">🕒 Vardiya Girişi</div>
+    <div style="font-size:13px;color:#667;line-height:1.5;margin-bottom:14px;">Bugün henüz kimse giriş yapmamış görünüyor. Geldiysen adını seçip giriş yap 👇</div>
+    <select id="vpop-personel" onchange="vpopSec()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;background:#fff;color:#1a3010;margin-bottom:10px;"><option value="">— Adını seç —</option></select>
+    <input id="vpop-pin" type="tel" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="Şifreni gir" style="display:none;width:100%;box-sizing:border-box;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;text-align:center;letter-spacing:4px;margin-bottom:10px;">
+    <button onclick="vpopGiris()" id="vpop-btn" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#2e7d32,#1f5c38);color:#fff;font-size:15px;font-weight:800;cursor:pointer;">🟢 Giriş Yap</button>
+    <button onclick="vpopKapat()" style="width:100%;padding:11px;border:none;background:none;color:#888;font-size:13px;cursor:pointer;margin-top:6px;">Şimdi değil</button>
+  </div>
+</div>
+
 <!-- MOBİL DRAWER -->
 <button class="mob-adis-btn" id="mob-btn" onclick="openDrawer()">🧾<span class="mob-adis-badge" id="mob-badge">0</span></button>
 <div class="drawer-overlay" id="d-overlay" onclick="closeDrawer()"></div>
@@ -4474,8 +4486,9 @@ setInterval(function(){gunCiroYukle();},60000);
   var _vconf={personel:[],acilis:[],kapanis:[],malzeme:[],pinli:null};
   var _vsel=''; try{ _vsel=localStorage.getItem('cactus_vardiya_ben_'+SUBE)||''; }catch(e){}
   var _vbusy=false;
-  // Seçili kişinin şifresi var mı? (pinli listesi yoksa — eski sunucu — güvenli taraf: iste)
-  function _pinGerekli(){ if(!_vsel) return false; if(!Array.isArray(_vconf.pinli)) return true; return _vconf.pinli.indexOf(_vsel)>=0; }
+  // Kişinin şifresi var mı? (pinli listesi yoksa — eski sunucu — güvenli taraf: iste)
+  function _adPinli(ad){ if(!Array.isArray(_vconf.pinli)) return true; return _vconf.pinli.indexOf(ad)>=0; }
+  function _pinGerekli(){ return _vsel ? _adPinli(_vsel) : false; }
   function _esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function _saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
   // İş günü sınırı: sabah 05:00. 05:00 öncesi bir önceki güne sayılır (gece kapanışı doğru sayılsın).
@@ -4603,6 +4616,51 @@ setInterval(function(){gunCiroYukle();},60000);
     var icerde=Object.keys(byAd).filter(function(ad){return byAd[ad].payload.aksiyon==='giris';});
     el.innerHTML = icerde.length ? icerde.map(function(ad){return '<span class="var-tag">🟢 '+_esc(ad)+' · '+_saat(byAd[ad].ts)+'</span>';}).join('') : '<span style="color:var(--k2)">Şu an vardiyada kimse yok.</span>';
   }
+  // ─── Açılış pop-up'ı: sayfa açıldığında bugün kimse içerde değilse giriş hatırlat ───
+  var _vpopKapatildi=false;
+  function icerdeListesi(){
+    var byAd={};
+    bugunEv().filter(function(e){return e.type==='vardiya'&&e.payload&&e.payload.ad;}).sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){ byAd[e.payload.ad]=e; });
+    return Object.keys(byAd).filter(function(ad){return byAd[ad].payload.aksiyon==='giris';});
+  }
+  function vardiyaPopupGoster(){
+    if(_vpopKapatildi) return;
+    if(!(_vconf.personel&&_vconf.personel.length)) return;   // personel tanımlı değil
+    if(icerdeListesi().length) return;                       // biri zaten vardiyada
+    var ov=document.getElementById('vpop'); if(!ov||ov.style.display==='flex') return;
+    var sel=document.getElementById('vpop-personel');
+    if(sel) sel.innerHTML='<option value="">— Adını seç —</option>'+_vconf.personel.map(function(p){return '<option value="'+_esc(p)+'"'+(p===_vsel?' selected':'')+'>'+_esc(p)+'</option>';}).join('');
+    ov.style.display='flex';
+    vpopSec();
+  }
+  window.vpopSec=function(){
+    var sel=document.getElementById('vpop-personel'), pi=document.getElementById('vpop-pin');
+    var ad=(sel&&sel.value)||'';
+    if(pi){ pi.style.display=(ad&&_adPinli(ad))?'':'none'; pi.value=''; }
+  };
+  window.vpopKapat=function(){ _vpopKapatildi=true; var ov=document.getElementById('vpop'); if(ov) ov.style.display='none'; };
+  window.vpopGiris=function(){
+    var sel=document.getElementById('vpop-personel'); var ad=(sel&&sel.value)||'';
+    if(!ad){ alert('Adını seç'); return; }
+    var pi=document.getElementById('vpop-pin'); var pin=(pi&&pi.value||'').trim();
+    if(_adPinli(ad)&&!pin){ alert('Şifreni gir'); if(pi)pi.focus(); return; }
+    var btn=document.getElementById('vpop-btn'); if(btn){ btn.disabled=true; btn.textContent='⏳ Giriş yapılıyor…'; }
+    fetch(EV_API+'/api/vardiya-giris',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sube:SUBE,ad:ad,pin:pin,aksiyon:'giris',cihaz_id:_cihazId})})
+      .then(function(r){return r.json().catch(function(){return {ok:false,error:'Sunucu hatası'};});})
+      .then(function(d){
+        if(btn){ btn.disabled=false; btn.textContent='🟢 Giriş Yap'; }
+        if(d&&d.ok){
+          _vsel=ad; try{localStorage.setItem('cactus_vardiya_ben_'+SUBE,ad);}catch(e){}
+          vpopKapat();
+          if(typeof _evSync==='function') _evSync();
+          setTimeout(vardiyaRender, 700);
+        } else { alert((d&&d.error)||'Giriş başarısız'); }
+      })
+      .catch(function(){ if(btn){ btn.disabled=false; btn.textContent='🟢 Giriş Yap'; } alert('Bağlantı hatası — tekrar deneyin'); });
+  };
+  // Sayfa açılışından kısa süre sonra kontrol et (config + cache'ten event log hazır olsun)
+  setTimeout(function(){ vardiyaConfigYukle(function(){ vardiyaPopupGoster(); }); }, 2200);
+
   // Açık ekranı 3 sn'de bir tazele (diğer cihazların işaretlemeleri _evSync ile gelir)
   setInterval(function(){ var s=document.getElementById('scr-var'); if(s && s.classList.contains('on')) vardiyaRender(); }, 3000);
 })();

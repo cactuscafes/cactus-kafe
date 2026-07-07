@@ -148,6 +148,7 @@ async function setVardiyaDurum(env, obj) {
 }
 
 // ─── Stok takibi: ürün bazında adet; MASA_PAY event'inde otomatik düşer ───
+let _stokSemaHazir = false;
 async function ensureStokTable(env) {
   await env.ADISYON_DB.prepare(
     `CREATE TABLE IF NOT EXISTS stok (
@@ -155,6 +156,20 @@ async function ensureStokTable(env) {
        adet REAL NOT NULL DEFAULT 0, esik REAL NOT NULL DEFAULT 0,
        updated_at INTEGER, PRIMARY KEY (sube, urun_id))`
   ).run();
+  if (!_stokSemaHazir) {
+    // Hammadde alanları: birim (shot/bardak...), paket tanımı (1 kg = 100 shot), tür (urun|hammadde)
+    for (const kolon of ["birim TEXT DEFAULT ''", "paket_ad TEXT DEFAULT ''", "paket_birim REAL DEFAULT 0", "tur TEXT DEFAULT 'urun'"]) {
+      try { await env.ADISYON_DB.prepare('ALTER TABLE stok ADD COLUMN ' + kolon).run(); } catch (e) {}
+    }
+    // Reçete: ürün → hammadde + miktar (Latte → 1 shot; Double Türk → 2 shot)
+    await env.ADISYON_DB.prepare(
+      `CREATE TABLE IF NOT EXISTS recete (
+         sube TEXT NOT NULL, urun_id TEXT NOT NULL, urun_ad TEXT DEFAULT '',
+         hammadde_id TEXT NOT NULL, miktar REAL NOT NULL,
+         PRIMARY KEY (sube, urun_id, hammadde_id))`
+    ).run();
+    _stokSemaHazir = true;
+  }
 }
 // Ödeme event'lerindeki ürünleri stoktan düş; eşik altına inenler için WhatsApp uyar.
 // SADECE kabul edilmiş (yeni) event'lerle çağrılmalı — retry'da çift düşmesin.
@@ -176,11 +191,24 @@ async function stokDusHook(env, evts) {
   if (!subeler.length) return;
   await ensureStokTable(env);
   for (const sube of subeler) {
+    // Reçeteli ürünler: satılan adet × bileşen miktarı kadar hammaddeden düş
+    const ids = Object.keys(dusum[sube]);
+    const azalt = {}; ids.forEach(function (id) { azalt[id] = dusum[sube][id]; });
+    try {
+      const ph = ids.map(function () { return '?'; }).join(',');
+      const rc = await env.ADISYON_DB.prepare(
+        `SELECT urun_id, hammadde_id, miktar FROM recete WHERE sube = ? AND urun_id IN (` + ph + `)`
+      ).bind(sube, ...ids).all();
+      for (const r of (rc.results || [])) {
+        const m = Number(r.miktar) * dusum[sube][r.urun_id];
+        if (m > 0) azalt[r.hammadde_id] = (azalt[r.hammadde_id] || 0) + m;
+      }
+    } catch (e) {}
     const uyarilar = [];
-    for (const id of Object.keys(dusum[sube])) {
+    for (const id of Object.keys(azalt)) {
       const row = await env.ADISYON_DB.prepare(`SELECT ad, adet, esik FROM stok WHERE sube = ? AND urun_id = ?`).bind(sube, id).first();
       if (!row) continue; // bu ürün takip edilmiyor
-      const yeni = Number(row.adet) - dusum[sube][id];
+      const yeni = Number(row.adet) - azalt[id];
       await env.ADISYON_DB.prepare(`UPDATE stok SET adet = ?, updated_at = ? WHERE sube = ? AND urun_id = ?`).bind(yeni, Date.now(), sube, id).run();
       // Eşiğin ÜSTÜnden altına inişte uyar (tekrar tekrar değil)
       if (yeni <= Number(row.esik) && Number(row.adet) > Number(row.esik)) {
@@ -640,8 +668,32 @@ export default {
         if (request.method === 'GET') {
           const sube = url.searchParams.get('sube') || '';
           if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
-          const rows = await env.ADISYON_DB.prepare(`SELECT urun_id, ad, adet, esik, updated_at FROM stok WHERE sube = ? ORDER BY ad`).bind(sube).all();
-          return json({ ok: true, urunler: (rows.results || []).map(function (r) { return { id: r.urun_id, ad: r.ad, adet: Number(r.adet), esik: Number(r.esik), ts: r.updated_at }; }) }, 200, NO_STORE);
+          const rows = await env.ADISYON_DB.prepare(`SELECT urun_id, ad, adet, esik, birim, paket_ad, paket_birim, tur, updated_at FROM stok WHERE sube = ? ORDER BY ad`).bind(sube).all();
+          const hepsi = (rows.results || []).map(function (r) {
+            return { id: r.urun_id, ad: r.ad, adet: Number(r.adet), esik: Number(r.esik), birim: r.birim || '', paket_ad: r.paket_ad || '', paket_birim: Number(r.paket_birim) || 0, tur: r.tur === 'hammadde' ? 'hammadde' : 'urun', ts: r.updated_at };
+          });
+          const hammaddeler = hepsi.filter(function (x) { return x.tur === 'hammadde'; });
+          const dogrudan = hepsi.filter(function (x) { return x.tur !== 'hammadde'; });
+          // Reçeteler + "kaç adet daha yapılabilir" hesabı (min bileşen kapasitesi)
+          const rc = await env.ADISYON_DB.prepare(`SELECT urun_id, urun_ad, hammadde_id, miktar FROM recete WHERE sube = ?`).bind(sube).all();
+          const receteler = (rc.results || []).map(function (r) { return { urun_id: r.urun_id, urun_ad: r.urun_ad || r.urun_id, hammadde_id: r.hammadde_id, miktar: Number(r.miktar) }; });
+          const H = {}; hammaddeler.forEach(function (h) { H[h.id] = h; });
+          const grup = {};
+          receteler.forEach(function (r) { (grup[r.urun_id] = grup[r.urun_id] || { ad: r.urun_ad, bilesen: [] }).bilesen.push(r); });
+          const hesaplanan = [];
+          Object.keys(grup).forEach(function (pid) {
+            let min = Infinity, az = false;
+            grup[pid].bilesen.forEach(function (b) {
+              const h = H[b.hammadde_id]; if (!h || !(Number(b.miktar) > 0)) return;
+              const yap = Math.floor(h.adet / b.miktar);
+              if (yap < min) min = yap;
+              if (h.adet <= h.esik) az = true;
+            });
+            if (min === Infinity) return;
+            // esik: hammadde eşiğe indiyse rozet turuncuya dönsün diye adet'e eşitlenir
+            hesaplanan.push({ id: pid, ad: grup[pid].ad, adet: min, esik: az ? min : 0, hesap: true });
+          });
+          return json({ ok: true, urunler: dogrudan.concat(hesaplanan), hammaddeler: hammaddeler, receteler: receteler }, 200, NO_STORE);
         }
         if (request.method === 'POST') {
           const token = request.headers.get('X-Cactus-Key') || '';
@@ -653,6 +705,24 @@ export default {
           if (!id) return json({ ok: false, error: 'urun_id gerekli' }, 400, NO_STORE);
           if (body.islem === 'sil') {
             await env.ADISYON_DB.prepare(`DELETE FROM stok WHERE sube = ? AND urun_id = ?`).bind(sube, id).run();
+            // Hammadde silinirse onu kullanan reçeteler de temizlensin
+            await env.ADISYON_DB.prepare(`DELETE FROM recete WHERE sube = ? AND hammadde_id = ?`).bind(sube, id).run();
+            return json({ ok: true }, 200, NO_STORE);
+          }
+          if (body.islem === 'recete') {
+            const hid = String(body.hammadde_id || '').trim();
+            const miktar = Number(body.miktar) || 0;
+            if (!hid || miktar <= 0) return json({ ok: false, error: 'hammadde ve miktar gerekli' }, 400, NO_STORE);
+            await env.ADISYON_DB.prepare(
+              `INSERT INTO recete (sube, urun_id, urun_ad, hammadde_id, miktar) VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(sube, urun_id, hammadde_id) DO UPDATE SET urun_ad = excluded.urun_ad, miktar = excluded.miktar`
+            ).bind(sube, id, String(body.urun_ad || id), hid, miktar).run();
+            return json({ ok: true }, 200, NO_STORE);
+          }
+          if (body.islem === 'recete-sil') {
+            const hid = String(body.hammadde_id || '').trim();
+            if (hid) await env.ADISYON_DB.prepare(`DELETE FROM recete WHERE sube = ? AND urun_id = ? AND hammadde_id = ?`).bind(sube, id, hid).run();
+            else await env.ADISYON_DB.prepare(`DELETE FROM recete WHERE sube = ? AND urun_id = ?`).bind(sube, id).run();
             return json({ ok: true }, 200, NO_STORE);
           }
           if (body.islem === 'ekle') {
@@ -663,11 +733,14 @@ export default {
             if (!r.meta.changes) return json({ ok: false, error: 'ürün stok listesinde yok' }, 400, NO_STORE);
             return json({ ok: true }, 200, NO_STORE);
           }
-          // varsayılan: kaydet (upsert — mutlak adet + eşik + ad)
+          // varsayılan: kaydet (upsert — mutlak adet + eşik + ad; hammaddede birim/paket bilgisi)
+          const tur = body.tur === 'hammadde' ? 'hammadde' : 'urun';
           await env.ADISYON_DB.prepare(
-            `INSERT INTO stok (sube, urun_id, ad, adet, esik, updated_at) VALUES (?, ?, ?, ?, ?, ?)
-             ON CONFLICT(sube, urun_id) DO UPDATE SET ad = excluded.ad, adet = excluded.adet, esik = excluded.esik, updated_at = excluded.updated_at`
-          ).bind(sube, id, String(body.ad || id), Number(body.adet) || 0, Number(body.esik) || 0, Date.now()).run();
+            `INSERT INTO stok (sube, urun_id, ad, adet, esik, birim, paket_ad, paket_birim, tur, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(sube, urun_id) DO UPDATE SET ad = excluded.ad, adet = excluded.adet, esik = excluded.esik,
+               birim = excluded.birim, paket_ad = excluded.paket_ad, paket_birim = excluded.paket_birim, tur = excluded.tur, updated_at = excluded.updated_at`
+          ).bind(sube, id, String(body.ad || id), Number(body.adet) || 0, Number(body.esik) || 0,
+                 String(body.birim || ''), String(body.paket_ad || ''), Number(body.paket_birim) || 0, tur, Date.now()).run();
           return json({ ok: true }, 200, NO_STORE);
         }
         return json({ ok: false, error: 'method not allowed' }, 405, NO_STORE);

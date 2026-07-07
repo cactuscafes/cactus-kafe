@@ -978,7 +978,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <!-- MAAŞ / BORDRO -->
       <div class="panel" id="panel-stok" style="max-width:1080px;">
         <div class="pttl">📦 Stok Takibi</div>
-        <div class="psub">Takip ettiğin ürünlerin stoğu adisyonda her <b>ödeme</b> alındığında otomatik düşer; eşiğin altına inince WhatsApp uyarısı gelir.</div>
+        <div class="psub">Hammadde stoğu (çekirdek, limonata…) reçetelere göre her <b>ödemede otomatik düşer</b>; eşiğin altına inince WhatsApp uyarısı gelir. Adisyonda ürün kartları "kaç adet daha yapılabilir" rozetini gösterir.</div>
 
         <div class="vad-tabs">
           <button class="vad-tab on" id="stokTabFsm" onclick="stokSube('fsm')">🏙 FSM</button>
@@ -988,8 +988,38 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           <button class="vad-mini" onclick="stokYukleAdmin()">🔄 Yenile</button>
         </div>
 
+        <!-- 1) HAMMADDE -->
         <div class="vad-blok" style="margin-bottom:20px;">
-          <div class="vad-blok-ttl">➕ Ürün Ekle / Güncelle</div>
+          <div class="vad-blok-ttl">🧺 Hammaddeler</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1.4;min-width:170px;"><label class="lbl">Hammadde Adı</label><input id="hamAd" placeholder="Espresso çekirdeği" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:90px;"><label class="lbl">Birim</label><input id="hamBirim" placeholder="shot" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:80px;"><label class="lbl">Paket Adı</label><input id="hamPaketAd" placeholder="kg" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:110px;"><label class="lbl">1 Paket = ? Birim</label><input id="hamPaketBirim" type="number" min="0" placeholder="100" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:100px;"><label class="lbl">Elde Kaç Paket</label><input id="hamPaketSayi" type="number" min="0" step="0.1" placeholder="2" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <div style="min-width:100px;"><label class="lbl">Eşik (birim)</label><input id="hamEsik" type="number" min="0" value="10" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <button class="btn-primary" onclick="hamEkleKaydet()">💾 Kaydet</button>
+          </div>
+          <div style="font-size:11px;color:var(--mist);margin-top:8px;line-height:1.6;">Örnek: <b>Espresso çekirdeği</b> · birim <b>shot</b> · paket <b>kg</b> · 1 paket = <b>100</b> birim · elde <b>2</b> paket → 200 shot stok. <b>Limonata</b> · birim <b>bardak</b> · paket <b>şişe</b> · 1 şişe = <b>16</b> bardak.</div>
+          <div id="hamListe" style="margin-top:12px;"><div class="vad-bos">Yükleniyor…</div></div>
+        </div>
+
+        <!-- 2) REÇETELER -->
+        <div class="vad-blok" style="margin-bottom:20px;">
+          <div class="vad-blok-ttl">🔗 Reçeteler <span style="font-weight:400;color:var(--mist);font-size:11px;">(ürün başına hangi hammaddeden ne kadar gider)</span></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1.6;min-width:200px;"><label class="lbl">Ürün (adisyon menüsünden)</label><select id="recUrunSec" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit;"><option value="">— Ürün seç —</option></select></div>
+            <div style="flex:1.2;min-width:160px;"><label class="lbl">Hammadde</label><select id="recHamSec" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit;"><option value="">— Hammadde seç —</option></select></div>
+            <div style="min-width:90px;"><label class="lbl">Miktar</label><input id="recMiktar" type="number" min="0" step="0.25" value="1" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
+            <button class="btn-primary" onclick="recEkle()">🔗 Bağla</button>
+          </div>
+          <div style="font-size:11px;color:var(--mist);margin-top:8px;line-height:1.6;">Örnek: <b>Latte → 1 shot</b>, <b>Double Türk Kahvesi → 2 shot</b>, <b>Limonata → 1 bardak</b>. Bir ürüne birden fazla hammadde bağlanabilir (örn. Mocha → 1 shot + 1 çikolata).</div>
+          <div id="recListe" style="margin-top:12px;"><div class="vad-bos">Yükleniyor…</div></div>
+        </div>
+
+        <!-- 3) ADET BAZLI HAZIR ÜRÜN -->
+        <div class="vad-blok">
+          <div class="vad-blok-ttl">📦 Adet Bazlı Ürün Stoğu <span style="font-weight:400;color:var(--mist);font-size:11px;">(reçetesiz hazır ürünler: kek dilimi, kutu içecek…)</span></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
             <div style="flex:2;min-width:220px;">
               <label class="lbl">Ürün (adisyon menüsünden)</label>
@@ -999,12 +1029,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <div style="min-width:90px;"><label class="lbl">Uyarı Eşiği</label><input id="stokEsik" type="number" min="0" value="3" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></div>
             <button class="btn-primary" onclick="stokEkleKaydet()">💾 Kaydet</button>
           </div>
-          <div style="font-size:11px;color:var(--mist);margin-top:8px;line-height:1.5;">Zaten listede olan bir ürünü seçersen adet/eşik değerleri üzerine yazılır (sayım düzeltmek için de kullan). Takip etmek istemediğin ürünleri hiç ekleme.</div>
-        </div>
-
-        <div class="vad-blok">
-          <div class="vad-blok-ttl">📦 Takip Edilen Ürünler</div>
-          <div id="stokListe"><div class="vad-bos">Yükleniyor…</div></div>
+          <div id="stokListe" style="margin-top:12px;"><div class="vad-bos">Yükleniyor…</div></div>
         </div>
       </div>
 
@@ -4729,23 +4754,22 @@ if('serviceWorker' in navigator){
 </script>
 
 <script>
-/* ═══ STOK TAKİBİ — admin paneli ═══
-   Kayıtlar worker D1 'stok' tablosunda (GET public, POST X-Cactus-Key).
-   Ürün id'leri adisyon menüsüyle birebir; sunucu MASA_PAY event'inde düşer. */
+/* ═══ STOK TAKİBİ — admin paneli (hammadde + reçete + adet bazlı) ═══
+   Worker D1: 'stok' (tur=urun|hammadde; birim/paket alanları) + 'recete'.
+   Ödemede sunucu, reçetelere göre hammaddeden ve adet bazlı ürünlerden düşer. */
 (function(){
   var STOK_API=(typeof _CM_EV_API!=='undefined')?_CM_EV_API:'https://cactus-kafe.batuhanbulut.workers.dev';
   var _stSube='fsm';
-  var _stListe=[];
+  var _stD={urunler:[],hammaddeler:[],receteler:[]};
   function stok_tok(){ try{ var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null'); return (t&&t.token)?t.token:''; }catch(e){ return ''; } }
   function stok_esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function stok_slug(ad){ return 'ham_'+String(ad).toLowerCase().replace(/[çğıöşü]/g,function(c){return {'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u'}[c];}).replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40); }
   window.stokAdminAc=function(){ stokTabSync(); stokUrunleriDoldur(); stokYukleAdmin(); };
   window.stokSube=function(sb){ _stSube=(sb==='podyum')?'podyum':'fsm'; stokTabSync(); stokUrunleriDoldur(); stokYukleAdmin(); };
   function stokTabSync(){ var f=document.getElementById('stokTabFsm'),p=document.getElementById('stokTabPodyum'); if(f)f.classList.toggle('on',_stSube==='fsm'); if(p)p.classList.toggle('on',_stSube==='podyum'); }
 
-  // Ürün seçici — adisyon menüsünden (id'ler ödeme event'indekilerle birebir aynı)
+  // Ürün seçicileri — adisyon menüsünden (id'ler ödeme event'iyle birebir)
   function stokUrunleriDoldur(){
-    var sel=document.getElementById('stokUrunSec'); if(!sel) return;
-    sel.innerHTML='<option value="">— Yükleniyor… —</option>';
     fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=adisyon_'+_stSube+'&t='+Date.now())
       .then(function(r){return r.ok?r.json():null;})
       .then(function(d){
@@ -4759,8 +4783,15 @@ if('serviceWorker' in navigator){
             if(grup) ops.push('<optgroup label="'+stok_esc(kat.label||k)+'">'+grup+'</optgroup>');
           });
         }
-        sel.innerHTML=ops.length>1?ops.join(''):'<option value="">— Menü boş —</option>';
-      }).catch(function(){ sel.innerHTML='<option value="">— Menü yüklenemedi —</option>'; });
+        var html=ops.length>1?ops.join(''):'<option value="">— Menü boş —</option>';
+        ['stokUrunSec','recUrunSec'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML=html; });
+      }).catch(function(){ ['stokUrunSec','recUrunSec'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML='<option value="">— Menü yüklenemedi —</option>'; }); });
+  }
+  function hamSecDoldur(){
+    var el=document.getElementById('recHamSec'); if(!el) return;
+    el.innerHTML='<option value="">— Hammadde seç —</option>'+_stD.hammaddeler.map(function(h){
+      return '<option value="'+stok_esc(h.id)+'">'+stok_esc(h.ad)+(h.birim?(' ('+stok_esc(h.birim)+')'):'')+'</option>';
+    }).join('');
   }
 
   window.stokYukleAdmin=function(){
@@ -4768,24 +4799,114 @@ if('serviceWorker' in navigator){
     fetch(STOK_API+'/api/stok?sube='+_stSube+'&t='+Date.now(),{cache:'no-store'})
       .then(function(r){return r.ok?r.json():null;})
       .then(function(d){
-        _stListe=(d&&d.ok&&Array.isArray(d.urunler))?d.urunler:[];
-        stokRender();
-        if(dEl) dEl.textContent='☁️ '+_stListe.length+' ürün';
+        _stD={
+          urunler:(d&&d.ok&&Array.isArray(d.urunler))?d.urunler:[],
+          hammaddeler:(d&&d.ok&&Array.isArray(d.hammaddeler))?d.hammaddeler:[],
+          receteler:(d&&d.ok&&Array.isArray(d.receteler))?d.receteler:[]
+        };
+        hamSecDoldur(); hamRender(); recRender(); stokRender();
+        if(dEl) dEl.textContent='☁️ '+_stD.hammaddeler.length+' hammadde · '+_stD.receteler.length+' reçete';
       })
       .catch(function(){ if(dEl) dEl.textContent='⚠️ bağlantı yok'; });
   };
+  function renkVer(adet,esik){ return adet<=0?'#c0392b':(adet<=esik?'#c67000':'#2d7a3a'); }
+  function sayi(x){ return Math.round(Number(x)*100)/100; }
+
+  // ── Hammadde ──
+  function hamRender(){
+    var el=document.getElementById('hamListe'); if(!el) return;
+    if(!_stD.hammaddeler.length){ el.innerHTML='<div class="vad-bos">Henüz hammadde yok — yukarıdan ekle.</div>'; return; }
+    el.innerHTML=_stD.hammaddeler.map(function(h){
+      var pk=(h.paket_birim>0&&h.paket_ad)?(' <span style="color:var(--mist);font-weight:400;">(≈'+sayi(h.adet/h.paket_birim)+' '+stok_esc(h.paket_ad)+')</span>'):'';
+      var etiket=h.adet<=0?'TÜKENDİ':(sayi(h.adet)+' '+stok_esc(h.birim||'birim'));
+      return '<div class="vad-logrow">'
+        +'<span style="font-weight:600;flex:1;min-width:130px;">'+stok_esc(h.ad)+'</span>'
+        +'<span style="font-weight:800;color:'+renkVer(h.adet,h.esik)+';white-space:nowrap;">'+etiket+'</span>'+pk
+        +'<span style="color:var(--mist);font-size:11px;white-space:nowrap;">eşik '+sayi(h.esik)+'</span>'
+        +'<button class="vad-mini" onclick="hamArti(\''+stok_esc(h.id)+'\')" title="Stok girişi">➕</button>'
+        +'<button class="vad-mini" onclick="hamDuzelt(\''+stok_esc(h.id)+'\')" title="Sayım düzelt">✏️</button>'
+        +'<button class="vad-mini" onclick="stokSil(\''+stok_esc(h.id)+'\')" title="Sil">🗑</button>'
+        +'</div>';
+    }).join('');
+  }
+  window.hamEkleKaydet=function(){
+    var ad=(document.getElementById('hamAd').value||'').trim();
+    if(!ad){ if(typeof toast==='function') toast('⚠️ Hammadde adı gir'); return; }
+    var birim=(document.getElementById('hamBirim').value||'').trim()||'birim';
+    var paketAd=(document.getElementById('hamPaketAd').value||'').trim();
+    var paketBirim=Number(document.getElementById('hamPaketBirim').value)||0;
+    var paketSayi=Number(document.getElementById('hamPaketSayi').value)||0;
+    var esik=Number(document.getElementById('hamEsik').value)||0;
+    var adet=paketBirim>0?paketSayi*paketBirim:paketSayi;
+    // Aynı adla mevcutsa id'sini koru (sayımı ezmemek adına yine de kaydet mutlak yazar)
+    var mevcut=_stD.hammaddeler.find(function(h){return h.ad.toLowerCase()===ad.toLowerCase();});
+    var id=mevcut?mevcut.id:stok_slug(ad);
+    stokPost({islem:'kaydet',tur:'hammadde',urun_id:id,ad:ad,adet:adet,esik:esik,birim:birim,paket_ad:paketAd,paket_birim:paketBirim},function(){
+      if(typeof toast==='function') toast('✅ '+ad+': '+sayi(adet)+' '+birim);
+      document.getElementById('hamAd').value=''; document.getElementById('hamPaketSayi').value='';
+    });
+  };
+  window.hamArti=function(id){
+    var h=_stD.hammaddeler.find(function(x){return x.id===id;}); if(!h) return;
+    var pakla=(h.paket_birim>0);
+    var v=prompt('"'+h.ad+'" için kaç '+(pakla?(h.paket_ad||'paket'):(h.birim||'birim'))+' girişi yapılsın?','1');
+    if(v===null) return; var n=Number(String(v).replace(',','.'));
+    if(!n){ if(typeof toast==='function') toast('⚠️ Geçerli sayı gir'); return; }
+    var delta=pakla?n*h.paket_birim:n;
+    stokPost({islem:'ekle',urun_id:id,delta:delta},function(){ if(typeof toast==='function') toast('✅ +'+sayi(delta)+' '+(h.birim||'birim')); });
+  };
+  window.hamDuzelt=function(id){
+    var h=_stD.hammaddeler.find(function(x){return x.id===id;}); if(!h) return;
+    var v=prompt('"'+h.ad+'" güncel sayım — '+(h.birim||'birim')+' cinsinden (mevcut: '+sayi(h.adet)+'):', String(Math.max(0,Math.round(h.adet))));
+    if(v===null) return;
+    stokPost({islem:'kaydet',tur:'hammadde',urun_id:id,ad:h.ad,adet:Number(String(v).replace(',','.'))||0,esik:h.esik,birim:h.birim,paket_ad:h.paket_ad,paket_birim:h.paket_birim},function(){ if(typeof toast==='function') toast('✅ Sayım güncellendi'); });
+  };
+
+  // ── Reçete ──
+  function recRender(){
+    var el=document.getElementById('recListe'); if(!el) return;
+    if(!_stD.receteler.length){ el.innerHTML='<div class="vad-bos">Henüz reçete yok — ürünle hammaddeyi yukarıdan bağla.</div>'; return; }
+    var H={}; _stD.hammaddeler.forEach(function(h){H[h.id]=h;});
+    var Y={}; _stD.urunler.forEach(function(u){ if(u.hesap) Y[u.id]=u.adet; });
+    var grup={}, sira=[];
+    _stD.receteler.forEach(function(r){ if(!grup[r.urun_id]){grup[r.urun_id]={ad:r.urun_ad,bilesen:[]};sira.push(r.urun_id);} grup[r.urun_id].bilesen.push(r); });
+    el.innerHTML=sira.map(function(pid){
+      var g=grup[pid];
+      var yap=(Y[pid]!==undefined)?('<span style="font-weight:800;color:'+renkVer(Y[pid],0)+';white-space:nowrap;">'+(Y[pid]<=0?'YAPILAMAZ':('yapılabilir: '+Y[pid]))+'</span>'):'';
+      var parcalar=g.bilesen.map(function(b){
+        var h=H[b.hammadde_id];
+        return '<span style="background:var(--paper);border:1px solid var(--line);border-radius:100px;padding:3px 10px;font-size:11.5px;white-space:nowrap;">'
+          +sayi(b.miktar)+' × '+stok_esc(h?(h.birim||'birim'):'?')+' <b>'+stok_esc(h?h.ad:b.hammadde_id)+'</b>'
+          +' <a href="javascript:void(0)" onclick="recSil(\''+stok_esc(pid)+'\',\''+stok_esc(b.hammadde_id)+'\')" style="text-decoration:none;color:#c0392b;">✕</a></span>';
+      }).join(' ');
+      return '<div class="vad-logrow" style="flex-wrap:wrap;"><span style="font-weight:600;min-width:130px;">'+stok_esc(g.ad)+'</span>'+parcalar+'<span style="margin-left:auto;">'+yap+'</span></div>';
+    }).join('');
+  }
+  window.recEkle=function(){
+    var us=document.getElementById('recUrunSec'), hs=document.getElementById('recHamSec');
+    var uid=(us&&us.value)||'', hid=(hs&&hs.value)||'';
+    var miktar=Number(String((document.getElementById('recMiktar')||{}).value).replace(',','.'))||0;
+    if(!uid){ if(typeof toast==='function') toast('⚠️ Ürün seç'); return; }
+    if(!hid){ if(typeof toast==='function') toast('⚠️ Hammadde seç'); return; }
+    if(miktar<=0){ if(typeof toast==='function') toast('⚠️ Miktar gir'); return; }
+    var uad=(us.options[us.selectedIndex]&&us.options[us.selectedIndex].getAttribute('data-ad'))||uid;
+    stokPost({islem:'recete',urun_id:uid,urun_ad:uad,hammadde_id:hid,miktar:miktar},function(){ if(typeof toast==='function') toast('🔗 '+uad+' reçetesi kaydedildi'); });
+  };
+  window.recSil=function(uid,hid){ stokPost({islem:'recete-sil',urun_id:uid,hammadde_id:hid}); };
+
+  // ── Adet bazlı hazır ürün ──
   function stokRender(){
     var el=document.getElementById('stokListe'); if(!el) return;
-    if(!_stListe.length){ el.innerHTML='<div class="vad-bos">Henüz takip edilen ürün yok — yukarıdan ekle.</div>'; return; }
-    el.innerHTML=_stListe.map(function(u){
-      var renk = u.adet<=0 ? '#c0392b' : (u.adet<=u.esik ? '#c67000' : '#2d7a3a');
-      var etiket = u.adet<=0 ? 'TÜKENDİ' : (Math.round(u.adet*100)/100)+' kaldı';
+    var dogrudan=_stD.urunler.filter(function(u){return !u.hesap;});
+    if(!dogrudan.length){ el.innerHTML='<div class="vad-bos">Adet bazlı takip edilen ürün yok.</div>'; return; }
+    el.innerHTML=dogrudan.map(function(u){
+      var etiket=u.adet<=0?'TÜKENDİ':(sayi(u.adet)+' kaldı');
       return '<div class="vad-logrow">'
         +'<span style="font-weight:600;flex:1;min-width:120px;">'+stok_esc(u.ad)+'</span>'
-        +'<span style="font-weight:800;color:'+renk+';white-space:nowrap;">'+etiket+'</span>'
-        +'<span style="color:var(--mist);font-size:11px;white-space:nowrap;">eşik '+u.esik+'</span>'
-        +'<button class="vad-mini" onclick="stokArti(\''+stok_esc(u.id)+'\')" title="Stok girişi">➕ Ekle</button>'
-        +'<button class="vad-mini" onclick="stokDuzelt(\''+stok_esc(u.id)+'\')" title="Sayımı düzelt">✏️</button>'
+        +'<span style="font-weight:800;color:'+renkVer(u.adet,u.esik)+';white-space:nowrap;">'+etiket+'</span>'
+        +'<span style="color:var(--mist);font-size:11px;white-space:nowrap;">eşik '+sayi(u.esik)+'</span>'
+        +'<button class="vad-mini" onclick="stokArti(\''+stok_esc(u.id)+'\')" title="Stok girişi">➕</button>'
+        +'<button class="vad-mini" onclick="stokDuzelt(\''+stok_esc(u.id)+'\')" title="Sayım düzelt">✏️</button>'
         +'<button class="vad-mini" onclick="stokSil(\''+stok_esc(u.id)+'\')" title="Takipten çıkar">🗑</button>'
         +'</div>';
     }).join('');
@@ -4810,21 +4931,22 @@ if('serviceWorker' in navigator){
     stokPost({islem:'kaydet',urun_id:id,ad:ad,adet:adet,esik:esik},function(){ if(typeof toast==='function') toast('✅ '+ad+' stok takibinde'); });
   };
   window.stokArti=function(id){
-    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
+    var u=_stD.urunler.find(function(x){return x.id===id&&!x.hesap;}); if(!u) return;
     var v=prompt('"'+u.ad+'" için kaç adet stok girişi yapılsın?','10');
     if(v===null) return; var delta=Number(v);
     if(!delta){ if(typeof toast==='function') toast('⚠️ Geçerli sayı gir'); return; }
     stokPost({islem:'ekle',urun_id:id,delta:delta},function(){ if(typeof toast==='function') toast('✅ Stok girişi: +'+delta); });
   };
   window.stokDuzelt=function(id){
-    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
+    var u=_stD.urunler.find(function(x){return x.id===id&&!x.hesap;}); if(!u) return;
     var v=prompt('"'+u.ad+'" güncel sayım (mevcut: '+u.adet+'):', String(Math.max(0,Math.round(u.adet))));
     if(v===null) return;
     stokPost({islem:'kaydet',urun_id:id,ad:u.ad,adet:Number(v)||0,esik:u.esik},function(){ if(typeof toast==='function') toast('✅ Sayım güncellendi'); });
   };
   window.stokSil=function(id){
-    var u=_stListe.find(function(x){return x.id===id;}); if(!u) return;
-    if(!confirm('"'+u.ad+'" stok takibinden çıkarılsın mı?')) return;
+    var u=_stD.urunler.find(function(x){return x.id===id&&!x.hesap;})||_stD.hammaddeler.find(function(x){return x.id===id;});
+    if(!u) return;
+    if(!confirm('"'+u.ad+'" stok takibinden çıkarılsın mı?'+(_stD.receteler.some(function(r){return r.hammadde_id===id;})?' (Bağlı reçeteler de silinir)':''))) return;
     stokPost({islem:'sil',urun_id:id});
   };
 })();

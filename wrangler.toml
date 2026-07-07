@@ -12,6 +12,13 @@ binding = "ADISYON_DB"
 database_name = "cactus-adisyon-events"
 database_id = "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
 
+# rapor-api'ye service binding — verifyYonetim token doğrulaması bunun üzerinden.
+# ÖNEMLİ: Worker içinden aynı hesabın workers.dev adresine fetch Cloudflare
+# tarafından engelleniyor (bordro/vardiya kayıtları bu yüzden hep 401 alıyordu).
+[[services]]
+binding = "RAPOR"
+service = "cactus-rapor-api"
+
 [observability]
 enabled = true
 

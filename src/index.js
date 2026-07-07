@@ -32,12 +32,16 @@ const NO_STORE = { 'Cache-Control': 'no-store, no-cache, must-revalidate' };
 // rapor-api'nin auth'lı (/kart/listele) ucuna token ile proxy istek atıp
 // 200 dönerse yetkili sayarız. Herhangi bir hata/red → fail-closed (yetkisiz).
 const RAPOR_API_BASE = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
-async function verifyYonetim(token) {
+async function verifyYonetim(env, token) {
   if (!token || String(token).length < 8) return false;
   try {
-    const r = await fetch(RAPOR_API_BASE + '/kart/listele', {
+    // Aynı hesabın workers.dev adresine worker içinden doğrudan fetch Cloudflare
+    // tarafından engelleniyor (istek hiç ulaşmıyor) → Service Binding (env.RAPOR)
+    // üzerinden gidiyoruz. Binding yoksa (lokal dev) normal fetch'e düşer.
+    const istek = new Request(RAPOR_API_BASE + '/kart/listele', {
       headers: { 'X-Cactus-Key': String(token) },
     });
+    const r = env.RAPOR ? await env.RAPOR.fetch(istek) : await fetch(istek);
     return r.status === 200;
   } catch (e) {
     return false;
@@ -385,7 +389,8 @@ export default {
 
     // ─── /api/ping — sağlık testi ───
     if (url.pathname === '/api/ping') {
-      return json({ ok: true, ts: Date.now() });
+      // rapor_binding: verifyYonetim'in kullandığı service binding bağlı mı (teşhis için)
+      return json({ ok: true, ts: Date.now(), rapor_binding: !!env.RAPOR });
     }
 
     // ─── /api/reset — temizleme (gün sonu / debug) ───
@@ -412,7 +417,7 @@ export default {
     // Kimlik: X-Cactus-Key header (yönetim token'ı). Yetkisiz → 401.
     if (url.pathname === '/api/bordro') {
       const token = request.headers.get('X-Cactus-Key') || '';
-      const yetkili = await verifyYonetim(token);
+      const yetkili = await verifyYonetim(env, token);
       if (!yetkili) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
       try {
         await env.ADISYON_DB.prepare(
@@ -474,7 +479,7 @@ export default {
           const cfg = await getVardiyaCfg(env, sube);
           if (url.searchParams.get('full') === '1') {
             const token = request.headers.get('X-Cactus-Key') || '';
-            if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+            if (!(await verifyYonetim(env, token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
             // wa_ready: Green API kimliği + alıcı numara çözülebiliyor mu (secret veya D1) — kurulum ipucu için
             const wa = await resolveWa(env, cfg);
             const waReady = !!(wa.instance && wa.token && wa.phone);
@@ -496,7 +501,7 @@ export default {
         }
         if (request.method === 'POST') {
           const token = request.headers.get('X-Cactus-Key') || '';
-          if (!(await verifyYonetim(token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+          if (!(await verifyYonetim(env, token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
           const body = await request.json();
           const sube = body.sube;
           if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);

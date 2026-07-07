@@ -1,3 +1,10 @@
+# cactus-kafe — API worker'ı (adisyon event log, bordro, vardiya) + statik dosyalar.
+# NOT: cactuscafes.com alan adı GitHub Pages'ten servis ediliyor; bu worker'a
+# erişim workers.dev üzerinden. Custom domain route'ları bilinçli olarak YOK.
+# NOT: Cron zamanlayıcısı ayrı worker'da (wrangler-cron.toml / cactus-kafe-cron).
+# UYARI: wrangler, wrangler.jsonc'yi wrangler.toml'a TERCİH EDER — bu repoya
+# ikinci bir config dosyası eklemeyin (eski jsonc, toml'daki triggers/services
+# eklerini sessizce gölgelediği için kaldırıldı).
 name = "cactus-kafe"
 compatibility_date = "2026-04-26"
 main = "src/index.js"
@@ -13,29 +20,10 @@ database_name = "cactus-adisyon-events"
 database_id = "3a5ac73e-326c-4eff-9dc8-a5de49f18d44"
 
 # rapor-api'ye service binding — verifyYonetim token doğrulaması bunun üzerinden.
-# ÖNEMLİ: Worker içinden aynı hesabın workers.dev adresine fetch Cloudflare
-# tarafından engelleniyor (bordro/vardiya kayıtları bu yüzden hep 401 alıyordu).
+# Worker içinden aynı hesabın workers.dev adresine düz fetch engelli olduğu için şart.
 [[services]]
 binding = "RAPOR"
 service = "cactus-rapor-api"
 
 [observability]
 enabled = true
-
-# NOT: cron trigger'ları asset'li worker'da kaydolmuyor (wrangler 3 ve 4 ile
-# denendi, schedule sessizce atlanıyor). Vardiya zamanlayıcısı ayrı worker'da:
-# wrangler-cron.toml (cactus-kafe-cron).
-
-[env.production]
-vars = { ENVIRONMENT = "production" }
-
-[[routes]]
-pattern = "cactuscafes.com"
-custom_domain = true
-
-[[routes]]
-pattern = "www.cactuscafes.com"
-custom_domain = true
-
-[env.staging]
-vars = { ENVIRONMENT = "staging" }

@@ -1166,7 +1166,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         </div>
 
         <div class="vad-blok" style="margin-bottom:26px;">
-          <div class="vad-blok-ttl">📆 Giriş / Çıkış Geçmişi <span style="font-weight:400;color:var(--mist);font-size:11px;">(son 14 gün · günlük toplam süreyle)</span></div>
+          <div class="vad-blok-ttl" style="flex-wrap:wrap;">📆 Giriş / Çıkış Geçmişi
+            <select id="vadGecmisGun" onchange="vardiyaGecmisYukle()" style="margin-left:auto;padding:5px 8px;border:1px solid var(--line);border-radius:7px;font-size:11.5px;background:var(--surface);color:var(--ink);">
+              <option value="14">Son 14 gün</option>
+              <option value="30">Son 30 gün</option>
+              <option value="60">Son 60 gün</option>
+            </select>
+            <button class="vad-mini" onclick="vardiyaGecmisCSV()">⬇️ Excel/CSV</button>
+          </div>
           <div id="vadGecmis"><div class="vad-bos">Yükleniyor…</div></div>
         </div>
 
@@ -4543,46 +4550,88 @@ if('serviceWorker' in navigator){
       .catch(function(){ if(el){ el.textContent='⚠️ Kaydedilemedi'; el.style.color='#c0392b'; } });
   };
 
-  // ─── Giriş/Çıkış geçmişi: son 14 iş günü, kişi bazında seanslar + günlük toplam ───
+  // ─── Giriş/Çıkış geçmişi: dönem seçimli (14/30/60 gün) + özet + CSV ───
+  var _vadGecmisSeans=[]; // son yüklemenin seansları (özet ve CSV için)
+  function vadGun(ts){ var d=new Date(ts); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
+  function vadSure(ms){ return Math.floor(ms/3600000)+'s '+Math.round((ms%3600000)/60000)+'dk'; }
+  function vadSeansHesapla(evs){
+    var grup={};
+    evs.forEach(function(e){ var k=vadGun(e.ts)+'|'+e.ad; (grup[k]=grup[k]||[]).push(e); });
+    var seans=[];
+    Object.keys(grup).forEach(function(k){
+      var i=k.indexOf('|'); var g=Number(k.slice(0,i)); var ad=k.slice(i+1);
+      var acik=null;
+      grup[k].sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){
+        if(e.aksiyon==='giris'){ if(acik===null) acik=e.ts; }
+        else if(acik!==null){ seans.push({gun:g,ad:ad,giris:acik,cikis:e.ts,sure:e.ts-acik}); acik=null; }
+      });
+      if(acik!==null){
+        var bugunMu=(g===vadGun(Date.now()));
+        seans.push({gun:g,ad:ad,giris:acik,cikis:null,sure:bugunMu?(Date.now()-acik):0,devam:bugunMu});
+      }
+    });
+    return seans;
+  }
   window.vardiyaGecmisYukle=function(){
+    var gunSel=document.getElementById('vadGecmisGun');
+    var gun=Number(gunSel&&gunSel.value)||14;
     var el=document.getElementById('vadGecmis'); if(el) el.innerHTML='<div class="vad-bos">Yükleniyor…</div>';
-    fetch(VAD_EV_API+'/api/vardiya-gecmis?sube='+_vadSube+'&gun=14&t='+Date.now(),{cache:'no-store',headers:{'X-Cactus-Key':vadToken()}})
+    fetch(VAD_EV_API+'/api/vardiya-gecmis?sube='+_vadSube+'&gun='+gun+'&t='+Date.now(),{cache:'no-store',headers:{'X-Cactus-Key':vadToken()}})
       .then(function(r){return r.ok?r.json():null;})
       .then(function(d){ vardiyaGecmisRender((d&&d.ok&&Array.isArray(d.events))?d.events:null); })
       .catch(function(){ vardiyaGecmisRender(null); });
   };
   function vardiyaGecmisRender(evs){
     var el=document.getElementById('vadGecmis'); if(!el) return;
-    if(evs===null){ el.innerHTML='<div class="vad-bos">Geçmiş yüklenemedi.</div>'; return; }
-    if(!evs.length){ el.innerHTML='<div class="vad-bos">Henüz giriş/çıkış kaydı yok.</div>'; return; }
+    if(evs===null){ _vadGecmisSeans=[]; el.innerHTML='<div class="vad-bos">Geçmiş yüklenemedi.</div>'; return; }
+    if(!evs.length){ _vadGecmisSeans=[]; el.innerHTML='<div class="vad-bos">Henüz giriş/çıkış kaydı yok.</div>'; return; }
+    var seans=vadSeansHesapla(evs); _vadGecmisSeans=seans;
+    // Dönem özeti: kişi bazında toplam süre + çalışılan gün sayısı
+    var toplamlar={}, adlar=[];
+    seans.forEach(function(x){ if(!toplamlar[x.ad]){ toplamlar[x.ad]={sure:0,gunler:{}}; adlar.push(x.ad); } toplamlar[x.ad].sure+=x.sure; toplamlar[x.ad].gunler[x.gun]=1; });
+    adlar.sort(function(a,b){return toplamlar[b].sure-toplamlar[a].sure;});
+    var ozet='<div style="margin-bottom:16px;padding:12px 14px;background:var(--paper,#faf8f4);border:1px solid var(--line);border-radius:10px;">'
+      +'<div style="font-size:11px;font-weight:800;color:var(--mist);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">👥 Dönem toplamı — kişi bazında</div>'
+      +adlar.map(function(ad){
+        var t=toplamlar[ad]; var ond=(t.sure/3600000).toFixed(1).replace('.',',');
+        return '<div class="vad-logrow"><span style="font-weight:600;min-width:88px;">'+esc(ad)+'</span><span style="color:var(--mist);">'+Object.keys(t.gunler).length+' gün</span><span style="margin-left:auto;font-weight:700;">'+vadSure(t.sure)+' <span style="color:var(--mist);font-weight:400;">('+ond+' saat)</span></span></div>';
+      }).join('')
+      +'</div>';
+    // Gün gün liste (en yeni üstte)
     var gunler={}, sira=[];
-    evs.forEach(function(e){
-      var g=gunBasi ? (function(ts){ var d=new Date(ts); var s2=new Date(d); s2.setHours(5,0,0,0); if(d<s2) s2.setDate(s2.getDate()-1); return s2.getTime(); })(e.ts) : e.ts;
-      if(!gunler[g]){ gunler[g]={}; sira.push(g); }
-      if(!gunler[g][e.ad]) gunler[g][e.ad]=[];
-      gunler[g][e.ad].push(e);
-    });
-    sira.sort(function(a,b){return b-a;}); // en yeni gün üstte
-    var bugunG=(function(){ var d=new Date(); var s2=new Date(d); s2.setHours(5,0,0,0); if(d<s2) s2.setDate(s2.getDate()-1); return s2.getTime(); })();
-    el.innerHTML=sira.map(function(g){
+    seans.forEach(function(x){ if(!gunler[x.gun]){ gunler[x.gun]={}; sira.push(x.gun); } (gunler[x.gun][x.ad]=gunler[x.gun][x.ad]||[]).push(x); });
+    sira.sort(function(a,b){return b-a;});
+    el.innerHTML=ozet+sira.map(function(g){
       var baslik=new Date(g).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',weekday:'long'});
-      var kisiler=gunler[g];
-      var satirlar=Object.keys(kisiler).map(function(ad){
-        var seg=[], acik=null, toplam=0;
-        kisiler[ad].sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){
-          if(e.aksiyon==='giris'){ if(acik===null) acik=e.ts; }
-          else if(acik!==null){ seg.push(saat(acik)+'–'+saat(e.ts)); toplam+=e.ts-acik; acik=null; }
-        });
-        if(acik!==null){
-          if(g===bugunG){ seg.push(saat(acik)+'– <span style="color:#2d7a3a;">devam ediyor</span>'); toplam+=Date.now()-acik; }
-          else { seg.push(saat(acik)+'–? <span style="color:#c0392b;">(çıkış işaretlenmemiş)</span>'); }
-        }
-        var sure=toplam>0?(Math.floor(toplam/3600000)+'s '+Math.round((toplam%3600000)/60000)+'dk'):'';
-        return '<div class="vad-logrow"><span style="font-weight:600;min-width:88px;">'+esc(ad)+'</span><span>'+seg.join(', ')+'</span><span style="margin-left:auto;color:var(--mist);white-space:nowrap;font-size:11.5px;">'+sure+'</span></div>';
+      var satirlar=Object.keys(gunler[g]).map(function(ad){
+        var xs=gunler[g][ad].slice().sort(function(a,b){return a.giris-b.giris;}); var toplam=0;
+        var seg=xs.map(function(x){ toplam+=x.sure;
+          if(x.cikis) return saat(x.giris)+'–'+saat(x.cikis);
+          return saat(x.giris)+(x.devam?'– <span style="color:#2d7a3a;">devam ediyor</span>':'–? <span style="color:#c0392b;">(çıkış işaretlenmemiş)</span>');
+        }).join(', ');
+        return '<div class="vad-logrow"><span style="font-weight:600;min-width:88px;">'+esc(ad)+'</span><span>'+seg+'</span><span style="margin-left:auto;color:var(--mist);white-space:nowrap;font-size:11.5px;">'+(toplam>0?vadSure(toplam):'')+'</span></div>';
       }).join('');
       return '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:800;color:var(--mist);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">'+esc(baslik)+'</div>'+satirlar+'</div>';
     }).join('');
   }
+  window.vardiyaGecmisCSV=function(){
+    if(!_vadGecmisSeans.length){ if(typeof toast==='function') toast('⚠️ İndirilecek kayıt yok'); return ''; }
+    var sat=['Tarih;Personel;Giriş;Çıkış;Süre (dk);Süre (saat)'];
+    _vadGecmisSeans.slice().sort(function(a,b){return a.gun-b.gun||a.giris-b.giris;}).forEach(function(x){
+      sat.push(new Date(x.gun).toLocaleDateString('tr-TR')+';'+x.ad+';'+saat(x.giris)+';'
+        +(x.cikis?saat(x.cikis):(x.devam?'devam ediyor':'işaretlenmemiş'))+';'
+        +Math.round(x.sure/60000)+';'+(x.sure/3600000).toFixed(2).replace('.',','));
+    });
+    var csv=sat.join('\n');
+    try{
+      var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='vardiya_'+_vadSube+'_'+new Date().toISOString().slice(0,10)+'.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+    }catch(e){}
+    return csv;
+  };
 
   window.vardiyaCanliYukle=function(){
     var dEl=document.getElementById('vadDurum'); if(dEl) dEl.textContent='⏳ yükleniyor…';

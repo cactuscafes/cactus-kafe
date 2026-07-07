@@ -10,14 +10,14 @@ jobs:
       - name: Service binding + auth probu
         run: |
           echo "1) /api/ping (rapor_binding gorunmeli)"
-          curl -sS "https://cactuscafes.com/api/ping"
+          curl -sS "https://cactus-kafe.batuhanbulut.workers.dev/api/ping"
           echo
           echo "2) POST /api/vardiya gecersiz token (unauthorized beklenir)"
-          curl -sS -X POST "https://cactuscafes.com/api/vardiya" \
+          curl -sS -X POST "https://cactus-kafe.batuhanbulut.workers.dev/api/vardiya" \
             -H "Content-Type: application/json" \
             -H "X-Cactus-Key: gecersiz-test-token-123456" \
             -d '{"sube":"podyum","personel":[],"acilis":[],"kapanis":[]}'
           echo
           echo "3) GET /api/vardiya?full=1 gecersiz token"
-          curl -sS "https://cactuscafes.com/api/vardiya?sube=podyum&full=1" -H "X-Cactus-Key: gecersiz-test-token-123456"
+          curl -sS "https://cactus-kafe.batuhanbulut.workers.dev/api/vardiya?sube=podyum&full=1" -H "X-Cactus-Key: gecersiz-test-token-123456"
           echo

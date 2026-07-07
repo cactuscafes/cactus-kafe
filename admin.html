@@ -4015,7 +4015,9 @@ if('serviceWorker' in navigator){
    ═══════════════════════════════════════════════════════════════════════ */
 (function(){
   var BORDRO_SUBE=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='podyum')?'podyum':'fsm';
-  var API='/api/bordro';
+  // DİKKAT: cactuscafes.com GitHub Pages'ten servis ediliyor — orada /api yok!
+  // API'ye tek yol worker'ın kendi adresi. (Bordro senkronu bu yüzden hiç çalışmamıştı.)
+  var API='https://cactus-kafe.batuhanbulut.workers.dev/api/bordro';
   var _dirty={}; // şube → yerelde gönderilmemiş değişiklik var mı
   function key(s){ return 'cactus_bordro_'+s; }
   function token(){ try{ var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null'); return (t&&t.token)?t.token:''; }catch(e){ return ''; } }
@@ -4417,11 +4419,12 @@ if('serviceWorker' in navigator){
    PIN'ler asla public KV'ye yazılmaz. Adisyon ekranları isim+maddeleri public
    GET /api/vardiya'dan okur (PIN dönmez); giriş /api/vardiya-giris'te server
    tarafında PIN ile doğrulanır. Canlı durum /api/events log'undan hesaplanır.
-   ÖNEMLİ: Çağrılar SAME-ORIGIN (/api/...) — bordro gibi. workers.dev üzerinden
-   çağrılınca verifyYonetim'in rapor-api'ye subrequest'i Cloudflare tarafından
-   engelleniyor (aynı hesap workers.dev→workers.dev kısıtı) → 401 unauthorized. */
+   ÖNEMLİ: cactuscafes.com GitHub Pages'ten servis ediliyor — same-origin /api yok
+   (404 döner). API çağrıları worker adresine (workers.dev) gitmek ZORUNDA.
+   verifyYonetim'in rapor-api doğrulaması worker tarafında service binding ile
+   yapılır (wrangler.toml [[services]] RAPOR) — düz fetch Cloudflare'da engelli. */
 (function(){
-  var VAD_EV_API=''; // same-origin — yukarıdaki nota bak
+  var VAD_EV_API='https://cactus-kafe.batuhanbulut.workers.dev';
   var VAD_DEF_ACILIS=['Makineleri çalıştır / ısıt','Vitrini ve teşhiri hazırla','Kasayı ve para üstünü kontrol et','Zemini ve masaları sil','Müzik ve ışıkları aç','Eksik / stok kontrolü'];
   var VAD_DEF_KAPANIS=['Kasayı say ve kapat','Kahve makinelerini temizle','Buzdolabı / vitrin kontrolü','Çöpleri çıkar','Zemini temizle','Cihazları ve ışıkları kapat','Kapıyı kilitle'];
   var _vadSube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='fsm')?'fsm':'podyum';

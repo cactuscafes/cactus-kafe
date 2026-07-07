@@ -1167,8 +1167,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           <div class="vad-col">
             <div class="vad-col-ttl">👤 Personel + Şifre</div>
             <div id="vadPersonel" class="vad-list"></div>
-            <div class="vad-ekle"><input id="vadYeniPersonel" placeholder="İsim ekle" onkeydown="if(event.key==='Enter'){document.getElementById('vadYeniPersonelPin').focus();}"><input id="vadYeniPersonelPin" inputmode="numeric" maxlength="12" placeholder="Şifre" style="max-width:90px;" onkeydown="if(event.key==='Enter')vardiyaEkle('personel')"><button onclick="vardiyaEkle('personel')">+ Ekle</button></div>
-            <div style="font-size:11px;color:var(--mist);margin-top:6px;line-height:1.5;">Her personelin kendi şifresi olur; adisyon ekranında bu şifreyle giriş yapılır. Her girişte WhatsApp'ına bildirim gelir. Şifreyi değiştirmek için ✏️ simgesine tıkla, sonra <b>Kaydet</b>.</div>
+            <div class="vad-ekle"><input id="vadYeniPersonel" placeholder="İsim ekle" onkeydown="if(event.key==='Enter'){document.getElementById('vadYeniPersonelPin').focus();}"><input id="vadYeniPersonelPin" inputmode="numeric" maxlength="12" placeholder="Şifre (opsiyonel)" style="max-width:120px;" onkeydown="if(event.key==='Enter')vardiyaEkle('personel')"><button onclick="vardiyaEkle('personel')">+ Ekle</button></div>
+            <div style="font-size:11px;color:var(--mist);margin-top:6px;line-height:1.5;">Şifre <b>isteğe bağlı</b>: boş bırakırsan personel adını seçip direkt giriş yapar. Şifre koyarsan sadece o kişiye sorulur. Her girişte WhatsApp'ına bildirim gelir. ✏️ ile şifre koy/değiştir/kaldır, sonra <b>Kaydet</b>.</div>
           </div>
           <div class="vad-col">
             <div class="vad-col-ttl">🌅 Açılış Maddeleri</div>
@@ -4472,7 +4472,7 @@ if('serviceWorker' in navigator){
     var pEl=document.getElementById('vadPersonel');
     if(pEl){
       var pers=_vadConf.personel||[];
-      pEl.innerHTML=pers.length? pers.map(function(p,i){ return '<div class="vad-li"><span class="txt">'+esc(p.ad)+'</span><span style="font-size:12px;color:var(--mist);letter-spacing:2px;margin-left:8px;">🔑 '+(p.pin?esc(p.pin):'—')+'</span><button onclick="vardiyaPinDegistir('+i+')" title="Şifreyi değiştir">✏️</button><button onclick="vardiyaSil(\'personel\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
+      pEl.innerHTML=pers.length? pers.map(function(p,i){ return '<div class="vad-li"><span class="txt">'+esc(p.ad)+'</span><span style="font-size:12px;color:var(--mist);letter-spacing:2px;margin-left:8px;">'+(p.pin?('🔑 '+esc(p.pin)):'🔓 şifresiz')+'</span><button onclick="vardiyaPinDegistir('+i+')" title="Şifre koy / değiştir / kaldır">✏️</button><button onclick="vardiyaSil(\'personel\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
     }
     ['acilis','kapanis'].forEach(function(tur){
       var el=document.getElementById('vad'+tur.charAt(0).toUpperCase()+tur.slice(1)); if(!el) return;
@@ -4486,7 +4486,7 @@ if('serviceWorker' in navigator){
       var inp=document.getElementById('vadYeniPersonel'), pinp=document.getElementById('vadYeniPersonelPin');
       var ad=(inp&&inp.value||'').trim(), pin=(pinp&&pinp.value||'').trim();
       if(!ad) return;
-      if(!pin){ if(typeof toast==='function') toast('⚠️ Şifre gir'); if(pinp)pinp.focus(); return; }
+      // Şifre isteğe bağlı — boşsa şifresiz giriş yapılır
       if(!Array.isArray(_vadConf.personel)) _vadConf.personel=[];
       _vadConf.personel.push({ad:ad,pin:pin});
       if(inp)inp.value=''; if(pinp)pinp.value=''; vardiyaEditorRender(); if(inp)inp.focus();
@@ -4501,14 +4501,12 @@ if('serviceWorker' in navigator){
   window.vardiyaSil=function(tur,idx){ if(Array.isArray(_vadConf[tur])){ _vadConf[tur].splice(idx,1); vardiyaEditorRender(); } };
   window.vardiyaPinDegistir=function(idx){
     var p=(_vadConf.personel||[])[idx]; if(!p) return;
-    var yeni=prompt('"'+p.ad+'" için yeni şifre:', p.pin||'');
+    var yeni=prompt('"'+p.ad+'" için yeni şifre (boş bırak = şifresiz giriş):', p.pin||'');
     if(yeni===null) return; // vazgeçti
-    yeni=String(yeni).trim();
-    if(!yeni){ if(typeof toast==='function') toast('⚠️ Şifre boş olamaz'); return; }
-    p.pin=yeni;
+    p.pin=String(yeni).trim();
     vardiyaEditorRender();
     var el=document.getElementById('vadKayitDurum');
-    if(el){ el.textContent='🔑 '+p.ad+' şifresi değişti — 💾 Kaydet\'e basmayı unutma'; el.style.color='#b8860b'; }
+    if(el){ el.textContent=(p.pin?('🔑 '+p.ad+' şifresi değişti'):('🔓 '+p.ad+' artık şifresiz'))+' — 💾 Kaydet\'e basmayı unutma'; el.style.color='#b8860b'; }
   };
   window.vardiyaConfigKaydet=function(){
     var el=document.getElementById('vadKayitDurum'); if(el){ el.textContent='Kaydediliyor…'; el.style.color='var(--mist)'; }

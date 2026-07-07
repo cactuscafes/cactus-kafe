@@ -4462,9 +4462,11 @@ setInterval(function(){gunCiroYukle();},60000);
      İşaretlemeler event-log'a (type checklist, masa=null) yazılır. -->
 <script>
 (function(){
-  var _vconf={personel:[],acilis:[],kapanis:[]};
+  var _vconf={personel:[],acilis:[],kapanis:[],pinli:null};
   var _vsel=''; try{ _vsel=localStorage.getItem('cactus_vardiya_ben_'+SUBE)||''; }catch(e){}
   var _vbusy=false;
+  // Seçili kişinin şifresi var mı? (pinli listesi yoksa — eski sunucu — güvenli taraf: iste)
+  function _pinGerekli(){ if(!_vsel) return false; if(!Array.isArray(_vconf.pinli)) return true; return _vconf.pinli.indexOf(_vsel)>=0; }
   function _esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function _saat(ts){ try{ return new Date(Number(ts)).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
   // İş günü sınırı: sabah 05:00. 05:00 öncesi bir önceki güne sayılır (gece kapanışı doğru sayılsın).
@@ -4474,7 +4476,7 @@ setInterval(function(){gunCiroYukle();},60000);
   window.vardiyaConfigYukle=function(cb){
     fetch(EV_API+'/api/vardiya?sube='+SUBE+'&t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
       if(d&&d.ok){
-        _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[] };
+        _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[], pinli:Array.isArray(d.pinli)?d.pinli:null };
       }
       if(cb)cb();
     }).catch(function(){ if(cb)cb(); });
@@ -4486,7 +4488,7 @@ setInterval(function(){gunCiroYukle();},60000);
     if(_vbusy) return;
     if(!_vsel){ alert('Önce personel seçin'); return; }
     var pi=document.getElementById('var-pin'); var pin=(pi&&pi.value||'').trim();
-    if(!pin){ alert('Şifreni gir'); if(pi)pi.focus(); return; }
+    if(_pinGerekli() && !pin){ alert('Şifreni gir'); if(pi)pi.focus(); return; }
     _vbusy=true;
     var gEl=document.getElementById('var-giris'), cEl=document.getElementById('var-cikis');
     if(gEl)gEl.disabled=true; if(cEl)cEl.disabled=true;
@@ -4524,6 +4526,8 @@ setInterval(function(){gunCiroYukle();},60000);
     if(uy) uy.style.display=bos?'block':'none';
     var sel=document.getElementById('var-personel');
     if(sel){ sel.innerHTML='<option value="">— Personel seç —</option>'+_vconf.personel.map(function(p){return '<option value="'+_esc(p)+'"'+(p===_vsel?' selected':'')+'>'+_esc(p)+'</option>';}).join(''); }
+    // Şifre kutusu sadece şifresi olan kişiye görünsün
+    var pi=document.getElementById('var-pin'); if(pi) pi.style.display=_pinGerekli()?'':'none';
     vardiyaDurumRender(); vardiyaListe('acilis'); vardiyaListe('kapanis'); vardiyaIcerde();
   }
   function vardiyaDurumRender(){

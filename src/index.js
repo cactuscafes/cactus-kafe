@@ -484,8 +484,15 @@ export default {
             const envWa = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN);
             return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, gec_saat: cfg.gec_saat, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
           }
-          // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez)
-          return json({ ok: true, personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean), acilis: cfg.acilis, kapanis: cfg.kapanis }, 200, NO_STORE);
+          // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez).
+          // pinli: şifresi OLAN isimler — adisyon şifre kutusunu sadece bunlara gösterir.
+          return json({
+            ok: true,
+            personel: (cfg.personel || []).map(function (p) { return p && p.ad; }).filter(Boolean),
+            pinli: (cfg.personel || []).filter(function (p) { return p && p.ad && p.pin; }).map(function (p) { return p.ad; }),
+            acilis: cfg.acilis,
+            kapanis: cfg.kapanis,
+          }, 200, NO_STORE);
         }
         if (request.method === 'POST') {
           const token = request.headers.get('X-Cactus-Key') || '';
@@ -530,9 +537,10 @@ export default {
       }
     }
 
-    // ─── /api/vardiya-giris — PIN'li giriş/çıkış (herkese açık ama PIN ile korumalı) ───
-    // POST { sube, ad, pin, aksiyon('giris'|'cikis'), cihaz_id }
-    //   → PIN doğru ise vardiya event'i kaydeder; girişte WhatsApp bildirimi gönderir
+    // ─── /api/vardiya-giris — giriş/çıkış (şifre isteğe bağlı: kişide şifre varsa doğrulanır) ───
+    // POST { sube, ad, pin?, aksiyon('giris'|'cikis'), cihaz_id }
+    //   → kişinin şifresi varsa eşleşme zorunlu; yoksa şifresiz kabul.
+    //     Vardiya event'i kaydeder; girişte WhatsApp bildirimi gönderir.
     if (url.pathname === '/api/vardiya-giris' && request.method === 'POST') {
       try {
         await ensureVardiyaTable(env);
@@ -542,11 +550,11 @@ export default {
         const pin = String(body.pin || '').trim();
         const aksiyon = body.aksiyon === 'cikis' ? 'cikis' : 'giris';
         if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
-        if (!ad || !pin) return json({ ok: false, error: 'Ad ve PIN gerekli' }, 200, NO_STORE);
+        if (!ad) return json({ ok: false, error: 'Ad gerekli' }, 200, NO_STORE);
         const cfg = await getVardiyaCfg(env, sube);
         const kisi = (cfg.personel || []).find(function (p) { return p && p.ad === ad; });
         if (!kisi) return json({ ok: false, error: 'Personel bulunamadı' }, 200, NO_STORE);
-        if (!kisi.pin || kisi.pin !== pin) return json({ ok: false, error: 'PIN hatalı' }, 200, NO_STORE);
+        if (kisi.pin && kisi.pin !== pin) return json({ ok: false, error: 'Şifre hatalı' }, 200, NO_STORE);
         const now = Date.now();
         const evtId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v' + now + '-' + Math.round(now % 1e6));
         await env.ADISYON_DB.prepare(

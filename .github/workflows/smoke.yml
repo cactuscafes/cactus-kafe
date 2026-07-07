@@ -1,0 +1,27 @@
+name: Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Canli menu verisi (kategori yapisi)
+        run: |
+          echo "1) menu_public (site menusu)"
+          curl -sS "https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=menu_public" | head -c 3000
+          echo
+          echo "2) adisyon_podyum (podyum adisyon menusu)"
+          curl -sS "https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=adisyon_podyum" | python3 -c "
+          import json,sys
+          try:
+            d=json.load(sys.stdin)
+            def kat(x,pre=''):
+              if isinstance(x,dict):
+                for k,v in x.items():
+                  if isinstance(v,dict) and 'urunler' in v: print(pre+k,'|',v.get('label',''),'|',len(v['urunler']),'urun')
+                  elif isinstance(v,dict): print(pre+k+':'); kat(v,pre+'  ')
+            kat(d)
+          except Exception as e: print('parse hatasi', e)
+          "

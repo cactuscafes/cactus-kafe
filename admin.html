@@ -1138,7 +1138,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
           <button class="vad-tab" id="vadTabPodyum" onclick="vardiyaAdminSube('podyum')">🌿 Podyumpark</button>
           <span id="vadDurum" style="font-size:11.5px;color:var(--mist);margin-left:6px;white-space:nowrap;"></span>
           <div style="flex:1"></div>
-          <button class="vad-mini" onclick="vardiyaCanliYukle()">🔄 Yenile</button>
+          <button class="vad-mini" onclick="vardiyaCanliYukle();vardiyaGecmisYukle()">🔄 Yenile</button>
         </div>
 
         <div class="vad-canli">
@@ -1163,6 +1163,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <div class="vad-blok" style="margin-bottom:26px;">
           <div class="vad-blok-ttl">📋 Bugün Giriş / Çıkış</div>
           <div id="vadLog"></div>
+        </div>
+
+        <div class="vad-blok" style="margin-bottom:26px;">
+          <div class="vad-blok-ttl">📆 Giriş / Çıkış Geçmişi <span style="font-weight:400;color:var(--mist);font-size:11px;">(son 14 gün · günlük toplam süreyle)</span></div>
+          <div id="vadGecmis"><div class="vad-bos">Yükleniyor…</div></div>
         </div>
 
         <div class="pttl" style="font-size:20px;margin-bottom:2px;">⚙️ Ayarlar</div>
@@ -4452,6 +4457,7 @@ if('serviceWorker' in navigator){
     vadTabSync();
     vardiyaConfigYukleAdmin();
     vardiyaCanliYukle();
+    vardiyaGecmisYukle();
     if(_vadPoll) clearInterval(_vadPoll);
     _vadPoll=setInterval(function(){
       var pn=document.getElementById('panel-vardiya');
@@ -4459,7 +4465,7 @@ if('serviceWorker' in navigator){
       else { clearInterval(_vadPoll); _vadPoll=null; }
     }, 6000);
   };
-  window.vardiyaAdminSube=function(s){ _vadSube=(s==='fsm')?'fsm':'podyum'; vadTabSync(); vardiyaConfigYukleAdmin(); vardiyaCanliYukle(); };
+  window.vardiyaAdminSube=function(s){ _vadSube=(s==='fsm')?'fsm':'podyum'; vadTabSync(); vardiyaConfigYukleAdmin(); vardiyaCanliYukle(); vardiyaGecmisYukle(); };
   function vadTabSync(){ var f=document.getElementById('vadTabFsm'),p=document.getElementById('vadTabPodyum'); if(f)f.classList.toggle('on',_vadSube==='fsm'); if(p)p.classList.toggle('on',_vadSube==='podyum'); }
 
   function _vadNormPersonel(arr){
@@ -4536,6 +4542,47 @@ if('serviceWorker' in navigator){
       })
       .catch(function(){ if(el){ el.textContent='⚠️ Kaydedilemedi'; el.style.color='#c0392b'; } });
   };
+
+  // ─── Giriş/Çıkış geçmişi: son 14 iş günü, kişi bazında seanslar + günlük toplam ───
+  window.vardiyaGecmisYukle=function(){
+    var el=document.getElementById('vadGecmis'); if(el) el.innerHTML='<div class="vad-bos">Yükleniyor…</div>';
+    fetch(VAD_EV_API+'/api/vardiya-gecmis?sube='+_vadSube+'&gun=14&t='+Date.now(),{cache:'no-store',headers:{'X-Cactus-Key':vadToken()}})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){ vardiyaGecmisRender((d&&d.ok&&Array.isArray(d.events))?d.events:null); })
+      .catch(function(){ vardiyaGecmisRender(null); });
+  };
+  function vardiyaGecmisRender(evs){
+    var el=document.getElementById('vadGecmis'); if(!el) return;
+    if(evs===null){ el.innerHTML='<div class="vad-bos">Geçmiş yüklenemedi.</div>'; return; }
+    if(!evs.length){ el.innerHTML='<div class="vad-bos">Henüz giriş/çıkış kaydı yok.</div>'; return; }
+    var gunler={}, sira=[];
+    evs.forEach(function(e){
+      var g=gunBasi ? (function(ts){ var d=new Date(ts); var s2=new Date(d); s2.setHours(5,0,0,0); if(d<s2) s2.setDate(s2.getDate()-1); return s2.getTime(); })(e.ts) : e.ts;
+      if(!gunler[g]){ gunler[g]={}; sira.push(g); }
+      if(!gunler[g][e.ad]) gunler[g][e.ad]=[];
+      gunler[g][e.ad].push(e);
+    });
+    sira.sort(function(a,b){return b-a;}); // en yeni gün üstte
+    var bugunG=(function(){ var d=new Date(); var s2=new Date(d); s2.setHours(5,0,0,0); if(d<s2) s2.setDate(s2.getDate()-1); return s2.getTime(); })();
+    el.innerHTML=sira.map(function(g){
+      var baslik=new Date(g).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',weekday:'long'});
+      var kisiler=gunler[g];
+      var satirlar=Object.keys(kisiler).map(function(ad){
+        var seg=[], acik=null, toplam=0;
+        kisiler[ad].sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){
+          if(e.aksiyon==='giris'){ if(acik===null) acik=e.ts; }
+          else if(acik!==null){ seg.push(saat(acik)+'–'+saat(e.ts)); toplam+=e.ts-acik; acik=null; }
+        });
+        if(acik!==null){
+          if(g===bugunG){ seg.push(saat(acik)+'– <span style="color:#2d7a3a;">devam ediyor</span>'); toplam+=Date.now()-acik; }
+          else { seg.push(saat(acik)+'–? <span style="color:#c0392b;">(çıkış işaretlenmemiş)</span>'); }
+        }
+        var sure=toplam>0?(Math.floor(toplam/3600000)+'s '+Math.round((toplam%3600000)/60000)+'dk'):'';
+        return '<div class="vad-logrow"><span style="font-weight:600;min-width:88px;">'+esc(ad)+'</span><span>'+seg.join(', ')+'</span><span style="margin-left:auto;color:var(--mist);white-space:nowrap;font-size:11.5px;">'+sure+'</span></div>';
+      }).join('');
+      return '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:800;color:var(--mist);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">'+esc(baslik)+'</div>'+satirlar+'</div>';
+    }).join('');
+  }
 
   window.vardiyaCanliYukle=function(){
     var dEl=document.getElementById('vadDurum'); if(dEl) dEl.textContent='⏳ yükleniyor…';

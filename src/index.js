@@ -576,6 +576,30 @@ export default {
       }
     }
 
+    // ─── /api/vardiya-gecmis — giriş/çıkış geçmişi (yönetim; admin geçmiş bölümü) ───
+    // GET ?sube=X&gun=N (X-Cactus-Key) → son N iş gününün vardiya event'leri
+    if (url.pathname === '/api/vardiya-gecmis' && request.method === 'GET') {
+      try {
+        const token = request.headers.get('X-Cactus-Key') || '';
+        if (!(await verifyYonetim(env, token))) return json({ ok: false, error: 'unauthorized' }, 401, NO_STORE);
+        const sube = url.searchParams.get('sube') || '';
+        if (sube !== 'fsm' && sube !== 'podyum') return json({ ok: false, error: 'sube required' }, 400, NO_STORE);
+        const gun = Math.min(Math.max(Number(url.searchParams.get('gun') || 14), 1), 60);
+        const bas = gunBasiMs(Date.now()) - (gun - 1) * 86400000;
+        const rows = await env.ADISYON_DB.prepare(
+          `SELECT payload, ts FROM adisyon_events WHERE sube = ? AND type = 'vardiya' AND ts >= ? ORDER BY ts ASC`
+        ).bind(sube, bas).all();
+        const evs = [];
+        for (const r of (rows.results || [])) {
+          let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
+          if (p && p.ad) evs.push({ ad: p.ad, aksiyon: p.aksiyon === 'cikis' ? 'cikis' : 'giris', ts: r.ts });
+        }
+        return json({ ok: true, events: evs }, 200, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 500, NO_STORE);
+      }
+    }
+
     // ─── /api/malzeme-bildir — personel eksikleri işaretleyip Gönder'e basınca tek WhatsApp ───
     // POST { sube, ad?, eksikler:[...], cihaz_id? } — liste config'teki malzemelerle süzülür.
     if (url.pathname === '/api/malzeme-bildir' && request.method === 'POST') {

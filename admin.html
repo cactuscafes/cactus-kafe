@@ -1154,6 +1154,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <div class="vad-blok-ttl">🌙 Kapanış <span id="vadKapanisSay" class="vad-say"></span></div>
             <div id="vadKapanisCanli"></div>
           </div>
+          <div class="vad-blok">
+            <div class="vad-blok-ttl">🧂 Eksik Malzeme <span id="vadMalzemeSay" class="vad-say"></span></div>
+            <div id="vadMalzemeCanli"></div>
+          </div>
         </div>
 
         <div class="vad-blok" style="margin-bottom:26px;">
@@ -1179,6 +1183,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <div class="vad-col-ttl">🌙 Kapanış Maddeleri</div>
             <div id="vadKapanis" class="vad-list"></div>
             <div class="vad-ekle"><input id="vadYeniKapanis" placeholder="Madde ekle" onkeydown="if(event.key==='Enter')vardiyaEkle('kapanis')"><button onclick="vardiyaEkle('kapanis')">+ Ekle</button></div>
+          </div>
+          <div class="vad-col">
+            <div class="vad-col-ttl">🧂 Malzeme Listesi</div>
+            <div id="vadMalzeme" class="vad-list"></div>
+            <div class="vad-ekle"><input id="vadYeniMalzeme" placeholder="Malzeme ekle" onkeydown="if(event.key==='Enter')vardiyaEkle('malzeme')"><button onclick="vardiyaEkle('malzeme')">+ Ekle</button></div>
+            <div style="font-size:11px;color:var(--mist);margin-top:6px;line-height:1.5;">Personel adisyonda biten/azalan malzemeyi işaretler; eksikler burada ve gece özetinde görünür.</div>
           </div>
         </div>
 
@@ -4426,9 +4436,10 @@ if('serviceWorker' in navigator){
 (function(){
   var VAD_EV_API='https://cactus-kafe.batuhanbulut.workers.dev';
   var VAD_DEF_ACILIS=['Makineleri çalıştır / ısıt','Vitrini ve teşhiri hazırla','Kasayı ve para üstünü kontrol et','Zemini ve masaları sil','Müzik ve ışıkları aç','Eksik / stok kontrolü'];
+  var VAD_DEF_MALZEME=['Kahve çekirdeği','Süt','Yulaf sütü','Karamel şurubu','Vanilya şurubu','Fındık şurubu','Çikolata sosu','Krema','Karton bardak','Pipet','Peçete'];
   var VAD_DEF_KAPANIS=['Kasayı say ve kapat','Kahve makinelerini temizle','Buzdolabı / vitrin kontrolü','Çöpleri çıkar','Zemini temizle','Cihazları ve ışıkları kapat','Kapıyı kilitle'];
   var _vadSube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE==='fsm')?'fsm':'podyum';
-  var _vadConf={personel:[],acilis:[],kapanis:[],gec_saat:''};
+  var _vadConf={personel:[],acilis:[],kapanis:[],malzeme:[],gec_saat:''};
   var _vadLastEv=null;
   var _vadPoll=null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -4465,11 +4476,12 @@ if('serviceWorker' in navigator){
         personel:(d&&d.ok)?_vadNormPersonel(d.personel):[],
         acilis:(d&&d.ok&&Array.isArray(d.acilis)&&d.acilis.length)?d.acilis:(bosGeldi?VAD_DEF_ACILIS.slice():[]),
         kapanis:(d&&d.ok&&Array.isArray(d.kapanis)&&d.kapanis.length)?d.kapanis:(bosGeldi?VAD_DEF_KAPANIS.slice():[]),
+        malzeme:(d&&d.ok&&Array.isArray(d.malzeme)&&d.malzeme.length)?d.malzeme:VAD_DEF_MALZEME.slice(),
         gec_saat:(d&&d.ok&&d.gec_saat)?String(d.gec_saat):''
       };
       vardiyaEditorRender();
       if(_vadLastEv) vardiyaCanliRender(_vadLastEv); // config gelince canlı bloğu maddelerle tazele
-    }).catch(function(){ _vadConf={personel:[],acilis:VAD_DEF_ACILIS.slice(),kapanis:VAD_DEF_KAPANIS.slice(),gec_saat:''}; vardiyaEditorRender(); if(_vadLastEv) vardiyaCanliRender(_vadLastEv); });
+    }).catch(function(){ _vadConf={personel:[],acilis:VAD_DEF_ACILIS.slice(),kapanis:VAD_DEF_KAPANIS.slice(),malzeme:VAD_DEF_MALZEME.slice(),gec_saat:''}; vardiyaEditorRender(); if(_vadLastEv) vardiyaCanliRender(_vadLastEv); });
   }
   function vardiyaEditorRender(){
     var pEl=document.getElementById('vadPersonel');
@@ -4477,7 +4489,7 @@ if('serviceWorker' in navigator){
       var pers=_vadConf.personel||[];
       pEl.innerHTML=pers.length? pers.map(function(p,i){ return '<div class="vad-li"><span class="txt">'+esc(p.ad)+'</span><span style="font-size:12px;color:var(--mist);letter-spacing:2px;margin-left:8px;">'+(p.pin?('🔑 '+esc(p.pin)):'🔓 şifresiz')+'</span><button onclick="vardiyaPinDegistir('+i+')" title="Şifre koy / değiştir / kaldır">✏️</button><button onclick="vardiyaSil(\'personel\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
     }
-    ['acilis','kapanis'].forEach(function(tur){
+    ['acilis','kapanis','malzeme'].forEach(function(tur){
       var el=document.getElementById('vad'+tur.charAt(0).toUpperCase()+tur.slice(1)); if(!el) return;
       var arr=_vadConf[tur]||[];
       el.innerHTML=arr.length? arr.map(function(x,i){ return '<div class="vad-li"><span class="txt">'+esc(x)+'</span><button onclick="vardiyaSil(\''+tur+'\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
@@ -4515,7 +4527,7 @@ if('serviceWorker' in navigator){
     var el=document.getElementById('vadKayitDurum'); if(el){ el.textContent='Kaydediliyor…'; el.style.color='var(--mist)'; }
     var gs=document.getElementById('vadGecSaat');
     _vadConf.gec_saat=(gs&&gs.value||'').trim();
-    var payload={sube:_vadSube,personel:_vadConf.personel,acilis:_vadConf.acilis,kapanis:_vadConf.kapanis,gec_saat:_vadConf.gec_saat};
+    var payload={sube:_vadSube,personel:_vadConf.personel,acilis:_vadConf.acilis,kapanis:_vadConf.kapanis,malzeme:_vadConf.malzeme,gec_saat:_vadConf.gec_saat};
     fetch(VAD_EV_API+'/api/vardiya',{method:'POST',headers:{'Content-Type':'application/json','X-Cactus-Key':vadToken()},body:JSON.stringify(payload)})
       .then(function(r){return r.json().catch(function(){return null;}).then(function(j){return {ok:r.ok,j:j};});})
       .then(function(res){
@@ -4531,19 +4543,23 @@ if('serviceWorker' in navigator){
       var evs=(j&&Array.isArray(j.events))?j.events:[];
       var gb=gunBasi();
       var bugun=evs.filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; });
-      _vadLastEv=bugun;
-      vardiyaCanliRender(bugun);
+      // Malzeme günlük sıfırlanmaz — son 7 günün son işaret durumu
+      var m7=evs.filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=Date.now()-7*86400000; });
+      _vadLastEv={bugun:bugun,m7:m7};
+      vardiyaCanliRender(_vadLastEv);
       if(dEl){ dEl.textContent='☁️ canlı'; dEl.style.color='#2d7a3a'; }
     }).catch(function(){ if(dEl){ dEl.textContent='⚠️ bağlantı yok'; dEl.style.color='#c0392b'; } });
   };
-  function vardiyaCanliRender(bugun){
+  function vardiyaCanliRender(veri){
+    var bugun=Array.isArray(veri)?veri:(veri&&veri.bugun)||[];
+    var m7=(veri&&veri.m7)||[];
     // içerde
     var byAd={}; bugun.filter(function(e){return e.type==='vardiya'&&e.payload&&e.payload.ad;}).sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){ byAd[e.payload.ad]=e; });
     var icerde=Object.keys(byAd).filter(function(ad){return byAd[ad].payload.aksiyon==='giris';});
     var icEl=document.getElementById('vadIcerde');
     if(icEl) icEl.innerHTML=icerde.length? icerde.map(function(ad){return '<span class="vad-tag">🟢 '+esc(ad)+' · '+saat(byAd[ad].ts)+'</span>';}).join('') : '<div class="vad-bos">Şu an vardiyada kimse yok.</div>';
     // checklist blokları
-    ['acilis','kapanis'].forEach(function(tur){
+    ['acilis','kapanis','malzeme'].forEach(function(tur){
       var cont=document.getElementById('vad'+(tur==='acilis'?'Acilis':'Kapanis')+'Canli'); if(!cont) return;
       var items=_vadConf[tur]||[];
       var evs=bugun.filter(function(e){return e.type==='checklist'&&e.payload&&e.payload.tur===tur;});
@@ -4556,6 +4572,19 @@ if('serviceWorker' in navigator){
       }).join('') : '<div class="vad-bos">Madde tanımlı değil.</div>';
       var say=document.getElementById(tur==='acilis'?'vadAcilisSay':'vadKapanisSay'); if(say) say.textContent=items.length?(done+'/'+items.length):'';
     });
+    // eksik malzeme (son 7 gün, son durum)
+    var mEl=document.getElementById('vadMalzemeCanli');
+    if(mEl){
+      var mItems=_vadConf.malzeme||[];
+      var mSon={};
+      m7.forEach(function(e){ if(e.payload&&e.payload.tur==='malzeme'){ var k=e.payload.madde; if(!mSon[k]||e.ts>mSon[k].ts) mSon[k]=e; } });
+      var eksikler=mItems.filter(function(m){ return mSon[m]&&mSon[m].payload.done; });
+      mEl.innerHTML=eksikler.length? eksikler.map(function(m){
+        var e=mSon[m];
+        return '<div class="vad-cl" style="background:#fdecec;border-color:#e6a1a1;"><span class="ck" style="background:#c0392b;border-color:#c0392b;color:#fff;">!</span><span class="mad">'+esc(m)+'</span><span class="who">'+esc(e.payload.ad||'')+' · '+saat(e.ts)+'</span></div>';
+      }).join('') : '<div class="vad-bos">Eksik malzeme yok 🎉</div>';
+      var mSay=document.getElementById('vadMalzemeSay'); if(mSay) mSay.textContent=eksikler.length?(eksikler.length+' eksik'):'';
+    }
     // log
     var logEl=document.getElementById('vadLog');
     if(logEl){

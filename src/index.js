@@ -63,6 +63,8 @@ async function getVardiyaCfg(env, sube) {
         personel: Array.isArray(d.personel) ? d.personel : [],
         acilis: Array.isArray(d.acilis) ? d.acilis : [],
         kapanis: Array.isArray(d.kapanis) ? d.kapanis : [],
+        // Malzeme listesi — işaretli = eksik/azaldı (günlük değil; alınana dek kalır)
+        malzeme: Array.isArray(d.malzeme) ? d.malzeme : [],
         // Bildirim numarası (boş → genel numara: env.WA_PHONE ya da D1 '_wa_')
         wa_phone: d.wa_phone || '',
         // Geç kalma uyarı saati "HH:MM" İstanbul (boş = kapalı)
@@ -70,7 +72,7 @@ async function getVardiyaCfg(env, sube) {
       };
     }
   } catch (e) {}
-  return { personel: [], acilis: [], kapanis: [], wa_phone: '', gec_saat: '' };
+  return { personel: [], acilis: [], kapanis: [], malzeme: [], wa_phone: '', gec_saat: '' };
 }
 // WhatsApp gönderimi — raporlarla AYNI kanal: Green API (rapor-api'deki whatsappGonder ile birebir).
 // Kimlik bilgileri: önce worker secret'ları (GREEN_INSTANCE/GREEN_TOKEN/WA_PHONE),
@@ -184,6 +186,20 @@ async function vardiyaOzetOlustur(env, sube, basTs, bitTs, cfg) {
     for (const e of evs) { if (e.type === 'checklist' && e.p.tur === tur) son[e.p.madde] = !!e.p.done; }
     const biten = items.filter(function (m) { return son[m]; }).length;
     satirlar.push((tur === 'acilis' ? '🌅 Açılış: ' : '🌙 Kapanış: ') + biten + '/' + items.length + (biten === items.length ? ' ✅' : ' ⚠️'));
+  }
+  // Eksik malzeme — günlük değil: son 7 günün son işaret durumu (alınınca kaldırılır)
+  const mItems = (cfg && cfg.malzeme) || [];
+  if (mItems.length) {
+    const mr = await env.ADISYON_DB.prepare(
+      `SELECT payload, ts FROM adisyon_events WHERE sube = ? AND type = 'checklist' AND ts >= ? AND ts < ? ORDER BY ts ASC`
+    ).bind(sube, bitTs - 7 * 86400000, bitTs).all();
+    const mSon = {};
+    for (const r of (mr.results || [])) {
+      let p; try { p = JSON.parse(r.payload); } catch (e) { continue; }
+      if (p && p.tur === 'malzeme') mSon[p.madde] = !!p.done;
+    }
+    const eksik = mItems.filter(function (m) { return mSon[m]; });
+    if (eksik.length) satirlar.push('🧂 Eksik malzeme: ' + eksik.join(', '));
   }
   return satirlar.join('\n');
 }
@@ -487,7 +503,7 @@ export default {
             // green_set: kimlik zaten kayıtlı mı (token asla dönmez); env_wa: secret'lardan mı geliyor
             const greenSet = !!(wa.instance && wa.token);
             const envWa = !!(env.GREEN_INSTANCE && env.GREEN_TOKEN);
-            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, wa_phone: cfg.wa_phone, gec_saat: cfg.gec_saat, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
+            return json({ ok: true, personel: cfg.personel, acilis: cfg.acilis, kapanis: cfg.kapanis, malzeme: cfg.malzeme, wa_phone: cfg.wa_phone, gec_saat: cfg.gec_saat, wa_default: waDefMask, wa_ready: waReady, green_set: greenSet, env_wa: envWa }, 200, NO_STORE);
           }
           // Herkese açık: sadece isimler + maddeler (PIN ve numara asla dönmez).
           // pinli: şifresi OLAN isimler — adisyon şifre kutusunu sadece bunlara gösterir.
@@ -497,6 +513,7 @@ export default {
             pinli: (cfg.personel || []).filter(function (p) { return p && p.ad && p.pin; }).map(function (p) { return p.ad; }),
             acilis: cfg.acilis,
             kapanis: cfg.kapanis,
+            malzeme: cfg.malzeme,
           }, 200, NO_STORE);
         }
         if (request.method === 'POST') {
@@ -510,6 +527,7 @@ export default {
             personel: Array.isArray(body.personel) ? body.personel.map(function (p) { return { ad: String((p && p.ad) || '').trim(), pin: String((p && p.pin) || '').trim() }; }).filter(function (p) { return p.ad; }) : [],
             acilis: Array.isArray(body.acilis) ? body.acilis.map(String) : [],
             kapanis: Array.isArray(body.kapanis) ? body.kapanis.map(String) : [],
+            malzeme: Array.isArray(body.malzeme) ? body.malzeme.map(String) : [],
             wa_phone: String(body.wa_phone || '').replace(/\D/g, ''),
             gec_saat: /^\d{1,2}:\d{2}$/.test(gecSaat) ? gecSaat : '',
           };

@@ -1051,6 +1051,8 @@ if('serviceWorker' in navigator){
 #scr-var .var-item.done .var-chk{background:#2e7d32;border-color:#2e7d32;color:#fff;}
 #scr-var .var-mad{flex:1;font-size:15px;color:var(--k1);font-weight:600;}
 #scr-var .var-item.done .var-mad{text-decoration:line-through;color:var(--k2);}
+#scr-var .var-item.eksik{background:#fdecec;border-color:#e6a1a1;}
+#scr-var .var-item.eksik .var-chk{background:#c0392b;border-color:#c0392b;color:#fff;}
 #scr-var .var-who{font-size:11px;color:var(--k2);white-space:nowrap;}
 #scr-var .var-tag{display:inline-block;background:#eef7ee;border:1px solid #9ccc9c;color:#1f5c38;border-radius:100px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;}
 #scr-var #var-durum{font-size:14px;color:var(--k1);}
@@ -1075,6 +1077,11 @@ if('serviceWorker' in navigator){
     <div class="var-card">
       <div class="var-ttl">🌙 Kapanış Kontrol Listesi <span id="var-kapanis-say" class="var-say"></span></div>
       <div id="var-kapanis"></div>
+    </div>
+    <div class="var-card">
+      <div class="var-ttl">🧂 Malzeme — Eksikler <span id="var-malzeme-say" class="var-say"></span></div>
+      <div style="font-size:12px;color:var(--k2);margin:-4px 0 10px;">Biten/azalan malzemeyi işaretle; alınınca işareti kaldır. (Günlük sıfırlanmaz.)</div>
+      <div id="var-malzeme"></div>
     </div>
     <div class="var-card">
       <div class="var-ttl">🕒 Şu An Vardiyada</div>
@@ -4462,7 +4469,7 @@ setInterval(function(){gunCiroYukle();},60000);
      İşaretlemeler event-log'a (type checklist, masa=null) yazılır. -->
 <script>
 (function(){
-  var _vconf={personel:[],acilis:[],kapanis:[],pinli:null};
+  var _vconf={personel:[],acilis:[],kapanis:[],malzeme:[],pinli:null};
   var _vsel=''; try{ _vsel=localStorage.getItem('cactus_vardiya_ben_'+SUBE)||''; }catch(e){}
   var _vbusy=false;
   // Seçili kişinin şifresi var mı? (pinli listesi yoksa — eski sunucu — güvenli taraf: iste)
@@ -4472,11 +4479,14 @@ setInterval(function(){gunCiroYukle();},60000);
   // İş günü sınırı: sabah 05:00. 05:00 öncesi bir önceki güne sayılır (gece kapanışı doğru sayılsın).
   function gunBasi(){ var d=new Date(); var s=new Date(d); s.setHours(5,0,0,0); if(d<s) s.setDate(s.getDate()-1); return s.getTime(); }
   function bugunEv(){ var gb=gunBasi(); return (window._eventLog||[]).filter(function(e){ return e && (e.type==='vardiya'||e.type==='checklist') && Number(e.ts)>=gb; }); }
+  // Malzeme günlük sıfırlanmaz — son 7 günün son işaret durumu geçerli
+  function son7gunEv(){ var sinir=Date.now()-7*86400000; return (window._eventLog||[]).filter(function(e){ return e && e.type==='checklist' && Number(e.ts)>=sinir; }); }
+  function turEv(tur){ return tur==='malzeme' ? son7gunEv() : bugunEv(); }
 
   window.vardiyaConfigYukle=function(cb){
     fetch(EV_API+'/api/vardiya?sube='+SUBE+'&t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
       if(d&&d.ok){
-        _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[], pinli:Array.isArray(d.pinli)?d.pinli:null };
+        _vconf={ personel:Array.isArray(d.personel)?d.personel:[], acilis:Array.isArray(d.acilis)?d.acilis:[], kapanis:Array.isArray(d.kapanis)?d.kapanis:[], malzeme:Array.isArray(d.malzeme)?d.malzeme:[], pinli:Array.isArray(d.pinli)?d.pinli:null };
       }
       if(cb)cb();
     }).catch(function(){ if(cb)cb(); });
@@ -4513,7 +4523,7 @@ setInterval(function(){gunCiroYukle();},60000);
   window.vardiyaTik=function(tur,idx){
     if(!_vsel){ alert('Önce personel seçin'); return; }
     var madde=(_vconf[tur]||[])[idx]; if(madde==null) return;
-    var last=null; bugunEv().forEach(function(e){ if(e.type==='checklist'&&e.payload&&e.payload.tur===tur&&e.payload.madde===madde){ if(!last||e.ts>last.ts) last=e; } });
+    var last=null; turEv(tur).forEach(function(e){ if(e.type==='checklist'&&e.payload&&e.payload.tur===tur&&e.payload.madde===madde){ if(!last||e.ts>last.ts) last=e; } });
     var yeni=!(last&&last.payload.done);
     _pushEvent('checklist',null,{ad:_vsel,tur:tur,madde:madde,done:yeni});
     vardiyaRender();
@@ -4528,7 +4538,7 @@ setInterval(function(){gunCiroYukle();},60000);
     if(sel){ sel.innerHTML='<option value="">— Personel seç —</option>'+_vconf.personel.map(function(p){return '<option value="'+_esc(p)+'"'+(p===_vsel?' selected':'')+'>'+_esc(p)+'</option>';}).join(''); }
     // Şifre kutusu sadece şifresi olan kişiye görünsün
     var pi=document.getElementById('var-pin'); if(pi) pi.style.display=_pinGerekli()?'':'none';
-    vardiyaDurumRender(); vardiyaListe('acilis'); vardiyaListe('kapanis'); vardiyaIcerde();
+    vardiyaDurumRender(); vardiyaListe('acilis'); vardiyaListe('kapanis'); vardiyaListe('malzeme'); vardiyaIcerde();
   }
   function vardiyaDurumRender(){
     var el=document.getElementById('var-durum'), gEl=document.getElementById('var-giris'), cEl=document.getElementById('var-cikis');
@@ -4542,15 +4552,18 @@ setInterval(function(){gunCiroYukle();},60000);
   }
   function vardiyaListe(tur){
     var cont=document.getElementById('var-'+tur); if(!cont) return;
-    var items=_vconf[tur]||[]; var evs=bugunEv().filter(function(e){return e.type==='checklist'&&e.payload&&e.payload.tur===tur;});
+    var items=_vconf[tur]||[]; var evs=turEv(tur).filter(function(e){return e.type==='checklist'&&e.payload&&e.payload.tur===tur;});
+    var eksikMi=(tur==='malzeme');
     var done=0;
     cont.innerHTML = items.length ? items.map(function(m,i){
       var last=null; evs.forEach(function(e){ if(e.payload.madde===m && (!last||e.ts>last.ts)) last=e; });
       var isDone=!!(last&&last.payload.done); if(isDone) done++;
       var who=isDone?('<span class="var-who">'+_esc(last.payload.ad||'')+' · '+_saat(last.ts)+'</span>'):'';
-      return '<div class="var-item'+(isDone?' done':'')+'" onclick="vardiyaTik(\''+tur+'\','+i+')"><span class="var-chk">'+(isDone?'✓':'')+'</span><span class="var-mad">'+_esc(m)+'</span>'+who+'</div>';
+      var cls=isDone?(eksikMi?' eksik':' done'):'';
+      var isaret=isDone?(eksikMi?'!':'✓'):'';
+      return '<div class="var-item'+cls+'" onclick="vardiyaTik(\''+tur+'\','+i+')"><span class="var-chk">'+isaret+'</span><span class="var-mad">'+_esc(m)+'</span>'+who+'</div>';
     }).join('') : '<div style="color:var(--k2);font-size:13px;padding:6px 0;">Madde tanımlı değil.</div>';
-    var say=document.getElementById('var-'+tur+'-say'); if(say) say.textContent=items.length?(done+'/'+items.length):'';
+    var say=document.getElementById('var-'+tur+'-say'); if(say) say.textContent=items.length?(eksikMi?(done?(done+' eksik'):'eksik yok'):(done+'/'+items.length)):'';
   }
   function vardiyaIcerde(){
     var el=document.getElementById('var-icerdekiler'); if(!el) return;

@@ -7,21 +7,18 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Canli menu verisi (kategori yapisi)
+      - name: Stok dusumu + idempotens testi
         run: |
-          echo "1) menu_public (site menusu)"
-          curl -sS "https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=menu_public" | head -c 3000
+          EVID="stok-test-$(date +%s)"
+          BODY="{\"events\":[{\"id\":\"$EVID\",\"sube\":\"fsm\",\"type\":\"MASA_PAY\",\"masa\":99,\"payload\":{\"urunler\":[{\"id\":\"__stok_test\",\"adet\":2}],\"tutar\":0},\"ts\":$(date +%s)000,\"cihaz_id\":\"smoke-stok\"}]}"
+          echo "1) MASA_PAY gonder (2 adet dusmeli)"
+          curl -sS -X POST "https://cactus-kafe.batuhanbulut.workers.dev/api/events" -H "Content-Type: application/json" -d "$BODY"
           echo
-          echo "2) adisyon_podyum (podyum adisyon menusu)"
-          curl -sS "https://cactus-rapor-api.batuhanbulut.workers.dev/menu/cek?sube=adisyon_podyum" | python3 -c "
-          import json,sys
-          try:
-            d=json.load(sys.stdin)
-            def kat(x,pre=''):
-              if isinstance(x,dict):
-                for k,v in x.items():
-                  if isinstance(v,dict) and 'urunler' in v: print(pre+k,'|',v.get('label',''),'|',len(v['urunler']),'urun')
-                  elif isinstance(v,dict): print(pre+k+':'); kat(v,pre+'  ')
-            kat(d)
-          except Exception as e: print('parse hatasi', e)
-          "
+          sleep 3
+          echo "2) AYNI event tekrar (retry simulasyonu — DUSMEMELI)"
+          curl -sS -X POST "https://cactus-kafe.batuhanbulut.workers.dev/api/events" -H "Content-Type: application/json" -d "$BODY"
+          echo
+          sleep 3
+          echo "3) Stok durumu (beklenen: Stok Testi adet=3)"
+          curl -sS "https://cactus-kafe.batuhanbulut.workers.dev/api/stok?sube=fsm"
+          echo

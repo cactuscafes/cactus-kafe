@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v45'; // v45: hammadde + reçete bazlı stok (1 kg = 100 shot modeli)
+const VERSION = 'cactus-v46'; // v46: menü kayan yazısında sadakat kartı daveti (tıklanınca kart.html)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

@@ -115,7 +115,9 @@
           mq.style.display = 'none';
           document.body.style.paddingTop = '';
         } else if (st.metin) {
-          var seg = st.metin + '   ✦   ';
+          // Sadakat segmenti sabit: admin şerit metnini değiştirse de kart daveti kaybolmaz
+          // (şeride tıklayınca kart.html açılır — tıklama sayfadaki gömülü onclick'te).
+          var seg = st.metin + '   ✦   🎖️  7 yıldız = 1 bedava içecek — dokun, sadakat kartını oluştur   ✦   ';
           mq.querySelectorAll('.pm-seg').forEach(function (el) {
             var logo = el.querySelector('.pm-logo'); // kayan yazıdaki logo görselini koru
             el.textContent = seg;

@@ -337,6 +337,29 @@ footer{padding:40px 20px 24px;}
 .upop-img.zoomed img{transform:scale(2);cursor:zoom-out;}
 .upop-img{cursor:zoom-in;overflow:hidden;}
 
+/* ── Kategori emoji rozeti (masaüstü: sade satır içi) ── */
+.cat-emoji{font-size:26px;line-height:1;margin-right:2px;}
+
+/* ── MOBİL: renkli akordeon kartları — her kategori kendi renginde (--kc/--kcs JS'ten) ── */
+@media(max-width:768px){
+  .cat-list{padding:0 14px;}
+  .cat-section{border-bottom:none;margin-bottom:12px;border-radius:18px;background:var(--kcs,#f6f3ee);overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:box-shadow .3s;}
+  .cat-section.open{box-shadow:0 10px 26px rgba(0,0,0,.10);}
+  .cat-header{padding:13px 14px;}
+  .cat-header-left{align-items:center;gap:12px;}
+  .cat-emoji{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:14px;background:#fff;font-size:22px;margin-right:0;box-shadow:0 1px 6px rgba(0,0,0,.07);}
+  .cat-name{font-size:20px;font-weight:500;color:var(--kc,#1a1a1a);letter-spacing:.4px;}
+  .cat-count{font-size:9px;background:#fff;color:var(--kc,#888);padding:3px 9px;border-radius:10px;font-weight:700;letter-spacing:1.4px;}
+  .cat-arrow{width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--kc,#1a1a1a);color:#fff;font-size:17px;line-height:1;}
+  .cat-products{padding-left:14px;padding-right:14px;}
+  .cat-section.open .cat-products{padding-bottom:20px;}
+  .product-card .product-img-wrap{border-radius:12px;}
+  .product-emoji-placeholder{background:#fff;}
+  /* Alt kategori barı hapları kategori renginde (--pc JS'ten) */
+  .akb-pill{color:var(--pc,#666);border-color:var(--pc,#ddd);background:#fff;}
+  .akb-pill.aktif{background:var(--pc,var(--dark));color:#fff;border-color:var(--pc,var(--dark));}
+}
+
 /* Erişilebilirlik — hareket istemeyenler */
 @media (prefers-reduced-motion: reduce){
   .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn,#alt-kat-bar{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
@@ -1073,7 +1096,14 @@ function renderMenu(sube) {
       return c;
     }).join('');
   } else if (spotlightEl) { spotlightEl.style.display='none'; }
-  catListEl.innerHTML = katData.map(function(kat) {
+  // Kategori renk paleti — mobil akordeon kartları (id bilinmiyorsa sırayla yedekten)
+  var KAT_RENK={
+    sicak:['#a86b32','#f7ecdc'], soguk:['#2e7fa8','#e3f2fa'], kokteyl:['#c2447e','#fbe6f1'],
+    vitamin:['#d97a1f','#fdeedd'], waffle:['#b8860b','#faf0d7'], tatlilar:['#c05a5a','#fbe9e7'],
+    cay:['#3e7d46','#e6f3e7'], tost:['#8a5a36','#f3e9df']
+  };
+  var YEDEK_RENK=[['#2d5a27','#e9f1e7'],['#b47b3c','#f6ead8'],['#2e7fa8','#e3f2fa'],['#c2447e','#fbe6f1'],['#d97a1f','#fdeedd']];
+  catListEl.innerHTML = katData.map(function(kat, katIdx) {
     var urunler=(kat.urunler||[]).filter(function(u){ return !u.gizli; });
     var katEmoji=(String(kat.label||'').match(/^([\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}️‍]+)/u)||['',''])[1].trim();
     if (!urunler.length) return '';
@@ -1096,9 +1126,12 @@ function renderMenu(sube) {
       h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
       return h;
     }).join('');
-    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'" data-kat="'+(kat.label||kat.id)+'">';
+    var rk=KAT_RENK[kat.id]||YEDEK_RENK[katIdx%YEDEK_RENK.length];
+    var adSade=katEmoji?String(kat.label||'').replace(katEmoji,'').trim():'';
+    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'" data-kat="'+(kat.label||kat.id)+'" style="--kc:'+rk[0]+';--kcs:'+rk[1]+'">';
     ch+='<div class="cat-header" onclick="toggleCat(\'cat-'+kat.id+'-'+sube+'\')">';
-    ch+='<div class="cat-header-left"><span class="cat-name">'+kat.label+'</span>';
+    ch+='<div class="cat-header-left">'+(katEmoji?'<span class="cat-emoji">'+katEmoji+'</span>':'');
+    ch+='<span class="cat-name">'+(adSade||kat.label)+'</span>';
     ch+='<span class="cat-count">'+urunler.length+' cesit</span></div>';
     ch+='<span class="cat-arrow">+</span></div>';
     ch+='<div class="cat-products">'+uH+'</div></div>';
@@ -1578,6 +1611,8 @@ function altKatBarGuncelle(){
     var pill=document.createElement('div');
     pill.className='akb-pill';
     pill.textContent=ad;
+    var kc=(k.style.getPropertyValue('--kc')||'').trim(); // kategori rengi kartla aynı olsun
+    if(kc) pill.style.setProperty('--pc',kc);
     pill.onclick=function(){
       if(!k.classList.contains('open')) toggleCat(k.id);
       setTimeout(function(){k.scrollIntoView({behavior:'smooth',block:'start'});},120);

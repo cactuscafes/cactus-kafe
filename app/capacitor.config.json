@@ -1,0 +1,13 @@
+{
+  "appId": "com.cactuscafes.coffee",
+  "appName": "Cactus Coffee",
+  "webDir": "www",
+  "server": {
+    "url": "https://cactuscafes.com/menu-podyum.html",
+    "allowNavigation": ["cactuscafes.com", "*.cactuscafes.com", "*.workers.dev"]
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#fdfaf3"
+  }
+}

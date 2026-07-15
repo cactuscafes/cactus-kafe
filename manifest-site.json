@@ -1,0 +1,21 @@
+{
+  "name": "Cactus Coffee",
+  "short_name": "Cactus",
+  "description": "Cactus Coffee Podyumpark — menü, kampanyalar ve sadakat kartı",
+  "start_url": "/menu-podyum.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdfaf3",
+  "theme_color": "#0e1f08",
+  "lang": "tr",
+  "id": "/menu-podyum.html",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Sadakat Kartım", "url": "/kart.html", "description": "Yıldızlarını gör" },
+    { "name": "Menü", "url": "/menu-podyum.html", "description": "Podyumpark menüsü" }
+  ]
+}

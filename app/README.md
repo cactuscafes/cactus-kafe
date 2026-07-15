@@ -1,62 +1,49 @@
-# 🌵 Cactus Coffee — iOS Uygulaması (App Store Rehberi)
+# 🌵 Cactus Coffee — iPhone Uygulaması
 
-Bu klasör, cactuscafes.com'u iPhone uygulamasına çeviren **Capacitor** projesidir.
-Uygulama, siteyi uygulama penceresi içinde açar — sitede yaptığın her değişiklik
-(menü, fiyat, kampanya) **uygulama güncellemesi gerektirmeden** anında uygulamada görünür.
+Bu klasörde **hazır bir Xcode projesi** var (`CactusCoffee.xcodeproj`).
+Terminal, Node, ek kurulum **gerekmez** — indir, çift tıkla, imzala, gönder.
 
-Aşağıdaki adımların tamamı **Mac'te** yapılır. Toplam süre: ilk seferde ~1 saat
-(çoğu Xcode indirmesi), sonraki güncellemelerde ~10 dk.
+Uygulama, cactuscafes.com'u uygulama penceresinde açar. Menü/fiyat/kampanya
+değişikliklerin uygulama güncellemesi gerektirmeden anında uygulamada görünür.
+Telefon/WhatsApp/Instagram linkleri otomatik olarak ilgili uygulamada açılır;
+internet yoksa "Tekrar Dene" ekranı çıkar.
 
 ---
 
-## 1. Kurulum (bir kez)
+## Adım 1 — Projeyi Mac'e indir (2 dk)
 
-1. **Xcode'u kur:** App Store'dan "Xcode" (ücretsiz, ~10 GB). İlk açılışta ek bileşenleri onayla.
-2. **Node.js kur:** https://nodejs.org → "LTS" sürümünü indir, kur.
-3. **Terminal'i aç** ve bu klasöre gel:
-   ```
-   cd cactus-kafe/app
-   npm install
-   npx cap add ios
-   ```
-   Bu komut `ios/` klasörünü (Xcode projesini) oluşturur.
+1. Mac'te tarayıcıdan: **github.com/cactuscafes/cactus-kafe** → yeşil **Code** düğmesi → **Download ZIP**.
+2. ZIP'i aç → `app` klasörüne gir → **`CactusCoffee.xcodeproj`** dosyasına çift tıkla. Xcode açılır.
 
-## 2. Xcode'da imzalama (bir kez)
+## Adım 2 — İmzala ve dene (5 dk)
 
-```
-npx cap open ios
-```
-Xcode açılınca:
+1. Xcode menüsü → **Settings → Accounts → +** → Apple Developer hesabının Apple ID'siyle gir (yalnızca ilk sefer).
+2. Sol paneldeki en üstteki **CactusCoffee** projesine tıkla → ortadaki **Signing & Capabilities** sekmesi → **Team** listesinden hesabını seç. (Hata/uyarı kalmamalı.)
+3. Üstteki cihaz seçiciden bir **iPhone simülatörü** seç → **▶** düğmesi. Uygulama açılıp siteyi göstermeli.
+4. Kendi iPhone'unda denemek istersen: telefonu kabloyla bağla, cihaz seçiciden telefonu seç → ▶. (Telefonda Ayarlar → Genel → VPN ve Aygıt Yönetimi'nden geliştiriciye güven demen istenebilir.)
 
-1. Soldaki gezginde en üstteki **App** projesine tıkla → **Signing & Capabilities** sekmesi.
-2. **Team:** Apple Developer hesabını seç (ilk sefer: Xcode → Settings → Accounts → Apple ID'ni ekle).
-3. **Bundle Identifier:** `com.cactuscafes.coffee` (dokunma, hazır geliyor).
-4. Üstteki cihaz seçiciden kendi iPhone'unu veya bir simülatör seç → **▶ Run** ile dene.
+## Adım 3 — App Store'a gönder (~30 dk, çoğu form doldurma)
 
-## 3. App Store'a gönderme
+1. **appstoreconnect.apple.com** → Uygulamalarım → **+ → Yeni Uygulama**:
+   - Platform: iOS · Ad: **Cactus Coffee** · Birincil dil: Türkçe
+   - Bundle ID: **com.cactuscafes.coffee** (listede çıkması için önce 2. adımın yapılmış olması gerekir; çıkmazsa developer.apple.com → Identifiers'dan elle ekle)
+   - SKU: `cactus1`
+2. Xcode'da üstteki cihaz seçiciyi **Any iOS Device (arm64)** yap → menüden **Product → Archive** → pencerede **Distribute App → App Store Connect → Upload** (hepsinde varsayılanlarla devam).
+3. App Store Connect'te sürüm sayfasını doldur:
+   - **Ekran görüntüleri:** uygulamayı simülatörde aç, ⌘S ile 6.7" ve 6.1" boyutlarında görüntü al (simülatör türünü değiştirerek).
+   - **Açıklama:** sadakat kartını öne çıkar — "7 yıldız topla, içeceğin bizden. Menü, kampanyalar ve dijital sadakat kartın cebinde."
+   - **Gizlilik:** "Veri Türleri" → yalnızca *İletişim Bilgisi → Telefon Numarası*, "Uygulama İşlevselliği" amacıyla, kimliğe bağlı, izleme yok.
+   - **İnceleme Bilgileri** notuna: "Sadakat kartını test etmek için: [test telefon numarası yazın]".
+4. **İncelemeye Gönder.** Sonuç genelde 1-3 gün içinde gelir.
 
-1. **App Store Connect'te kayıt:** https://appstoreconnect.apple.com → Uygulamalarım → **+**
-   → Yeni Uygulama. Ad: "Cactus Coffee", dil: Türkçe, Bundle ID: `com.cactuscafes.coffee`, SKU: `cactus1`.
-2. **Uygulama ikonu:** repo kökündeki `icon-1024.png` hazır (1024×1024). Xcode'da
-   `App/Assets.xcassets/AppIcon` içine sürükle.
-3. **Arşivle:** Xcode'da üstteki cihaz seçiciyi **Any iOS Device (arm64)** yap →
-   menüden **Product → Archive** → açılan pencerede **Distribute App → App Store Connect → Upload**.
-4. App Store Connect'te sürümü doldur: ekran görüntüleri (iPhone'da uygulamayı açıp
-   ekran görüntüsü almak yeterli), açıklama, gizlilik ("veri toplanmıyor" —
-   sadakat kartındaki telefon numarası "İletişim Bilgisi / Uygulama İşlevi" olarak beyan edilir).
-5. **İncelemeye gönder.**
+## Reddedilirse (panik yok)
 
-## ⚠️ Apple reddi riski ve çözümü
+Apple bazen site-sarmalayıcı uygulamaları "4.2 Minimum Functionality" ile reddeder.
+Bu olursa cevap yazma hakkın var; ayrıca push bildirimi gibi yerel bir özellik
+ekleyerek yeniden göndermek genellikle yeterli oluyor — o noktada bana haber ver,
+projeye ekleyeyim.
 
-Apple, "sadece web sitesini gösteren" uygulamaları bazen **4.2 Minimum Functionality**
-gerekçesiyle reddeder. Şansı artırmak için:
+## Sonraki sürümler
 
-- Açıklamada uygulamanın **sadakat kartı** işlevini öne çıkar ("yıldız biriktir, bedava içecek kazan").
-- İnceleme notlarına test için örnek bir telefon numarası yaz (kartı görebilsinler).
-- Reddedilirse panik yok: cevap hakkın var; genellikle push bildirimi veya küçük bir
-  yerel özellik ekleyince geçer. O noktada tekrar yardım isteyebilirsin.
-
-## Sonraki güncellemeler
-
-Site değişiklikleri için hiçbir şey yapman gerekmez. Yalnızca uygulamanın kendisini
-(ikon, isim, yerel ayar) değiştirirsen: sürüm numarasını yükselt → Archive → Upload.
+Site değişikliği için hiçbir şey yapma. Uygulamanın kendisi değişirse (ikon, isim):
+Xcode'da projeye tıkla → General → Version'ı yükselt (1.1) → Archive → Upload.

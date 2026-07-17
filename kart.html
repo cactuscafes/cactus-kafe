@@ -91,6 +91,13 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .giris-tesvik{font-size:12px;color:var(--amber);text-align:center;margin:2px 0 12px;letter-spacing:.3px;}
 .giris-tesvik b{color:var(--latte);font-weight:600;}
 .giris-kvkk{font-size:10.5px;color:rgba(245,234,216,.62);text-align:center;margin-top:12px;line-height:1.55;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.kvkk-onay{display:flex;align-items:flex-start;gap:9px;margin:2px 0 12px;cursor:pointer;text-align:left;}
+.kvkk-onay input{margin-top:2px;width:17px;height:17px;flex:none;accent-color:#c8a86a;cursor:pointer;}
+.kvkk-onay span{font-size:11px;color:rgba(245,234,216,.75);line-height:1.55;}
+.kvkk-onay a{color:#e8c47a;font-weight:700;text-decoration:underline;}
+.kvkk-metin{background:rgba(0,0,0,.25);border:1px solid rgba(200,168,106,.25);border-radius:10px;padding:12px 14px;margin:0 0 12px;font-size:10.5px;color:rgba(245,234,216,.7);line-height:1.7;max-height:180px;overflow-y:auto;text-align:left;}
+.kvkk-metin b{color:#e8c47a;font-weight:700;}
+.kvkk-metin a{color:#e8c47a;}
 .giris-alt-link{text-align:center;margin-top:14px;}
 .giris-alt-link a{font-size:12px;color:rgba(245,234,216,.65);text-decoration:none;}
 .giris-alt-link a b{color:var(--amber);}
@@ -236,6 +243,13 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         <input class="giris-input" id="adInput" type="text" placeholder="Adın Soyadın" autocomplete="name" aria-label="Ad soyad"
           oninput="kartFormCheck()" onkeydown="if(event.key==='Enter')girisYap()">
         <div class="giris-tesvik">🎁 İlk kez mi? <b>İlk yıldızın bizden.</b></div>
+        <label class="kvkk-onay" id="kvkkRow">
+          <input type="checkbox" id="kvkkChk" onchange="kartFormCheck()" aria-label="KVKK onayı">
+          <span><a href="javascript:void(0)" onclick="kvkkAc(event)">KVKK Aydınlatma Metni</a>'ni okudum; ad-soyad ve telefon numaramın sadakat programı için işlenmesine açık rıza veriyorum.</span>
+        </label>
+        <div class="kvkk-metin" id="kvkkMetin" style="display:none;">
+          <b>Veri Sorumlusu:</b> Cactus Coffee (Nilüfer/Bursa) · <b>İşlenen veriler:</b> ad-soyad, telefon numarası ve yıldız/işlem geçmişi · <b>Amaç:</b> dijital sadakat programının yürütülmesi (yıldız kazanımı ve hediye takibi) · <b>Hukuki sebep:</b> açık rızanız · <b>Aktarım:</b> verileriniz üçüncü kişilerle paylaşılmaz, reklam amaçlı kullanılmaz; yalnızca hizmet altyapı sağlayıcımızın sunucularında saklanır · <b>Saklama:</b> üyeliğiniz süresince; talebinizle silinir · <b>Haklarınız (KVKK m.11):</b> verilerinize erişme, düzeltme, silme ve rızayı geri çekme için kafede personele başvurabilir veya <a href="tel:+905380146600">0538 014 66 00</a>'ı arayabilirsiniz.
+        </div>
         <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Oluştur →</button>
         <div class="giris-hata" id="girisHata"></div>
         <div class="giris-kvkk">🔒 Numaran yalnızca sadakat puanların için kullanılır, kimseyle paylaşılmaz.</div>
@@ -335,8 +349,14 @@ function telFormat(input){
 function kartFormCheck(){
   var tel=(document.getElementById('telInput').value||'').replace(/\D/g,'');
   var ad=(document.getElementById('adInput').value||'').trim();
+  var kvkk=!!(document.getElementById('kvkkChk')||{}).checked;
   var btn=document.getElementById('girisBtn');
-  if(btn) btn.disabled = _viewMode ? (tel.length!==11) : !(tel.length===11 && ad.length>=2);
+  if(btn) btn.disabled = _viewMode ? (tel.length!==11) : !(tel.length===11 && ad.length>=2 && kvkk);
+}
+function kvkkAc(e){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  var m=document.getElementById('kvkkMetin');
+  if(m) m.style.display = m.style.display==='none' ? '' : 'none';
 }
 
 function sayfa(id){
@@ -352,11 +372,14 @@ function girisModuDegis(){
       tesvik=document.querySelector('.giris-tesvik'), link=document.getElementById('girisModLink'),
       hata=document.getElementById('girisHata');
   if(hata) hata.textContent='';
+  var kvkkRow=document.getElementById('kvkkRow'), kvkkMetin=document.getElementById('kvkkMetin');
   if(_viewMode){
     ad.style.display='none'; ad.value='';
     if(baslik) baslik.textContent='Kartını Gör';
     if(alt) alt.textContent='Telefonunu gir, yıldızlarını gör';
     if(tesvik) tesvik.style.display='none';
+    if(kvkkRow) kvkkRow.style.display='none';
+    if(kvkkMetin) kvkkMetin.style.display='none';
     btn.textContent='Kartımı Gör →';
     if(link) link.innerHTML='Yeni misin? <b>Kart oluştur</b>';
   } else {
@@ -364,6 +387,7 @@ function girisModuDegis(){
     if(baslik) baslik.textContent='Kartını Oluştur';
     if(alt) alt.textContent='Ad soyad ve telefonun yeterli — uygulama yok, üyelik yok';
     if(tesvik) tesvik.style.display='';
+    if(kvkkRow) kvkkRow.style.display='';
     btn.textContent='Kartımı Oluştur →';
     if(link) link.innerHTML='Zaten kartın var mı? <b>Telefonla gör</b>';
   }
@@ -383,10 +407,11 @@ function girisYap(){
     return;
   }
   if(!ad||ad.length<2){hata.textContent='Lütfen ad soyad girin.';return;}
+  if(!((document.getElementById('kvkkChk')||{}).checked)){hata.textContent='Devam etmek için KVKK aydınlatma metnini onaylamalısın.';return;}
   hata.textContent='';
   document.getElementById('girisBtn').disabled=true;
   sayfa('sayfaYukl');
-  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad})})
+  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad,kvkk:true})})
     .then(function(r){return r.json();})
     .then(function(d){
       if(!d.ok){throw new Error(d.error||'Hata');}

@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v47'; // v47: Podyum menü mobil kategori kartları (renkli akordeon)
+const VERSION = 'cactus-v48'; // v48: menü alt kategori barı → sağ altta FAB + açılır kategori listesi (içeriği örtmüyor)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

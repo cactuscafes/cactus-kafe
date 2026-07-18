@@ -309,12 +309,23 @@ footer{padding:40px 20px 24px;}
 .sk-stamp.anim-fill{animation:skPop .5s cubic-bezier(.34,1.4,.64,1);}
 
 /* 9. Sticky alt kategori navi */
-#alt-kat-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px) saturate(150%);border-top:1px solid var(--border);z-index:85;padding:10px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.7,.2,1);box-shadow:0 -6px 22px rgba(0,0,0,.06);-webkit-overflow-scrolling:touch;}
-#alt-kat-bar::-webkit-scrollbar{display:none;}
-#alt-kat-bar.on{transform:translateY(0);}
-.akb-pill{flex-shrink:0;padding:8px 14px;border:1.5px solid var(--border);border-radius:18px;background:#fff;color:#666;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap;}
-.akb-pill.aktif{background:var(--dark);color:#fff;border-color:var(--dark);}
-@media(min-width:769px){#alt-kat-bar{display:none;}}
+/* Kategori FAB — sağ altta yuvarlak buton + açılır kategori listesi (alt bar yerine) */
+#kat-fab{position:fixed;right:28px;bottom:96px;z-index:10002;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2d5a27,#1a3010);color:#f7f2ea;border:none;box-shadow:0 8px 24px rgba(20,40,15,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s;}
+#kat-fab.on{opacity:1;pointer-events:auto;transform:none;}
+#kat-fab svg{width:22px;height:22px;}
+#kat-popup-bg{position:fixed;inset:0;z-index:10000;background:rgba(10,20,8,.45);opacity:0;pointer-events:none;transition:opacity .2s;}
+#kat-popup-bg.on{opacity:1;pointer-events:auto;}
+#kat-popup{position:fixed;right:20px;bottom:160px;z-index:10001;background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.25);width:min(320px,calc(100vw - 40px));max-height:min(60vh,540px);overflow-y:auto;padding:8px;opacity:0;pointer-events:none;transform:translateY(10px) scale(.97);transform-origin:bottom right;transition:opacity .22s,transform .22s;-webkit-overflow-scrolling:touch;}
+#kat-popup.on{opacity:1;pointer-events:auto;transform:none;}
+.kp-row{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:none;background:none;border-radius:12px;cursor:pointer;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent;}
+.kp-row:active{background:rgba(45,90,39,.08);}
+.kp-row .ke{flex:none;width:24px;text-align:center;font-size:17px;display:flex;align-items:center;justify-content:center;color:var(--kc,#444);}
+.kp-row .ke svg{width:20px;height:20px;}
+.kp-row .ka{flex:1;font-size:15px;font-weight:500;color:#1a1a1a;font-family:'Fraunces',serif;letter-spacing:.2px;}
+.kp-row .kc{font-size:12px;color:#999;font-weight:600;font-family:'Inter',sans-serif;}
+.kp-row.aktif{background:rgba(200,168,106,.16);}
+.kp-row.aktif .ka{color:#7a5c20;}
+@media(min-width:769px){#kat-fab,#kat-popup,#kat-popup-bg{display:none;}}
 
 /* 11. Pull-to-refresh */
 #ptr-ind{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-60px) scale(.85);width:40px;height:40px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:95;box-shadow:0 4px 14px rgba(0,0,0,.08);transition:transform .25s,opacity .25s;opacity:0;font-size:18px;}
@@ -356,14 +367,11 @@ footer{padding:40px 20px 24px;}
   .cat-section.open .cat-products{padding-bottom:20px;}
   .product-card .product-img-wrap{border-radius:12px;}
   .product-emoji-placeholder{background:#fff;}
-  /* Alt kategori barı hapları kategori renginde (--pc JS'ten) */
-  .akb-pill{color:var(--pc,#666);border-color:var(--pc,#ddd);background:#fff;}
-  .akb-pill.aktif{background:var(--pc,var(--dark));color:#fff;border-color:var(--pc,var(--dark));}
 }
 
 /* Erişilebilirlik — hareket istemeyenler */
 @media (prefers-reduced-motion: reduce){
-  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn,#alt-kat-bar{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
+  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn,#kat-fab,#kat-popup{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
   .product-card img,.spotlight-card img{opacity:1!important;}
   .sk-img,.sk-line{animation:none!important;}
 }
@@ -882,7 +890,9 @@ footer{padding:40px 20px 24px;}
 <div id="ptr-ind">↓</div>
 
 <!-- ⓘ Alt sticky kategori bar (mobil) -->
-<div id="alt-kat-bar"></div>
+<div id="kat-popup-bg" onclick="katPopupKapat()"></div>
+<div id="kat-popup" role="menu" aria-label="Kategoriler"></div>
+<button id="kat-fab" onclick="katPopupToggle()" aria-label="Kategori listesini aç" title="Kategoriler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button>
 
 
 <!-- ⓘ Quiz Modal -->
@@ -1600,68 +1610,74 @@ function kampanyaTatlilara(){
 
 // 9. Alt kategori barını besle (aktif şubeye göre)
 function altKatBarGuncelle(){
-  var bar=document.getElementById('alt-kat-bar');
-  if(!bar) return;
+  // Kategori popup listesini (FAB menüsü) yeniden kur
+  var pop=document.getElementById('kat-popup');
+  if(!pop) return;
   var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
   if(!liste) return;
   var katlar=liste.querySelectorAll('.cat-section');
-  if(!katlar.length){bar.classList.remove('on');return;}
-  bar.innerHTML='';
+  pop.innerHTML='';
   katlar.forEach(function(k){
-    var ad=k.dataset.kat||'?';
-    var pill=document.createElement('div');
-    pill.className='akb-pill';
-    pill.textContent=ad;
+    var etiket=k.dataset.kat||'?';
+    var ad=etiket.replace(/^[^\p{L}\p{N}]+/u,'').trim()||etiket; // baştaki emojiyi at
+    var say=k.querySelectorAll('.product-card').length;
+    var ikon=k.querySelector('.cat-name svg.cic, .cat-name .cic');
+    var yedekEmoji=((etiket.match(/^[^\p{L}\p{N}]+/u)||[''])[0]).trim(); // ikon yoksa ham emoji
+    var row=document.createElement('button');
+    row.type='button'; row.className='kp-row'; row.dataset.target=k.id;
     var kc=(k.style.getPropertyValue('--kc')||'').trim(); // kategori rengi kartla aynı olsun
-    if(kc) pill.style.setProperty('--pc',kc);
-    pill.onclick=function(){
+    if(kc) row.style.setProperty('--kc',kc);
+    row.innerHTML='<span class="ke">'+(ikon?ikon.outerHTML:yedekEmoji)+'</span><span class="ka">'+ad+'</span><span class="kc">'+say+'</span>';
+    row.onclick=function(){
+      katPopupKapat();
       if(!k.classList.contains('open')) toggleCat(k.id);
-      setTimeout(function(){k.scrollIntoView({behavior:'smooth',block:'start'});},120);
+      setTimeout(function(){k.scrollIntoView({behavior:'smooth',block:'start'});},140);
     };
-    pill.dataset.target=k.id;
-    bar.appendChild(pill);
+    pop.appendChild(row);
   });
 }
+function katPopupToggle(){
+  var pop=document.getElementById('kat-popup'),bg=document.getElementById('kat-popup-bg');
+  if(!pop||!bg) return;
+  if(pop.classList.contains('on')){katPopupKapat();return;}
+  altKatBarGuncelle();           // liste güncel olsun
+  altKatPillAktifGuncelle();     // görünen kategori işaretli açılsın
+  pop.classList.add('on'); bg.classList.add('on');
+}
+function katPopupKapat(){
+  var pop=document.getElementById('kat-popup'),bg=document.getElementById('kat-popup-bg');
+  if(pop) pop.classList.remove('on');
+  if(bg) bg.classList.remove('on');
+}
 function altKatBarOto(){
-  // Sayfa scroll edildiğinde alt bar görünür / kaybolur
-  var bar=document.getElementById('alt-kat-bar');
-  if(!bar) return;
-  var lastY=0,ticking=false;
+  // Scroll'a göre FAB görünür/gizli (sayfa başında gizli)
+  var fab=document.getElementById('kat-fab');
+  if(!fab) return;
+  var ticking=false;
   function tick(){
-    var y=window.scrollY;
-    var winH=window.innerHeight;
-    // Sayfa başında gizli, ortadayken görünür, en altta gizli
-    var max=document.body.scrollHeight-winH;
-    if(y>320 && y<max-160) bar.classList.add('on');
-    else bar.classList.remove('on');
-    // Aktif pill
-    altKatPillAktifGuncelle();
+    if(window.scrollY>320) fab.classList.add('on');
+    else { fab.classList.remove('on'); katPopupKapat(); }
     ticking=false;
   }
   window.addEventListener('scroll',function(){
     if(!ticking){requestAnimationFrame(tick);ticking=true;}
   },{passive:true});
+  setInterval(tick,700); // scroll eventi tetiklenmeyen webview'ler için emniyet
+  tick();
 }
 function altKatPillAktifGuncelle(){
-  var bar=document.getElementById('alt-kat-bar');
-  if(!bar||!bar.classList.contains('on')) return;
+  // Popup'ta o an görünen kategoriyi işaretle
+  var pop=document.getElementById('kat-popup');
+  if(!pop) return;
   var liste=document.getElementById('cat-list-'+AKTIF_SUBE);
   if(!liste) return;
-  var katlar=liste.querySelectorAll('.cat-section');
-  var aktifId=null;
-  var topRef=140;
-  katlar.forEach(function(k){
+  var aktifId=null, topRef=140;
+  liste.querySelectorAll('.cat-section').forEach(function(k){
     var r=k.getBoundingClientRect();
     if(r.top<=topRef && r.bottom>topRef) aktifId=k.id;
   });
-  bar.querySelectorAll('.akb-pill').forEach(function(p){
-    if(p.dataset.target===aktifId){
-      if(!p.classList.contains('aktif')){
-        p.classList.add('aktif');
-        // Scroll the pill into view in the bar
-        p.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
-      }
-    } else p.classList.remove('aktif');
+  pop.querySelectorAll('.kp-row').forEach(function(p){
+    p.classList.toggle('aktif',p.dataset.target===aktifId);
   });
 }
 

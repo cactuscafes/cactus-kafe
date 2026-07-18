@@ -371,7 +371,9 @@ footer{padding:40px 20px 24px;}
 
 /* Erişilebilirlik — hareket istemeyenler */
 @media (prefers-reduced-motion: reduce){
-  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn,#kat-fab,#kat-popup{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
+  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
+  /* FAB/popup görünürlüğü opacity ile yönetiliyor — burada opacity dayatma, sadece animasyonu kapat */
+  #kat-fab,#kat-popup,#kat-popup-bg{transition:none!important;animation:none!important;}
   .product-card img,.spotlight-card img{opacity:1!important;}
   .sk-img,.sk-line{animation:none!important;}
 }

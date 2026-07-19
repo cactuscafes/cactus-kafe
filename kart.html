@@ -141,6 +141,16 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 
 /* Bedava banner */
 .bedava-banner{background:linear-gradient(135deg,#2c5a1a,#1e3d10);border:1px solid rgba(200,168,106,.35);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 4px 24px rgba(44,90,26,.3);}
+/* Kutlama — hediye hakkı kazanınca konfeti + banner zıplaması */
+#konfetiKap{position:fixed;inset:0;pointer-events:none;z-index:10005;overflow:hidden;}
+.konf{position:absolute;top:-16px;width:9px;height:14px;border-radius:2px;opacity:.95;animation:konfDus linear forwards;}
+.konf.yuvarlak{width:8px;height:8px;border-radius:50%;}
+@keyframes konfDus{0%{transform:translate3d(0,-12vh,0) rotate(0deg);}100%{transform:translate3d(var(--kx,0),112vh,0) rotate(var(--kr,720deg));}}
+.bedava-banner.kutla{animation:bedavaPop .7s cubic-bezier(.3,1.6,.4,1);}
+@keyframes bedavaPop{0%{transform:scale(.55);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
+.bedava-banner.kutla .bedava-ikon{animation:bedavaZipla 1s ease .5s 2;}
+@keyframes bedavaZipla{0%,100%{transform:translateY(0);}35%{transform:translateY(-7px) rotate(-8deg);}65%{transform:translateY(-3px) rotate(6deg);}}
+@media(prefers-reduced-motion:reduce){.konf{display:none;}.bedava-banner.kutla,.bedava-banner.kutla .bedava-ikon{animation:none;}}
 .bedava-ikon{font-size:32px;flex-shrink:0;}
 .bedava-txt .bedava-baslik{font-size:14px;color:var(--latte);font-weight:600;margin-bottom:3px;}
 .bedava-txt .bedava-alt{font-size:11px;color:rgba(245,234,216,.6);}
@@ -441,6 +451,27 @@ function kartGecmisCek(tel){
 }
 
 var _kartTel=null, _kartPul=0, _kartPoll=null, _kartPollKuruldu=false;
+/* Kutlama konfetisi — marka renklerinde, 4.5 sn'de kendini temizler */
+function kutlamaPatlat(){
+  try{ if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+  var eski=document.getElementById('konfetiKap'); if(eski) eski.remove();
+  var kap=document.createElement('div'); kap.id='konfetiKap';
+  var renkler=['#c8a86a','#e8c47a','#f7f2ea','#7fb069','#d4b87a','#4a7a3a'];
+  for(var i=0;i<64;i++){
+    var p=document.createElement('div');
+    p.className='konf'+(i%3===0?' yuvarlak':'');
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.background=renkler[i%renkler.length];
+    p.style.setProperty('--kx',(Math.random()*140-70)+'px');
+    p.style.setProperty('--kr',Math.round(Math.random()*720+360)+'deg');
+    p.style.animationDuration=(2.4+Math.random()*1.5)+'s';
+    p.style.animationDelay=(Math.random()*.6)+'s';
+    kap.appendChild(p);
+  }
+  document.body.appendChild(kap);
+  try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){}
+  setTimeout(function(){ if(kap.parentNode) kap.remove(); },4800);
+}
 function kartGoster(m, oncekiGoster){
   sayfa('sayfaKart');
   var pul=m.pul||0;
@@ -456,7 +487,20 @@ function kartGoster(m, oncekiGoster){
   document.getElementById('dkHediyeNo').textContent=bedavaHak+' hak';
   document.getElementById('statPul').textContent=pul;
   document.getElementById('statToplam').textContent=topKaz;
-  document.getElementById('bedavaBanner').style.display=bedavaHak>0?'flex':'none';
+  var banner=document.getElementById('bedavaBanner');
+  banner.style.display=bedavaHak>0?'flex':'none';
+  // Kutlama: hediye hakkı varsa (oturumda hak sayısı başına bir kez) konfeti patlat
+  var kKey='cactus_kutlama_'+_kartTel;
+  if(bedavaHak>0){
+    if(String(bedavaHak)!==sessionStorage.getItem(kKey)){
+      try{sessionStorage.setItem(kKey,String(bedavaHak));}catch(e){}
+      banner.classList.remove('kutla'); void banner.offsetWidth; banner.classList.add('kutla');
+      kutlamaPatlat();
+    }
+  } else {
+    try{sessionStorage.removeItem(kKey);}catch(e){} // hak kullanılınca sıfırla — yeni hak yine kutlanır
+    banner.classList.remove('kutla');
+  }
 
   // Dürtü: bedavaya kaç kaldı
   var nudge=document.getElementById('dkNudge'), kalan=ESIK-gosterPul;

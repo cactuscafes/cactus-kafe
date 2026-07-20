@@ -22,8 +22,8 @@
 <link rel="manifest" href="manifest-site.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="foto-hero-podyum.jpg" fetchpriority="high" media="(min-width:769px)">
-<link rel="preload" as="image" href="foto-hero-podyum-mobil.jpg" fetchpriority="high" media="(max-width:768px)">
+<link rel="preload" as="image" href="foto-hero-podyum2.jpg" fetchpriority="high" media="(min-width:769px)">
+<link rel="preload" as="image" href="foto-hero-podyum-mobil2.jpg" fetchpriority="high" media="(max-width:768px)">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;}
@@ -42,9 +42,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 
 /* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;}
-.hero-pic{display:contents;}
-.hero-blur{display:none;}
-.hero-bg{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-pic{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;}
+.hero-blur{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(26px) brightness(.6) saturate(1.1);transform:scale(1.12);}
+.hero-bg{width:auto;height:100%;object-fit:contain;display:block;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
 .hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
@@ -59,12 +59,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
 /* Mobil: fotoğrafın TAMAMI net görünür; boşluklar aynı karenin flu devamıyla dolar */
 @media(max-width:768px){
-  .hero{height:100svh;min-height:600px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .hero{height:auto;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;}
   .hero-blur{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(22px) brightness(.5) saturate(1.15);transform:scale(1.15);}
   .hero-pic{display:block;order:2;width:100%;position:relative;z-index:1;box-shadow:0 14px 44px rgba(0,0,0,.45);}
   .hero-bg{position:static;width:100%;height:auto;object-fit:unset;animation:none!important;transform:none!important;}
   .hero-overlay,.steam-wrap{display:none;}
-  .hero-content{position:static;order:1;padding:88px 20px 24px;z-index:1;}
+  .hero-content{position:static;order:1;padding:128px 20px 26px;z-index:1;}
   .hero-scroll{position:static;order:3;transform:none;margin:18px auto 0;left:auto;bottom:auto;z-index:1;}
 }
 
@@ -183,7 +183,7 @@ footer{padding:60px 24px 30px;}
   50%{transform:scale(1.08) translate(-1.5%,-1%);}
   100%{transform:scale(1.04) translate(1%,1%);}
 }
-.hero-bg{animation:kenBurns 28s ease-in-out infinite alternate;}
+/* kenBurns kaldırıldı — foto tam görünür kalsın */
 
 /* 2. HERO TITLE — harf harf belirir */
 .hero-title{display:inline-flex;gap:0;overflow:visible;}
@@ -427,10 +427,10 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 
 <section class="hero">
-  <img class="hero-blur" src="foto-hero-podyum-mobil.jpg" alt="" aria-hidden="true">
+  <img class="hero-blur" src="foto-hero-podyum-mobil2.jpg" alt="" aria-hidden="true">
   <picture class="hero-pic">
-    <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil.jpg">
-    <img class="hero-bg" src="foto-hero-podyum.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">
+    <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
+    <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">
   </picture>
   <div class="hero-overlay"></div>
   <div class="steam-wrap" aria-hidden="true">

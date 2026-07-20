@@ -56,15 +56,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 @media(max-width:600px){.hero-btns{flex-direction:column;gap:10px;width:100%;max-width:280px;margin:0 auto;}.hero-btn{padding:14px 24px;font-size:9.5px;letter-spacing:3px;}}
 .hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:3px;text-transform:uppercase;}
 .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
-/* Mobil: kırpma yok — yazılar üstte (marka zemini), fotoğrafın TAMAMI altta */
-@media(max-width:768px){
-  .hero{height:auto;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;background:linear-gradient(160deg,#2c4a1e 0%,#1a3310 55%,#0e1f08 100%);}
-  .hero-pic{display:block;order:2;width:100%;}
-  .hero-bg{position:static;width:100%;height:auto;object-fit:unset;animation:none!important;transform:none!important;}
-  .hero-overlay,.steam-wrap{display:none;}
-  .hero-content{position:static;order:1;padding:112px 20px 30px;}
-  .hero-scroll{position:static;order:3;transform:none;margin:20px auto 26px;left:auto;bottom:auto;}
-}
 
 
 /* MENU SECTION */

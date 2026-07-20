@@ -43,8 +43,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 /* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;}
 .hero-pic{position:absolute;inset:0;}
-.hero-blur{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(26px) brightness(.6) saturate(1.1);transform:scale(1.12);}
-.hero-bg{width:100%;height:100%;object-fit:contain;display:block;}
+.hero-bg{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
 .hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
@@ -422,7 +421,6 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 
 <section class="hero">
-  <img class="hero-blur" src="foto-hero-podyum-mobil2.jpg" alt="" aria-hidden="true">
   <picture class="hero-pic">
     <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
     <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">

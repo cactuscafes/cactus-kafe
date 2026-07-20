@@ -42,9 +42,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 
 /* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;}
-.hero-pic{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;}
+.hero-pic{position:absolute;inset:0;}
 .hero-blur{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(26px) brightness(.6) saturate(1.1);transform:scale(1.12);}
-.hero-bg{width:auto;height:100%;object-fit:contain;display:block;}
+.hero-bg{width:100%;height:100%;object-fit:contain;display:block;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
 .hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
@@ -57,16 +57,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 @media(max-width:600px){.hero-btns{flex-direction:column;gap:10px;width:100%;max-width:280px;margin:0 auto;}.hero-btn{padding:14px 24px;font-size:9.5px;letter-spacing:3px;}}
 .hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:3px;text-transform:uppercase;}
 .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
-/* Mobil: fotoğrafın TAMAMI net görünür; boşluklar aynı karenin flu devamıyla dolar */
-@media(max-width:768px){
-  .hero{height:auto;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;}
-  .hero-blur{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(22px) brightness(.5) saturate(1.15);transform:scale(1.15);}
-  .hero-pic{display:block;order:2;width:100%;position:relative;z-index:1;box-shadow:0 14px 44px rgba(0,0,0,.45);}
-  .hero-bg{position:static;width:100%;height:auto;object-fit:unset;animation:none!important;transform:none!important;}
-  .hero-overlay,.steam-wrap{display:none;}
-  .hero-content{position:static;order:1;padding:128px 20px 26px;z-index:1;}
-  .hero-scroll{position:static;order:3;transform:none;margin:18px auto 0;left:auto;bottom:auto;z-index:1;}
-}
+
 
 
 /* MENU SECTION */

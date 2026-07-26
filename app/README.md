@@ -1,74 +1,78 @@
 # 🌵 Cactus Coffee — iPhone Uygulaması
 
-`CactusCoffee.xcodeproj` hazır bir Xcode projesidir. Terminal, Node, ek kurulum
-**gerekmez** — indir, çift tıkla, imzala, gönder.
+Uygulama artık **GitHub'da otomatik derleniyor, imzalanıyor ve App Store'a yükleniyor.**
+Mac'te Xcode açmana gerek yok — tarayıcıdan bir düğmeye basman yeterli.
 
 ## Uygulama ne yapıyor?
 
 | Sekme | İçerik |
 |---|---|
 | ☕ **Menü** | cactuscafes.com/menu-podyum canlı menüsü (sitede değişen her şey anında görünür) |
-| ⭐ **Sadakat Kartı** | **Tamamen native (SwiftUI):** kart oluşturma/görüntüleme, yıldız ızgarası, bedava içecek hakkı, kasada gösterilecek numara + QR, son işlemler, çekerek yenileme, çevrimdışı görünüm, paylaşma |
+| ⭐ **Sadakat Kartı** | **Tamamen native:** kart oluşturma/görüntüleme, yıldız ızgarası, bedava içecek hakkı, kasada gösterilecek numara + QR, son işlemler, çekerek yenileme, çevrimdışı görünüm, paylaşma |
 | 📞 **İletişim** | **Native:** arama, WhatsApp, Apple Haritalar yol tarifi, Instagram, paylaşma |
 
-Sadakat kartı sunucudaki `/kart/*` API'sini kullanır; kart bilgisi cihazda saklandığı
-için internet yokken de görünür. Uygulama açık temaya kilitlidir (marka rengi krem/yeşil).
+---
+
+# BİR KEZ yapılacak kurulum (~5 dk)
+
+Apple, kendi hesabına ait bir anahtar olmadan yükleme kabul etmiyor. Bu anahtarı
+bir kez oluşturup GitHub'a tanıtıyoruz; sonrası tamamen otomatik.
+
+## 1. App Store Connect API anahtarı oluştur
+
+1. **appstoreconnect.apple.com** → sağ üstten **Users and Access**
+2. Üstteki **Integrations** sekmesi → **App Store Connect API** → **Team Keys**
+3. **+** düğmesi → Name: `GitHub Otomasyon` → Access: **App Manager** → **Generate**
+4. Oluşan satırdan **Download API Key** ile `AuthKey_XXXXXXXXXX.p8` dosyasını indir
+   *(bu dosya yalnızca bir kez indirilebilir — masaüstünde dursun)*
+5. Aynı sayfadan not al: **KEY ID** (10 karakter) ve en üstteki **Issuer ID** (uzun uuid)
+
+## 2. Takım kimliğini (Team ID) öğren
+
+**developer.apple.com/account** → **Membership details** → **Team ID** (10 karakter).
+
+## 3. GitHub'a 4 secret ekle
+
+**github.com/cactuscafes/cactus-kafe** → **Settings** → sol menü **Secrets and variables**
+→ **Actions** → **New repository secret** ile dört tane ekle:
+
+| Name | Value |
+|---|---|
+| `ASC_KEY_ID` | 1. adımdaki KEY ID |
+| `ASC_ISSUER_ID` | 1. adımdaki Issuer ID |
+| `ASC_KEY_P8` | `.p8` dosyasını metin düzenleyicide aç, **tüm içeriği** yapıştır (`-----BEGIN PRIVATE KEY-----` satırı dahil) |
+| `APPLE_TEAM_ID` | 2. adımdaki Team ID |
+
+> Secret'lar şifrelenir; iş akışı loglarında görünmez ve dışarıdan okunamaz.
 
 ---
 
-## 1. Projeyi Mac'e indir (2 dk)
+# HER yüklemede yapılacak (30 saniye)
 
-1. **github.com/cactuscafes/cactus-kafe** → yeşil **Code** → **Download ZIP**.
-   *(Daha önce indirdiysen eski klasörü sil — kod güncellendi.)*
-2. ZIP'i aç → `app` klasörü → **`CactusCoffee.xcodeproj`** çift tık.
+1. **github.com/cactuscafes/cactus-kafe** → **Actions** sekmesi
+2. Soldan **iOS — App Store'a yükle** → sağdaki **Run workflow**
+3. **Build numarası:** bir öncekinden büyük bir sayı yaz (ilk otomatik yükleme için `3`)
+4. **İncelemeye gönder:** işaretlersen build yüklendikten sonra sürümü Apple'a
+   otomatik gönderir; işaretlemezsen sadece yükler, göndermeyi sen yaparsın
+5. **Run workflow** → yeşil tik gelene kadar bekle (~15-40 dk; çoğu süre Apple'ın
+   build'i işlemesi)
 
-## 2. İmzala ve dene (5 dk)
-
-1. Sol panelde en üstteki **CactusCoffee** → **Signing & Capabilities** → **Team:** hesabını seç.
-2. Üstteki cihaz seçiciden bir **iPhone simülatörü** → **▶**.
-3. Üç sekmeyi de gez. Sadakat Kartı sekmesinde kendi numaranla **"Telefonla gör"** dene.
-4. Beğendiğin 3-5 ekranda **⌘S** ile ekran görüntüsü al (Sadakat Kartı ekranı mutlaka olsun).
-
-## 3. Yükle (10 dk)
-
-1. Cihaz seçici → **Any iOS Device (arm64)**.
-2. **Product → Archive** → Organizer açılır → **Distribute App → App Store Connect → Upload**.
-3. "Upload Successful" → App Store Connect'te 15-30 dk içinde işlenir (bu yükleme **1.0 (2)**).
-
-## 4. Yeniden incelemeye gönder
-
-appstoreconnect.apple.com → Cactus Coffee → **1.0** sürüm sayfası:
-
-1. **Build** bölümünde eskisini kaldır, **1.0 (2)**'yi seç.
-2. Ekran görüntülerini yenileriyle değiştir.
-3. **App Review Information → Notes** kutusuna şunu yapıştır (İngilizce, Apple'a cevap):
-
-```
-Thank you for the feedback regarding Guideline 4.2.
-
-This build adds substantial native functionality beyond the web content:
-
-1. Loyalty Card tab — a fully native SwiftUI experience: customers create and view
-   their loyalty card in the app, see their star progress, free-drink credits and
-   transaction history, display a scannable QR code and phone number at the counter,
-   pull to refresh, and share the program. Card data is cached on device so it
-   remains available offline.
-2. Contact tab — native actions: call, WhatsApp, Apple Maps directions, Instagram
-   and system share sheet.
-3. Menu tab — our live café menu.
-
-To test the loyalty card, enter any Turkish phone number starting with 05
-(for example 0555 111 22 33) and a name. No password or sign-in is required.
-```
-
-4. **Save → Add for Review → Submit for Review**.
-
----
+İş akışı sırasıyla şunları yapar: derler → otomatik imzalar → App Store Connect'e
+yükler → build işlenene kadar bekler → sürüme bağlar → inceleme notlarını yazar →
+(istersen) incelemeye gönderir.
 
 ## Notlar
 
-- **Sürüm numarası:** Bu yükleme build 2. Bir sonraki yüklemede Xcode'da projeye tıkla →
-  **General → Build** değerini 3 yap (aynı numara ikinci kez yüklenemez).
-- **Ret gelirse:** mesajı olduğu gibi paylaş; gerekirse push bildirimi gibi ek native
-  özellik ekleyip yeni build çıkarırız.
+- **Ekran görüntüleri** App Store'da zaten duruyor; değiştirmek istersen App Store
+  Connect → sürüm sayfasından yükleyebilirsin (zorunlu değil).
+- **İnceleme notu metni** `app/inceleme-notu.txt` dosyasındadır; Apple'ın 4.2
+  gerekçesine cevap verecek şekilde yazıldı, otomatik gönderilir.
+- **Ret gelirse** mesajı paylaş; gerekli düzeltmeyi yapıp yeni build numarasıyla
+  iş akışını tekrar çalıştırırız.
 - **Site değişiklikleri** (menü, fiyat, kampanya) uygulama güncellemesi gerektirmez.
+
+## Mac'te elle yapmak istersen (opsiyonel)
+
+`app/CactusCoffee.xcodeproj` çift tık → **Signing & Capabilities → Team** seç →
+simülatörde **▶** ile dene. Yükleme için **Any iOS Device → Product → Archive →
+Distribute App → App Store Connect → Upload**.

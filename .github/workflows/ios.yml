@@ -1,0 +1,115 @@
+name: iOS — App Store'a yükle
+
+# Elle tetiklenir: Actions sekmesi → "iOS — App Store'a yükle" → Run workflow
+# Gerekli secret'lar (Settings → Secrets and variables → Actions):
+#   ASC_KEY_ID      App Store Connect API anahtar kimliği (10 karakter)
+#   ASC_ISSUER_ID   Issuer ID (uuid biçiminde)
+#   ASC_KEY_P8      İndirilen AuthKey_XXXX.p8 dosyasının TAM içeriği
+#   APPLE_TEAM_ID   Apple geliştirici takım kimliği (10 karakter)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_numarasi:
+        description: "Build numarası — her yüklemede artmalı (Apple aynısını 2. kez kabul etmez)"
+        required: true
+        default: "3"
+      incelemeye_gonder:
+        description: "Yükleme sonrası sürümü App Review'a gönder"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ios-yukleme
+  cancel-in-progress: false
+
+jobs:
+  yukle:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: API anahtarını hazırla
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$ASC_KEY_P8" || { echo "❌ ASC_KEY_P8 secret'ı boş"; exit 1; }
+          mkdir -p "$HOME/private_keys"
+          printf '%s\n' "$ASC_KEY_P8" > "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          chmod 600 "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          echo "✓ Anahtar yerleştirildi"
+
+      - name: Arşivle (imzalama otomatik)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project app/CactusCoffee.xcodeproj \
+            -scheme CactusCoffee \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/CactusCoffee.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CURRENT_PROJECT_VERSION="${{ inputs.build_numarasi }}" \
+            CODE_SIGN_STYLE=Automatic
+
+      - name: App Store Connect'e yükle
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/CactusCoffee.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "✓ Yükleme tamamlandı — Apple tarafında işlenmeyi bekliyor"
+
+      - name: Build'i sürüme bağla, notları yaz (istenirse incelemeye gönder)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          BUNDLE_ID: com.cactuscafes.coffee
+          BUILD_NUMARASI: ${{ inputs.build_numarasi }}
+          SURUM: "1.0"
+          INCELEMEYE_GONDER: ${{ inputs.incelemeye_gonder }}
+          INCELEME_NOTU_DOSYASI: app/inceleme-notu.txt
+        run: |
+          set -euo pipefail
+          export ASC_KEY_PATH="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet pyjwt cryptography
+          "$RUNNER_TEMP/venv/bin/python" app/asc.py
+
+      - name: Anahtarı sil
+        if: always()
+        run: rm -rf "$HOME/private_keys" || true

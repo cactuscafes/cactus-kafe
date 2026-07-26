@@ -1,0 +1,16 @@
+Thank you for the feedback regarding Guideline 4.2.
+
+This build adds substantial native functionality beyond the web content:
+
+1. Loyalty Card tab — a fully native SwiftUI experience. Customers create and view
+   their loyalty card inside the app, see their star progress and free-drink credits,
+   display a scannable QR code and phone number at the counter, review their
+   transaction history, and pull to refresh. Card data is cached on device, so the
+   card remains available offline.
+2. Contact tab — native actions: phone call, WhatsApp, Apple Maps directions,
+   Instagram, and the system share sheet.
+3. Menu tab — our live cafe menu.
+
+To test the loyalty card, open the "Sadakat Karti" (Loyalty Card) tab and enter any
+Turkish phone number starting with 05 (for example 0555 111 22 33) together with a
+name. No password or sign-in is required.

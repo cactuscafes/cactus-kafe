@@ -349,6 +349,11 @@ footer{padding:40px 20px 24px;}
 .upop-img.zoomed img{transform:scale(2);cursor:zoom-out;}
 .upop-img{cursor:zoom-in;overflow:hidden;}
 
+/* ── Dil değiştirme düğmesi (TR ⇄ EN) ── */
+#dilBtn{margin-top:14px;padding:7px 16px;border:1.5px solid var(--border);border-radius:100px;background:#fff;color:#1a3010;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:600;letter-spacing:1.2px;cursor:pointer;transition:background .2s,border-color .2s;}
+#dilBtn:hover{background:#1a3010;color:#fff;border-color:#1a3010;}
+@media(max-width:768px){#dilBtn{margin-top:10px;padding:6px 14px;font-size:11px;}}
+
 /* ── Kategori emoji rozeti (masaüstü: sade satır içi) ── */
 .cat-emoji{font-size:26px;line-height:1;margin-right:2px;}
 
@@ -570,6 +575,7 @@ footer{padding:40px 20px 24px;}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 <script src="site-ayarlar.js?v=2" defer></script>
+<script src="menu-i18n.js?v=1"></script>
 </head>
 <body>
 
@@ -818,6 +824,7 @@ footer{padding:40px 20px 24px;}
     <p class="menu-header-eyebrow">Cactus Coffee</p>
     <h1 class="menu-header-title">C | <em>Menü</em></h1>
     <p class="menu-header-sub">FSM Şubesi &nbsp;·&nbsp; Podyumpark Şubesi</p>
+    <button id="dilBtn" onclick="dilDegistir()" aria-label="Change language / Dili değiştir">🇬🇧 English</button>
   </div>
   <a class="menu-google" href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" aria-label="Podyumpark şubesini Google'da değerlendir">
     <span class="mg-top">
@@ -984,7 +991,7 @@ function skeletonGoster(){
   for(var i=0;i<6;i++) sk+='<div class="sk-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line price"></div></div>';
   ['cat-list-fsm','cat-list-podyum'].forEach(function(id){
     var el=document.getElementById(id);
-    if(el) el.innerHTML='<div class="cat-section open"><div class="cat-header"><div class="cat-header-left"><span class="cat-name">Yükleniyor…</span></div></div><div class="cat-products">'+sk+'</div></div>';
+    if(el) el.innerHTML='<div class="cat-section open"><div class="cat-header"><div class="cat-header-left"><span class="cat-name">'+(typeof T==='function'?T('Yükleniyor…'):'Yükleniyor…')+'</span></div></div><div class="cat-products">'+sk+'</div></div>';
   });
   ['spotlight-grid-fsm','spotlight-grid-podyum'].forEach(function(id){
     var el=document.getElementById(id);
@@ -1100,12 +1107,12 @@ function renderMenu(sube) {
   if (spotItems.length > 0 && spotGridEl) {
     spotGridEl.innerHTML = spotItems.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||'',kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
+      POPUP_DATA.push({ad:T(u.ad),fiyat:u.fiyat||'',aciklama:T(u.aciklama||''),foto:u.foto||'',emoji:u.emoji||'',servis:T(u.servis||''),kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
       var servisBadge = u.servis?'<span class="product-servis">'+u.servis+'</span>':'';
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
       c+='<div class="spotlight-img-wrap">'+servisBadge+'<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'"></div>';
-      c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+u.ad+'</div>';
-      c+='<div class="spotlight-card-price">'+(u.fiyat||'')+' TL</div></div></div>';
+      c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+T(u.ad)+'</div>';
+      c+='<div class="spotlight-card-price">'+TFiyat(u.fiyat)+'</div></div></div>';
       return c;
     }).join('');
   } else if (spotlightEl) { spotlightEl.style.display='none'; }
@@ -1122,7 +1129,7 @@ function renderMenu(sube) {
     if (!urunler.length) return '';
     var uH=urunler.map(function(u){
       var pidx = POPUP_DATA.length;
-      POPUP_DATA.push({ad:u.ad,fiyat:u.fiyat||'',aciklama:u.aciklama||'',foto:u.foto||'',emoji:u.emoji||'',servis:u.servis||'',kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
+      POPUP_DATA.push({ad:T(u.ad),fiyat:u.fiyat||'',aciklama:T(u.aciklama||''),foto:u.foto||'',emoji:u.emoji||'',servis:T(u.servis||''),kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
       var img=u.foto?'<img src="'+u.foto+'" alt="'+u.ad+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'<div class="product-emoji-placeholder">'+(u.emoji||katEmoji||'')+'</div>';
       // ── Rozet (Popüler / Yeni / Mevsim) — ürün etiketine göre ──
       var rozet='';
@@ -1133,19 +1140,21 @@ function renderMenu(sube) {
       var servisBadge = u.servis?'<span class="product-servis">'+u.servis+'</span>':'';
       var h='<div class="product-card'+(u.tukendi?' tukendi':'')+'"'+(u.tukendi?'':' onclick="upopAc('+pidx+')"')+'>';
       h+='<div class="product-img-wrap">'+rozet+servisBadge+img+'</div>';
-      h+='<div class="product-name">'+u.ad+'</div>';
-      if(u.aciklama) h+='<div class="product-desc">'+u.aciklama+'</div>';
+      h+='<div class="product-name">'+T(u.ad)+'</div>';
+      if(u.aciklama) h+='<div class="product-desc">'+T(u.aciklama)+'</div>';
       h+=_urunMetaHTML(u);
-      h+='<div class="product-price">'+(u.fiyat||'-')+' TL</div></div>';
+      h+='<div class="product-price">'+TFiyat(u.fiyat)+'</div></div>';
       return h;
     }).join('');
     var rk=KAT_RENK[kat.id]||YEDEK_RENK[katIdx%YEDEK_RENK.length];
     var adSade=katEmoji?String(kat.label||'').replace(katEmoji,'').trim():'';
-    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'" data-kat="'+(kat.label||kat.id)+'" style="--kc:'+rk[0]+';--kcs:'+rk[1]+'">';
+    // data-kat: FAB kategori listesi buradan beslenir — emoji korunur, ad çevrilir
+    var katEtiket=(katEmoji?katEmoji+' ':'')+T(adSade||kat.label||kat.id);
+    var ch='<div class="cat-section" id="cat-'+kat.id+'-'+sube+'" data-kat="'+katEtiket+'" style="--kc:'+rk[0]+';--kcs:'+rk[1]+'">';
     ch+='<div class="cat-header" onclick="toggleCat(\'cat-'+kat.id+'-'+sube+'\')">';
     ch+='<div class="cat-header-left">'+(katEmoji?'<span class="cat-emoji">'+katEmoji+'</span>':'');
-    ch+='<span class="cat-name">'+(adSade||kat.label)+'</span>';
-    ch+='<span class="cat-count">'+urunler.length+' cesit</span></div>';
+    ch+='<span class="cat-name">'+T(adSade||kat.label)+'</span>';
+    ch+='<span class="cat-count">'+TCesit(urunler.length)+'</span></div>';
     ch+='<span class="cat-arrow">+</span></div>';
     ch+='<div class="cat-products">'+uH+'</div></div>';
     return ch;
@@ -1722,7 +1731,7 @@ function upopAc(idx) {
     _metaEl.innerHTML=_mh;
     _metaEl.style.display=_mh?'':'none';
   }
-  document.getElementById('upopFiyat').textContent = u.fiyat ? u.fiyat+' TL' : '';
+  document.getElementById('upopFiyat').textContent = u.fiyat ? TFiyat(u.fiyat) : '';
   document.getElementById('upopBg').classList.add('on');
   document.body.style.overflow = 'hidden';
   imgDivZoomKur(imgDiv);

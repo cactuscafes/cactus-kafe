@@ -157,9 +157,19 @@ def incelemeye_gonder(app_id, surum_id):
         print("ℹ️  Zaten incelemede bekleyen bir gönderim var — yenisi oluşturulmadı.")
         return
 
-    # Retten kalan açık gönderim dosyaları yeni gönderime izin vermez — iptal et
+    # Retten kalan açık gönderimler: önce öğelerini sök, sonra dosyayı iptal et
     for eski in acik:
         durum = eski["attributes"].get("state")
+        try:
+            ogeler = istek(f"/v1/reviewSubmissions/{eski['id']}/items?limit=50")
+            for oge in ogeler.get("data", []):
+                try:
+                    istek(f"/v1/reviewSubmissionItems/{oge['id']}", "DELETE")
+                    print("✓ Eski gönderimden öğe söküldü")
+                except urllib.error.HTTPError:
+                    print("⚠️  Öğe sökülemedi — iptalle devam")
+        except urllib.error.HTTPError:
+            pass
         try:
             istek(f"/v1/reviewSubmissions/{eski['id']}", "PATCH", {"data": {
                 "type": "reviewSubmissions", "id": eski["id"],
@@ -176,14 +186,24 @@ def incelemeye_gonder(app_id, surum_id):
     }})["data"]["id"]
     print("✓ Yeni gönderim dosyası açıldı")
 
-    istek("/v1/reviewSubmissionItems", "POST", {"data": {
-        "type": "reviewSubmissionItems",
-        "relationships": {
-            "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
-            "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
-        },
-    }})
-    print("✓ Sürüm gönderim dosyasına eklendi")
+    # İptal Apple tarafında yayılana kadar sürüm "başka gönderimde" görünebilir — sabırla dene
+    for deneme in range(10):
+        try:
+            istek("/v1/reviewSubmissionItems", "POST", {"data": {
+                "type": "reviewSubmissionItems",
+                "relationships": {
+                    "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
+                    "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
+                },
+            }})
+            print("✓ Sürüm gönderim dosyasına eklendi")
+            break
+        except urllib.error.HTTPError as e:
+            if e.code == 409 and deneme < 9:
+                print(f"… sürüm henüz serbest değil — 15 sn sonra tekrar (deneme {deneme + 1}/10)")
+                time.sleep(15)
+            else:
+                raise
 
     istek(f"/v1/reviewSubmissions/{gonderim_id}", "PATCH", {"data": {
         "type": "reviewSubmissions", "id": gonderim_id, "attributes": {"submitted": True},

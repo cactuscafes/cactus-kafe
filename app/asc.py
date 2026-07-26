@@ -163,13 +163,21 @@ def incelemeye_gonder(app_id, surum_id):
         "relationships": {"app": {"data": {"type": "apps", "id": app_id}}},
     }})["data"]["id"]
 
-    istek("/v1/reviewSubmissionItems", "POST", {"data": {
-        "type": "reviewSubmissionItems",
-        "relationships": {
-            "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
-            "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
-        },
-    }})
+    try:
+        istek("/v1/reviewSubmissionItems", "POST", {"data": {
+            "type": "reviewSubmissionItems",
+            "relationships": {
+                "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
+                "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
+            },
+        }})
+        print("✓ Sürüm gönderim dosyasına eklendi")
+    except urllib.error.HTTPError as e:
+        if e.code == 409:
+            # Önceki gönderimden kalan dosyada sürüm zaten ekli — doğrudan gönder
+            print("ℹ️  Sürüm zaten gönderim dosyasında — doğrudan gönderiliyor")
+        else:
+            raise
     istek(f"/v1/reviewSubmissions/{gonderim_id}", "PATCH", {"data": {
         "type": "reviewSubmissions", "id": gonderim_id, "attributes": {"submitted": True},
     }})

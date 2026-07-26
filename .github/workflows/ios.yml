@@ -18,6 +18,10 @@ on:
         description: "Yükleme sonrası sürümü App Review'a gönder"
         type: boolean
         default: false
+      sadece_gonder:
+        description: "Derleme/yükleme YAPMA — mevcut build'i sürüme bağlayıp gönder"
+        type: boolean
+        default: false
 
 concurrency:
   group: ios-yukleme
@@ -43,6 +47,7 @@ jobs:
           echo "✓ Anahtar yerleştirildi"
 
       - name: Arşivle (imzalama otomatik)
+        if: ${{ !inputs.sadece_gonder }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -64,6 +69,7 @@ jobs:
             CODE_SIGN_STYLE=Automatic
 
       - name: App Store Connect'e yükle
+        if: ${{ !inputs.sadece_gonder }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}

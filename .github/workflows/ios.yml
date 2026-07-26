@@ -22,6 +22,10 @@ on:
         description: "Derleme/yükleme YAPMA — mevcut build'i sürüme bağlayıp gönder"
         type: boolean
         default: false
+      sadece_durum:
+        description: "Hiçbir şey değiştirme — Apple'daki inceleme durumunu raporla"
+        type: boolean
+        default: false
 
 concurrency:
   group: ios-yukleme
@@ -47,7 +51,7 @@ jobs:
           echo "✓ Anahtar yerleştirildi"
 
       - name: Arşivle (imzalama otomatik)
-        if: ${{ !inputs.sadece_gonder }}
+        if: ${{ !inputs.sadece_gonder && !inputs.sadece_durum }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -69,7 +73,7 @@ jobs:
             CODE_SIGN_STYLE=Automatic
 
       - name: App Store Connect'e yükle
-        if: ${{ !inputs.sadece_gonder }}
+        if: ${{ !inputs.sadece_gonder && !inputs.sadece_durum }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -109,6 +113,7 @@ jobs:
           SURUM: "1.0"
           INCELEMEYE_GONDER: ${{ inputs.incelemeye_gonder }}
           INCELEME_NOTU_DOSYASI: app/inceleme-notu.txt
+          DURUM_RAPORU: ${{ inputs.sadece_durum }}
         run: |
           set -euo pipefail
           export ASC_KEY_PATH="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"

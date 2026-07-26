@@ -33,6 +33,7 @@ BUILD_NO = os.environ["BUILD_NUMARASI"]
 SURUM = os.environ.get("SURUM", "1.0")
 GONDER = os.environ.get("INCELEMEYE_GONDER", "false").lower() == "true"
 NOT_DOSYASI = os.environ.get("INCELEME_NOTU_DOSYASI", "")
+SADECE_DURUM = os.environ.get("DURUM_RAPORU", "false").lower() == "true"
 
 # Sürüm sayfası düzenlenebilir durumdayken build seçilebilir
 DUZENLENEBILIR = {
@@ -211,8 +212,26 @@ def incelemeye_gonder(app_id, surum_id):
     print("🚀 Sürüm incelemeye gönderildi.")
 
 
+def durum_raporu(app_id):
+    c = istek(f"/v1/apps/{app_id}/appStoreVersions?limit=5")
+    for v in c.get("data", []):
+        a = v["attributes"]
+        print(f"SÜRÜM {a.get('versionString')}: {a.get('appStoreState')}")
+    c = istek(f"/v1/reviewSubmissions?filter[app]={app_id}&limit=5")
+    for g in c.get("data", []):
+        a = g["attributes"]
+        print(f"GÖNDERİM: {a.get('state')} (gönderildi: {a.get('submittedDate')})")
+    c = istek(f"/v1/builds?filter[app]={app_id}&limit=3&sort=-uploadedDate")
+    for b in c.get("data", []):
+        a = b["attributes"]
+        print(f"BUILD {a.get('version')}: {a.get('processingState')}")
+
+
 def main():
     app_id = uygulama_id()
+    if SADECE_DURUM:
+        durum_raporu(app_id)
+        return
     build_id = build_bekle(app_id)
     surum_id = surum_bul(app_id)
     build_sec(surum_id, build_id)

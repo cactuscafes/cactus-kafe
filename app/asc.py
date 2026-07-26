@@ -150,34 +150,41 @@ def inceleme_notu_yaz(surum_id):
 
 
 def incelemeye_gonder(app_id, surum_id):
-    # Devam eden bir gönderim var mı?
     c = istek(f"/v1/reviewSubmissions?filter[app]={app_id}&filter[state]=READY_FOR_REVIEW,"
-              f"WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES&limit=5")
+              f"WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES&limit=10")
     acik = c.get("data") or []
     if any(s["attributes"].get("state") in ("WAITING_FOR_REVIEW", "IN_REVIEW") for s in acik):
         print("ℹ️  Zaten incelemede bekleyen bir gönderim var — yenisi oluşturulmadı.")
         return
-    gonderim_id = acik[0]["id"] if acik else istek("/v1/reviewSubmissions", "POST", {"data": {
+
+    # Retten kalan açık gönderim dosyaları yeni gönderime izin vermez — iptal et
+    for eski in acik:
+        durum = eski["attributes"].get("state")
+        try:
+            istek(f"/v1/reviewSubmissions/{eski['id']}", "PATCH", {"data": {
+                "type": "reviewSubmissions", "id": eski["id"],
+                "attributes": {"canceled": True},
+            }})
+            print(f"✓ Eski gönderim iptal edildi ({durum})")
+        except urllib.error.HTTPError:
+            print(f"⚠️  Eski gönderim iptal edilemedi ({durum}) — devam deneniyor")
+
+    gonderim_id = istek("/v1/reviewSubmissions", "POST", {"data": {
         "type": "reviewSubmissions",
         "attributes": {"platform": "IOS"},
         "relationships": {"app": {"data": {"type": "apps", "id": app_id}}},
     }})["data"]["id"]
+    print("✓ Yeni gönderim dosyası açıldı")
 
-    try:
-        istek("/v1/reviewSubmissionItems", "POST", {"data": {
-            "type": "reviewSubmissionItems",
-            "relationships": {
-                "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
-                "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
-            },
-        }})
-        print("✓ Sürüm gönderim dosyasına eklendi")
-    except urllib.error.HTTPError as e:
-        if e.code == 409:
-            # Önceki gönderimden kalan dosyada sürüm zaten ekli — doğrudan gönder
-            print("ℹ️  Sürüm zaten gönderim dosyasında — doğrudan gönderiliyor")
-        else:
-            raise
+    istek("/v1/reviewSubmissionItems", "POST", {"data": {
+        "type": "reviewSubmissionItems",
+        "relationships": {
+            "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": gonderim_id}},
+            "appStoreVersion": {"data": {"type": "appStoreVersions", "id": surum_id}},
+        },
+    }})
+    print("✓ Sürüm gönderim dosyasına eklendi")
+
     istek(f"/v1/reviewSubmissions/{gonderim_id}", "PATCH", {"data": {
         "type": "reviewSubmissions", "id": gonderim_id, "attributes": {"submitted": True},
     }})

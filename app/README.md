@@ -1,49 +1,74 @@
 # 🌵 Cactus Coffee — iPhone Uygulaması
 
-Bu klasörde **hazır bir Xcode projesi** var (`CactusCoffee.xcodeproj`).
-Terminal, Node, ek kurulum **gerekmez** — indir, çift tıkla, imzala, gönder.
+`CactusCoffee.xcodeproj` hazır bir Xcode projesidir. Terminal, Node, ek kurulum
+**gerekmez** — indir, çift tıkla, imzala, gönder.
 
-Uygulama, cactuscafes.com'u uygulama penceresinde açar. Menü/fiyat/kampanya
-değişikliklerin uygulama güncellemesi gerektirmeden anında uygulamada görünür.
-Telefon/WhatsApp/Instagram linkleri otomatik olarak ilgili uygulamada açılır;
-internet yoksa "Tekrar Dene" ekranı çıkar.
+## Uygulama ne yapıyor?
+
+| Sekme | İçerik |
+|---|---|
+| ☕ **Menü** | cactuscafes.com/menu-podyum canlı menüsü (sitede değişen her şey anında görünür) |
+| ⭐ **Sadakat Kartı** | **Tamamen native (SwiftUI):** kart oluşturma/görüntüleme, yıldız ızgarası, bedava içecek hakkı, kasada gösterilecek numara + QR, son işlemler, çekerek yenileme, çevrimdışı görünüm, paylaşma |
+| 📞 **İletişim** | **Native:** arama, WhatsApp, Apple Haritalar yol tarifi, Instagram, paylaşma |
+
+Sadakat kartı sunucudaki `/kart/*` API'sini kullanır; kart bilgisi cihazda saklandığı
+için internet yokken de görünür. Uygulama açık temaya kilitlidir (marka rengi krem/yeşil).
 
 ---
 
-## Adım 1 — Projeyi Mac'e indir (2 dk)
+## 1. Projeyi Mac'e indir (2 dk)
 
-1. Mac'te tarayıcıdan: **github.com/cactuscafes/cactus-kafe** → yeşil **Code** düğmesi → **Download ZIP**.
-2. ZIP'i aç → `app` klasörüne gir → **`CactusCoffee.xcodeproj`** dosyasına çift tıkla. Xcode açılır.
+1. **github.com/cactuscafes/cactus-kafe** → yeşil **Code** → **Download ZIP**.
+   *(Daha önce indirdiysen eski klasörü sil — kod güncellendi.)*
+2. ZIP'i aç → `app` klasörü → **`CactusCoffee.xcodeproj`** çift tık.
 
-## Adım 2 — İmzala ve dene (5 dk)
+## 2. İmzala ve dene (5 dk)
 
-1. Xcode menüsü → **Settings → Accounts → +** → Apple Developer hesabının Apple ID'siyle gir (yalnızca ilk sefer).
-2. Sol paneldeki en üstteki **CactusCoffee** projesine tıkla → ortadaki **Signing & Capabilities** sekmesi → **Team** listesinden hesabını seç. (Hata/uyarı kalmamalı.)
-3. Üstteki cihaz seçiciden bir **iPhone simülatörü** seç → **▶** düğmesi. Uygulama açılıp siteyi göstermeli.
-4. Kendi iPhone'unda denemek istersen: telefonu kabloyla bağla, cihaz seçiciden telefonu seç → ▶. (Telefonda Ayarlar → Genel → VPN ve Aygıt Yönetimi'nden geliştiriciye güven demen istenebilir.)
+1. Sol panelde en üstteki **CactusCoffee** → **Signing & Capabilities** → **Team:** hesabını seç.
+2. Üstteki cihaz seçiciden bir **iPhone simülatörü** → **▶**.
+3. Üç sekmeyi de gez. Sadakat Kartı sekmesinde kendi numaranla **"Telefonla gör"** dene.
+4. Beğendiğin 3-5 ekranda **⌘S** ile ekran görüntüsü al (Sadakat Kartı ekranı mutlaka olsun).
 
-## Adım 3 — App Store'a gönder (~30 dk, çoğu form doldurma)
+## 3. Yükle (10 dk)
 
-1. **appstoreconnect.apple.com** → Uygulamalarım → **+ → Yeni Uygulama**:
-   - Platform: iOS · Ad: **Cactus Coffee** · Birincil dil: Türkçe
-   - Bundle ID: **com.cactuscafes.coffee** (listede çıkması için önce 2. adımın yapılmış olması gerekir; çıkmazsa developer.apple.com → Identifiers'dan elle ekle)
-   - SKU: `cactus1`
-2. Xcode'da üstteki cihaz seçiciyi **Any iOS Device (arm64)** yap → menüden **Product → Archive** → pencerede **Distribute App → App Store Connect → Upload** (hepsinde varsayılanlarla devam).
-3. App Store Connect'te sürüm sayfasını doldur:
-   - **Ekran görüntüleri:** uygulamayı simülatörde aç, ⌘S ile 6.7" ve 6.1" boyutlarında görüntü al (simülatör türünü değiştirerek).
-   - **Açıklama:** sadakat kartını öne çıkar — "7 yıldız topla, içeceğin bizden. Menü, kampanyalar ve dijital sadakat kartın cebinde."
-   - **Gizlilik:** "Veri Türleri" → yalnızca *İletişim Bilgisi → Telefon Numarası*, "Uygulama İşlevselliği" amacıyla, kimliğe bağlı, izleme yok.
-   - **İnceleme Bilgileri** notuna: "Sadakat kartını test etmek için: [test telefon numarası yazın]".
-4. **İncelemeye Gönder.** Sonuç genelde 1-3 gün içinde gelir.
+1. Cihaz seçici → **Any iOS Device (arm64)**.
+2. **Product → Archive** → Organizer açılır → **Distribute App → App Store Connect → Upload**.
+3. "Upload Successful" → App Store Connect'te 15-30 dk içinde işlenir (bu yükleme **1.0 (2)**).
 
-## Reddedilirse (panik yok)
+## 4. Yeniden incelemeye gönder
 
-Apple bazen site-sarmalayıcı uygulamaları "4.2 Minimum Functionality" ile reddeder.
-Bu olursa cevap yazma hakkın var; ayrıca push bildirimi gibi yerel bir özellik
-ekleyerek yeniden göndermek genellikle yeterli oluyor — o noktada bana haber ver,
-projeye ekleyeyim.
+appstoreconnect.apple.com → Cactus Coffee → **1.0** sürüm sayfası:
 
-## Sonraki sürümler
+1. **Build** bölümünde eskisini kaldır, **1.0 (2)**'yi seç.
+2. Ekran görüntülerini yenileriyle değiştir.
+3. **App Review Information → Notes** kutusuna şunu yapıştır (İngilizce, Apple'a cevap):
 
-Site değişikliği için hiçbir şey yapma. Uygulamanın kendisi değişirse (ikon, isim):
-Xcode'da projeye tıkla → General → Version'ı yükselt (1.1) → Archive → Upload.
+```
+Thank you for the feedback regarding Guideline 4.2.
+
+This build adds substantial native functionality beyond the web content:
+
+1. Loyalty Card tab — a fully native SwiftUI experience: customers create and view
+   their loyalty card in the app, see their star progress, free-drink credits and
+   transaction history, display a scannable QR code and phone number at the counter,
+   pull to refresh, and share the program. Card data is cached on device so it
+   remains available offline.
+2. Contact tab — native actions: call, WhatsApp, Apple Maps directions, Instagram
+   and system share sheet.
+3. Menu tab — our live café menu.
+
+To test the loyalty card, enter any Turkish phone number starting with 05
+(for example 0555 111 22 33) and a name. No password or sign-in is required.
+```
+
+4. **Save → Add for Review → Submit for Review**.
+
+---
+
+## Notlar
+
+- **Sürüm numarası:** Bu yükleme build 2. Bir sonraki yüklemede Xcode'da projeye tıkla →
+  **General → Build** değerini 3 yap (aynı numara ikinci kez yüklenemez).
+- **Ret gelirse:** mesajı olduğu gibi paylaş; gerekirse push bildirimi gibi ek native
+  özellik ekleyip yeni build çıkarırız.
+- **Site değişiklikleri** (menü, fiyat, kampanya) uygulama güncellemesi gerektirmez.

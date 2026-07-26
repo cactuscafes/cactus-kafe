@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   yukle:
-    runs-on: macos-15
+    runs-on: macos-26  # Xcode 26 SDK zorunlu (Apple, iOS 26 SDK istiyor)
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

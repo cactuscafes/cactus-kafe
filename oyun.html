@@ -327,6 +327,24 @@ function metinKonturlu(t, x, y, boy){
   cx.fillStyle = R.krem; cx.fillText(t, x, y);
 }
 
+/* Geri düğmesi — uygulama WKWebView olduğu için tarayıcı geri tuşu yok,
+ * oyundan çıkışın tek yolu bu. Ses düğmesiyle aynı dokunma önceliğinde. */
+function geriDugmesiCiz(){
+  var x = 40, y = 44;
+  cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
+  cx.fillStyle = 'rgba(247,239,222,.92)'; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5; cx.stroke();
+  cx.beginPath();
+  cx.moveTo(x + 4, y - 7); cx.lineTo(x - 4, y); cx.lineTo(x + 4, y + 7);
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.8;
+  cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.stroke();
+}
+
+function geriDon(){
+  if (document.referrer && history.length > 1) history.back();
+  else location.href = 'kart.html';
+}
+
 function sesDugmesiCiz(){
   var x = W - 40, y = 44;
   cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
@@ -459,6 +477,7 @@ function ciz(){
   // Skor
   if (durum !== DURUM.HAZIR) metinKonturlu(String(skor), W / 2, 118, 58);
   sesDugmesiCiz();
+  geriDugmesiCiz();
 
   if (durum === DURUM.HAZIR) hazirEkran();
   if (durum === DURUM.BITTI && performance.now() - olumZamani > 550) bittiEkran();
@@ -510,6 +529,10 @@ function bittiEkran(){
 
 /* ══════════════ GİRDİ ══════════════ */
 function dokun(mx, my){
+  if (Math.hypot(mx - 40, my - 44) <= 30){             // geri düğmesi
+    geriDon();
+    return;
+  }
   if (Math.hypot(mx - (W - 40), my - 44) <= 30){       // ses düğmesi
     sesAcik = !sesAcik;
     try { localStorage.setItem('cactus_oyun_ses', sesAcik ? '1' : '0'); } catch(e){}

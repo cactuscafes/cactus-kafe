@@ -12,5 +12,5 @@ This build adds substantial native functionality beyond the web content:
 3. Menu tab — our live cafe menu.
 
 To test the loyalty card, open the "Sadakat Karti" (Loyalty Card) tab and enter any
-Turkish phone number starting with 05 (for example 0555 111 22 33) together with a
+phone number (at least 10 digits, for example 5551112233 or 1234567890) together with a
 name. No password or sign-in is required.

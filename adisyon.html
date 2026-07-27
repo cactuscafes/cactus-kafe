@@ -3870,10 +3870,15 @@ function qrTara(){
   requestAnimationFrame(qrTara);
 }
 
-/* "CACTUS:05XXXXXXXXX" bekleriz. Önek yoksa reddedilir —
- * böylece menü QR'ı veya rastgele bir kod yanlışlıkla pul eklemez. */
+/* İki biçim kabul edilir:
+ *   "CACTUS:05XXXXXXXXX" — kart.html'in ürettiği QR (web/uygulama içi sayfa)
+ *   "05XXXXXXXXX"        — iOS uygulamasının native kartındaki QR
+ * İkincisi olmadan uygulamadan kartını gösteren müşterinin QR'ı okunmuyordu.
+ * Serbest metin yine reddedilir: yalnızca 05 ile başlayan 11 hane geçerli,
+ * yani menü QR'ı veya rastgele bir kod pul ekleyemez. */
 function qrTelCoz(veri){
-  var m=/^CACTUS:(\d{10,11})$/.exec(String(veri).trim());
+  var s=String(veri).trim();
+  var m=/^(?:CACTUS:)?(\d{10,11})$/.exec(s);
   if(!m) return null;
   var tel=m[1];
   if(tel.length===10 && tel.indexOf('5')===0) tel='0'+tel;

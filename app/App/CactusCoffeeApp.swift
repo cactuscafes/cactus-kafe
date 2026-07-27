@@ -236,7 +236,7 @@ struct KartTab: View {
     var body: some View {
         ZStack {
             KREM.ignoresSafeArea()
-            if kayitliTel.count == 11 {
+            if kayitliTel.count >= 10 {
                 KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
                           gecmis: gecmis, yukleniyor: yukleniyor,
                           yenile: { Task { await tazele(elle: true) } },
@@ -246,7 +246,7 @@ struct KartTab: View {
                 KayitGovde(tamamlandi: kartaGec)
             }
         }
-        .onAppear { if kayitliTel.count == 11 { Task { await tazele(elle: false) } } }
+        .onAppear { if kayitliTel.count >= 10 { Task { await tazele(elle: false) } } }
     }
 
     private func kartaGec(_ tel: String, _ bilgi: KartBilgi) {
@@ -300,7 +300,7 @@ struct KayitGovde: View {
                     .font(.subheadline).foregroundColor(SOLGUN)
                     .multilineTextAlignment(.center)
 
-                TextField("05XX XXX XX XX", text: telBinding)
+                TextField("Telefon numarası", text: telBinding)
                     .keyboardType(.numberPad)
                     .textContentType(.telephoneNumber)
                     .textFieldStyle(.roundedBorder)
@@ -319,10 +319,10 @@ struct KayitGovde: View {
                         else { Text("Kartımı Oluştur →").bold() }
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .background(tel.count == 11 ? YESIL : Color.gray.opacity(0.4))
+                    .background(tel.count >= 10 ? YESIL : Color.gray.opacity(0.4))
                     .foregroundColor(.white).clipShape(Capsule())
                 }
-                .disabled(tel.count != 11 || yukleniyor)
+                .disabled(tel.count < 10 || yukleniyor)
 
                 Button("Zaten kartın var mı? Telefonla gör") {
                     Task { await mevcutuGetir() }
@@ -339,8 +339,8 @@ struct KayitGovde: View {
 
     @MainActor private func gonder() async {
         hata = ""
-        guard tel.count == 11, tel.hasPrefix("0") else {
-            hata = "Lütfen 11 haneli numaranı gir (05XX XXX XX XX)."
+        guard tel.count >= 10 else {
+            hata = "Lütfen geçerli bir telefon numarası gir."
             return
         }
         yukleniyor = true
@@ -362,7 +362,7 @@ struct KayitGovde: View {
 
     @MainActor private func mevcutuGetir() async {
         hata = ""
-        guard tel.count == 11 else { hata = "Önce telefon numaranı yaz."; return }
+        guard tel.count >= 10 else { hata = "Önce telefon numaranı yaz."; return }
         yukleniyor = true
         defer { yukleniyor = false }
         if let v = await KartAPI.bak(tel) {

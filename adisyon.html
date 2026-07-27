@@ -3775,6 +3775,38 @@ function kartKisiEkle(){
   liste.appendChild(row);
   row.querySelector('input[type="tel"]').focus();
 }
+/* ══════════ OYUN ÖDÜLÜ (Cactus Jump → limonata) ══════════
+ * Müşteri oyunda 30 skoru geçince hakkı sunucuya yazılıyor. Burada
+ * pul eklendikten sonra bekleyen hak sorgulanır; varsa satıra teslim
+ * düğmesi düşer. Teslim ucu token ister — müşteri kendi hakkını
+ * "verildi" yapamaz, yalnızca adisyon yapabilir. */
+function limonataBak(row, tel){
+  if(!row || !tel) return;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/oyun-odul-bak?telefon='+encodeURIComponent(tel))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d.ok || !d.odul) return;
+      if(row.querySelector('.limonata-btn')) return;
+      var b=document.createElement('button');
+      b.className='limonata-btn';
+      b.textContent='🍋 LİMONATA VER  ('+d.odul.skor+' skor)';
+      b.style.cssText='margin-top:6px;padding:9px;background:#e8b83a;color:#3a2f10;border:none;border-radius:8px;'
+        +'font-family:\'Montserrat\',sans-serif;font-size:11px;letter-spacing:1.2px;cursor:pointer;width:100%;';
+      b.onclick=function(){ limonataVer(b, tel); };
+      row.appendChild(b);
+    }).catch(function(){});
+}
+function limonataVer(btn, tel){
+  btn.disabled=true; btn.textContent='...';
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/oyun-odul-kullan', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ telefon: tel, sube: _kartSube })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(d.ok){ btn.style.background='#2d7a4f'; btn.style.color='#fff'; btn.textContent='✓ LİMONATA VERİLDİ'; }
+    else { btn.disabled=false; btn.style.background='#c0392b'; btn.style.color='#fff'; btn.textContent=d.error||'Hata'; }
+  }).catch(function(){ btn.disabled=false; btn.textContent='🍋 LİMONATA VER'; });
+}
+
 /* ══════════ QR OKUTMA (sadakat kartı) ══════════
  * Müşteri kart.html'deki QR'ı gösterir, personel okutur.
  * Safari'de yerleşik BarcodeDetector yok; jsQR ilk okutmada gecikmeli yüklenir
@@ -3895,6 +3927,7 @@ function kartPulEkleRow(btn){
       var m = d.musteri; var pul = m.pul||0; var esik=7; var bedava=Math.floor(pul/esik);
       sonucSpan.style.color = '#2d7a4f';
       sonucSpan.textContent = '✓ '+(pul%esik)+'/'+esik+(bedava>0?' 🎉':'');
+      limonataBak(row, tel);   // oyundan kazanılmış limonata hakkı var mı
     } else {
       sonucSpan.style.color='#c0392b'; sonucSpan.textContent=d.error||'Hata';
       btn.disabled=false; input.disabled=false; if(sel) sel.disabled=false;

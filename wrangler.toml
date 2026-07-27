@@ -5,7 +5,7 @@
 # UYARI: wrangler, wrangler.jsonc'yi wrangler.toml'a TERCİH EDER — bu repoya
 # ikinci bir config dosyası eklemeyin (eski jsonc, toml'daki triggers/services
 # eklerini sessizce gölgelediği için kaldırıldı).
-name = "cactus-kafe"
+name = "cactus-kafe1"
 compatibility_date = "2026-04-26"
 main = "src/index.js"
 

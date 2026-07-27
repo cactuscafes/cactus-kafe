@@ -1218,6 +1218,15 @@ if('serviceWorker' in navigator){
 
 <div class="toast" id="toast"></div>
 
+<!-- QR OKUYUCU — sadakat panelinin üstünde açılır (z-index daha yüksek) -->
+<div id="qrOkuyucu" style="display:none;position:fixed;inset:0;z-index:9995;background:#000;flex-direction:column;align-items:center;justify-content:center;">
+  <video id="qrVideo" muted playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"></video>
+  <canvas id="qrCanvas" style="display:none;"></canvas>
+  <div style="position:relative;width:66vw;max-width:280px;aspect-ratio:1;border:3px solid rgba(255,255,255,.9);border-radius:20px;box-shadow:0 0 0 100vmax rgba(0,0,0,.5);"></div>
+  <div id="qrDurum" style="position:absolute;bottom:110px;left:0;right:0;text-align:center;color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;padding:0 24px;text-shadow:0 1px 4px rgba(0,0,0,.8);"></div>
+  <button onclick="qrKapat()" style="position:absolute;bottom:38px;left:50%;transform:translateX(-50%);padding:13px 34px;background:#fff;color:#0e0e0e;border:none;border-radius:26px;font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:2px;cursor:pointer;">VAZGEÇ</button>
+</div>
+
 <!-- SADAKAT KARTI PANELI -->
 <div id="kart-overlay" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center;padding:0 12px 24px;" onclick="if(event.target===this)kartPanelKapat()">
   <div id="kart-panel" style="background:#fff;border-radius:16px 16px 12px 12px;width:100%;max-width:440px;padding:22px 20px 20px;transform:translateY(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);">
@@ -3758,13 +3767,105 @@ function kartKisiEkle(){
     + '<input type="tel" inputmode="numeric" placeholder="05XX XXX XX XX" maxlength="11" oninput="kartTelDuzelt(this)"'
     + ' style="flex:1;padding:8px 10px;border:1.5px solid #e0dbd3;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:13px;outline:none;"'
     + ' onfocus="this.style.borderColor=\'#b8965a\'" onblur="this.style.borderColor=\'#e0dbd3\'"'
-    + ' onkeydown="if(event.key===\'Enter\')kartPulEkleRow(this.nextElementSibling)">'
-    + '<button onclick="kartPulEkleRow(this)" style="padding:8px 13px;background:#0e0e0e;color:#fff;border:none;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;white-space:nowrap;">+1 Pul</button>'
+    + ' onkeydown="if(event.key===\'Enter\')kartPulEkleRow(this.parentElement.querySelector(\'.kart-ekle-btn\'))">'
+    + '<button onclick="kartQrOkut(this)" title="QR okut" style="padding:8px 11px;background:#faf8f5;color:#0e0e0e;border:1.5px solid #e0dbd3;border-radius:8px;font-size:15px;line-height:1;cursor:pointer;">▣</button>'
+    + '<button class="kart-ekle-btn" onclick="kartPulEkleRow(this)" style="padding:8px 13px;background:#0e0e0e;color:#fff;border:none;border-radius:8px;font-family:\'Montserrat\',sans-serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;white-space:nowrap;">+1 Pul</button>'
     + '<span style="font-size:11px;min-width:46px;color:#888;text-align:right;"></span>'
     + '</div>';
   liste.appendChild(row);
   row.querySelector('input[type="tel"]').focus();
 }
+/* ══════════ QR OKUTMA (sadakat kartı) ══════════
+ * Müşteri kart.html'deki QR'ı gösterir, personel okutur.
+ * Safari'de yerleşik BarcodeDetector yok; jsQR ilk okutmada gecikmeli yüklenir
+ * (130 KB — her adisyon açılışında yüklenmesin diye).
+ * Kamera yalnızca HTTPS'te açılır; apex adres HTTPS zorunlu olduğu için sorun yok. */
+var _qrAkis=null, _qrDur=false, _qrHedefBtn=null, _jsqrYukleniyor=null;
+
+function jsqrYukle(){
+  if(window.jsQR) return Promise.resolve();
+  if(_jsqrYukleniyor) return _jsqrYukleniyor;
+  _jsqrYukleniyor = new Promise(function(res, rej){
+    var s=document.createElement('script');
+    s.src='jsqr.js'; s.onload=res; s.onerror=function(){ _jsqrYukleniyor=null; rej(new Error('yuklenemedi')); };
+    document.head.appendChild(s);
+  });
+  return _jsqrYukleniyor;
+}
+
+function kartQrOkut(btn){
+  _qrHedefBtn = btn;
+  var ov=document.getElementById('qrOkuyucu');
+  ov.style.display='flex';
+  qrDurum('Kamera açılıyor…');
+  jsqrYukle().then(function(){
+    return navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
+  }).then(function(akis){
+    _qrAkis=akis; _qrDur=false;
+    var v=document.getElementById('qrVideo');
+    v.srcObject=akis;
+    v.setAttribute('playsinline','');   // iOS: tam ekrana geçmesin
+    return v.play();
+  }).then(function(){
+    qrDurum('QR kodu çerçeveye getir');
+    requestAnimationFrame(qrTara);
+  }).catch(function(e){
+    var m=String(e&&e.name||e);
+    if(m.indexOf('NotAllowed')>=0) qrDurum('Kamera izni reddedildi. Safari → Ayarlar → Kamera → İzin ver.');
+    else if(m.indexOf('NotFound')>=0) qrDurum('Kamera bulunamadı.');
+    else if(m.indexOf('yuklenemedi')>=0) qrDurum('Okuyucu yüklenemedi — bağlantını kontrol et.');
+    else qrDurum('Kamera açılamadı: '+m);
+  });
+}
+
+function qrDurum(t){ var d=document.getElementById('qrDurum'); if(d) d.textContent=t; }
+
+function qrTara(){
+  if(_qrDur) return;
+  var v=document.getElementById('qrVideo'), c=document.getElementById('qrCanvas');
+  if(!v||!v.videoWidth){ requestAnimationFrame(qrTara); return; }
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  var ctx=c.getContext('2d', { willReadFrequently:true });
+  ctx.drawImage(v,0,0,c.width,c.height);
+  var img=ctx.getImageData(0,0,c.width,c.height);
+  var sonuc=null;
+  try{ sonuc=window.jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'}); }catch(e){}
+  if(sonuc && sonuc.data){
+    var tel=qrTelCoz(sonuc.data);
+    if(tel){ qrKapat(); qrUygula(tel); return; }
+    qrDurum('Bu bir Cactus sadakat kartı değil');
+  }
+  requestAnimationFrame(qrTara);
+}
+
+/* "CACTUS:05XXXXXXXXX" bekleriz. Önek yoksa reddedilir —
+ * böylece menü QR'ı veya rastgele bir kod yanlışlıkla pul eklemez. */
+function qrTelCoz(veri){
+  var m=/^CACTUS:(\d{10,11})$/.exec(String(veri).trim());
+  if(!m) return null;
+  var tel=m[1];
+  if(tel.length===10 && tel.indexOf('5')===0) tel='0'+tel;
+  return tel.length===11 && tel.indexOf('05')===0 ? tel : null;
+}
+
+function qrUygula(tel){
+  if(!_qrHedefBtn) return;
+  var wrap=_qrHedefBtn.parentElement;
+  var input=wrap.querySelector('input[type="tel"]');
+  var ekle=wrap.querySelector('.kart-ekle-btn');
+  if(!input||!ekle) return;
+  input.value=tel;
+  try{ if(navigator.vibrate) navigator.vibrate(35); }catch(e){}
+  kartPulEkleRow(ekle);   // okuttuğun anda pulu ekle, ikinci dokunuş gerekmesin
+}
+
+function qrKapat(){
+  _qrDur=true;
+  if(_qrAkis){ _qrAkis.getTracks().forEach(function(t){ t.stop(); }); _qrAkis=null; }
+  var v=document.getElementById('qrVideo'); if(v) v.srcObject=null;
+  var ov=document.getElementById('qrOkuyucu'); if(ov) ov.style.display='none';
+}
+
 /* 0'sız yazılan numarayı düzelt: 5→05..., +90'lı yapıştırma → 0'lı */
 function kartTelDuzelt(input){
   var v=input.value.replace(/\D/g,'');

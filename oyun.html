@@ -13,6 +13,8 @@ body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:n
 #oyunCanvas{display:block;width:100vw;height:100vh;}
 /* Kampanya kartı — oyun bitince skor yeterliyse canvas üstünde açılır */
 #odulKat{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(10,20,8,.72);z-index:20;}
+/* Üyelik kapısı — doğrulanana kadar oyunun üstünde durur */
+#uyeKat{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(10,20,8,.82);z-index:30;}
 .odul-kart{background:#F7EFDE;border:3px solid #C8A86A;border-radius:24px;padding:26px 22px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45);}
 .odul-ikon{font-size:42px;line-height:1;margin-bottom:10px;}
 .odul-bas{font-family:'Fraunces',serif;font-size:21px;color:#1A3310;margin-bottom:8px;}
@@ -28,11 +30,26 @@ body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:n
 <body>
 <canvas id="oyunCanvas"></canvas>
 
+<!-- Üyelik kapısı — oyun yalnızca sadakat üyelerine açık -->
+<div id="uyeKat">
+  <div class="odul-kart">
+    <div class="odul-ikon">🎖</div>
+    <div class="odul-bas">Önce sadakat kartı</div>
+    <div class="odul-metin" id="uyeMetin">
+      Cactus Jump sadakat üyelerine özel. Telefonunu gir, üyeliğini doğrulayalım.
+    </div>
+    <input class="odul-tel" id="uyeTel" type="tel" inputmode="numeric" maxlength="11" placeholder="05XX XXX XX XX">
+    <button class="odul-btn" id="uyeGir">DOĞRULA VE OYNA</button>
+    <a class="odul-btn ikincil" href="kart.html" style="text-decoration:none;line-height:1.2;">Üye değilim — kaydol</a>
+    <div class="odul-durum" id="uyeDurum"></div>
+  </div>
+</div>
+
 <div id="odulKat">
   <div class="odul-kart">
     <div class="odul-ikon">🍋</div>
     <div class="odul-bas" id="odulBas">Limonata kazandın!</div>
-    <div class="odul-metin" id="odulMetin">30 skoru geçtin. Hakkını sadakat kartına işleyelim, tezgâhta göster ve limonatanı al.</div>
+    <div class="odul-metin" id="odulMetin">Hakkını sadakat kartına işleyelim, tezgâhta göster ve limonatanı al.</div>
     <input class="odul-tel" id="odulTel" type="tel" inputmode="numeric" maxlength="11" placeholder="05XX XXX XX XX">
     <button class="odul-btn" id="odulAl">HAKKIMI AL</button>
     <button class="odul-btn ikincil" onclick="odulKapat()">Kapat</button>
@@ -51,7 +68,7 @@ body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:n
  * arttığı için iOS sürümündeki işaretler ters çevrildi.
  * ═══════════════════════════════════════════════════════════════ */
 var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
-var ODUL_ESIK = 30;          // limonata eşiği — worker da aynı sayıyı doğrular
+var ODUL_ESIK = 25;          // limonata eşiği — worker da aynı sayıyı doğrular
 
 /* ── Oynanış ayarları (iOS sürümüyle aynı) ── */
 var YERCEKIMI = 2300, ZIPLAMA = -650, MAX_DUSUS = 1300;
@@ -506,12 +523,80 @@ function dokun(mx, my){
 cv.addEventListener('pointerdown', function(e){ e.preventDefault(); dokun(e.clientX, e.clientY); });
 window.addEventListener('keydown', function(e){ if (e.code === 'Space'){ e.preventDefault(); dokun(-99, -99); } });
 
+/* ══════════════ ÜYELİK KAPISI ══════════════
+ * Oyun sadakat üyelerine açık. Doğrulama /kart/bak ile yapılır ama o uç
+ * kötüye kullanıma karşı hız sınırlı; her açılışta sorgulamamak için sonuç
+ * cihazda 7 gün önbelleklenir. Bu bir güvenlik duvarı değil, kampanyanın
+ * üyeliğe bağlı kalmasını sağlayan bir kapı — ödülün gerçek doğrulaması
+ * zaten sunucuda (üye değilse hak tanımlanmıyor). */
+var UYE_ANAHTAR = 'cactus_oyun_uye';
+var uyeTel = null;
+
+function uyeOnbellek(){
+  try {
+    var v = JSON.parse(localStorage.getItem(UYE_ANAHTAR) || 'null');
+    if (v && v.tel && Date.now() - v.ts < 7 * 864e5) return v.tel;
+  } catch(e){}
+  return null;
+}
+function uyeKaydet(tel){
+  uyeTel = tel;
+  try {
+    localStorage.setItem(UYE_ANAHTAR, JSON.stringify({ tel: tel, ts: Date.now() }));
+    localStorage.setItem('cactus_kart_tel', tel);
+  } catch(e){}
+}
+function uyeKapiKapat(){ document.getElementById('uyeKat').style.display = 'none'; }
+
+function uyeDogrula(tel, btn, durumEl){
+  return fetch(API + '/kart/bak?telefon=' + encodeURIComponent(tel))
+    .then(function(r){ return r.json().then(function(j){ return { s: r.status, j: j }; }); })
+    .then(function(o){
+      if (o.j && o.j.ok && o.j.musteri){ uyeKaydet(tel); return true; }
+      if (o.s === 429) throw new Error('Çok fazla deneme — birazdan tekrar dene');
+      throw new Error('Bu numara sadakat kartına kayıtlı değil');
+    });
+}
+
+(function uyeKapiKur(){
+  var kat = document.getElementById('uyeKat');
+  var giris = document.getElementById('uyeTel');
+  var btn = document.getElementById('uyeGir');
+  var durumEl = document.getElementById('uyeDurum');
+
+  var onbellek = uyeOnbellek();
+  if (onbellek){ uyeTel = onbellek; uyeKapiKapat(); }
+  else {
+    var kayitli = '';
+    try { kayitli = localStorage.getItem('cactus_kart_tel') || ''; } catch(e){}
+    giris.value = kayitli;
+    // Kart sayfasından gelmişse sessizce doğrula, kullanıcıyı bekletme
+    if (kayitli.length === 11){
+      durumEl.style.color = '#5a5348'; durumEl.textContent = 'Üyelik kontrol ediliyor…';
+      uyeDogrula(kayitli).then(uyeKapiKapat).catch(function(){ durumEl.textContent = ''; });
+    }
+  }
+
+  btn.addEventListener('click', function(){
+    var tel = giris.value.replace(/\D/g, '');
+    if (tel.indexOf('5') === 0 && tel.length === 10) tel = '0' + tel;
+    if (tel.length !== 11){ durumEl.style.color = '#c0392b'; durumEl.textContent = 'Geçerli bir numara gir'; return; }
+    btn.disabled = true; durumEl.style.color = '#5a5348'; durumEl.textContent = 'Kontrol ediliyor…';
+    uyeDogrula(tel).then(function(){
+      durumEl.style.color = '#2d7a4f'; durumEl.textContent = '✓ Hoş geldin!';
+      setTimeout(uyeKapiKapat, 400);
+    }).catch(function(e){
+      durumEl.style.color = '#c0392b'; durumEl.textContent = e.message;
+      btn.disabled = false;
+    });
+  });
+  giris.addEventListener('keydown', function(e){ if (e.key === 'Enter') btn.click(); });
+})();
+
 /* ══════════════ KAMPANYA ══════════════ */
 function odulAc(s, sure){
   var kat = document.getElementById('odulKat');
-  var tel = '';
-  try { tel = localStorage.getItem('cactus_kart_tel') || ''; } catch(e){}
-  document.getElementById('odulTel').value = tel;
+  document.getElementById('odulTel').value = uyeTel || '';
   document.getElementById('odulMetin').textContent =
     s + ' skor yaptın! Hakkını sadakat kartına işleyelim, tezgâhta göster ve limonatanı al.';
   document.getElementById('odulDurum').textContent = '';

@@ -1069,11 +1069,17 @@ function toggleMainNav(){
     transform:translateX(-22px);
     transition:opacity .28s ease,transform .32s cubic-bezier(.2,.7,.2,1);
   }
-  #mainMobMenu.mob-open > a:nth-child(1){opacity:1;transform:none;transition-delay:.08s;}
-  #mainMobMenu.mob-open > a:nth-child(2){opacity:1;transform:none;transition-delay:.14s;}
-  #mainMobMenu.mob-open > a:nth-child(3){opacity:1;transform:none;transition-delay:.20s;}
-  #mainMobMenu.mob-open > a:nth-child(4){opacity:1;transform:none;transition-delay:.26s;}
-  #mainMobMenu.mob-open > a:nth-child(5){opacity:1;transform:none;transition-delay:.32s;}
+  /* Tüm bağlantılar görünür — sabit nth-child listesi menüye eklenen
+   * yeni öğeleri (6., 7., …) opacity:0'da bırakıyordu. */
+  #mainMobMenu.mob-open > a{opacity:1;transform:none;}
+  #mainMobMenu.mob-open > a:nth-child(1){transition-delay:.08s;}
+  #mainMobMenu.mob-open > a:nth-child(2){transition-delay:.14s;}
+  #mainMobMenu.mob-open > a:nth-child(3){transition-delay:.20s;}
+  #mainMobMenu.mob-open > a:nth-child(4){transition-delay:.26s;}
+  #mainMobMenu.mob-open > a:nth-child(5){transition-delay:.32s;}
+  #mainMobMenu.mob-open > a:nth-child(6){transition-delay:.38s;}
+  #mainMobMenu.mob-open > a:nth-child(7){transition-delay:.44s;}
+  #mainMobMenu.mob-open > a:nth-child(n+8){transition-delay:.50s;}
 }
 
 /* 3. HERO BOKEH (Yüzen altın taneler — sadece mobil) */

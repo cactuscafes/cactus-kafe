@@ -877,6 +877,41 @@ footer{padding:40px 20px 24px;}
   <div class="cat-list" id="cat-list-podyum"></div>
 </div>
 
+<!-- OYUN BANNER — menünün altında oyunlara davet -->
+<style>
+.oyun-banner{background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 40%,#0e1f08 100%);margin:56px 16px 0;border-radius:24px;padding:38px 34px;position:relative;overflow:hidden;}
+.oyun-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(184,150,90,.12) 0%,transparent 65%);pointer-events:none;}
+.ob-ic{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;position:relative;z-index:1;max-width:1080px;margin:0 auto;}
+.ob-yazi{flex:1;min-width:250px;}
+.ob-eyebrow{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;margin-bottom:12px;}
+.ob-title{font-family:'Fraunces',serif;font-size:clamp(24px,3vw,34px);font-weight:300;color:#f7f2ea;line-height:1.15;margin-bottom:10px;}
+.ob-title em{font-style:italic;color:#c8a86a;}
+.ob-sub{font-size:12.5px;color:rgba(245,234,216,.7);line-height:1.7;font-weight:300;margin-bottom:18px;max-width:420px;}
+.ob-cta{display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#c8a86a,#b8965a);color:#0e1f08;text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;border-radius:10px;transition:all .2s;}
+.ob-cta:hover{background:linear-gradient(135deg,#d8b87a,#c8a86a);transform:translateY(-1px);}
+.ob-oyunlar{display:flex;flex-direction:column;gap:12px;min-width:230px;}
+.ob-chip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(200,168,106,.28);border-radius:14px;padding:13px 16px;text-decoration:none;transition:all .2s;}
+.ob-chip:hover{background:rgba(255,255,255,.1);border-color:rgba(200,168,106,.5);}
+.ob-chip-ikon{font-size:24px;line-height:1;}
+.ob-chip b{display:block;font-size:13px;color:#f0e1c3;font-weight:600;}
+.ob-chip em{display:block;font-size:10.5px;color:rgba(245,234,216,.6);font-style:normal;margin-top:2px;}
+@media(max-width:560px){.oyun-banner{padding:30px 22px;margin:44px 12px 0;}.ob-oyunlar{width:100%;}}
+</style>
+<section class="oyun-banner">
+  <div class="ob-ic">
+    <div class="ob-yazi">
+      <div class="ob-eyebrow">Cactus Oyun Salonu</div>
+      <h2 class="ob-title">Kahven gelene kadar <em>oyna</em></h2>
+      <p class="ob-sub">Telefonundan direkt oynanır — indirme yok. Cactus Jump'ta 25 skor yapan üyeye limonata bizden.</p>
+      <a class="ob-cta" href="oyunlar.html">Oyunlara Git →</a>
+    </div>
+    <div class="ob-oyunlar">
+      <a class="ob-chip" href="oyun.html"><span class="ob-chip-ikon">🌵</span><span><b>Cactus Jump</b><em>🍋 Ödüllü · üyelere özel</em></span></a>
+      <a class="ob-chip" href="oyun-hafiza.html"><span class="ob-chip-ikon">🃏</span><span><b>Cactus Hafıza</b><em>Kart eşleştirme · herkese açık</em></span></a>
+    </div>
+  </div>
+</section>
+
 <!-- Hoşgeldin Toast -->
 <!-- Podyumpark Kampanya Pop-up -->
 <div class="kampanya-bg" id="kampanyaBg" onclick="if(event.target===this)kampanyaKapat()">

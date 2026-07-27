@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v55'; // v55: adisyon QR okuyucu uygulamanın çıplak numaralı QR'ını da kabul ediyor
+const VERSION = 'cactus-v56'; // v56: kampanya dört oyuna yayıldı (ortak oyun-odul.js)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

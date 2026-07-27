@@ -216,11 +216,12 @@ def rejection_detaylari(surum_id):
     try:
         c = istek(f"/v1/appStoreVersions/{surum_id}/appStoreReviewDetail")
         d = c.get("data")
-        if d and d.get("attributes", {}).get("rejectionNotes"):
-            print("\n📋 RET NEDENI:")
-            print(d["attributes"]["rejectionNotes"])
+        if d:
+            attrs = d.get("attributes", {})
+            print("\n📋 İNCELEME DETAYLARı:")
+            print(json.dumps(attrs, indent=2, ensure_ascii=False))
     except urllib.error.HTTPError:
-        pass
+        print("⚠️  İnceleme detayları alınamadı")
 
 
 def durum_raporu(app_id):

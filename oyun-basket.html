@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>Cactus Basket — Cactus Coffee</title>
+<meta name="theme-color" content="#F0C78C">
+<link rel="icon" href="favicon.svg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#F0C78C;}
+body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;}
+#oyunCanvas{display:block;width:100vw;height:100vh;}
+</style>
+</head>
+<body>
+<canvas id="oyunCanvas"></canvas>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+ * CACTUS BASKET — limonu bardağa fırlat
+ * Cactus Jump'ın tuval/ses altyapısıyla aynı kalıp: elle fizik,
+ * Web Audio sentez sesler, çentik güvenli alanı, tuvale çizilen
+ * geri/ses düğmeleri. 60 saniyede en çok basketi at; rim'e
+ * değmeden girerse +2 "temiz" sayılır.
+ * ═══════════════════════════════════════════════════════════════ */
+
+var SURE_SN = 60;
+var YERCEKIMI = 1900;
+var TOP_R = 15;
+var RIM_YARI = 36;        // bardak ağzının yarı genişliği
+var RIM_R = 5.5;          // rim kenar çarpışma yarıçapı
+var REKOR_ANAHTAR = 'cactus_basket_rekor';
+
+/* ── Marka renkleri (Cactus Jump ile aynı) ── */
+var R = {
+  gokUst:'#FCEFD3', gokOrta:'#F7DDB0', gokAlt:'#F0C78C',
+  kum:'#E3D2AC', kumKoyu:'#C9B487',
+  yaprak:'#3F7A34', koyuYesil:'#1A3310',
+  bardak:'#8B5E3C', bardakKenar:'#5C3A22', altin:'#C8A86A',
+  krem:'#F7EFDE', murekkep:'#14271D',
+  limon:'#F2D34C', limonKoyu:'#C9A227'
+};
+
+var cv = document.getElementById('oyunCanvas'), cx = cv.getContext('2d');
+var W = 0, H = 0, DPR = 1;
+
+/* Üst güvenli alan (çentik) — Cactus Jump'taki ölçüm */
+var UST_PAY = 0;
+function ustPayOlc(){
+  var p = document.createElement('div');
+  p.style.cssText = 'position:fixed;top:0;left:0;width:0;visibility:hidden;'
+    + 'padding-top:env(safe-area-inset-top,0px);padding-top:constant(safe-area-inset-top,0px);';
+  document.body.appendChild(p);
+  UST_PAY = parseFloat(getComputedStyle(p).paddingTop) || 0;
+  p.remove();
+  UST_PAY = Math.max(UST_PAY, 8);
+}
+function dugmeY(){ return UST_PAY + 30; }
+
+var gokGrad = null;
+function olcekle(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  gokGrad = cx.createLinearGradient(0, 0, 0, H);
+  gokGrad.addColorStop(0, R.gokUst);
+  gokGrad.addColorStop(0.55, R.gokOrta);
+  gokGrad.addColorStop(1, R.gokAlt);
+}
+window.addEventListener('resize', olcekle);
+
+/* ══════════════ SES ══════════════ */
+var AC = null, sesAcik = true;
+try { sesAcik = localStorage.getItem('cactus_oyun_ses') !== '0'; } catch(e){}
+function sesBaslat(){
+  if (AC) return;
+  try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ AC = null; }
+}
+function ton(f1, f2, sure, tip, ses){
+  if (!AC || !sesAcik) return;
+  var o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+  o.type = tip || 'sine';
+  o.frequency.setValueAtTime(f1, t);
+  if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(Math.max(f2, 1), t + sure);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(ses, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + sure);
+  o.connect(g); g.connect(AC.destination);
+  o.start(t); o.stop(t + sure + 0.02);
+}
+var Ses = {
+  firlat: function(){ ton(360, 560, 0.08, 'sine', 0.16); },
+  sek:    function(){ ton(500, 320, 0.05, 'triangle', 0.12); },
+  basket: function(){ ton(1047, 1047, 0.08, 'sine', 0.18); setTimeout(function(){ ton(1568, 1568, 0.16, 'sine', 0.16); }, 70); },
+  temiz:  function(){ [1047, 1319, 1568].forEach(function(f, i){ setTimeout(function(){ ton(f, f, 0.12, 'sine', 0.16); }, i * 70); }); },
+  kacti:  function(){ ton(300, 170, 0.18, 'triangle', 0.12); },
+  bitti:  function(){ ton(520, 130, 0.5, 'sine', 0.2); },
+  rekor:  function(){ [1047, 1319, 1568].forEach(function(f, i){ setTimeout(function(){ ton(f, f, i === 2 ? 0.3 : 0.12, 'sine', 0.2); }, i * 90); }); }
+};
+
+/* ══════════════ DURUM ══════════════ */
+var DURUM = { HAZIR:0, OYUN:1, BITTI:2 };
+var durum = DURUM.HAZIR;
+var skor = 0, rekor = 0, kalan = SURE_SN, yeniRekor = false, seri = 0;
+var bitisZamani = 0;
+try { rekor = parseInt(localStorage.getItem(REKOR_ANAHTAR) || '0', 10) || 0; } catch(e){}
+
+/* Top */
+var top_ = { x:0, y:0, vx:0, vy:0, ucusta:false, donme:0 };
+var rimDegdi = false, sayildi = false;
+/* Bardak (pota) */
+var pota = { x:0, y:0 };
+/* Nişan */
+var nisan = { aktif:false, bx:0, by:0, sx:0, sy:0 };
+/* Skor efekti */
+var patlamalar = [];
+
+function topSifirla(){
+  top_.x = W * (0.25 + Math.random() * 0.5);
+  top_.y = H - 120;
+  top_.vx = 0; top_.vy = 0; top_.ucusta = false; top_.donme = 0;
+  rimDegdi = false; sayildi = false;
+}
+function potaTasi(){
+  pota.x = W * (0.22 + Math.random() * 0.56);
+  pota.y = UST_PAY + 90 + Math.random() * (H * 0.22);
+}
+function hazirla(){
+  durum = DURUM.HAZIR;
+  skor = 0; kalan = SURE_SN; yeniRekor = false; seri = 0; patlamalar = [];
+  pota.x = W * 0.5; pota.y = UST_PAY + 130;
+  topSifirla();
+}
+function basla(){
+  durum = DURUM.OYUN;
+  skor = 0; kalan = SURE_SN; seri = 0;
+  potaTasi(); topSifirla();
+  sesBaslat();
+}
+function bitir(){
+  durum = DURUM.BITTI;
+  bitisZamani = performance.now();
+  nisan.aktif = false;
+  if (skor > rekor){
+    rekor = skor; yeniRekor = true;
+    try { localStorage.setItem(REKOR_ANAHTAR, String(rekor)); } catch(e){}
+    setTimeout(Ses.rekor, 500);
+  }
+  Ses.bitti();
+}
+
+/* ══════════════ FİZİK ══════════════ */
+function firlat(){
+  var dx = nisan.bx - nisan.sx, dy = nisan.by - nisan.sy;   // sapan: geri çek, ters yöne gider
+  var g = Math.hypot(dx, dy);
+  if (g < 18) return false;
+  top_.vx = -dx * 5.2; top_.vy = -dy * 5.2;
+  var hiz = Math.hypot(top_.vx, top_.vy), maxHiz = 1650;
+  if (hiz > maxHiz){ top_.vx *= maxHiz / hiz; top_.vy *= maxHiz / hiz; }
+  top_.ucusta = true;
+  Ses.firlat();
+  return true;
+}
+
+function rimCarp(px){
+  var dx = top_.x - px, dy = top_.y - pota.y;
+  var m = Math.hypot(dx, dy), min = TOP_R + RIM_R;
+  if (m > 0 && m < min){
+    var nx = dx / m, ny = dy / m;
+    top_.x = px + nx * min; top_.y = pota.y + ny * min;
+    var d = top_.vx * nx + top_.vy * ny;
+    if (d < 0){
+      top_.vx -= 1.7 * d * nx; top_.vy -= 1.7 * d * ny;
+      top_.vx *= 0.72; top_.vy *= 0.72;
+      rimDegdi = true;
+      if (Math.abs(d) > 90) Ses.sek();
+    }
+  }
+}
+
+function fizik(dt){
+  if (!top_.ucusta) return;
+  var oncekiY = top_.y;
+  top_.vy += YERCEKIMI * dt;
+  top_.x += top_.vx * dt;
+  top_.y += top_.vy * dt;
+  top_.donme += top_.vx * dt * 0.02;
+
+  // Duvarlar
+  if (top_.x < TOP_R){ top_.x = TOP_R; top_.vx = -top_.vx * 0.72; Ses.sek(); }
+  if (top_.x > W - TOP_R){ top_.x = W - TOP_R; top_.vx = -top_.vx * 0.72; Ses.sek(); }
+  if (top_.y < UST_PAY + TOP_R && top_.vy < 0){ top_.y = UST_PAY + TOP_R; top_.vy = -top_.vy * 0.6; }
+
+  // Rim kenarları
+  rimCarp(pota.x - RIM_YARI);
+  rimCarp(pota.x + RIM_YARI);
+
+  // Basket: rim hizasını yukarıdan aşağı, ağzın içinden geçmek
+  if (!sayildi && oncekiY <= pota.y && top_.y > pota.y && top_.vy > 0 &&
+      Math.abs(top_.x - pota.x) < RIM_YARI - TOP_R * 0.35){
+    sayildi = true;
+    var temiz = !rimDegdi;
+    var puan = temiz ? 2 : 1;
+    skor += puan; seri++;
+    patlamalar.push({ x: pota.x, y: pota.y, t: 0, yazi: temiz ? '+2 TEMİZ!' : '+1' });
+    if (temiz) Ses.temiz(); else Ses.basket();
+    setTimeout(function(){ potaTasi(); topSifirla(); }, 350);
+  }
+
+  // Kaçtı — yere düştü
+  if (top_.y > H + TOP_R * 2){
+    if (!sayildi){ seri = 0; Ses.kacti(); }
+    topSifirla();
+  }
+}
+
+/* ══════════════ ÇİZİM ══════════════ */
+function yolYuvarlak(x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2);
+  cx.beginPath();
+  cx.moveTo(x + r, y);
+  cx.arcTo(x + w, y, x + w, y + h, r);
+  cx.arcTo(x + w, y + h, x, y + h, r);
+  cx.arcTo(x, y + h, x, y, r);
+  cx.arcTo(x, y, x + w, y, r);
+  cx.closePath();
+}
+
+function limonCiz(x, y, aci){
+  cx.save(); cx.translate(x, y); cx.rotate(aci);
+  cx.beginPath(); cx.ellipse(0, 0, TOP_R, TOP_R * 0.86, 0, 0, 6.2832);
+  cx.fillStyle = R.limon; cx.fill();
+  cx.strokeStyle = R.limonKoyu; cx.lineWidth = 2.5; cx.stroke();
+  // Uç
+  cx.beginPath(); cx.ellipse(TOP_R * 0.92, 0, 3.2, 2.4, 0, 0, 6.2832);
+  cx.fillStyle = R.limonKoyu; cx.fill();
+  // Dilim çizgileri
+  cx.strokeStyle = 'rgba(201,162,39,.55)'; cx.lineWidth = 1.6;
+  [-0.6, 0, 0.6].forEach(function(a){
+    cx.beginPath(); cx.moveTo(0, 0);
+    cx.lineTo(Math.cos(a + 2.2) * TOP_R * 0.7, Math.sin(a + 2.2) * TOP_R * 0.6); cx.stroke();
+  });
+  // Yaprak
+  cx.beginPath();
+  cx.moveTo(-TOP_R * 0.7, -TOP_R * 0.5);
+  cx.quadraticCurveTo(-TOP_R * 1.4, -TOP_R * 1.1, -TOP_R * 0.5, -TOP_R * 1.05);
+  cx.quadraticCurveTo(-TOP_R * 0.45, -TOP_R * 0.6, -TOP_R * 0.7, -TOP_R * 0.5);
+  cx.fillStyle = R.yaprak; cx.fill();
+  cx.restore();
+}
+
+function potaCiz(){
+  var x = pota.x, y = pota.y;
+  // Gövde — yukarı doğru genişleyen Cactus bardağı (topun arkasında kalsın diye önce)
+  cx.beginPath();
+  cx.moveTo(x - RIM_YARI + 8, y + 74); cx.lineTo(x + RIM_YARI - 8, y + 74);
+  cx.lineTo(x + RIM_YARI, y); cx.lineTo(x - RIM_YARI, y); cx.closePath();
+  cx.fillStyle = R.bardak; cx.fill();
+  cx.strokeStyle = R.bardakKenar; cx.lineWidth = 3; cx.stroke();
+  // Karton tutamak
+  cx.beginPath();
+  cx.moveTo(x - RIM_YARI + 3, y + 22); cx.lineTo(x + RIM_YARI - 3, y + 22);
+  cx.lineTo(x + RIM_YARI - 1, y + 40); cx.lineTo(x - RIM_YARI + 1, y + 40); cx.closePath();
+  cx.fillStyle = R.altin; cx.fill();
+  cx.strokeStyle = R.bardakKenar; cx.lineWidth = 2; cx.stroke();
+  // Logo göz kırpması
+  cx.font = '700 10px Inter, sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillStyle = R.bardakKenar; cx.fillText('CACTUS', x, y + 31);
+  // Ağız (rim)
+  cx.beginPath(); cx.moveTo(x - RIM_YARI, y); cx.lineTo(x + RIM_YARI, y);
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 4; cx.lineCap = 'round'; cx.stroke();
+  [[x - RIM_YARI], [x + RIM_YARI]].forEach(function(p){
+    cx.beginPath(); cx.arc(p[0], y, RIM_R, 0, 6.2832);
+    cx.fillStyle = R.koyuYesil; cx.fill();
+  });
+}
+
+function nisanCiz(){
+  if (!nisan.aktif || top_.ucusta) return;
+  var dx = nisan.bx - nisan.sx, dy = nisan.by - nisan.sy;
+  if (Math.hypot(dx, dy) < 18) return;
+  // Yörünge önizlemesi — fırlatmayla aynı hız hesabı
+  var vx = -dx * 5.2, vy = -dy * 5.2;
+  var hiz = Math.hypot(vx, vy), maxHiz = 1650;
+  if (hiz > maxHiz){ vx *= maxHiz / hiz; vy *= maxHiz / hiz; }
+  var px = top_.x, py = top_.y, adim = 0.045;
+  cx.fillStyle = 'rgba(26,51,16,.4)';
+  for (var i = 0; i < 16; i++){
+    vy += YERCEKIMI * adim;
+    px += vx * adim; py += vy * adim;
+    cx.beginPath(); cx.arc(px, py, 4 - i * 0.16, 0, 6.2832); cx.fill();
+  }
+  // Sapan çizgisi — çekiş yönünde gerilir
+  cx.beginPath(); cx.moveTo(top_.x, top_.y);
+  cx.lineTo(top_.x + dx * 0.4, top_.y + dy * 0.4);
+  cx.strokeStyle = 'rgba(139,94,60,.5)'; cx.lineWidth = 3; cx.lineCap = 'round'; cx.stroke();
+}
+
+function metinKonturlu(t, x, y, boy){
+  cx.font = '800 ' + boy + 'px Inter, -apple-system, sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.lineJoin = 'round'; cx.lineWidth = 7;
+  cx.strokeStyle = R.murekkep; cx.strokeText(t, x, y);
+  cx.fillStyle = R.krem; cx.fillText(t, x, y);
+}
+
+function geriDugmesiCiz(){
+  var x = 40, y = dugmeY();
+  cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
+  cx.fillStyle = 'rgba(247,239,222,.92)'; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5; cx.stroke();
+  cx.beginPath();
+  cx.moveTo(x + 4, y - 7); cx.lineTo(x - 4, y); cx.lineTo(x + 4, y + 7);
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.8;
+  cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.stroke();
+}
+function sesDugmesiCiz(){
+  var x = W - 40, y = dugmeY();
+  cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
+  cx.fillStyle = 'rgba(247,239,222,.92)'; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5; cx.stroke();
+  cx.save(); cx.translate(x, y);
+  cx.fillStyle = R.koyuYesil;
+  cx.fillRect(-8, -3.5, 5, 7);
+  cx.beginPath(); cx.moveTo(-3, -3.5); cx.lineTo(2, -8); cx.lineTo(2, 8); cx.lineTo(-3, 3.5); cx.closePath(); cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2; cx.lineCap = 'round';
+  if (sesAcik){
+    [5, 9].forEach(function(r){ cx.beginPath(); cx.arc(3, 0, r, -1.05, 1.05); cx.stroke(); });
+  } else {
+    cx.beginPath(); cx.moveTo(5, -5); cx.lineTo(13, 5); cx.moveTo(13, -5); cx.lineTo(5, 5); cx.stroke();
+  }
+  cx.restore();
+}
+
+function ciz(){
+  cx.fillStyle = gokGrad; cx.fillRect(0, 0, W, H);
+
+  // Zemin
+  cx.fillStyle = R.kum; cx.fillRect(0, H - 70, W, 70);
+  cx.fillStyle = R.kumKoyu; cx.fillRect(0, H - 70, W, 8);
+
+  potaCiz();
+  nisanCiz();
+  limonCiz(top_.x, top_.y, top_.donme);
+
+  // Skor patlamaları
+  for (var i = patlamalar.length - 1; i >= 0; i--){
+    var p = patlamalar[i];
+    p.t += 0.02;
+    if (p.t >= 1){ patlamalar.splice(i, 1); continue; }
+    cx.globalAlpha = 1 - p.t;
+    metinKonturlu(p.yazi, p.x, p.y - 34 - p.t * 44, 22);
+    cx.globalAlpha = 1;
+  }
+
+  // HUD
+  if (durum !== DURUM.HAZIR){
+    metinKonturlu(String(skor), W / 2, dugmeY() + 8, 40);
+    cx.font = '700 14px Inter, sans-serif'; cx.textAlign = 'center';
+    cx.fillStyle = kalan <= 10 ? '#c0392b' : 'rgba(20,39,29,.75)';
+    cx.fillText(Math.ceil(kalan) + ' sn', W / 2, dugmeY() + 40);
+    if (seri >= 2){
+      cx.fillStyle = '#8a6a2a';
+      cx.fillText('🔥 ' + seri + ' seri', W / 2, dugmeY() + 60);
+    }
+  }
+  geriDugmesiCiz();
+  sesDugmesiCiz();
+
+  if (durum === DURUM.HAZIR) hazirEkran();
+  if (durum === DURUM.BITTI && performance.now() - bitisZamani > 500) bittiEkran();
+}
+
+function hazirEkran(){
+  var y = H * 0.56;
+  cx.font = '800 ' + Math.min(38, W * 0.095) + 'px Inter, sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillStyle = R.koyuYesil; cx.fillText('CACTUS BASKET', W / 2, y);
+  cx.fillStyle = R.altin; cx.fillRect(W / 2 - 70, y + 24, 140, 5);
+  cx.font = '600 15px Inter, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.75)';
+  cx.fillText('Limonu geri çek, bırak — bardağa at', W / 2, y + 52);
+  cx.fillText(SURE_SN + ' saniyede kaç basket?', W / 2, y + 76);
+  if (rekor > 0){
+    cx.font = '600 14px Inter, sans-serif'; cx.fillStyle = 'rgba(26,51,16,.8)';
+    cx.fillText('Rekor  ' + rekor, W / 2, y + 104);
+  }
+  cx.font = '600 13px Inter, sans-serif'; cx.fillStyle = '#8a6a2a';
+  cx.fillText('Rim\'e değmeden girerse +2', W / 2, y + 130);
+}
+
+function bittiEkran(){
+  var pw = Math.min(W - 56, 320), ph = 240, px = (W - pw) / 2, py = H * 0.30;
+  yolYuvarlak(px, py, pw, ph, 26);
+  cx.fillStyle = R.krem; cx.fill(); cx.strokeStyle = R.altin; cx.lineWidth = 4; cx.stroke();
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.font = '800 26px Inter, sans-serif'; cx.fillStyle = R.koyuYesil;
+  cx.fillText('SÜRE DOLDU', W / 2, py + 44);
+  cx.fillStyle = 'rgba(200,168,106,.5)'; cx.fillRect(px + 34, py + 66, pw - 68, 2);
+  cx.font = '600 13px Inter, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.55)';
+  cx.fillText('SKOR', W / 2 - pw * 0.22, py + 100);
+  cx.fillText('REKOR', W / 2 + pw * 0.22, py + 100);
+  cx.font = '800 36px Inter, sans-serif'; cx.fillStyle = R.koyuYesil;
+  cx.fillText(String(skor), W / 2 - pw * 0.22, py + 132);
+  cx.fillText(String(rekor), W / 2 + pw * 0.22, py + 132);
+  if (yeniRekor){
+    cx.font = '800 15px Inter, sans-serif'; cx.fillStyle = R.altin;
+    cx.fillText('YENİ REKOR!', W / 2, py + ph - 68);
+  }
+  cx.font = '600 15px Inter, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.7)';
+  cx.fillText('Tekrar oynamak için dokun', W / 2, py + ph - 36);
+}
+
+/* ══════════════ DÖNGÜ ══════════════ */
+var sonAn = 0;
+function dongu(an){
+  requestAnimationFrame(dongu);
+  if (!sonAn){ sonAn = an; return; }
+  var dt = Math.min((an - sonAn) / 1000, 1 / 30);
+  sonAn = an;
+  if (dt <= 0) return;
+
+  if (durum === DURUM.OYUN){
+    kalan -= dt;
+    if (kalan <= 0){ kalan = 0; bitir(); }
+    fizik(dt);
+  }
+  ciz();
+}
+
+/* ══════════════ GİRDİ ══════════════ */
+function geriDon(){
+  if (document.referrer && history.length > 1) history.back();
+  else location.href = 'oyunlar.html';
+}
+cv.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  var mx = e.clientX, my = e.clientY;
+  if (Math.hypot(mx - 40, my - dugmeY()) <= 30){ geriDon(); return; }
+  if (Math.hypot(mx - (W - 40), my - dugmeY()) <= 30){
+    sesAcik = !sesAcik;
+    try { localStorage.setItem('cactus_oyun_ses', sesAcik ? '1' : '0'); } catch(e2){}
+    sesBaslat(); if (sesAcik) Ses.basket();
+    return;
+  }
+  if (durum === DURUM.HAZIR){ basla(); return; }
+  if (durum === DURUM.BITTI){
+    if (performance.now() - bitisZamani > 700){ hazirla(); basla(); }
+    return;
+  }
+  if (top_.ucusta) return;
+  nisan.aktif = true;
+  nisan.sx = nisan.bx = mx; nisan.sy = nisan.by = my;
+});
+cv.addEventListener('pointermove', function(e){
+  if (!nisan.aktif) return;
+  nisan.bx = e.clientX; nisan.by = e.clientY;
+});
+cv.addEventListener('pointerup', function(){
+  if (!nisan.aktif) return;
+  nisan.aktif = false;
+  firlat();
+});
+
+/* ══════════════ BAŞLAT ══════════════ */
+ustPayOlc();
+olcekle();
+hazirla();
+requestAnimationFrame(dongu);
+</script>
+</body>
+</html>

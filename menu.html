@@ -889,7 +889,8 @@ footer{padding:40px 20px 24px;}
 .ob-sub{font-size:12.5px;color:rgba(245,234,216,.7);line-height:1.7;font-weight:300;margin-bottom:18px;max-width:420px;}
 .ob-cta{display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#c8a86a,#b8965a);color:#0e1f08;text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;border-radius:10px;transition:all .2s;}
 .ob-cta:hover{background:linear-gradient(135deg,#d8b87a,#c8a86a);transform:translateY(-1px);}
-.ob-oyunlar{display:flex;flex-direction:column;gap:12px;min-width:230px;}
+.ob-oyunlar{display:grid;grid-template-columns:repeat(2,minmax(200px,1fr));gap:10px;min-width:230px;}
+@media(max-width:700px){.ob-oyunlar{grid-template-columns:1fr;width:100%;}}
 .ob-chip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(200,168,106,.28);border-radius:14px;padding:13px 16px;text-decoration:none;transition:all .2s;}
 .ob-chip:hover{background:rgba(255,255,255,.1);border-color:rgba(200,168,106,.5);}
 .ob-chip-ikon{font-size:24px;line-height:1;}
@@ -907,7 +908,9 @@ footer{padding:40px 20px 24px;}
     </div>
     <div class="ob-oyunlar">
       <a class="ob-chip" href="oyun.html"><span class="ob-chip-ikon">🌵</span><span><b>Cactus Jump</b><em>🍋 Ödüllü · üyelere özel</em></span></a>
-      <a class="ob-chip" href="oyun-hafiza.html"><span class="ob-chip-ikon">🃏</span><span><b>Cactus Hafıza</b><em>Kart eşleştirme · herkese açık</em></span></a>
+      <a class="ob-chip" href="oyun-hafiza.html"><span class="ob-chip-ikon">🃏</span><span><b>Cactus Hafıza</b><em>Kart eşleştirme</em></span></a>
+      <a class="ob-chip" href="oyun-merdiven.html"><span class="ob-chip-ikon">🪜</span><span><b>Kahve Merdiveni</b><em>Birleştir, yüksel</em></span></a>
+      <a class="ob-chip" href="oyun-basket.html"><span class="ob-chip-ikon">🏀</span><span><b>Cactus Basket</b><em>Limonu bardağa at</em></span></a>
     </div>
   </div>
 </section>

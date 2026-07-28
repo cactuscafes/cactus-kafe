@@ -107,6 +107,26 @@ struct CevrimdisiEkran: View {
     }
 }
 
+struct HataEkrani: View {
+    var mesaj: String
+    var tekrarDene: () -> Void
+    var body: some View {
+        VStack(spacing: 14) {
+            Text("⚠️").font(.system(size: 56))
+            Text("Sorun oluştu").font(.headline).foregroundColor(KOYU)
+            Text(mesaj)
+                .font(.subheadline).foregroundColor(SOLGUN)
+                .multilineTextAlignment(.center)
+            Button(action: tekrarDene) {
+                Text("Tekrar Dene").bold()
+                    .padding(.horizontal, 26).padding(.vertical, 11)
+                    .background(YESIL).foregroundColor(.white).clipShape(Capsule())
+            }
+        }
+        .padding(30)
+    }
+}
+
 struct SiteView: UIViewRepresentable {
     @Binding var baglantiHatasi: Bool
 
@@ -192,39 +212,49 @@ enum KartAPI {
 
     static func bak(_ tel: String) async -> KartBilgi? {
         guard let url = URL(string: API + "/kart/bak?telefon=" + tel) else { return nil }
-        guard let ikili = try? await URLSession.shared.data(from: url) else { return nil }
-        guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any],
-              (j["ok"] as? Bool) == true,
-              let m = j["musteri"] as? [String: Any] else { return nil }
-        var satirlar: [String] = []
-        let ham = j["gecmis"] as? [[String: Any]] ?? []
-        for g in ham.prefix(5) {
-            let kullandi = (g["tip"] as? String) == "kullandi"
-            let etiket = kullandi ? "🎁 Bedava içecek" : "⭐ +\(sayi(g["miktar"])) yıldız"
-            satirlar.append(etiket + "   ·   " + tarihBicimle(g["tarih"] as? String ?? ""))
+        var req = URLRequest(url: url)
+        req.timeoutInterval = 8
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any],
+                  (j["ok"] as? Bool) == true,
+                  let m = j["musteri"] as? [String: Any] else { return nil }
+            var satirlar: [String] = []
+            let ham = j["gecmis"] as? [[String: Any]] ?? []
+            for g in ham.prefix(5) {
+                let kullandi = (g["tip"] as? String) == "kullandi"
+                let etiket = kullandi ? "🎁 Bedava içecek" : "⭐ +\(sayi(g["miktar"])) yıldız"
+                satirlar.append(etiket + "   ·   " + tarihBicimle(g["tarih"] as? String ?? ""))
+            }
+            return KartBilgi(ad: m["ad"] as? String ?? "",
+                             pul: sayi(m["pul"]),
+                             toplam: sayi(m["toplam_kazanilan"]),
+                             gecmis: satirlar)
+        } catch {
+            return nil
         }
-        return KartBilgi(ad: m["ad"] as? String ?? "",
-                         pul: sayi(m["pul"]),
-                         toplam: sayi(m["toplam_kazanilan"]),
-                         gecmis: satirlar)
     }
 
     static func kayit(_ tel: String, _ ad: String) async -> Bool {
         guard let url = URL(string: API + "/kart/kayit") else { return false }
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
+        req.timeoutInterval = 8
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try? JSONSerialization.data(withJSONObject: ["telefon": tel, "ad": ad])
-        guard let ikili = try? await URLSession.shared.data(for: req) else { return false }
-        guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
-        return (j["ok"] as? Bool) == true
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
+            return (j["ok"] as? Bool) == true
+        } catch {
+            return false
+        }
     }
 }
 
 // ═══════════════════ SADAKAT KARTI — EKRAN ═══════════════════
 
 struct KartTab: View {
-    // Çevrimdışıyken de kart görünsün diye son durum cihazda saklanır.
     @AppStorage("kartTel") private var kayitliTel = ""
     @AppStorage("kartAd") private var kayitliAd = ""
     @AppStorage("kartPul") private var pul = 0
@@ -232,16 +262,21 @@ struct KartTab: View {
 
     @State private var gecmis: [String] = []
     @State private var yukleniyor = false
+    @State private var hata: String = ""
 
     var body: some View {
         ZStack {
             KREM.ignoresSafeArea()
             if kayitliTel.count >= 10 {
-                KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
-                          gecmis: gecmis, yukleniyor: yukleniyor,
-                          yenile: { Task { await tazele(elle: true) } },
-                          cikis: cikisYap)
-                    .refreshable { await tazele(elle: false) }
+                if !hata.isEmpty {
+                    HataEkrani(mesaj: hata) { hata = ""; Task { await tazele(elle: false) } }
+                } else {
+                    KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
+                              gecmis: gecmis, yukleniyor: yukleniyor,
+                              yenile: { Task { await tazele(elle: true) } },
+                              cikis: cikisYap)
+                        .refreshable { await tazele(elle: false) }
+                }
             } else {
                 KayitGovde(tamamlandi: kartaGec)
             }
@@ -265,12 +300,19 @@ struct KartTab: View {
     @MainActor private func tazele(elle: Bool) async {
         yukleniyor = true
         defer { yukleniyor = false }
-        if let v = await KartAPI.bak(kayitliTel) {
-            pul = v.pul
-            toplam = v.toplam
-            gecmis = v.gecmis
-            if !v.ad.isEmpty { kayitliAd = v.ad }
-            if elle { dokunumBasarili() }
+        do {
+            if let v = await KartAPI.bak(kayitliTel) {
+                pul = v.pul
+                toplam = v.toplam
+                gecmis = v.gecmis
+                if !v.ad.isEmpty { kayitliAd = v.ad }
+                if elle { dokunumBasarili() }
+                hata = ""
+            } else {
+                hata = "Kart yüklenemedi. İnternet bağlantınızı kontrol edip tekrar dene."
+            }
+        } catch {
+            hata = "Bağlantı hatası. Tekrar denemek için dokunun."
         }
     }
 }

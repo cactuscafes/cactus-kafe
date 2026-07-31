@@ -47,6 +47,19 @@ struct RootView: View {
 
 // ═══════════════════ ORTAK YARDIMCILAR ═══════════════════
 
+/// Girilen numarayı sunucunun beklediği 11 haneli 05XX biçimine çevirir.
+/// Sunucu (rapor-api) yalnızca bu biçimi kabul ediyor, o yüzden kullanıcı
+/// hangi alışkanlıkla yazarsa yazsın burada tek biçime indiriyoruz:
+///   "+90 555 111 22 33" / "90555…" / "555 111 22 33" / "0555…" → "05551112233"
+/// Çevrilemeyen (Türkiye cep numarası olmayan) girdiler için nil döner.
+func telNormalize(_ ham: String) -> String? {
+    var d = ham.filter { $0.isNumber }
+    if d.hasPrefix("90") && d.count == 12 { d = String(d.dropFirst(2)) }  // +90 5xx…
+    if d.hasPrefix("0") { d = String(d.dropFirst()) }                     // 0 5xx…
+    guard d.count == 10, d.hasPrefix("5") else { return nil }             // 5xx + 7 hane
+    return "0" + d
+}
+
 func telBicimle(_ ham: String) -> String {
     let d = ham.filter { $0.isNumber }
     guard d.count == 11 else { return ham }
@@ -357,10 +370,13 @@ struct KayitGovde: View {
     @State private var yukleniyor = false
     @State private var hata = ""
 
+    /// 12 hane: "+90" ile yazanlar da sığsın (normalize ederken kırpılır)
     private var telBinding: Binding<String> {
         Binding(get: { tel },
-                set: { tel = String($0.filter { $0.isNumber }.prefix(11)) })
+                set: { tel = String($0.filter { $0.isNumber }.prefix(12)) })
     }
+
+    private var gecerliTel: String? { telNormalize(tel) }
 
     var body: some View {
         ScrollView {
@@ -372,7 +388,7 @@ struct KayitGovde: View {
                     .font(.subheadline).foregroundColor(SOLGUN)
                     .multilineTextAlignment(.center)
 
-                TextField("Telefon numarası", text: telBinding)
+                TextField("05XX XXX XX XX", text: telBinding)
                     .keyboardType(.numberPad)
                     .textContentType(.telephoneNumber)
                     .textFieldStyle(.roundedBorder)
@@ -391,10 +407,10 @@ struct KayitGovde: View {
                         else { Text("Kartımı Oluştur →").bold() }
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .background(tel.count >= 10 ? YESIL : Color.gray.opacity(0.4))
+                    .background(gecerliTel != nil ? YESIL : Color.gray.opacity(0.4))
                     .foregroundColor(.white).clipShape(Capsule())
                 }
-                .disabled(tel.count < 10 || yukleniyor)
+                .disabled(gecerliTel == nil || yukleniyor)
 
                 Button("Zaten kartın var mı? Telefonla gör") {
                     Task { await mevcutuGetir() }
@@ -411,22 +427,23 @@ struct KayitGovde: View {
 
     @MainActor private func gonder() async {
         hata = ""
-        guard tel.count >= 10 else {
-            hata = "Lütfen geçerli bir telefon numarası gir."
+        // Sunucu yalnızca 11 haneli 05XX numarasını kabul ediyor — girdiyi ona çeviriyoruz.
+        guard let no = gecerliTel else {
+            hata = "Cep numaranı 05XX XXX XX XX biçiminde gir (örn. 0555 111 22 33)."
             return
         }
         yukleniyor = true
         defer { yukleniyor = false }
         // Numara zaten kayıtlıysa doğrudan kartı aç
-        if let v = await KartAPI.bak(tel) { tamamlandi(tel, v); return }
+        if let v = await KartAPI.bak(no) { tamamlandi(no, v); return }
         let temizAd = ad.trimmingCharacters(in: .whitespaces)
         guard temizAd.count >= 2 else {
             hata = "Adını soyadını da yazar mısın?"
             return
         }
-        if await KartAPI.kayit(tel, temizAd) {
-            let v = await KartAPI.bak(tel) ?? KartBilgi(ad: temizAd, pul: 1, toplam: 1, gecmis: [])
-            tamamlandi(tel, v)
+        if await KartAPI.kayit(no, temizAd) {
+            let v = await KartAPI.bak(no) ?? KartBilgi(ad: temizAd, pul: 1, toplam: 1, gecmis: [])
+            tamamlandi(no, v)
         } else {
             hata = "Kayıt yapılamadı — internetini kontrol edip tekrar dene."
         }
@@ -434,11 +451,14 @@ struct KayitGovde: View {
 
     @MainActor private func mevcutuGetir() async {
         hata = ""
-        guard tel.count >= 10 else { hata = "Önce telefon numaranı yaz."; return }
+        guard let no = gecerliTel else {
+            hata = "Cep numaranı 05XX XXX XX XX biçiminde gir (örn. 0555 111 22 33)."
+            return
+        }
         yukleniyor = true
         defer { yukleniyor = false }
-        if let v = await KartAPI.bak(tel) {
-            tamamlandi(tel, v)
+        if let v = await KartAPI.bak(no) {
+            tamamlandi(no, v)
         } else {
             hata = "Bu numaraya kayıtlı kart bulunamadı."
         }

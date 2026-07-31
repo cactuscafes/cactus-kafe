@@ -6,8 +6,12 @@ no email, and no website visit is required to complete it.
 
 How to reach it:
 1. Open the "Sadakat Karti" (Loyalty Card) tab.
-2. Create a card by entering any phone number (at least 10 digits, for example
-   5551112233) together with a name. No password or sign-in is required.
+2. Create a card by entering a Turkish mobile number together with a name.
+   Please use this test number: 0555 111 22 33
+   (Our loyalty database stores Turkish mobile numbers, so the number must be in
+   the 05XX XXX XX XX format. The app accepts it typed as 05551112233,
+   5551112233 or +90 555 111 22 33 and normalises it for you.)
+   No password or sign-in is required.
 3. Scroll to the bottom of the card screen.
 4. Tap "Hesabimi Sil" ("Delete My Account") — the red button below "Cikis Yap".
 5. A confirmation alert appears; tap "Hesabimi Sil" to confirm.

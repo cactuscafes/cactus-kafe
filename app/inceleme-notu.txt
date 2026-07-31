@@ -1,7 +1,27 @@
-Thank you for the feedback regarding Guideline 4.2.
+Thank you for the feedback regarding Guideline 5.1.1(v) — Data Collection and Storage.
 
-This build adds substantial native functionality beyond the web content:
+ACCOUNT DELETION (new in this build)
+The Loyalty Card now offers account deletion directly inside the app. No phone call,
+no email, and no website visit is required to complete it.
 
+How to reach it:
+1. Open the "Sadakat Karti" (Loyalty Card) tab.
+2. Create a card by entering any phone number (at least 10 digits, for example
+   5551112233) together with a name. No password or sign-in is required.
+3. Scroll to the bottom of the card screen.
+4. Tap "Hesabimi Sil" ("Delete My Account") — the red button below "Cikis Yap".
+5. A confirmation alert appears; tap "Hesabimi Sil" to confirm.
+
+What deletion does: the customer record, the star balance and the full transaction
+history are permanently removed from our server, and the locally cached card is
+cleared. The action is irreversible. "Cikis Yap" ("Log Out") above it is a separate,
+clearly labelled action that only signs out on this device — it is not offered as a
+substitute for deletion.
+
+If the server cannot confirm the deletion, the app shows an error and keeps the card
+instead of reporting a deletion that did not happen.
+
+OTHER NATIVE FUNCTIONALITY (from the previous review, Guideline 4.2)
 1. Loyalty Card tab — a fully native SwiftUI experience. Customers create and view
    their loyalty card inside the app, see their star progress and free-drink credits,
    display a scannable QR code and phone number at the counter, review their
@@ -10,7 +30,3 @@ This build adds substantial native functionality beyond the web content:
 2. Contact tab — native actions: phone call, WhatsApp, Apple Maps directions,
    Instagram, and the system share sheet.
 3. Menu tab — our live cafe menu.
-
-To test the loyalty card, open the "Sadakat Karti" (Loyalty Card) tab and enter any
-phone number (at least 10 digits, for example 5551112233 or 1234567890) together with a
-name. No password or sign-in is required.

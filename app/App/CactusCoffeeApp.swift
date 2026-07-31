@@ -11,6 +11,8 @@ import CoreImage.CIFilterBuiltins
 
 let MENU_URL = URL(string: "https://cactuscafes.com/menu-podyum.html")!
 let API = "https://cactus-rapor-api.batuhanbulut.workers.dev"
+// Hesap silme ucu site worker'ında (kart-sil, yönetim anahtarını sunucuda tutar)
+let SITE_API = "https://cactus-kafe.batuhanbulut.workers.dev"
 let ESIK = 7
 
 let YESIL = Color(red: 0.18, green: 0.35, blue: 0.15)
@@ -250,6 +252,24 @@ enum KartAPI {
             return false
         }
     }
+
+    /// Hesabı kalıcı siler: müşteri kaydı + yıldızlar + işlem geçmişi sunucudan kalkar.
+    /// App Store Guideline 5.1.1(v) gereği uygulama içinden sunulur.
+    static func hesabiSil(_ tel: String) async -> Bool {
+        guard let url = URL(string: SITE_API + "/api/kart-sil") else { return false }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.timeoutInterval = 12
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: ["telefon": tel])
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
+            return (j["ok"] as? Bool) == true
+        } catch {
+            return false
+        }
+    }
 }
 
 // ═══════════════════ SADAKAT KARTI — EKRAN ═══════════════════
@@ -274,7 +294,8 @@ struct KartTab: View {
                     KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
                               gecmis: gecmis, yukleniyor: yukleniyor,
                               yenile: { Task { await tazele(elle: true) } },
-                              cikis: cikisYap)
+                              cikis: cikisYap,
+                              hesabiSil: { await hesabiSil() })
                         .refreshable { await tazele(elle: false) }
                 }
             } else {
@@ -295,6 +316,15 @@ struct KartTab: View {
 
     private func cikisYap() {
         kayitliTel = ""; kayitliAd = ""; pul = 0; toplam = 0; gecmis = []
+    }
+
+    /// Sunucudaki kayıt silinirse cihazdaki kopyayı da temizler.
+    /// Sunucu silmeyi onaylamazsa yerel veri KORUNUR — kullanıcıya hata gösterilir.
+    @MainActor private func hesabiSil() async -> Bool {
+        guard await KartAPI.hesabiSil(kayitliTel) else { return false }
+        cikisYap()
+        dokunumBasarili()
+        return true
     }
 
     @MainActor private func tazele(elle: Bool) async {
@@ -426,6 +456,11 @@ struct KartGovde: View {
     let yukleniyor: Bool
     let yenile: () -> Void
     let cikis: () -> Void
+    let hesabiSil: () async -> Bool
+
+    @State private var silOnayi = false
+    @State private var siliniyor = false
+    @State private var silHatasi = ""
 
     private var gosterilen: Int { pul % ESIK }
     private var hak: Int { pul / ESIK }
@@ -548,8 +583,48 @@ struct KartGovde: View {
 
             Button("Çıkış Yap", action: cikis)
                 .font(.caption).foregroundColor(SOLGUN)
+
+            hesapSilmeBolumu
         }
         .padding(.top, 4)
+    }
+
+    // Guideline 5.1.1(v): hesap uygulama içinden, tek adımda kalıcı silinebilmeli.
+    private var hesapSilmeBolumu: some View {
+        VStack(spacing: 6) {
+            Button(role: .destructive) { silOnayi = true } label: {
+                Text(siliniyor ? "Siliniyor…" : "Hesabımı Sil")
+                    .font(.caption.bold()).foregroundColor(.red)
+            }
+            .disabled(siliniyor)
+
+            Text("Kartın, yıldızların ve işlem geçmişin kalıcı olarak silinir.")
+                .font(.caption2).foregroundColor(SOLGUN)
+                .multilineTextAlignment(.center)
+
+            if !silHatasi.isEmpty {
+                Text(silHatasi)
+                    .font(.caption2).foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.top, 10)
+        .alert("Hesabını sil", isPresented: $silOnayi) {
+            Button("Vazgeç", role: .cancel) {}
+            Button("Hesabımı Sil", role: .destructive) {
+                silHatasi = ""
+                Task { @MainActor in
+                    siliniyor = true
+                    let oldu = await hesabiSil()
+                    siliniyor = false
+                    if !oldu {
+                        silHatasi = "Hesap silinemedi. İnternetini kontrol edip tekrar dene."
+                    }
+                }
+            }
+        } message: {
+            Text("Sadakat kartın, yıldızların ve tüm işlem geçmişin sunucudan kalıcı olarak silinecek. Bu işlem geri alınamaz.")
+        }
     }
 }
 

@@ -1,0 +1,105 @@
+name: Hesap silme ekran kaydı (simülatör)
+
+# Hesap silme akışını iOS simülatöründe otomatik oynatıp video kaydeder.
+# Video, çalıştırma sayfasındaki "Artifacts" bölümünden indirilir.
+#
+# NOT: Apple, incelemeye yanıt olarak FİZİKSEL CİHAZDA çekilmiş kayıt istiyor.
+# Bu kayıt akışın çalıştığını (ve çökmediğini) doğrulamak içindir; Apple'a
+# gönderilecek kaydın telefonda çekilmesi gerekir.
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_numarasi:
+        description: "Kayıtta kullanılacak sahte numara (05XX biçiminde)"
+        required: true
+        default: "05550000009"
+
+jobs:
+  kaydet:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Simülatör seç ve başlat
+        id: sim
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available --json | python3 -c "
+          import json,sys
+          d = json.load(sys.stdin)['devices']
+          for rt in sorted(d, reverse=True):
+              if 'iOS' not in rt:
+                  continue
+              for dev in d[rt]:
+                  if dev.get('isAvailable') and 'iPhone' in dev['name']:
+                      print(dev['udid'])
+                      sys.exit()
+          ")
+          test -n "$UDID" || { echo '❌ Uygun iPhone simülatörü bulunamadı'; exit 1; }
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          echo "✓ Simülatör hazır: $UDID"
+
+      - name: Kaydı başlat
+        run: |
+          set -euo pipefail
+          xcrun simctl io "${{ steps.sim.outputs.udid }}" recordVideo \
+            --codec h264 --force "$RUNNER_TEMP/hesap-silme.mp4" &
+          echo $! > "$RUNNER_TEMP/rec.pid"
+          echo "✓ Kayıt başladı"
+
+      - name: Akışı oynat (UI testi)
+        id: test
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          xcodebuild test \
+            -project app/CactusCoffee.xcodeproj \
+            -scheme CactusCoffee \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            -resultBundlePath "$RUNNER_TEMP/sonuc.xcresult" \
+            CODE_SIGNING_ALLOWED=NO \
+            TEST_RUNNER_TEST_NUMARASI="${{ inputs.test_numarasi }}" \
+            2>&1 | tee "$RUNNER_TEMP/test.log"
+          echo "durum=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Kaydı durdur
+        if: always()
+        run: |
+          set +e
+          if [ -f "$RUNNER_TEMP/rec.pid" ]; then
+            kill -INT "$(cat "$RUNNER_TEMP/rec.pid")" 2>/dev/null
+            sleep 5
+          fi
+          ls -la "$RUNNER_TEMP/hesap-silme.mp4" 2>/dev/null && echo "✓ Video yazıldı" || echo "⚠️ Video oluşmadı"
+
+      - name: Sonucu özetle
+        if: always()
+        run: |
+          set +e
+          echo "── Testin kendi çıktısı ──"
+          grep -E "SONUÇ:|XCTAssert|Test Case .* (passed|failed)|error:" "$RUNNER_TEMP/test.log" | tail -40
+          echo
+          if grep -q "SONUÇ: hesap silindi" "$RUNNER_TEMP/test.log"; then
+            echo "✅ Silme tamamlandı — kayıt ekranına dönüldü."
+          elif grep -q "SONUÇ: silme tamamlanmadı" "$RUNNER_TEMP/test.log"; then
+            echo "⚠️ Arayüz akışı çalıştı ama sunucu silmeyi reddetti."
+            echo "   Büyük ihtimalle KART_YONETIM_SIFRE secret'ı kurulu değil."
+          else
+            echo "❌ Akış tamamlanamadı — video ve loglara bak."
+          fi
+
+      - name: Videoyu ve sonuçları yükle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hesap-silme-kaydi
+          path: |
+            ${{ runner.temp }}/hesap-silme.mp4
+            ${{ runner.temp }}/test.log
+            ${{ runner.temp }}/sonuc.xcresult
+          if-no-files-found: warn
+          retention-days: 14

@@ -139,6 +139,27 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .dk-hediye-no{font-size:12px;color:var(--amber);letter-spacing:1px;font-weight:500;}
 .dk-hediye-txt{font-size:8px;color:rgba(245,234,216,.6);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
 
+/* Oyun ödülü — bekleyen limonata hakkı (varsayılan gizli) */
+.limonata-kutu{display:none;align-items:center;gap:13px;background:linear-gradient(135deg,#f2c94c,#e8b83a);border-radius:16px;padding:15px 17px;margin-bottom:14px;box-shadow:0 6px 22px rgba(232,184,58,.28);}
+.limonata-ikon{font-size:27px;line-height:1;}
+.limonata-bas{font-size:14px;font-weight:700;color:#3a2f10;}
+.limonata-alt{font-size:11px;color:rgba(58,47,16,.75);margin-top:2px;}
+
+/* Oyun daveti */
+.oyun-davet{display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.06);border:1px solid rgba(200,168,106,.28);border-radius:16px;padding:14px 16px;margin-bottom:14px;text-decoration:none;}
+.oyun-ikon{font-size:23px;line-height:1;}
+.oyun-davet b{display:block;font-size:13px;color:var(--latte);font-weight:600;}
+.oyun-davet em{display:block;font-size:10.5px;color:rgba(245,234,216,.6);font-style:normal;margin-top:2px;}
+.oyun-davet span:nth-child(2){flex:1;}
+.oyun-ok{font-size:22px;color:var(--amber);line-height:1;}
+
+/* Tezgâhta okutulan QR — beyaz zemin şart, koyu kart üzerinde okunmuyor */
+.kart-qr-kutu{background:#fff;border-radius:18px;padding:18px 16px 14px;margin-bottom:16px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.18);}
+.kart-qr-baslik{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#8a7a5c;margin-bottom:12px;}
+.kart-qr{display:flex;justify-content:center;}
+.kart-qr svg{width:172px;height:172px;display:block;}
+.kart-qr-alt{font-size:10px;color:#9a9488;margin-top:11px;line-height:1.5;}
+
 /* Bedava banner */
 .bedava-banner{background:linear-gradient(135deg,#2c5a1a,#1e3d10);border:1px solid rgba(200,168,106,.35);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 4px 24px rgba(44,90,26,.3);}
 /* Kutlama — hediye hakkı kazanınca konfeti + banner zıplaması */
@@ -208,6 +229,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
     <a href="menu-podyum.html">Podyumpark Menü</a>
     <a href="iletisim.html">İletişim</a>
     <a href="kart.html" class="aktif">🎖 Sadakat Kartı</a>
+    <a href="oyunlar.html">🎮 Oyun</a>
     <a href="iletisim.html#basvuru" class="nav-cta">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()">
@@ -220,6 +242,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
   <a href="menu-podyum.html" onclick="toggleMainNav()">Podyumpark Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()">İletişim</a>
   <a href="kart.html" onclick="toggleMainNav()" class="aktif">🎖 Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()">🎮 Oyun</a>
   <a href="iletisim.html#basvuru" onclick="toggleMainNav()" class="nav-cta">İş Başvurusu</a>
 </div>
 <script>function toggleMainNav(){var m=document.getElementById('mainMobMenu');m.style.display=m.style.display==='flex'?'none':'flex';}</script>
@@ -299,6 +322,41 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         </div>
       </div>
 
+      <!-- Oyundan kazanılmış limonata hakkı -->
+      <div class="limonata-kutu" id="limonataKutu">
+        <div class="limonata-ikon">🍋</div>
+        <div>
+          <div class="limonata-bas">Limonata hakkın var</div>
+          <div class="limonata-alt" id="limonataAlt">Tezgâhta göster, baristaya söyle.</div>
+        </div>
+      </div>
+
+      <!-- Oyun daveti -->
+      <a class="oyun-davet" href="oyun.html">
+        <span class="oyun-ikon">🎮</span>
+        <span>
+          <b>Cactus Jump oyna</b>
+          <em>25 skor yap, limonata kazan — haftada bir</em>
+        </span>
+        <span class="oyun-ok">›</span>
+      </a>
+
+      <a class="oyun-davet" href="oyunlar.html">
+        <span class="oyun-ikon">🕹</span>
+        <span>
+          <b>Oyun Salonu</b>
+          <em>Hafıza · Kahve Merdiveni · Basket — herkese açık</em>
+        </span>
+        <span class="oyun-ok">›</span>
+      </a>
+
+      <!-- Tezgâhta okutulacak QR -->
+      <div class="kart-qr-kutu">
+        <div class="kart-qr-baslik">Tezgâhta bunu okut</div>
+        <div class="kart-qr" id="kartQr"></div>
+        <div class="kart-qr-alt">Numaranı söylemene gerek yok — barista okutur, yıldızın eklenir.</div>
+      </div>
+
       <!-- Bedava hakkı varsa -->
       <div class="bedava-banner" id="bedavaBanner" style="display:none">
         <div class="bedava-ikon">🎉</div>
@@ -338,6 +396,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
   </div>
 </div>
 
+<script src="qrcode-gen.js"></script>
 <script>
 var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
 var ESIK = 7;
@@ -487,6 +546,42 @@ function kutlamaPatlat(){
   try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){}
   setTimeout(function(){ if(kap.parentNode) kap.remove(); },4800);
 }
+/* Oyundan kazanılmış, henüz teslim alınmamış limonata hakkını gösterir. */
+function limonataBak(){
+  var kutu=document.getElementById('limonataKutu');
+  if(!kutu || !_kartTel) return;
+  fetch(API+'/kart/oyun-odul-bak?telefon='+encodeURIComponent(_kartTel))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d && d.ok && d.odul){
+        kutu.style.display='flex';
+        document.getElementById('limonataAlt').textContent =
+          d.odul.skor+' skor yaptın — tezgâhta göster, limonatan hazır.';
+      } else {
+        kutu.style.display='none';
+      }
+    }).catch(function(){});
+}
+
+/* Tezgâhta okutulacak QR'ı çizer.
+ * Yük "CACTUS:05XXXXXXXXX" — önek sayesinde adisyon, rastgele QR'ları eleyebiliyor.
+ * QR yalnızca telefon numarası taşır; zaten baristanın elle yazdığı bilgi,
+ * yani okutmak yeni bir bilgi ifşa etmiyor, sadece yazmayı ortadan kaldırıyor. */
+function kartQrCiz(){
+  var kutu=document.getElementById('kartQr');
+  if(!kutu) return;
+  var tel=(_kartTel||'').replace(/\D/g,'');
+  if(tel.length<10 || typeof qrcode!=='function'){ kutu.innerHTML=''; return; }
+  if(kutu.getAttribute('data-tel')===tel) return;   // aynı numara için yeniden çizme
+  try{
+    var qr=qrcode(0,'M');
+    qr.addData('CACTUS:'+tel,'Byte');
+    qr.make();
+    kutu.innerHTML=qr.createSvgTag({cellSize:6,margin:2,scalable:true});
+    kutu.setAttribute('data-tel',tel);
+  }catch(e){ kutu.innerHTML=''; }
+}
+
 function kartGoster(m, oncekiGoster){
   sayfa('sayfaKart');
   var pul=m.pul||0;
@@ -516,6 +611,9 @@ function kartGoster(m, oncekiGoster){
     try{sessionStorage.removeItem(kKey);}catch(e){} // hak kullanılınca sıfırla — yeni hak yine kutlanır
     banner.classList.remove('kutla');
   }
+
+  kartQrCiz();
+  limonataBak();
 
   // Dürtü: bedavaya kaç kaldı
   var nudge=document.getElementById('dkNudge'), kalan=ESIK-gosterPul;

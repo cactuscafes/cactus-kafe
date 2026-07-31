@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Cactus Jump — Cactus Coffee</title>
+<meta name="theme-color" content="#F0C78C">
+<link rel="icon" href="favicon.svg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#F0C78C;}
+body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;}
+#oyunCanvas{display:block;width:100vw;height:100vh;}
+</style>
+</head>
+<body>
+<canvas id="oyunCanvas"></canvas>
+
+<!-- Üyelik kapısı — oyun yalnızca sadakat üyelerine açık -->
+
+<script src="oyun-odul.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+ * CACTUS JUMP — web sürümü
+ * iOS oyununun (cactus-game) birebir portu: aynı fizik sabitleri,
+ * aynı çizim, aynı sesler. Uygulama bir WKWebView olduğu için oyunun
+ * uygulama içinde çalışmasının tek yolu bu; bonusu sitede de oynanması.
+ *
+ * Fizik SpriteKit'te olduğu gibi elle hesaplanır. Tuvalde y aşağı doğru
+ * arttığı için iOS sürümündeki işaretler ters çevrildi.
+ * ═══════════════════════════════════════════════════════════════ */
+var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
+
+/* ── Oynanış ayarları (iOS sürümüyle aynı) ── */
+var YERCEKIMI = 2300, ZIPLAMA = -650, MAX_DUSUS = 1300;
+var HIZ_BAS = 200, HIZ_MAX = 330;
+var BOSLUK_BAS = 225, BOSLUK_MIN = 170;
+var SUTUN_EN = 82, SUTUN_ARA = 275, ZEMIN_Y = 130;
+var CARP_YW = 17, CARP_YH = 24;
+
+/* ── Marka renkleri ── */
+var R = {
+  gokUst:'#FCEFD3', gokOrta:'#F7DDB0', gokAlt:'#F0C78C',
+  kum:'#E3D2AC', kumKoyu:'#C9B487', kumCizgi:'#B49B6C',
+  kumTepeUzak:'#EBD6AE', kumTepeYakin:'#E0C596',
+  yaprak:'#3F7A34', acikYesil:'#5CA34C', koyuYesil:'#1A3310',
+  bardak:'#8B5E3C', bardakKenar:'#5C3A22', altin:'#C8A86A',
+  krem:'#F7EFDE', murekkep:'#14271D', gunes:'#FFE0A3'
+};
+
+var cv = document.getElementById('oyunCanvas'), cx = cv.getContext('2d');
+var W = 0, H = 0, DPR = 1;
+
+/* Üst güvenli alan (çentik / dinamik ada). Sayfa viewport-fit=cover ile
+ * tam ekran olduğu için tuval durum çubuğunun ALTINA kadar uzanıyor;
+ * düğmeler bu payı almazsa çentiğin arkasında kalıp görünmez oluyor.
+ * Tarayıcıda fark edilmiyor çünkü orada çentik yok. */
+var UST_PAY = 0;
+function ustPayOlc(){
+  var p = document.createElement('div');
+  p.style.cssText = 'position:fixed;top:0;left:0;width:0;visibility:hidden;'
+    + 'padding-top:env(safe-area-inset-top,0px);padding-top:constant(safe-area-inset-top,0px);';
+  document.body.appendChild(p);
+  UST_PAY = parseFloat(getComputedStyle(p).paddingTop) || 0;
+  p.remove();
+  // Çentiği olmayan cihazlarda da düğme kenara yapışmasın
+  UST_PAY = Math.max(UST_PAY, 8);
+}
+function dugmeY(){ return UST_PAY + 30; }
+
+function olcekle(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  gokCiz();
+}
+window.addEventListener('resize', olcekle);
+
+/* Gökyüzü degradesi her karede yeniden üretilmesin diye önbelleğe alınır */
+var gokGrad = null;
+function gokCiz(){
+  gokGrad = cx.createLinearGradient(0, 0, 0, H);
+  gokGrad.addColorStop(0, R.gokUst);
+  gokGrad.addColorStop(0.55, R.gokOrta);
+  gokGrad.addColorStop(1, R.gokAlt);
+}
+
+/* ── Tohumlu rastgele: arka plan her açılışta aynı görünsün ── */
+function Rast(tohum){
+  this.s = tohum >>> 0;
+  this.next = function(){ this.s = (this.s * 1664525 + 1013904223) >>> 0; return this.s / 4294967296; };
+  this.ara = function(a, b){ return a + this.next() * (b - a); };
+}
+
+/* ══════════════ SES — Web Audio ile sentez, dosya yok ══════════════ */
+var AC = null, sesAcik = true;
+try { sesAcik = localStorage.getItem('cactus_oyun_ses') !== '0'; } catch(e){}
+
+function sesBaslat(){
+  if (AC) return;
+  try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ AC = null; }
+}
+function ton(f1, f2, sure, tip, ses){
+  if (!AC || !sesAcik) return;
+  var o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+  o.type = tip || 'sine';
+  o.frequency.setValueAtTime(f1, t);
+  if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(Math.max(f2, 1), t + sure);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(ses, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + sure);
+  o.connect(g); g.connect(AC.destination);
+  o.start(t); o.stop(t + sure + 0.02);
+}
+function gurultu(sure, ses){
+  if (!AC || !sesAcik) return;
+  var n = Math.floor(AC.sampleRate * sure);
+  var buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0), son = 0;
+  for (var i = 0; i < n; i++){
+    son += ((Math.random() * 2 - 1) - son) * 0.28;      // alçak geçiren
+    d[i] = son * (1 - i / n);
+  }
+  var src = AC.createBufferSource(), g = AC.createGain();
+  src.buffer = buf; g.gain.value = ses;
+  src.connect(g); g.connect(AC.destination); src.start();
+}
+var Ses = {
+  zipla:  function(){ ton(300, 620, 0.09, 'sine', 0.22); gurultu(0.04, 0.05); },
+  puan:   function(){ ton(1319, 1319, 0.07, 'sine', 0.20); setTimeout(function(){ ton(1976, 1976, 0.15, 'sine', 0.18); }, 55); },
+  carp:   function(){ ton(220, 90, 0.14, 'triangle', 0.30); gurultu(0.09, 0.16); },
+  dusus:  function(){ ton(520, 130, 0.45, 'sine', 0.22); },
+  rekor:  function(){ [1047, 1319, 1568].forEach(function(f, i){ setTimeout(function(){ ton(f, f, i === 2 ? 0.3 : 0.12, 'sine', 0.2); }, i * 90); }); }
+};
+
+/* ══════════════ DURUM ══════════════ */
+var DURUM = { HAZIR:0, OYUN:1, BITTI:2 };
+var durum = DURUM.HAZIR;
+var oyuncuY = 0, hizY = 0, skor = 0, rekor = 0, engeller = [], sonSpawn = 0;
+var yeniRekor = false, olumZamani = 0, basZamani = 0, oynananSure = 0;
+var flash = 0;
+try { rekor = parseInt(localStorage.getItem('cactus_oyun_rekor') || '0', 10) || 0; } catch(e){}
+
+var rast = new Rast(20260726);
+var bulutlar = [], kumUzak = [], kumYakin = [], zeminDetay = [];
+
+function arkaPlanKur(){
+  bulutlar = []; kumUzak = []; kumYakin = []; zeminDetay = [];
+  var r = new Rast(20260726);
+  for (var i = 0; i < 4; i++)
+    bulutlar.push({ x: r.ara(0, 1) * W, y: H * r.ara(0.10, 0.34), o: r.ara(0.6, 1.1) });
+  for (var j = 0; j < 3; j++) kumUzak.push({ x: j * W });
+  for (var k = 0; k < 4; k++) kumYakin.push({ x: k * W * 0.8 });
+  for (var m = 0; m < 26; m++)
+    zeminDetay.push({ x: r.ara(0, 2) * W, y: r.ara(18, 100), g: r.ara(30, 110), nokta: r.next() > 0.72 });
+}
+
+var oyuncuX = 0;
+function hizNow(){ return Math.min(HIZ_BAS + skor * 3.2, HIZ_MAX); }
+function bosluk(){ return Math.max(BOSLUK_BAS - skor * 2.2, BOSLUK_MIN); }
+
+function hazirla(){
+  durum = DURUM.HAZIR;
+  skor = 0; hizY = 0; engeller = []; sonSpawn = 0; yeniRekor = false;
+  oynananSure = 0;
+  oyuncuX = W * 0.30; oyuncuY = H * 0.45;
+  arkaPlanKur();
+}
+function basla(){
+  durum = DURUM.OYUN;
+  hizY = ZIPLAMA;
+  sonSpawn = SUTUN_ARA * 0.45;
+  basZamani = performance.now();
+  sesBaslat();
+  Ses.zipla();
+}
+function zipla(){ hizY = ZIPLAMA; Ses.zipla(); }
+
+function bitir(){
+  if (durum !== DURUM.OYUN) return;
+  durum = DURUM.BITTI;
+  olumZamani = performance.now();
+  oynananSure = (olumZamani - basZamani) / 1000;
+  flash = 1;
+  Ses.carp(); setTimeout(Ses.dusus, 130);
+  if (skor > rekor){
+    rekor = skor; yeniRekor = true;
+    try { localStorage.setItem('cactus_oyun_rekor', String(rekor)); } catch(e){}
+    setTimeout(Ses.rekor, 550);
+  }
+  CactusOdul.bitti(skor, oynananSure);
+}
+
+/* ══════════════ ÇİZİM ══════════════ */
+function yolYuvarlak(x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2);
+  cx.beginPath();
+  cx.moveTo(x + r, y);
+  cx.arcTo(x + w, y, x + w, y + h, r);
+  cx.arcTo(x + w, y + h, x, y + h, r);
+  cx.arcTo(x, y + h, x, y, r);
+  cx.arcTo(x, y, x + w, y, r);
+  cx.closePath();
+}
+
+function bardakCiz(x, y, aci){
+  cx.save(); cx.translate(x, y); cx.rotate(aci);
+  cx.lineJoin = 'round';
+  // Gövde (yukarı doğru genişleyen bardak)
+  cx.beginPath();
+  cx.moveTo(-14, 26); cx.lineTo(14, 26); cx.lineTo(19, -20); cx.lineTo(-19, -20); cx.closePath();
+  cx.fillStyle = R.bardak; cx.fill();
+  cx.strokeStyle = R.bardakKenar; cx.lineWidth = 3; cx.stroke();
+  // Işık şeridi
+  cx.beginPath(); cx.moveTo(-9, 20); cx.lineTo(-13, -14);
+  cx.strokeStyle = 'rgba(247,239,222,.3)'; cx.lineWidth = 4; cx.lineCap = 'round'; cx.stroke();
+  // Karton tutamak
+  cx.beginPath();
+  cx.moveTo(-15.5, 18); cx.lineTo(15.5, 18); cx.lineTo(17, 2); cx.lineTo(-17, 2); cx.closePath();
+  cx.fillStyle = R.altin; cx.fill();
+  cx.strokeStyle = R.bardakKenar; cx.lineWidth = 2; cx.stroke();
+  // Kapak
+  yolYuvarlak(-23, -32, 46, 13, 5);
+  cx.fillStyle = R.bardakKenar; cx.fill();
+  yolYuvarlak(-19, -32, 38, 4, 2); cx.fillStyle = 'rgba(247,239,222,.5)'; cx.fill();
+  yolYuvarlak(-5, -34, 10, 4, 2); cx.fillStyle = R.bardakKenar; cx.fill();
+  // Gözler
+  [[-7.5, -9], [8, -9]].forEach(function(g){
+    cx.beginPath(); cx.arc(g[0], g[1], 6.5, 0, 6.2832);
+    cx.fillStyle = R.krem; cx.fill();
+    cx.strokeStyle = R.bardakKenar; cx.lineWidth = 2; cx.stroke();
+    cx.beginPath(); cx.arc(g[0] + 1.8, g[1], 3.2, 0, 6.2832);
+    cx.fillStyle = R.murekkep; cx.fill();
+  });
+  // Gülümseme
+  cx.beginPath(); cx.arc(0.5, -3, 6, 0.35, 2.79);
+  cx.strokeStyle = R.krem; cx.lineWidth = 2.2; cx.lineCap = 'round'; cx.stroke();
+  cx.restore();
+}
+
+/* Ucu boşluğa bakan kaktüs sütunu. yon=1 aşağıdan yükselir, yon=-1 yukarıdan sarkar. */
+function kaktusCiz(mx, ucY, yukseklik, yon){
+  cx.save(); cx.translate(mx, ucY); cx.scale(1, yon);
+  var yari = SUTUN_EN / 2;
+  // Kollar (gövdenin arkasında)
+  function kol(tabanY, sol){
+    if (yukseklik < 190) return;
+    var d = sol ? -1 : 1, kal = 16, uzan = 26;
+    var dirsek = d * (yari + uzan - kal / 2);
+    yolYuvarlak(Math.min(0, dirsek) - kal / 2, tabanY, Math.abs(dirsek) + kal, kal, kal / 2);
+    cx.fillStyle = R.yaprak; cx.fill(); cx.strokeStyle = R.koyuYesil; cx.lineWidth = 3; cx.stroke();
+    yolYuvarlak(dirsek - kal / 2, tabanY - 44, kal, 44 + kal, kal / 2);
+    cx.fillStyle = R.yaprak; cx.fill(); cx.stroke();
+  }
+  kol(100, true);
+  if (yukseklik > 260) kol(170, false);
+  // Gövde
+  yolYuvarlak(-yari, 0, SUTUN_EN, yukseklik + 30, yari * 0.85);
+  cx.fillStyle = R.yaprak; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 3; cx.stroke();
+  // Işık şeridi
+  yolYuvarlak(-yari + 12, 10, 9, Math.max(yukseklik - 46, 10), 4.5);
+  cx.fillStyle = 'rgba(92,163,76,.45)'; cx.fill();
+  // Yivler
+  cx.strokeStyle = 'rgba(26,51,16,.22)'; cx.lineWidth = 2; cx.lineCap = 'round';
+  [-yari * 0.30, yari * 0.34].forEach(function(gx){
+    cx.beginPath(); cx.moveTo(gx, 8); cx.lineTo(gx, Math.max(yukseklik - 34, 12)); cx.stroke();
+  });
+  // Dikenler
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5;
+  for (var y = 26; y < yukseklik - 20; y += 34){
+    cx.beginPath(); cx.moveTo(-yari, y); cx.lineTo(-yari - 7, y); cx.stroke();
+    cx.beginPath(); cx.moveTo(yari, y + 17); cx.lineTo(yari + 7, y + 17); cx.stroke();
+  }
+  // Uçtaki çiçek
+  for (var i = 0; i < 5; i++){
+    var a = i * 1.2566;
+    cx.beginPath(); cx.arc(Math.cos(a) * 7, 4 + Math.sin(a) * 7, 6, 0, 6.2832);
+    cx.fillStyle = R.altin; cx.fill();
+    cx.strokeStyle = R.bardakKenar; cx.lineWidth = 1.8; cx.stroke();
+  }
+  cx.beginPath(); cx.arc(0, 4, 4, 0, 6.2832); cx.fillStyle = R.krem; cx.fill();
+  cx.restore();
+}
+
+function kumTepeCiz(x, taban, en, yuk, renk){
+  cx.beginPath();
+  cx.moveTo(x, taban);
+  cx.lineTo(x, taban - yuk * 0.45);
+  cx.bezierCurveTo(x + en * 0.18, taban - yuk * 1.05, x + en * 0.32, taban - yuk * 0.1, x + en * 0.5, taban - yuk * 0.5);
+  cx.bezierCurveTo(x + en * 0.70, taban - yuk * 0.9, x + en * 0.86, taban - yuk * 0.15, x + en, taban - yuk * 0.45);
+  cx.lineTo(x + en, taban);
+  cx.closePath();
+  cx.fillStyle = renk; cx.fill();
+}
+
+function metinKonturlu(t, x, y, boy){
+  cx.font = '900 ' + boy + 'px Montserrat, -apple-system, sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.lineJoin = 'round'; cx.lineWidth = 7;
+  cx.strokeStyle = R.murekkep; cx.strokeText(t, x, y);
+  cx.fillStyle = R.krem; cx.fillText(t, x, y);
+}
+
+/* Geri düğmesi — uygulama WKWebView olduğu için tarayıcı geri tuşu yok,
+ * oyundan çıkışın tek yolu bu. Ses düğmesiyle aynı dokunma önceliğinde. */
+function geriDugmesiCiz(){
+  var x = 40, y = dugmeY();
+  cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
+  cx.fillStyle = 'rgba(247,239,222,.92)'; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5; cx.stroke();
+  cx.beginPath();
+  cx.moveTo(x + 4, y - 7); cx.lineTo(x - 4, y); cx.lineTo(x + 4, y + 7);
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.8;
+  cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.stroke();
+}
+
+function geriDon(){
+  if (document.referrer && history.length > 1) history.back();
+  else location.href = 'oyunlar.html';
+}
+
+function sesDugmesiCiz(){
+  var x = W - 40, y = dugmeY();
+  cx.beginPath(); cx.arc(x, y, 19, 0, 6.2832);
+  cx.fillStyle = 'rgba(247,239,222,.92)'; cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2.5; cx.stroke();
+  cx.save(); cx.translate(x, y);
+  cx.fillStyle = R.koyuYesil;
+  cx.fillRect(-8, -3.5, 5, 7);
+  cx.beginPath(); cx.moveTo(-3, -3.5); cx.lineTo(2, -8); cx.lineTo(2, 8); cx.lineTo(-3, 3.5); cx.closePath(); cx.fill();
+  cx.strokeStyle = R.koyuYesil; cx.lineWidth = 2; cx.lineCap = 'round';
+  if (sesAcik){
+    [5, 9].forEach(function(r){ cx.beginPath(); cx.arc(3, 0, r, -1.05, 1.05); cx.stroke(); });
+  } else {
+    cx.beginPath(); cx.moveTo(5, -5); cx.lineTo(13, 5); cx.moveTo(13, -5); cx.lineTo(5, 5); cx.stroke();
+  }
+  cx.restore();
+}
+
+/* ══════════════ DÖNGÜ ══════════════ */
+var sonAn = 0;
+function dongu(an){
+  requestAnimationFrame(dongu);
+  if (!sonAn){ sonAn = an; return; }
+  var dt = Math.min((an - sonAn) / 1000, 1 / 30);
+  sonAn = an;
+  if (dt <= 0) return;
+
+  var kayma = (durum === DURUM.OYUN ? hizNow() : HIZ_BAS * 0.45) * dt;
+
+  if (durum === DURUM.OYUN){
+    hizY = Math.min(hizY + YERCEKIMI * dt, MAX_DUSUS);
+    oyuncuY += hizY * dt;
+    if (oyuncuY < 34){ oyuncuY = 34; hizY = Math.max(hizY, 0); }
+    engelIsle(kayma);
+    carpismaBak();
+  } else if (durum === DURUM.BITTI){
+    if (oyuncuY + CARP_YH < H - ZEMIN_Y){
+      hizY = Math.min(hizY + YERCEKIMI * dt, MAX_DUSUS);
+      oyuncuY = Math.min(oyuncuY + hizY * dt, H - ZEMIN_Y - CARP_YH);
+    }
+  }
+  arkaPlanKaydir(kayma);
+  ciz();
+}
+
+function arkaPlanKaydir(dx){
+  bulutlar.forEach(function(b){ b.x -= dx * 0.12; if (b.x < -90) { b.x = W + 90; b.y = H * rast.ara(0.10, 0.34); } });
+  kumUzak.forEach(function(k){ k.x -= dx * 0.25; if (k.x + W < 0) k.x += W * kumUzak.length; });
+  kumYakin.forEach(function(k){ k.x -= dx * 0.5; if (k.x + W * 0.8 < 0) k.x += W * 0.8 * kumYakin.length; });
+  zeminDetay.forEach(function(z){ z.x -= dx; if (z.x + z.g < 0) z.x += W * 2; });
+}
+
+function engelIsle(dx){
+  for (var i = engeller.length - 1; i >= 0; i--){
+    var e = engeller[i];
+    e.x -= dx;
+    if (!e.sayildi && e.x + SUTUN_EN / 2 < oyuncuX){
+      e.sayildi = true; skor++; Ses.puan();
+    }
+    if (e.x < -SUTUN_EN * 2) engeller.splice(i, 1);
+  }
+  sonSpawn += dx;
+  if (sonSpawn >= SUTUN_ARA){
+    sonSpawn -= SUTUN_ARA;
+    var b = bosluk();
+    var enAlt = ZEMIN_Y + b / 2 + 60, enUst = H - b / 2 - 100;   // ekran altından ölçülü
+    if (enUst > enAlt){
+      var merkezAlttan = rast.ara(enAlt, enUst);
+      engeller.push({ x: W + SUTUN_EN, merkez: H - merkezAlttan, b: b, sayildi: false });
+    }
+  }
+}
+
+function carpismaBak(){
+  var zeminUst = H - ZEMIN_Y;
+  if (oyuncuY + CARP_YH >= zeminUst){ oyuncuY = zeminUst - CARP_YH; bitir(); return; }
+  var kutu = { x: oyuncuX - CARP_YW, y: oyuncuY - CARP_YH, w: CARP_YW * 2, h: CARP_YH * 2 };
+  for (var i = 0; i < engeller.length; i++){
+    var e = engeller[i];
+    if (Math.abs(e.x - oyuncuX) > SUTUN_EN + 40) continue;
+    var sol = e.x - SUTUN_EN / 2;
+    if (kutu.x + kutu.w < sol || kutu.x > sol + SUTUN_EN) continue;
+    var ustAlt = e.merkez - e.b / 2, altUst = e.merkez + e.b / 2;
+    if (kutu.y < ustAlt || kutu.y + kutu.h > altUst){ bitir(); return; }
+  }
+}
+
+function ciz(){
+  if (!gokGrad) gokCiz();
+  cx.fillStyle = gokGrad; cx.fillRect(0, 0, W, H);
+
+  // Güneş
+  var gx = W * 0.76, gy = H * 0.20;
+  [[87, .2], [67, .32], [46, .85]].forEach(function(p){
+    cx.beginPath(); cx.arc(gx, gy, p[0], 0, 6.2832);
+    cx.fillStyle = 'rgba(255,224,163,' + p[1] + ')'; cx.fill();
+  });
+  // Bulutlar
+  cx.fillStyle = 'rgba(255,255,255,.55)';
+  bulutlar.forEach(function(b){
+    [[-26, 0, 18], [0, 6, 24], [24, 0, 17], [10, -6, 16], [-12, -6, 15]].forEach(function(k){
+      cx.beginPath(); cx.arc(b.x + k[0] * b.o, b.y + k[1] * b.o, k[2] * b.o, 0, 6.2832); cx.fill();
+    });
+  });
+  // Kum tepeleri
+  var zeminUst = H - ZEMIN_Y;
+  kumUzak.forEach(function(k){ kumTepeCiz(k.x, zeminUst + 20, W, 150, R.kumTepeUzak); });
+  kumYakin.forEach(function(k){ kumTepeCiz(k.x, zeminUst + 14, W * 0.8, 105, R.kumTepeYakin); });
+
+  // Engeller
+  engeller.forEach(function(e){
+    var ustAlt = e.merkez - e.b / 2, altUst = e.merkez + e.b / 2;
+    kaktusCiz(e.x, altUst, zeminUst - altUst, 1);        // aşağıdan yükselen
+    kaktusCiz(e.x, ustAlt, ustAlt, -1);                  // yukarıdan sarkan
+  });
+
+  // Zemin
+  cx.fillStyle = R.kum; cx.fillRect(0, zeminUst, W, ZEMIN_Y);
+  cx.fillStyle = R.kumKoyu; cx.fillRect(0, zeminUst, W, 12);
+  cx.fillStyle = 'rgba(180,155,108,.4)';
+  zeminDetay.forEach(function(z){
+    if (z.nokta) { cx.beginPath(); cx.arc(z.x, zeminUst + z.y, 3, 0, 6.2832); cx.fill(); }
+    else cx.fillRect(z.x, zeminUst + z.y, z.g, 3);
+  });
+
+  // Oyuncu
+  var aci = durum === DURUM.BITTI ? -0.6 : Math.max(-0.42, Math.min(0.95, hizY / 1300));
+  bardakCiz(oyuncuX, oyuncuY, aci);
+
+  // Skor
+  if (durum !== DURUM.HAZIR) metinKonturlu(String(skor), W / 2, dugmeY() + 74, 58);
+  sesDugmesiCiz();
+  geriDugmesiCiz();
+
+  if (durum === DURUM.HAZIR) hazirEkran();
+  if (durum === DURUM.BITTI && performance.now() - olumZamani > 550) bittiEkran();
+
+  if (flash > 0){
+    cx.fillStyle = 'rgba(255,255,255,' + (flash * 0.6) + ')';
+    cx.fillRect(0, 0, W, H);
+    flash -= 0.05;
+  }
+}
+
+function hazirEkran(){
+  var y = H * 0.24;
+  cx.font = '900 ' + Math.min(40, W * 0.10) + 'px Montserrat, sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillStyle = R.koyuYesil; cx.fillText('CACTUS JUMP', W / 2, y);
+  cx.fillStyle = R.altin; cx.fillRect(W / 2 - 70, y + 24, 140, 5);
+  cx.font = '600 16px Montserrat, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.75)';
+  cx.fillText('Zıplamak için ekrana dokun', W / 2, y + 54);
+  if (rekor > 0){
+    cx.font = '600 14px Montserrat, sans-serif'; cx.fillStyle = 'rgba(26,51,16,.8)';
+    cx.fillText('Rekor  ' + rekor, W / 2, y + 84);
+  }
+  cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
+  cx.fillText('🍋 ' + CactusOdul.esik() + ' skor yap, limonata kazan', W / 2, y + 116);
+}
+
+function bittiEkran(){
+  var pw = Math.min(W - 56, 320), ph = 250, px = (W - pw) / 2, py = H * 0.30;
+  yolYuvarlak(px, py, pw, ph, 26);
+  cx.fillStyle = R.krem; cx.fill(); cx.strokeStyle = R.altin; cx.lineWidth = 4; cx.stroke();
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.font = '900 28px Montserrat, sans-serif'; cx.fillStyle = R.koyuYesil;
+  cx.fillText('OYUN BİTTİ', W / 2, py + 46);
+  cx.fillStyle = 'rgba(200,168,106,.5)'; cx.fillRect(px + 34, py + 68, pw - 68, 2);
+  cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.55)';
+  cx.fillText('SKOR', W / 2 - pw * 0.22, py + 106);
+  cx.fillText('REKOR', W / 2 + pw * 0.22, py + 106);
+  cx.font = '900 38px Montserrat, sans-serif'; cx.fillStyle = R.koyuYesil;
+  cx.fillText(String(skor), W / 2 - pw * 0.22, py + 136);
+  cx.fillText(String(rekor), W / 2 + pw * 0.22, py + 136);
+  if (yeniRekor){
+    cx.font = '900 15px Montserrat, sans-serif'; cx.fillStyle = R.altin;
+    cx.fillText('YENİ REKOR!', W / 2, py + ph - 74);
+  }
+  cx.font = '600 15px Montserrat, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.7)';
+  cx.fillText('Tekrar oynamak için dokun', W / 2, py + ph - 38);
+}
+
+/* ══════════════ GİRDİ ══════════════ */
+function dokun(mx, my){
+  if (Math.hypot(mx - 40, my - dugmeY()) <= 30){        // geri düğmesi
+    geriDon();
+    return;
+  }
+  if (Math.hypot(mx - (W - 40), my - dugmeY()) <= 30){  // ses düğmesi
+    sesAcik = !sesAcik;
+    try { localStorage.setItem('cactus_oyun_ses', sesAcik ? '1' : '0'); } catch(e){}
+    sesBaslat(); if (sesAcik) Ses.puan();
+    return;
+  }
+  if (durum === DURUM.HAZIR) basla();
+  else if (durum === DURUM.OYUN) zipla();
+  else if (durum === DURUM.BITTI && performance.now() - olumZamani > 700){ hazirla(); basla(); }
+}
+cv.addEventListener('pointerdown', function(e){ e.preventDefault(); dokun(e.clientX, e.clientY); });
+window.addEventListener('keydown', function(e){ if (e.code === 'Space'){ e.preventDefault(); dokun(-99, -99); } });
+
+/* ══════════════ BAŞLAT ══════════════ */
+ustPayOlc();
+olcekle();
+hazirla();
+requestAnimationFrame(dongu);
+</script>
+<script>CactusOdul.kur({ oyun:'jump', esik:25 });</script>
+</body>
+</html>

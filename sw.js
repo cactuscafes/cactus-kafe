@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v49'; // v49: Podyum menüsünde İngilizce dil desteği (TR/EN)
+const VERSION = 'cactus-v57'; // v57: oyun.html de ortak modüle geçti
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

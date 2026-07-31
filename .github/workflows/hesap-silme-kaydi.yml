@@ -81,7 +81,7 @@ jobs:
         run: |
           set +e
           echo "── Testin kendi çıktısı ──"
-          grep -E "SONUÇ:|XCTAssert|Test Case .* (passed|failed)|error:" "$RUNNER_TEMP/test.log" | tail -40
+          grep -E "SONUÇ:|TANI|XCTAssert|Test Case .* (passed|failed)|error:" "$RUNNER_TEMP/test.log" | tail -60
           echo
           if grep -q "SONUÇ: hesap silindi" "$RUNNER_TEMP/test.log"; then
             echo "✅ Silme tamamlandı — kayıt ekranına dönüldü."

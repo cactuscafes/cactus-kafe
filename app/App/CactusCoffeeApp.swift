@@ -11,6 +11,8 @@ import CoreImage.CIFilterBuiltins
 
 let MENU_URL = URL(string: "https://cactuscafes.com/menu-podyum.html")!
 let API = "https://cactus-rapor-api.batuhanbulut.workers.dev"
+// Hesap silme ucu site worker'ında (kart-sil, yönetim anahtarını sunucuda tutar)
+let SITE_API = "https://cactus-kafe.batuhanbulut.workers.dev"
 let ESIK = 7
 
 let YESIL = Color(red: 0.18, green: 0.35, blue: 0.15)
@@ -95,6 +97,26 @@ struct CevrimdisiEkran: View {
             Text("🌵").font(.system(size: 56))
             Text("Bağlantı kurulamadı").font(.headline).foregroundColor(KOYU)
             Text("İnternet bağlantını kontrol edip tekrar dene.")
+                .font(.subheadline).foregroundColor(SOLGUN)
+                .multilineTextAlignment(.center)
+            Button(action: tekrarDene) {
+                Text("Tekrar Dene").bold()
+                    .padding(.horizontal, 26).padding(.vertical, 11)
+                    .background(YESIL).foregroundColor(.white).clipShape(Capsule())
+            }
+        }
+        .padding(30)
+    }
+}
+
+struct HataEkrani: View {
+    var mesaj: String
+    var tekrarDene: () -> Void
+    var body: some View {
+        VStack(spacing: 14) {
+            Text("⚠️").font(.system(size: 56))
+            Text("Sorun oluştu").font(.headline).foregroundColor(KOYU)
+            Text(mesaj)
                 .font(.subheadline).foregroundColor(SOLGUN)
                 .multilineTextAlignment(.center)
             Button(action: tekrarDene) {
@@ -192,39 +214,67 @@ enum KartAPI {
 
     static func bak(_ tel: String) async -> KartBilgi? {
         guard let url = URL(string: API + "/kart/bak?telefon=" + tel) else { return nil }
-        guard let ikili = try? await URLSession.shared.data(from: url) else { return nil }
-        guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any],
-              (j["ok"] as? Bool) == true,
-              let m = j["musteri"] as? [String: Any] else { return nil }
-        var satirlar: [String] = []
-        let ham = j["gecmis"] as? [[String: Any]] ?? []
-        for g in ham.prefix(5) {
-            let kullandi = (g["tip"] as? String) == "kullandi"
-            let etiket = kullandi ? "🎁 Bedava içecek" : "⭐ +\(sayi(g["miktar"])) yıldız"
-            satirlar.append(etiket + "   ·   " + tarihBicimle(g["tarih"] as? String ?? ""))
+        var req = URLRequest(url: url)
+        req.timeoutInterval = 8
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any],
+                  (j["ok"] as? Bool) == true,
+                  let m = j["musteri"] as? [String: Any] else { return nil }
+            var satirlar: [String] = []
+            let ham = j["gecmis"] as? [[String: Any]] ?? []
+            for g in ham.prefix(5) {
+                let kullandi = (g["tip"] as? String) == "kullandi"
+                let etiket = kullandi ? "🎁 Bedava içecek" : "⭐ +\(sayi(g["miktar"])) yıldız"
+                satirlar.append(etiket + "   ·   " + tarihBicimle(g["tarih"] as? String ?? ""))
+            }
+            return KartBilgi(ad: m["ad"] as? String ?? "",
+                             pul: sayi(m["pul"]),
+                             toplam: sayi(m["toplam_kazanilan"]),
+                             gecmis: satirlar)
+        } catch {
+            return nil
         }
-        return KartBilgi(ad: m["ad"] as? String ?? "",
-                         pul: sayi(m["pul"]),
-                         toplam: sayi(m["toplam_kazanilan"]),
-                         gecmis: satirlar)
     }
 
     static func kayit(_ tel: String, _ ad: String) async -> Bool {
         guard let url = URL(string: API + "/kart/kayit") else { return false }
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
+        req.timeoutInterval = 8
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try? JSONSerialization.data(withJSONObject: ["telefon": tel, "ad": ad])
-        guard let ikili = try? await URLSession.shared.data(for: req) else { return false }
-        guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
-        return (j["ok"] as? Bool) == true
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
+            return (j["ok"] as? Bool) == true
+        } catch {
+            return false
+        }
+    }
+
+    /// Hesabı kalıcı siler: müşteri kaydı + yıldızlar + işlem geçmişi sunucudan kalkar.
+    /// App Store Guideline 5.1.1(v) gereği uygulama içinden sunulur.
+    static func hesabiSil(_ tel: String) async -> Bool {
+        guard let url = URL(string: SITE_API + "/api/kart-sil") else { return false }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.timeoutInterval = 12
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: ["telefon": tel])
+        do {
+            let ikili = try await URLSession.shared.data(for: req)
+            guard let j = try? JSONSerialization.jsonObject(with: ikili.0) as? [String: Any] else { return false }
+            return (j["ok"] as? Bool) == true
+        } catch {
+            return false
+        }
     }
 }
 
 // ═══════════════════ SADAKAT KARTI — EKRAN ═══════════════════
 
 struct KartTab: View {
-    // Çevrimdışıyken de kart görünsün diye son durum cihazda saklanır.
     @AppStorage("kartTel") private var kayitliTel = ""
     @AppStorage("kartAd") private var kayitliAd = ""
     @AppStorage("kartPul") private var pul = 0
@@ -232,21 +282,27 @@ struct KartTab: View {
 
     @State private var gecmis: [String] = []
     @State private var yukleniyor = false
+    @State private var hata: String = ""
 
     var body: some View {
         ZStack {
             KREM.ignoresSafeArea()
-            if kayitliTel.count == 11 {
-                KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
-                          gecmis: gecmis, yukleniyor: yukleniyor,
-                          yenile: { Task { await tazele(elle: true) } },
-                          cikis: cikisYap)
-                    .refreshable { await tazele(elle: false) }
+            if kayitliTel.count >= 10 {
+                if !hata.isEmpty {
+                    HataEkrani(mesaj: hata) { hata = ""; Task { await tazele(elle: false) } }
+                } else {
+                    KartGovde(tel: kayitliTel, ad: kayitliAd, pul: pul, toplam: toplam,
+                              gecmis: gecmis, yukleniyor: yukleniyor,
+                              yenile: { Task { await tazele(elle: true) } },
+                              cikis: cikisYap,
+                              hesabiSil: { await hesabiSil() })
+                        .refreshable { await tazele(elle: false) }
+                }
             } else {
                 KayitGovde(tamamlandi: kartaGec)
             }
         }
-        .onAppear { if kayitliTel.count == 11 { Task { await tazele(elle: false) } } }
+        .onAppear { if kayitliTel.count >= 10 { Task { await tazele(elle: false) } } }
     }
 
     private func kartaGec(_ tel: String, _ bilgi: KartBilgi) {
@@ -262,15 +318,31 @@ struct KartTab: View {
         kayitliTel = ""; kayitliAd = ""; pul = 0; toplam = 0; gecmis = []
     }
 
+    /// Sunucudaki kayıt silinirse cihazdaki kopyayı da temizler.
+    /// Sunucu silmeyi onaylamazsa yerel veri KORUNUR — kullanıcıya hata gösterilir.
+    @MainActor private func hesabiSil() async -> Bool {
+        guard await KartAPI.hesabiSil(kayitliTel) else { return false }
+        cikisYap()
+        dokunumBasarili()
+        return true
+    }
+
     @MainActor private func tazele(elle: Bool) async {
         yukleniyor = true
         defer { yukleniyor = false }
-        if let v = await KartAPI.bak(kayitliTel) {
-            pul = v.pul
-            toplam = v.toplam
-            gecmis = v.gecmis
-            if !v.ad.isEmpty { kayitliAd = v.ad }
-            if elle { dokunumBasarili() }
+        do {
+            if let v = await KartAPI.bak(kayitliTel) {
+                pul = v.pul
+                toplam = v.toplam
+                gecmis = v.gecmis
+                if !v.ad.isEmpty { kayitliAd = v.ad }
+                if elle { dokunumBasarili() }
+                hata = ""
+            } else {
+                hata = "Kart yüklenemedi. İnternet bağlantınızı kontrol edip tekrar dene."
+            }
+        } catch {
+            hata = "Bağlantı hatası. Tekrar denemek için dokunun."
         }
     }
 }
@@ -300,7 +372,7 @@ struct KayitGovde: View {
                     .font(.subheadline).foregroundColor(SOLGUN)
                     .multilineTextAlignment(.center)
 
-                TextField("05XX XXX XX XX", text: telBinding)
+                TextField("Telefon numarası", text: telBinding)
                     .keyboardType(.numberPad)
                     .textContentType(.telephoneNumber)
                     .textFieldStyle(.roundedBorder)
@@ -319,10 +391,10 @@ struct KayitGovde: View {
                         else { Text("Kartımı Oluştur →").bold() }
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .background(tel.count == 11 ? YESIL : Color.gray.opacity(0.4))
+                    .background(tel.count >= 10 ? YESIL : Color.gray.opacity(0.4))
                     .foregroundColor(.white).clipShape(Capsule())
                 }
-                .disabled(tel.count != 11 || yukleniyor)
+                .disabled(tel.count < 10 || yukleniyor)
 
                 Button("Zaten kartın var mı? Telefonla gör") {
                     Task { await mevcutuGetir() }
@@ -339,8 +411,8 @@ struct KayitGovde: View {
 
     @MainActor private func gonder() async {
         hata = ""
-        guard tel.count == 11, tel.hasPrefix("0") else {
-            hata = "Lütfen 11 haneli numaranı gir (05XX XXX XX XX)."
+        guard tel.count >= 10 else {
+            hata = "Lütfen geçerli bir telefon numarası gir."
             return
         }
         yukleniyor = true
@@ -362,7 +434,7 @@ struct KayitGovde: View {
 
     @MainActor private func mevcutuGetir() async {
         hata = ""
-        guard tel.count == 11 else { hata = "Önce telefon numaranı yaz."; return }
+        guard tel.count >= 10 else { hata = "Önce telefon numaranı yaz."; return }
         yukleniyor = true
         defer { yukleniyor = false }
         if let v = await KartAPI.bak(tel) {
@@ -384,6 +456,11 @@ struct KartGovde: View {
     let yukleniyor: Bool
     let yenile: () -> Void
     let cikis: () -> Void
+    let hesabiSil: () async -> Bool
+
+    @State private var silOnayi = false
+    @State private var siliniyor = false
+    @State private var silHatasi = ""
 
     private var gosterilen: Int { pul % ESIK }
     private var hak: Int { pul / ESIK }
@@ -506,8 +583,48 @@ struct KartGovde: View {
 
             Button("Çıkış Yap", action: cikis)
                 .font(.caption).foregroundColor(SOLGUN)
+
+            hesapSilmeBolumu
         }
         .padding(.top, 4)
+    }
+
+    // Guideline 5.1.1(v): hesap uygulama içinden, tek adımda kalıcı silinebilmeli.
+    private var hesapSilmeBolumu: some View {
+        VStack(spacing: 6) {
+            Button(role: .destructive) { silOnayi = true } label: {
+                Text(siliniyor ? "Siliniyor…" : "Hesabımı Sil")
+                    .font(.caption.bold()).foregroundColor(.red)
+            }
+            .disabled(siliniyor)
+
+            Text("Kartın, yıldızların ve işlem geçmişin kalıcı olarak silinir.")
+                .font(.caption2).foregroundColor(SOLGUN)
+                .multilineTextAlignment(.center)
+
+            if !silHatasi.isEmpty {
+                Text(silHatasi)
+                    .font(.caption2).foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.top, 10)
+        .alert("Hesabını sil", isPresented: $silOnayi) {
+            Button("Vazgeç", role: .cancel) {}
+            Button("Hesabımı Sil", role: .destructive) {
+                silHatasi = ""
+                Task { @MainActor in
+                    siliniyor = true
+                    let oldu = await hesabiSil()
+                    siliniyor = false
+                    if !oldu {
+                        silHatasi = "Hesap silinemedi. İnternetini kontrol edip tekrar dene."
+                    }
+                }
+            }
+        } message: {
+            Text("Sadakat kartın, yıldızların ve tüm işlem geçmişin sunucudan kalıcı olarak silinecek. Bu işlem geri alınamaz.")
+        }
     }
 }
 

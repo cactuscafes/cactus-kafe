@@ -808,6 +808,43 @@ export default {
       }
     }
 
+    // ─── /api/kart-sil — sadakat kartını kullanıcının KENDİSİ siler ───
+    // POST { telefon } → rapor-api'nin /kart/musteri-sil ucuna yönetim anahtarıyla iletir.
+    // App Store Guideline 5.1.1(v): hesap oluşturabilen uygulama, hesabın uygulama
+    // İÇİNDEN silinmesini de sunmak zorunda (destek hattına yönlendirmek yetmiyor).
+    // Kimlik modeli /kart/bak ile aynı: numarayı bilen o karta erişir — kart zaten
+    // şifresiz/üyeliksiz ve numarayla sorgulanabiliyor.
+    if (url.pathname === '/api/kart-sil' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const tel = String(body.telefon || '').replace(/\D/g, '');
+        if (tel.length < 10) return json({ ok: false, error: 'Geçerli telefon numarası gerekli' }, 400, NO_STORE);
+        const anahtar = env.KART_YONETIM_KEY || '';
+        const basliklar = { 'Content-Type': 'application/json' };
+        if (anahtar) basliklar['X-Cactus-Key'] = anahtar;
+        // Worker içinden aynı hesabın workers.dev adresine düz fetch engelli →
+        // service binding (env.RAPOR) üzerinden; binding yoksa (lokal dev) fetch'e düşer.
+        const istek = new Request(RAPOR_API_BASE + '/kart/musteri-sil', {
+          method: 'POST',
+          headers: basliklar,
+          body: JSON.stringify({ telefon: tel }),
+        });
+        const r = env.RAPOR ? await env.RAPOR.fetch(istek) : await fetch(istek);
+        let d = null;
+        try { d = await r.json(); } catch (e) {}
+        if (r.status === 401 || r.status === 403) {
+          // KART_YONETIM_KEY secret'ı kurulmamış/geçersiz. Sessizce "silindi" DEMEyiz.
+          return json({ ok: false, error: 'Silme servisi yapılandırılmamış' }, 500, NO_STORE);
+        }
+        if (!r.ok || !(d && d.ok)) {
+          return json({ ok: false, error: (d && d.error) || 'Kart silinemedi' }, 502, NO_STORE);
+        }
+        return json({ ok: true }, 200, NO_STORE);
+      } catch (e) {
+        return json({ ok: false, error: String(e && e.message || e) }, 400, NO_STORE);
+      }
+    }
+
     // ─── /api/vardiya-giris — giriş/çıkış (şifre isteğe bağlı: kişide şifre varsa doğrulanır) ───
     // POST { sube, ad, pin?, aksiyon('giris'|'cikis'), cihaz_id }
     //   → kişinin şifresi varsa eşleşme zorunlu; yoksa şifresiz kabul.

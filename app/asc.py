@@ -212,11 +212,26 @@ def incelemeye_gonder(app_id, surum_id):
     print("🚀 Sürüm incelemeye gönderildi.")
 
 
+def rejection_detaylari(surum_id):
+    try:
+        c = istek(f"/v1/appStoreVersions/{surum_id}/appStoreReviewDetail")
+        d = c.get("data")
+        if d:
+            attrs = d.get("attributes", {})
+            print("\n📋 İNCELEME DETAYLARı:")
+            print(json.dumps(attrs, indent=2, ensure_ascii=False))
+    except urllib.error.HTTPError:
+        print("⚠️  İnceleme detayları alınamadı")
+
+
 def durum_raporu(app_id):
     c = istek(f"/v1/apps/{app_id}/appStoreVersions?limit=5")
     for v in c.get("data", []):
         a = v["attributes"]
-        print(f"SÜRÜM {a.get('versionString')}: {a.get('appStoreState')}")
+        durum = a.get('appStoreState')
+        print(f"SÜRÜM {a.get('versionString')}: {durum}")
+        if durum == "REJECTED":
+            rejection_detaylari(v["id"])
     c = istek(f"/v1/reviewSubmissions?filter[app]={app_id}&limit=5")
     for g in c.get("data", []):
         a = g["attributes"]

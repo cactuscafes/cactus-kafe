@@ -1,0 +1,81 @@
+name: Hesap silme ucunu doğrula
+
+# Apple Guideline 5.1.1(v) için eklenen /api/kart-sil ucunun CANLIDA gerçekten
+# sildiğini uçtan uca kanıtlar. Gerekli, çünkü rapor-api'nin /kart/musteri-sil
+# ucu yönetim anahtarı istiyor olabilir; isterse worker'da KART_YONETIM_KEY
+# secret'ı kurulu olmalı. Bu iş akışı hangi durumda olduğumuzu kesin söyler.
+#
+# Güvenlik: sahte bir numara kullanır ve o numara ZATEN KAYITLIYSA hiçbir şey
+# yapmadan durur — gerçek müşteri verisine dokunmaz.
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_numarasi:
+        description: "Test için kullanılacak sahte numara (gerçek müşteri olmamalı)"
+        required: true
+        default: "5550000001"
+
+jobs:
+  dogrula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Uçtan uca silme testi
+        env:
+          KART_API: https://cactus-rapor-api.batuhanbulut.workers.dev
+          SITE_API: https://cactus-kafe.batuhanbulut.workers.dev
+          TEL: ${{ inputs.test_numarasi }}
+        run: |
+          set -uo pipefail
+
+          bak() { curl -s --max-time 20 "$KART_API/kart/bak?telefon=$TEL"; }
+
+          echo "── 1) Numara zaten kayıtlı mı? ──"
+          ONCE=$(bak); echo "$ONCE"
+          if echo "$ONCE" | grep -q '"ok":true'; then
+            echo "❌ $TEL zaten kayıtlı — gerçek veri olabilir. Test durduruldu."
+            echo "   Başka bir sahte numarayla tekrar çalıştır."
+            exit 1
+          fi
+
+          echo "── 2) Test kartı oluştur ──"
+          KAYIT=$(curl -s --max-time 20 -X POST "$KART_API/kart/kayit" \
+            -H 'Content-Type: application/json' \
+            -d "{\"telefon\":\"$TEL\",\"ad\":\"Silme Testi\",\"kvkk\":true}")
+          echo "$KAYIT"
+          echo "$KAYIT" | grep -q '"ok":true' || { echo "❌ Test kartı oluşturulamadı."; exit 1; }
+
+          echo "── 3) Kart gerçekten oluştu mu? ──"
+          VAR=$(bak); echo "$VAR"
+          echo "$VAR" | grep -q '"ok":true' || { echo "❌ Kart oluşmadı, test anlamsız."; exit 1; }
+          echo "✓ Test kartı hazır"
+
+          echo "── 4) /api/kart-sil çağrılıyor (uygulamanın yaptığı çağrı) ──"
+          KOD=$(curl -s --max-time 25 -o /tmp/sil.json -w '%{http_code}' \
+            -X POST "$SITE_API/api/kart-sil" \
+            -H 'Content-Type: application/json' \
+            -d "{\"telefon\":\"$TEL\"}")
+          echo "HTTP $KOD"; cat /tmp/sil.json; echo
+
+          echo "── 5) Kart sunucudan gitti mi? ──"
+          SONRA=$(bak); echo "$SONRA"
+          echo
+
+          if echo "$SONRA" | grep -q '"ok":true'; then
+            echo "══════════════════════════════════════════════════════"
+            echo "❌ SİLME ÇALIŞMIYOR — kart hâlâ duruyor."
+            if grep -q 'yapılandırılmamış' /tmp/sil.json; then
+              echo "   Sebep: KART_YONETIM_KEY secret'ı kurulu değil."
+              echo "   Çözüm: npx wrangler secret put KART_YONETIM_KEY"
+            fi
+            echo "   Bu hâliyle Apple'a GÖNDERME — aynı gerekçeyle geri döner."
+            echo "══════════════════════════════════════════════════════"
+            echo "⚠️ Test kartı ($TEL) silinemedi — admin panelinden elle sil."
+            exit 1
+          fi
+
+          echo "══════════════════════════════════════════════════════"
+          echo "✅ SİLME ÇALIŞIYOR — kayıt sunucudan kalktı."
+          echo "   /api/kart-sil uçtan uca doğrulandı, ek secret gerekmiyor."
+          echo "   iOS build'i incelemeye gönderilebilir."
+          echo "══════════════════════════════════════════════════════"

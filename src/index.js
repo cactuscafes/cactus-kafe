@@ -48,6 +48,34 @@ async function verifyYonetim(env, token) {
   }
 }
 
+// Yönetim jetonu — /kart/musteri-sil gibi auth'lu rapor-api uçları için.
+// Jetonlar süreli (exp) olduğundan secret'a JETON koymak birkaç gün sonra bozulur;
+// bu yüzden secret olarak PAROLA (KART_YONETIM_SIFRE) tutulur ve jeton gerektiğinde
+// /auth/login'den alınıp isolate ömrü boyunca önbelleklenir.
+// KART_YONETIM_KEY verilmişse (uzun ömürlü bir anahtar varsa) o doğrudan kullanılır.
+let _yonetimJeton = { token: '', exp: 0 };
+async function yonetimJetonu(env) {
+  if (env.KART_YONETIM_KEY) return String(env.KART_YONETIM_KEY);
+  const sifre = env.KART_YONETIM_SIFRE;
+  if (!sifre) return '';
+  const now = Date.now();
+  if (_yonetimJeton.token && _yonetimJeton.exp > now + 60000) return _yonetimJeton.token;
+  try {
+    const istek = new Request(RAPOR_API_BASE + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sifre: String(sifre) }),
+    });
+    const r = env.RAPOR ? await env.RAPOR.fetch(istek) : await fetch(istek);
+    const d = await r.json();
+    if (d && d.ok && d.token) {
+      _yonetimJeton = { token: d.token, exp: Number(d.exp) || (now + 3600000) };
+      return d.token;
+    }
+  } catch (e) {}
+  return '';
+}
+
 // ─── Vardiya ayar deposu (personel+PIN, checklist maddeleri, WhatsApp config) ───
 async function ensureVardiyaTable(env) {
   await env.ADISYON_DB.prepare(
@@ -819,7 +847,7 @@ export default {
         const body = await request.json();
         const tel = String(body.telefon || '').replace(/\D/g, '');
         if (tel.length < 10) return json({ ok: false, error: 'Geçerli telefon numarası gerekli' }, 400, NO_STORE);
-        const anahtar = env.KART_YONETIM_KEY || '';
+        const anahtar = await yonetimJetonu(env);
         const basliklar = { 'Content-Type': 'application/json' };
         if (anahtar) basliklar['X-Cactus-Key'] = anahtar;
         // Worker içinden aynı hesabın workers.dev adresine düz fetch engelli →
@@ -833,7 +861,7 @@ export default {
         let d = null;
         try { d = await r.json(); } catch (e) {}
         if (r.status === 401 || r.status === 403) {
-          // KART_YONETIM_KEY secret'ı kurulmamış/geçersiz. Sessizce "silindi" DEMEyiz.
+          // KART_YONETIM_SIFRE secret'ı kurulmamış/geçersiz. Sessizce "silindi" DEMEyiz.
           return json({ ok: false, error: 'Silme servisi yapılandırılmamış' }, 500, NO_STORE);
         }
         if (!r.ok || !(d && d.ok)) {

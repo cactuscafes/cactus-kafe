@@ -65,8 +65,9 @@ jobs:
             echo "══════════════════════════════════════════════════════"
             echo "❌ SİLME ÇALIŞMIYOR — kart hâlâ duruyor."
             if grep -q 'yapılandırılmamış' /tmp/sil.json; then
-              echo "   Sebep: KART_YONETIM_KEY secret'ı kurulu değil."
-              echo "   Çözüm: npx wrangler secret put KART_YONETIM_KEY"
+              echo "   Sebep: KART_YONETIM_SIFRE secret'ı kurulu değil."
+              echo "   Çözüm: npx wrangler secret put KART_YONETIM_SIFRE"
+              echo "           (değer: admin panelinin yönetim parolası)"
             fi
             echo "   Bu hâliyle Apple'a GÖNDERME — aynı gerekçeyle geri döner."
             echo "══════════════════════════════════════════════════════"

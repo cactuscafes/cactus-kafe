@@ -1,0 +1,42 @@
+Hello,
+
+Thank you for the detailed feedback regarding Guideline 5.1.1(v).
+
+Account deletion is now offered directly inside the app. Completing it requires no
+phone call, no email, no customer service contact and no website visit.
+
+WHERE TO FIND IT
+1. Open the "Sadakat Karti" (Loyalty Card) tab.
+2. Create a card by entering a Turkish mobile number together with a name.
+   No password and no sign-in is required.
+   Test number: 0555 111 22 33
+   (Our loyalty database stores Turkish mobile numbers, so the number must be in the
+   05XX XXX XX XX format. The field accepts it typed as 05551112233, 5551112233 or
+   +90 555 111 22 33 and normalises it automatically.)
+3. On the card screen, scroll to the bottom.
+4. Tap the red "Hesabimi Sil" ("Delete My Account") button.
+5. A confirmation alert appears. Tap "Hesabimi Sil" to confirm.
+
+WHAT DELETION DOES
+The customer record, the star balance and the entire transaction history are
+permanently removed from our server, and the locally cached card is cleared from the
+device. The action is irreversible and completes entirely within the app.
+
+"Cikis Yap" ("Log Out"), shown directly above the delete button, is a separate and
+clearly labelled action that only signs out on this device. It is not offered as a
+substitute for account deletion.
+
+SCREEN RECORDING
+A screen recording captured on a physical device (iPhone 13 Pro Max, iOS 26.5.2) is
+attached. It shows, in one uninterrupted take:
+- creating a new account from the empty registration form,
+- the created loyalty card,
+- scrolling to and tapping the account deletion option,
+- the confirmation alert and its confirmation,
+- the card screen returning to the empty registration state, confirming the account
+  no longer exists.
+
+The same recording has also been added to the Notes field of the App Review
+Information section.
+
+Thank you for your time.

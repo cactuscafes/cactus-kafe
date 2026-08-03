@@ -473,6 +473,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       <button class="sb-btn" onclick="panelAc('basvurular',this)">📩 Başvurular <span id="basvuruBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sikayetler',this)">💬 Şikayet & Öneri <span id="sikayetBadge" style="display:none;background:#e74c3c;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
       <button class="sb-btn" onclick="panelAc('sadakat',this);kartListeYukle()">🎖 Sadakat Kartı <span id="sadakatBadge" style="display:none;background:#b8965a;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle;"></span></button>
+      <button class="sb-btn" onclick="panelAc('limonata',this);limonataYukle()">🍋 Limonata Hakları</button>
       <button class="sb-btn" onclick="panelAc('ziyaret',this);ziyaretYukle()">📈 Ziyaretçiler</button>
 
       <div class="sb-ttl">Site İçeriği</div>
@@ -954,6 +955,23 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
         <!-- Müşteri listesi -->
         <div style="font-size:13px;font-weight:600;color:#555;margin:0 0 10px;border-top:1.5px solid var(--stone);padding-top:18px;">👥 Tüm Müşteriler</div>
         <div id="kartListesi"></div>
+      </div>
+
+      <!-- LİMONATA HAKLARI (oyun ödülü) -->
+      <div class="panel" id="panel-limonata">
+        <div class="pttl">🍋 Limonata Hakları</div>
+        <div class="psub">Oyunlardan kazanılan haklar · kişi başı haftada 1</div>
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+          <button onclick="limonataYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
+          <div id="limonataChips" style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="limonataFiltre('bekleyen',this)" class="lm-chip on" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">⏳ Bekleyen</button>
+            <button onclick="limonataFiltre('verilen',this)" class="lm-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">✓ Verilen</button>
+            <button onclick="limonataFiltre('hepsi',this)" class="lm-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Tümü</button>
+          </div>
+          <span id="limonataSayac" style="font-size:12px;color:var(--mist);"></span>
+        </div>
+        <div id="limonataOzet" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;"></div>
+        <div id="limonataListesi"></div>
       </div>
 
       <div class="panel" id="panel-ziyaret">
@@ -3687,6 +3705,128 @@ document.addEventListener('DOMContentLoaded', function(){
   setTimeout(_emailCloudCek,1500);
   setInterval(_emailCloudCek,15000);
 });
+
+/* ══════════ LİMONATA HAKLARI (oyun ödülü) ══════════
+ * Kaydı silmek haftalık bekleme süresini de sıfırlar: kilit son kazanma
+ * zamanına bakıyor, kayıt gidince kişi hemen yeniden kazanabilir.
+ * Yanlışlıkla verilmiş bir hakkı geri almak da, birine yeniden hak
+ * tanımak da aynı düğmeyle yapılıyor. */
+var _limonataVerisi = [];
+var _limonataFiltre = 'bekleyen';
+
+var OYUN_ADLARI = {
+  jump: 'Cactus Jump', basket: 'Cactus Basket',
+  merdiven: 'Kahve Merdiveni', hafiza: 'Cactus Hafıza'
+};
+
+function limonataTarih(ms){
+  if(!ms) return '—';
+  var d = new Date(Number(ms));
+  var p = function(n){ return n < 10 ? '0'+n : n; };
+  return p(d.getDate())+'.'+p(d.getMonth()+1)+'.'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+async function limonataYukle(){
+  var listEl = document.getElementById('limonataListesi');
+  if(!listEl) return;
+  listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Yükleniyor...</div>';
+  try {
+    var r = await fetch(KART_API + '/kart/oyun-odul-listele');
+    var d = await r.json();
+    if(!d.ok) throw new Error(d.error || 'Liste alınamadı');
+    _limonataVerisi = d.kayitlar || [];
+    limonataOzetCiz();
+    limonataRender();
+  } catch(e){
+    listEl.innerHTML = '<div style="color:var(--rd);font-size:13px;padding:20px 0;">Yüklenemedi: ' + e.message + '</div>';
+  }
+}
+
+function limonataOzetCiz(){
+  var bekleyen = _limonataVerisi.filter(function(k){ return !k.kullanildi; }).length;
+  var verilen  = _limonataVerisi.filter(function(k){ return k.kullanildi; }).length;
+  var haftaOnce = Date.now() - 7*24*60*60*1000;
+  var buHafta = _limonataVerisi.filter(function(k){ return k.kazanma >= haftaOnce; }).length;
+  document.getElementById('limonataOzet').innerHTML = [
+    {label:'Bekleyen Hak', val: bekleyen, hl: bekleyen > 0},
+    {label:'Verilen', val: verilen},
+    {label:'Bu Hafta Kazanılan', val: buHafta}
+  ].map(function(k){
+    return '<div class="kart" style="text-align:center;'+(k.hl?'border-color:var(--gold);':'')+'">'
+      +'<div style="font-size:24px;font-weight:700;font-family:\'Fraunces\',serif;color:'+(k.hl?'var(--gold)':'var(--ink)')+'">'+k.val+'</div>'
+      +'<div style="font-size:11px;color:var(--mist);letter-spacing:1px;margin-top:2px;">'+k.label+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function limonataFiltre(f, btn){
+  _limonataFiltre = f;
+  document.querySelectorAll('.lm-chip').forEach(function(b){
+    b.classList.remove('on');
+    b.style.background = '#fff'; b.style.color = ''; b.style.borderColor = 'var(--stone)';
+  });
+  btn.classList.add('on');
+  btn.style.background = 'var(--ink)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--ink)';
+  limonataRender();
+}
+
+function limonataRender(){
+  var listEl = document.getElementById('limonataListesi');
+  var kayitlar = _limonataVerisi.filter(function(k){
+    if(_limonataFiltre === 'bekleyen') return !k.kullanildi;
+    if(_limonataFiltre === 'verilen')  return !!k.kullanildi;
+    return true;
+  });
+  document.getElementById('limonataSayac').textContent = kayitlar.length + ' kayıt';
+  if(!kayitlar.length){
+    listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:24px 0;text-align:center;">Bu filtrede kayıt yok.</div>';
+    return;
+  }
+  listEl.innerHTML = kayitlar.map(function(k){
+    var oyun = OYUN_ADLARI[k.oyun] || k.oyun || 'Cactus Jump';
+    var birim = k.oyun === 'hafiza' ? 'hamle' : 'skor';
+    var verildi = !!k.kullanildi;
+    return '<div style="border:1.5px solid '+(verildi?'var(--stone)':'var(--gold)')+';border-radius:10px;padding:13px 15px;margin-bottom:9px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;'+(verildi?'opacity:.7;':'')+'">'
+      + '<div style="flex:1;min-width:190px;">'
+      +   '<div style="font-weight:700;font-size:14px;color:var(--ink);">'+(k.musteri_ad || 'İsimsiz')+'</div>'
+      +   '<div style="font-size:12px;color:var(--mist);margin-top:2px;">'+k.telefon+' · '+oyun+' · '+k.skor+' '+birim+'</div>'
+      +   '<div style="font-size:11px;color:var(--mist);margin-top:3px;">Kazandı: '+limonataTarih(k.kazanma)
+      +     (verildi ? ' · Verildi: '+limonataTarih(k.kullanma) : '')+'</div>'
+      + '</div>'
+      + (verildi
+          ? '<span style="font-size:11px;font-weight:600;color:var(--brand);letter-spacing:1px;">✓ VERİLDİ</span>'
+          : '<button onclick="limonataVerildi('+k.id+')" style="padding:8px 14px;background:#e8b83a;color:#3a2f10;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:1px;">🍋 VERİLDİ İŞARETLE</button>')
+      + '<button onclick="limonataSil('+k.id+',\''+k.telefon+'\')" style="padding:8px 12px;background:#fff;color:var(--rd);border:1.5px solid var(--rd);border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Sil</button>'
+      + '</div>';
+  }).join('');
+}
+
+async function limonataVerildi(id){
+  var k = _limonataVerisi.filter(function(x){ return x.id === id; })[0];
+  if(!k) return;
+  try {
+    var r = await fetch(KART_API + '/kart/oyun-odul-kullan', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ telefon: k.telefon, sube: 'admin' })
+    });
+    var d = await r.json();
+    if(!d.ok) throw new Error(d.error || 'İşlenemedi');
+    await limonataYukle();
+  } catch(e){ alert('Hata: ' + e.message); }
+}
+
+async function limonataSil(id, tel){
+  if(!confirm('Bu limonata hakkı silinsin mi?\n\nSilince kişinin haftalık bekleme süresi de sıfırlanır —\nhemen yeniden kazanabilir hale gelir.')) return;
+  try {
+    var r = await fetch(KART_API + '/kart/oyun-odul-sil', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: id })
+    });
+    var d = await r.json();
+    if(!d.ok) throw new Error(d.error || 'Silinemedi');
+    await limonataYukle();
+  } catch(e){ alert('Hata: ' + e.message); }
+}
 
 /* ══════════ SADAKAT KARTI ══════════ */
 var KART_API = RAPOR_API;

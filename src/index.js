@@ -836,6 +836,39 @@ export default {
       }
     }
 
+    // ─── /api/kart-sil-teshis — silme yolu neden çalışmıyor, onu söyler ───
+    // Sır SIZDIRMAZ: yalnızca "var mı yok mu" ve HTTP kodu döner, değer asla dönmez.
+    // Secret kurulduğu hâlde silme reddedilirse hatanın nerede olduğunu tek çağrıda gösterir.
+    if (url.pathname === '/api/kart-sil-teshis' && request.method === 'GET') {
+      const sifreVar = !!env.KART_YONETIM_SIFRE;
+      const anahtarVar = !!env.KART_YONETIM_KEY;
+      let girisHttp = null;
+      let jetonAlindi = false;
+      if (sifreVar) {
+        try {
+          const istek = new Request(RAPOR_API_BASE + '/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sifre: String(env.KART_YONETIM_SIFRE) }),
+          });
+          const r = env.RAPOR ? await env.RAPOR.fetch(istek) : await fetch(istek);
+          girisHttp = r.status;
+          const d = await r.json().catch(function () { return null; });
+          jetonAlindi = !!(d && d.ok && d.token);
+        } catch (e) {
+          girisHttp = 'istek hatası: ' + String(e && e.message || e);
+        }
+      }
+      return json({
+        ok: true,
+        sifre_secreti_var: sifreVar,
+        anahtar_secreti_var: anahtarVar,
+        rapor_binding_var: !!env.RAPOR,
+        auth_login_http: girisHttp,
+        jeton_alinabildi: jetonAlindi,
+      }, 200, NO_STORE);
+    }
+
     // ─── /api/kart-sil — sadakat kartını kullanıcının KENDİSİ siler ───
     // POST { telefon } → rapor-api'nin /kart/musteri-sil ucuna yönetim anahtarıyla iletir.
     // App Store Guideline 5.1.1(v): hesap oluşturabilen uygulama, hesabın uygulama

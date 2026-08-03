@@ -14,7 +14,11 @@ on:
       test_numarasi:
         description: "Test için kullanılacak sahte numara (gerçek müşteri olmamalı)"
         required: true
-        default: "5550000001"
+        default: "05550000001"
+      sadece_sil:
+        description: "Kart oluşturma — sadece verilen numarayı sil (kalan test kartlarını temizlemek için)"
+        type: boolean
+        default: false
 
 jobs:
   dogrula:
@@ -25,30 +29,47 @@ jobs:
           KART_API: https://cactus-rapor-api.batuhanbulut.workers.dev
           SITE_API: https://cactus-kafe.batuhanbulut.workers.dev
           TEL: ${{ inputs.test_numarasi }}
+          SADECE_SIL: ${{ inputs.sadece_sil }}
         run: |
           set -uo pipefail
 
           bak() { curl -s --max-time 20 "$KART_API/kart/bak?telefon=$TEL"; }
 
+          echo "── 0) Silme yolu teşhisi (sır içermez) ──"
+          curl -s --max-time 20 "$SITE_API/api/kart-sil-teshis"; echo
+          echo "   sifre_secreti_var=false  → secret worker'a ulaşmamış (yanlış worker/ad)"
+          echo "   auth_login_http=401      → secret var ama parola yanlış"
+          echo "   jeton_alinabildi=true    → yetki tamam, silme çalışmalı"
+          echo
+
           echo "── 1) Numara zaten kayıtlı mı? ──"
           ONCE=$(bak); echo "$ONCE"
           if echo "$ONCE" | grep -q '"ok":true'; then
-            echo "❌ $TEL zaten kayıtlı — gerçek veri olabilir. Test durduruldu."
-            echo "   Başka bir sahte numarayla tekrar çalıştır."
-            exit 1
+            if [ "$SADECE_SIL" != "true" ]; then
+              echo "❌ $TEL zaten kayıtlı — gerçek veri olabilir. Test durduruldu."
+              echo "   Başka bir sahte numarayla tekrar çalıştır."
+              echo "   (Bu kartı kasten silmek istiyorsan 'sadece_sil' seçeneğiyle çalıştır.)"
+              exit 1
+            fi
+            echo "ℹ️  Kayıt var ve 'sadece sil' istendi — oluşturma atlanıyor."
+          elif [ "$SADECE_SIL" = "true" ]; then
+            echo "✓ $TEL zaten kayıtlı değil — silinecek bir şey yok."
+            exit 0
           fi
 
-          echo "── 2) Test kartı oluştur ──"
-          KAYIT=$(curl -s --max-time 20 -X POST "$KART_API/kart/kayit" \
-            -H 'Content-Type: application/json' \
-            -d "{\"telefon\":\"$TEL\",\"ad\":\"Silme Testi\",\"kvkk\":true}")
-          echo "$KAYIT"
-          echo "$KAYIT" | grep -q '"ok":true' || { echo "❌ Test kartı oluşturulamadı."; exit 1; }
+          if [ "$SADECE_SIL" != "true" ]; then
+            echo "── 2) Test kartı oluştur ──"
+            KAYIT=$(curl -s --max-time 20 -X POST "$KART_API/kart/kayit" \
+              -H 'Content-Type: application/json' \
+              -d "{\"telefon\":\"$TEL\",\"ad\":\"Silme Testi\",\"kvkk\":true}")
+            echo "$KAYIT"
+            echo "$KAYIT" | grep -q '"ok":true' || { echo "❌ Test kartı oluşturulamadı."; exit 1; }
 
-          echo "── 3) Kart gerçekten oluştu mu? ──"
-          VAR=$(bak); echo "$VAR"
-          echo "$VAR" | grep -q '"ok":true' || { echo "❌ Kart oluşmadı, test anlamsız."; exit 1; }
-          echo "✓ Test kartı hazır"
+            echo "── 3) Kart gerçekten oluştu mu? ──"
+            VAR=$(bak); echo "$VAR"
+            echo "$VAR" | grep -q '"ok":true' || { echo "❌ Kart oluşmadı, test anlamsız."; exit 1; }
+            echo "✓ Test kartı hazır"
+          fi
 
           echo "── 4) /api/kart-sil çağrılıyor (uygulamanın yaptığı çağrı) ──"
           KOD=$(curl -s --max-time 25 -o /tmp/sil.json -w '%{http_code}' \

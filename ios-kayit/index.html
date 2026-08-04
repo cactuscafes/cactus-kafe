@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cactus Adisyon — iPhone Cihaz Kaydı</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--zemin:#0a2a1d;--panel:#0e3d2a;--panel2:#124a33;--cizgi:#1e5c40;--altin:#c8a86a;--altin2:#a98a4e;--krem:#fdfaf3;--gri:#c2d3c8;--gri2:#8aa697}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--zemin);color:var(--krem);font-family:'Inter',-apple-system,sans-serif;min-height:100dvh;display:flex;padding:20px}
+.kutu{margin:auto;width:min(460px,100%);background:var(--panel);border:1px solid var(--cizgi);border-radius:18px;padding:32px 26px}
+.logo{display:block;width:190px;margin:0 auto 10px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:18px;color:var(--altin);letter-spacing:3px;text-align:center;margin-bottom:22px}
+.kayit{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--altin),var(--altin2));color:#12301f;font-weight:600;padding:16px;border-radius:12px;font-size:16.5px;text-decoration:none;margin-bottom:8px}
+.kayit:active{transform:scale(.98)}
+.altyazi{text-align:center;font-size:12px;color:var(--gri2);margin-bottom:22px}
+h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:15px;color:var(--gri);letter-spacing:1px;margin:20px 0 10px;padding-top:18px;border-top:1px solid var(--cizgi)}
+ol{padding-left:20px;font-size:14px;line-height:1.85;color:var(--gri)}
+ol strong{color:var(--krem);font-weight:500}
+.not{background:var(--panel2);border-radius:10px;padding:13px 15px;font-size:13px;color:var(--gri);line-height:1.7;margin-top:16px}
+.not b{color:var(--altin)}
+.uyari{background:#3a2c0e;border:1px solid var(--altin2);border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.65;margin-bottom:18px}
+.uyari b{color:var(--altin)}
+.alt{text-align:center;font-size:11.5px;color:var(--gri2);margin-top:24px;line-height:1.7}
+#yonetim{display:none;margin-top:20px}
+table{width:100%;border-collapse:collapse;font-size:12px;color:var(--gri)}
+th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--cizgi)}
+th{color:var(--altin);font-weight:600}
+td.udid{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;word-break:break-all;color:var(--krem)}
+.kopyala{background:var(--panel);border:1px solid var(--cizgi);border-radius:8px;color:var(--gri);padding:9px 14px;font-size:12.5px;cursor:pointer;font-family:inherit;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="kutu">
+  <img class="logo" src="/logo-light.png" alt="Cactus">
+  <h1>iPHONE CİHAZ KAYDI</h1>
+
+  <div class="uyari">
+    <b>Bu sayfayı Safari ile açın.</b> Chrome, WhatsApp veya Instagram içinden
+    açtıysanız kayıt çalışmaz — adresi kopyalayıp Safari'ye yapıştırın.
+  </div>
+
+  <a class="kayit" href="https://cactus-kafe.batuhanbulut.workers.dev/api/ios/profil">📲 Bu Cihazı Kaydet</a>
+  <p class="altyazi">Yalnız cihaz kimliği alınır — kişisel veri, konum, rehber alınmaz.</p>
+
+  <h2>Nasıl olacak?</h2>
+  <ol>
+    <li>Yukarıdaki düğmeye dokunun. iPhone <strong>“Profil İndirildi”</strong> der.</li>
+    <li><strong>Ayarlar</strong>'ı açın — en üstte <strong>“Profil İndirildi”</strong>
+        satırına dokunun, sağ üstten <strong>Yükle</strong> deyin (şifrenizi ister).</li>
+    <li><strong>“Doğrulanmadı”</strong> uyarısı çıkarsa yine <strong>Yükle</strong>
+        deyin — profil bize ait, yalnız cihaz kimliğini iletir.</li>
+    <li>Ekranda <strong>“Cihazınız kaydedildi”</strong> yazısını görünce iş bitti.
+        Profili hemen silebilirsiniz.</li>
+  </ol>
+
+  <div class="not">
+    <b>Sonrası:</b> yönetici cihazınızı Apple'a tanıttıktan sonra size
+    <b>kurulum linki</b> gelecek. O linke dokunduğunuzda uygulama doğrudan kurulur —
+    App Store gerekmez.
+  </div>
+
+  <div class="not">
+    <b>Neden gerekiyor?</b> Apple, mağaza dışından kurulan uygulamaların yalnız
+    <b>önceden tanıtılmış cihazlarda</b> çalışmasına izin veriyor. Android'de böyle
+    bir kayıt gerekmiyor, iPhone'da zorunlu.
+  </div>
+
+  <div id="yonetim">
+    <h2>Kayıtlı cihazlar (yönetim)</h2>
+    <div id="liste"></div>
+    <button class="kopyala" onclick="hepsiniKopyala()">UDID'leri kopyala</button>
+  </div>
+
+  <p class="alt">
+    Bu sayfa yalnız Cactus personeli içindir, arama motorlarında listelenmez.
+  </p>
+</div>
+
+<script>
+// Yönetim bölümü: yalnız bu cihazda yönetim oturumu açıksa görünür.
+// Token, adisyon/rapor sayfalarının kullandığı anahtarın aynısı (aynı origin).
+var API = 'https://cactus-kafe.batuhanbulut.workers.dev';
+var UDIDLER = [];
+(function () {
+  var tok = null;
+  try {
+    var t = JSON.parse(localStorage.getItem('cactus_yonetim_token') || 'null');
+    if (t && t.token && t.exp > Date.now()) tok = t.token;
+  } catch (e) {}
+  if (!tok) return;
+  fetch(API + '/api/ios/cihazlar', { headers: { 'X-Cactus-Key': tok } })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (!d || !d.ok) return;
+      UDIDLER = (d.cihazlar || []).map(function (c) { return c.udid; });
+      var satirlar = (d.cihazlar || []).map(function (c) {
+        var tarih = c.ts ? new Date(c.ts).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+        return '<tr><td class="udid">' + c.udid + '</td><td>' + (c.urun || '') + '</td><td>' + tarih + '</td></tr>';
+      }).join('');
+      document.getElementById('liste').innerHTML = (d.cihazlar || []).length
+        ? '<table><tr><th>UDID</th><th>Model</th><th>Kayıt</th></tr>' + satirlar + '</table>'
+        : '<p style="font-size:13px;color:#8aa697">Henüz kayıtlı cihaz yok.</p>';
+      document.getElementById('yonetim').style.display = 'block';
+    })
+    .catch(function () {});
+})();
+
+function hepsiniKopyala() {
+  var metin = UDIDLER.join('\n');
+  var bitir = function () {
+    var b = document.querySelector('.kopyala');
+    b.textContent = 'Kopyalandı ✓';
+    setTimeout(function () { b.textContent = "UDID'leri kopyala"; }, 2000);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(metin).then(bitir).catch(function () {});
+}
+</script>
+</body>
+</html>

@@ -177,6 +177,15 @@ async function setVardiyaDurum(env, obj) {
 
 // ─── Stok takibi: ürün bazında adet; MASA_PAY event'inde otomatik düşer ───
 let _stokSemaHazir = false;
+// iOS Ad Hoc dağıtımı için toplanan cihaz kimlikleri (bkz. /api/ios/*).
+async function ensureIosTable(env) {
+  await env.ADISYON_DB.prepare(
+    `CREATE TABLE IF NOT EXISTS ios_cihazlar (
+       udid TEXT PRIMARY KEY, urun TEXT DEFAULT '', surum TEXT DEFAULT '',
+       seri TEXT DEFAULT '', ts INTEGER)`
+  ).run();
+}
+
 async function ensureStokTable(env) {
   await env.ADISYON_DB.prepare(
     `CREATE TABLE IF NOT EXISTS stok (
@@ -944,6 +953,80 @@ export default {
       } catch (e) {
         return json({ ok: false, error: String(e && e.message || e) }, 400, NO_STORE);
       }
+    }
+
+    // ─── /api/ios/profil — Ad Hoc kurulum için cihaz kimliği (UDID) toplama ───
+    // Apple "Profile Service" profili: iPhone bunu kurunca cihaz bilgilerini
+    // imzalı olarak /api/ios/kayit'e POST eder. Ad Hoc dağıtımda her cihazın
+    // UDID'si Apple geliştirici portalına kaydedilmek ZORUNDA — bu uç onu toplar.
+    // Profil imzasız olduğu için iPhone "Doğrulanmadı" der; normal, kurulabilir.
+    if (url.pathname === '/api/ios/profil') {
+      const geriUrl = new URL(request.url).origin + '/api/ios/kayit';
+      const profil = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <dict>
+    <key>URL</key><string>${geriUrl}</string>
+    <key>DeviceAttributes</key>
+    <array><string>UDID</string><string>PRODUCT</string><string>VERSION</string><string>SERIAL</string></array>
+  </dict>
+  <key>PayloadOrganization</key><string>Cactus Cafes</string>
+  <key>PayloadDisplayName</key><string>Cactus Adisyon — Cihaz Kaydı</string>
+  <key>PayloadVersion</key><integer>1</integer>
+  <key>PayloadUUID</key><string>7f1c0a52-3d4e-4b71-9c1a-cactusadisyon01</string>
+  <key>PayloadIdentifier</key><string>com.cactuscafes.adisyon.kayit</string>
+  <key>PayloadDescription</key><string>Cactus Adisyon uygulamasının bu cihaza kurulabilmesi için cihaz kimliğini iletir. Kurulum bittikten sonra bu profili silebilirsiniz.</string>
+  <key>PayloadType</key><string>Profile Service</string>
+</dict>
+</plist>`;
+      return new Response(profil, {
+        headers: {
+          'Content-Type': 'application/x-apple-aspen-config',
+          'Content-Disposition': 'attachment; filename="cactus-adisyon-kayit.mobileconfig"',
+          ...NO_STORE,
+        },
+      });
+    }
+
+    // ─── /api/ios/kayit — profilin gönderdiği cihaz bilgisi (Apple imzalı plist) ───
+    // Gövde PKCS#7 imzalı; içindeki düz plist metnini ayıklayıp UDID'yi okuyoruz.
+    // (Worker'da imza doğrulaması yapılmıyor: gizli adres + yalnız UDID toplandığı
+    //  için risk yok, sahte kayıt en fazla listeye çöp satır ekler.)
+    if (url.pathname === '/api/ios/kayit' && request.method === 'POST') {
+      try {
+        await ensureIosTable(env);
+        const ham = await request.text();
+        const bas = ham.indexOf('<?xml');
+        const son = ham.indexOf('</plist>');
+        const govde = (bas >= 0 && son > bas) ? ham.slice(bas, son) : '';
+        const alan = (ad) => {
+          const m = govde.match(new RegExp('<key>' + ad + '</key>\\s*<string>([^<]*)</string>'));
+          return m ? m[1].trim() : '';
+        };
+        const udid = alan('UDID');
+        if (!udid) return new Response('UDID okunamadı', { status: 400, headers: NO_STORE });
+        await env.ADISYON_DB.prepare(
+          `INSERT INTO ios_cihazlar (udid, urun, surum, seri, ts) VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT(udid) DO UPDATE SET urun=excluded.urun, surum=excluded.surum, ts=excluded.ts`
+        ).bind(udid, alan('PRODUCT'), alan('VERSION'), alan('SERIAL'), Date.now()).run();
+        // Profil servisi akışında cihaz yanıtı Safari'ye taşır — teşekkür sayfasına at.
+        return new Response('', { status: 302, headers: { Location: 'https://cactuscafes.com/ios-kayit/tamam.html', ...NO_STORE } });
+      } catch (e) {
+        return new Response('Hata: ' + String(e && e.message || e), { status: 400, headers: NO_STORE });
+      }
+    }
+
+    // ─── /api/ios/cihazlar — kayıtlı cihaz listesi (yönetim) ───
+    if (url.pathname === '/api/ios/cihazlar' && request.method === 'GET') {
+      const yetkili = await verifyYonetim(env, request.headers.get('X-Cactus-Key'));
+      if (!yetkili) return json({ ok: false, error: 'yetkisiz' }, 401, NO_STORE);
+      await ensureIosTable(env);
+      const r = await env.ADISYON_DB.prepare(
+        'SELECT udid, urun, surum, seri, ts FROM ios_cihazlar ORDER BY ts DESC'
+      ).all();
+      return json({ ok: true, cihazlar: r.results || [] }, 200, NO_STORE);
     }
 
     // Diğer her şey → statik dosya

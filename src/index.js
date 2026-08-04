@@ -990,6 +990,18 @@ export default {
       });
     }
 
+    // ─── /api/ios/manifest.plist — itms-services kurulum bildirimi ───
+    // Dosyanın kendisi kur-fad12bdb/ios/ altında (sürümü scripts/ipa.js yazar),
+    // ama GitHub Pages onu application/octet-stream ile veriyor; iOS bazı
+    // sürümlerde bunu yutmuyor. Burada aynı içerik doğru Content-Type ile sunulur.
+    if (url.pathname === '/api/ios/manifest.plist') {
+      const kaynak = await env.ASSETS.fetch(new Request(new URL('/kur-fad12bdb/ios/manifest.plist', request.url)));
+      if (!kaynak.ok) return new Response('manifest yok', { status: 404, headers: NO_STORE });
+      return new Response(kaynak.body, {
+        headers: { 'Content-Type': 'text/xml; charset=utf-8', ...NO_STORE },
+      });
+    }
+
     // ─── /api/ios/kayit — profilin gönderdiği cihaz bilgisi (Apple imzalı plist) ───
     // Gövde PKCS#7 imzalı; içindeki düz plist metnini ayıklayıp UDID'yi okuyoruz.
     // (Worker'da imza doğrulaması yapılmıyor: gizli adres + yalnız UDID toplandığı

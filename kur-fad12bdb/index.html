@@ -86,7 +86,9 @@ code{display:block;background:var(--zemin);border:1px solid var(--cizgi);border-
     yönetici onayladıktan sonra aşağıdaki düğme çalışır.
   </p>
 
-  <a class="indir" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fcactuscafes.com%2Fkur-fad12bdb%2Fios%2Fmanifest.plist">⬇ iPhone'a Kur</a>
+  <!-- Manifest bilerek worker'dan veriliyor: GitHub Pages .plist'i
+       application/octet-stream ile sunuyor, iOS bunu her sürümde kabul etmiyor. -->
+  <a class="indir" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fcactus-kafe.batuhanbulut.workers.dev%2Fapi%2Fios%2Fmanifest.plist">⬇ iPhone'a Kur</a>
   <p class="boyut">Safari ile açın · iOS 15 ve üzeri</p>
 
   <ol style="margin-top:14px">

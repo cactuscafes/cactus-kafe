@@ -787,6 +787,77 @@ body.cekmece-acik #surum-rozet,
 body.cekmece-acik #baglanti-rozet,
 body.cekmece-acik #sube-rozet{display:none!important;}
 
+/* ══════════ PATRON PANELİ ══════════ */
+.pat-wrap{padding:14px;max-width:900px;margin:0 auto;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));}
+.pat-ust{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.pat-ttl{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--k1);line-height:1.1;}
+.pat-tarih{font-size:11.5px;color:var(--k2);opacity:.75;margin-top:3px;letter-spacing:.3px;}
+.pat-yenile{padding:10px 14px;min-height:44px;border:1.5px solid var(--kr3);border-radius:10px;
+  background:#fff;color:var(--k1);font-size:13px;font-weight:700;flex-shrink:0;}
+.pat-yenile:active{transform:scale(.96);}
+.pat-yenile.calisiyor{opacity:.55;}
+
+/* Üst toplam kartı — patronun tek bakışta göreceği rakam */
+.pat-toplam{background:linear-gradient(135deg,#0d2b1a 0%,#142b10 55%,#0a1f22 100%);
+  border-radius:16px;padding:18px 18px 16px;margin-bottom:14px;color:#f4f1eb;}
+.pat-t-lbl{font-size:9.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,.42);}
+.pat-t-val{font-family:'Fraunces',serif;font-size:34px;font-weight:700;line-height:1.1;margin:6px 0 3px;}
+.pat-t-alt{font-size:12px;color:rgba(255,255,255,.6);}
+.pat-t-satir{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;}
+.pat-t-krt{background:rgba(255,255,255,.07);border-radius:9px;padding:8px 6px;text-align:center;}
+.pat-t-krt .pk{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);}
+.pat-t-krt .pv{font-family:'Fraunces',serif;font-size:15px;font-weight:700;margin-top:3px;}
+.pat-t-krt.net .pv{color:#4ade80;}
+.pat-t-krt.gider .pv{color:#e88c6a;}
+
+/* Şube kartı */
+.pat-sube{background:#fff;border:1.5px solid var(--kr2);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--sh);}
+.pat-s-ust{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.pat-s-ad{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--k1);}
+.pat-s-rozet{font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:var(--kr2);color:var(--k2);white-space:nowrap;}
+.pat-s-rozet.dolu{background:rgba(46,138,82,.15);color:var(--gr2);}
+.pat-s-krt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.pat-s-krt>div{background:var(--kr);border-radius:9px;padding:9px 8px;text-align:center;}
+.pat-s-krt .sk{font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--k2);opacity:.65;}
+.pat-s-krt .sv{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--k1);margin-top:3px;}
+.pat-s-krt .ss{font-size:9.5px;color:var(--k2);opacity:.6;margin-top:1px;}
+.pat-s-satir{display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px;color:var(--k2);margin-bottom:4px;}
+.pat-s-satir b{color:var(--k1);}
+.pat-etiket{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--k2);opacity:.6;margin:12px 0 6px;}
+.pat-masalar{display:flex;flex-wrap:wrap;gap:6px;}
+.pat-masa{background:var(--kr);border:1px solid var(--kr2);border-radius:9px;padding:6px 9px;font-size:11.5px;color:var(--k1);line-height:1.35;}
+.pat-masa b{font-family:'Fraunces',serif;font-size:13px;}
+.pat-masa .pm-sure{color:var(--k2);opacity:.7;font-size:10px;}
+.pat-masa.uzun{border-color:var(--or);background:rgba(184,76,0,.07);}
+.pat-masa.uzun .pm-sure{color:var(--or);opacity:1;font-weight:700;}
+.pat-kisi{display:inline-flex;align-items:center;gap:5px;background:rgba(46,138,82,.12);border-radius:100px;padding:5px 11px;font-size:11.5px;font-weight:700;color:var(--gr);}
+.pat-kisi.cikti{background:var(--kr2);color:var(--k2);opacity:.75;font-weight:400;}
+.pat-bos{font-size:12px;color:var(--k2);opacity:.55;}
+
+/* En çok satanlar */
+.pat-bolum{background:#fff;border:1.5px solid var(--kr2);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--sh);}
+.pat-b-ttl{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--k1);margin-bottom:10px;}
+.pat-urunler{display:flex;flex-direction:column;gap:7px;}
+.pat-urun{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--k1);}
+.pat-urun-no{width:21px;height:21px;border-radius:50%;background:var(--k1);color:var(--kr);font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pat-urun-ad{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pat-urun-adet{font-weight:700;color:var(--al);flex-shrink:0;}
+.pat-not{font-size:10.5px;color:var(--k2);opacity:.5;text-align:center;line-height:1.6;}
+
+@media(max-width:700px){
+  .pat-wrap{padding:12px;}
+  .pat-t-val{font-size:30px;}
+  .pat-t-satir{grid-template-columns:repeat(2,1fr);}
+}
+
+/* Patron ekranındayken yüzen düğmeler/rozetler gizlenir — kart içeriğini kapatıyorlardı */
+body.patron-acik .masa-fab,
+body.patron-acik .mob-adis-btn,
+body.patron-acik #surum-rozet,
+body.patron-acik #baglanti-rozet,
+body.patron-acik #sube-rozet{display:none!important;}
+
 </style>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
@@ -877,6 +948,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="hdr-tabs">
     <button class="htab on" onclick="goTo('kas',this)"><span class="tico">🧾</span>Kasiyer</button>
+    <button class="htab" id="tab-patron" onclick="goTo('pat',this);patronGoster();" title="İki şubenin bugünkü durumu — yönetici şifresi ister"><span class="tico">👑</span>Patron</button>
     <button class="htab" onclick="goTo('var',this);vardiyaGoster();" title="Vardiya giriş/çıkış ve açılış/kapanış kontrol listesi"><span class="tico">🕒</span>Vardiya</button>
     <button class="htab htab-eylem" onclick="kartYildizAc()" title="Masadaki içecekler için sadakat yıldızı ekle"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="goTo('tuk',this)" title="Biten ürünleri işaretle"><span class="tico">🚫</span>Tükendi</button>
@@ -1108,6 +1180,43 @@ document.addEventListener('DOMContentLoaded', function(){
     <div id="har-tarih" style="text-align:center;font-size:11px;color:var(--kr3);margin-top:14px;letter-spacing:1px;"></div>
   </div>
 </div>
+<!-- ══════════ PATRON PANELİ ══════════
+     İki şubeyi tek ekranda canlı gösterir (bu cihaz hangi şubede olursa olsun).
+     Şifre korumalı — goTo('pat') yönetici şifresini sorar.
+     Veri kaynakları:
+       • ciro/işlem  → rapor-api /islem/listele  (islemler tablosu — doğru kaynak,
+                       satis tablosu Podyum'da eksik olduğu için ASLA kullanılmaz)
+       • açık masa   → rapor-api /sync/durum
+       • gider       → rapor-api /menu/cek?sube=harcama_<sube>_<tarih>
+       • vardiya     → cactus-kafe /api/vardiya-gecmis (yönetim token'ı ister) -->
+<div class="scr" id="scr-pat">
+  <div class="pat-wrap">
+    <div class="pat-ust">
+      <div>
+        <div class="pat-ttl">👑 Patron</div>
+        <div class="pat-tarih" id="pat-tarih"></div>
+      </div>
+      <button class="pat-yenile" onclick="patronYukle(true)" id="pat-yenile-btn">↻ Yenile</button>
+    </div>
+
+    <div class="pat-toplam" id="pat-toplam">
+      <div class="pat-t-lbl">BUGÜN — İKİ ŞUBE TOPLAM</div>
+      <div class="pat-t-val" id="pat-t-val">₺—</div>
+      <div class="pat-t-alt" id="pat-t-alt">yükleniyor…</div>
+      <div class="pat-t-satir" id="pat-t-satir"></div>
+    </div>
+
+    <div id="pat-subeler"></div>
+
+    <div class="pat-bolum">
+      <div class="pat-b-ttl">🏆 Bugünün en çok satanları</div>
+      <div id="pat-urunler" class="pat-urunler"></div>
+    </div>
+
+    <div class="pat-not" id="pat-not"></div>
+  </div>
+</div>
+
 <div class="scr" id="scr-yon">
   <div class="yon-wrap">
     <div class="yon-sec">
@@ -1756,13 +1865,14 @@ function goTo(id,el){
   // EN BAŞINDA olmalı — aşağıda olursa bölüm önce görünür hâle geliyor.
   if(id==='rap' && window.PERSONEL_MODU){ return; }
   // Yönet ve Raporlar şifre ister
-  if((id==='yon'||id==='rap')&&!_korumaAktif()){
-    sifreSor(id==='yon'?'Yönet Paneli':'Raporlar',function(){goTo(id,el);});
+  if((id==='pat'||id==='yon'||id==='rap')&&!_korumaAktif()){
+    sifreSor(id==='pat'?'Patron Paneli':(id==='yon'?'Yönet Paneli':'Raporlar'),function(){goTo(id,el);if(id==='pat')patronGoster();});
     return;
   }
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.htab').forEach(t=>t.classList.remove('on'));
   document.getElementById('scr-'+id).classList.add('on');
+  document.body.classList.toggle('patron-acik', id==='pat');
   el.classList.add('on');
   if(id==='yon'){menuGuncelleAnlik();renderYon();}
   if(id==='tuk'){if(typeof menuGuncelleAnlik==='function')menuGuncelleAnlik();renderTukendi();}
@@ -3721,7 +3831,8 @@ function rapGoster(){
     }
     var sayac={};
     islemler.forEach(function(s){
-      var det=s.urun_detay||s.urunDetay;
+      // API bazı kayıtlarda diziyi, bazılarında JSON metnini döndürüyor (admin.html de ikisini de karşılıyor)
+      var det=s.urun_detay||s.urun_detay_json||s.urunDetay;
       if(Array.isArray(det)){ det.forEach(function(u){ if(u&&u.ad){ sayac[u.ad]=(sayac[u.ad]||0)+(Number(u.adet)||0); } }); }
       else if(s.urunler){ String(s.urunler).split(',').forEach(function(p){ p=p.trim(); if(!p)return; var m=p.match(/^(.*?)\s*[x×]\s*(\d+)$/i); if(m){ sayac[m[1].trim()]=(sayac[m[1].trim()]||0)+parseInt(m[2],10); } else { sayac[p]=(sayac[p]||0)+1; } }); }
     });
@@ -4145,6 +4256,207 @@ renderMasalar();renderKatBar();renderUrunler();renderAdisyon();
 // Günün cirosu - başlangıçta tarih yaz, 60sn'de bir arka planda yükle
 if(!window.PERSONEL_MODU){ gunCiroTarihGoster(); renderCanliCiro(); }
 if(!window.PERSONEL_MODU) setInterval(function(){gunCiroYukle();},60000);
+
+/* ══════════ PATRON PANELİ ══════════
+   İKİ ŞUBEYİ birden gösterir — bu cihaz hangi şubede olursa olsun.
+   Ekran açıkken 60 sn'de bir kendini tazeler, kapanınca zamanlayıcı durur.
+   Ciro kaynağı /islem/listele (islemler tablosu). satis tablosu Podyum'da
+   ~3 kat eksik olduğu için ASLA kullanılmaz — bkz. rapor kaynağı notları. */
+var PAT_API='https://cactus-rapor-api.batuhanbulut.workers.dev';
+var PAT_WORKER='https://cactus-kafe.batuhanbulut.workers.dev';
+var PAT_SUBELER=[{k:'podyum',ad:'Podyum Park'},{k:'fsm',ad:'FSM'}];
+var PAT_UZUN_DK=90;   // bundan uzun oturan masa turuncu vurgulanır
+var _patTimer=null,_patCalisiyor=false;
+
+function _patFmt(v){return '₺'+Math.round(Number(v)||0).toLocaleString('tr-TR');}
+function _patSureMetin(ms){
+  var dk=Math.max(0,Math.floor((ms||0)/60000));
+  if(dk<60) return dk+' dk';
+  return Math.floor(dk/60)+'s '+(dk%60)+'d';
+}
+function _patMasaAd(sube,no){
+  if(sube==='podyum') return ({31:'Al-Git 31',32:'Al-Git 32',33:'Waffle 33',34:'Waffle 34'})[no]||('Masa '+no);
+  return 'Masa '+no;
+}
+function _patEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+function _patToken(){
+  try{var t=JSON.parse(localStorage.getItem('cactus_yonetim_token')||'null');return (t&&t.token&&t.exp>Date.now())?t.token:'';}catch(e){return '';}
+}
+function _patJson(url,opt){
+  return fetch(url,opt||{}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+}
+
+/* Tek şubenin bugünkü tablosu: ciro, açık masalar, gider, vardiya. */
+function _patSubeVeri(sube,gun){
+  var tok=_patToken();
+  return Promise.all([
+    _patJson(PAT_API+'/islem/listele?sube='+sube+'&baslangic='+gun+'&bitis='+gun),
+    _patJson(PAT_API+'/sync/durum?sube='+sube+'&since=0'),
+    _patJson(PAT_API+'/menu/cek?sube=harcama_'+sube+'_'+gun),
+    _patJson(PAT_WORKER+'/api/vardiya-gecmis?sube='+sube+'&gun=1',tok?{headers:{'X-Cactus-Key':tok}}:{})
+  ]).then(function(r){
+    // ── Kapanan ciro (ödemesi alınmış işlemler) ──
+    var islemler=Array.isArray(r[0])?r[0]:[];
+    // Çift tıklama/race kalıntıları ciroyu şişirmesin — kasiyerdeki ile aynı süzgeç
+    if(typeof _islemDeduplica==='function') islemler=_islemDeduplica(islemler);
+    var kapandi=0,nakit=0,kart=0,urunler={};
+    islemler.forEach(function(s){
+      kapandi+=Number(s.toplam)||0;
+      if(s.nakit_tutar||s.kart_tutar){
+        nakit+=Number(s.nakit_tutar)||0; kart+=Number(s.kart_tutar)||0;
+      }else{ // eski kayıtlarda bölünmüş tutar yok → ödeme tipine bak
+        var t=(s.odeme_tipi||'').toLowerCase();
+        if(t.indexOf('kart')>=0||t.indexOf('kredi')>=0) kart+=Number(s.toplam)||0; else nakit+=Number(s.toplam)||0;
+      }
+      var det=s.urun_detay||s.urunDetay;
+      if(typeof det==='string'){ try{det=JSON.parse(det);}catch(e){det=null;} }
+      if(Array.isArray(det)) det.forEach(function(u){
+        if(!u||!u.ad) return; urunler[u.ad]=(urunler[u.ad]||0)+(Number(u.adet)||0);
+      });
+    });
+    // ── Açık masalar (henüz ödenmemiş) ──
+    var acik=[],acikTop=0,simdi=Date.now();
+    var mas=(r[1]&&Array.isArray(r[1].masalar))?r[1].masalar:[];
+    mas.forEach(function(m){
+      var items=Array.isArray(m.items)?m.items:[];
+      if(!items.length) return;
+      var tut=0,enEski=0,adet=0;
+      items.forEach(function(it){
+        tut+=(Number(it.fiyat)||0)*(Number(it.adet)||0);
+        adet+=Number(it.adet)||0;
+        var ts=(typeof _parseTs==='function')?_parseTs(it):(Number(it.ts)||0);
+        if(ts&&(!enEski||ts<enEski)) enEski=ts;
+      });
+      if(tut<=0) return;
+      acikTop+=tut;
+      acik.push({no:m.masa,tutar:tut,adet:adet,sure:enEski?(simdi-enEski):0});
+    });
+    acik.sort(function(a,b){return b.sure-a.sure;});
+    // ── Gider (tutar zaten adet dahil toplam) ──
+    var gider=0;
+    var kayitlar=(r[2]&&Array.isArray(r[2].kayitlar))?r[2].kayitlar:[];
+    kayitlar.forEach(function(k){gider+=Number(k.tutar)||0;});
+    // ── Vardiya: kişinin BUGÜNKÜ son hareketi giriş ise içeride sayılır ──
+    var son={},icerde=[],cikan=[];
+    var evs=(r[3]&&Array.isArray(r[3].events))?r[3].events:[];
+    evs.forEach(function(e){ if(e&&e.ad) son[e.ad]=e; });
+    Object.keys(son).forEach(function(ad){ (son[ad].aksiyon==='cikis'?cikan:icerde).push(ad); });
+    return {sube:sube,kapandi:kapandi,islemAdet:islemler.length,nakit:nakit,kart:kart,
+      acik:acik,acikTop:acikTop,gider:gider,urunler:urunler,
+      icerde:icerde,cikan:cikan,vardiyaOk:!!(r[3]&&r[3].ok),ciroOk:Array.isArray(r[0])};
+  });
+}
+
+function _patSubeKart(bilgi,ad){
+  if(!bilgi) return '<div class="pat-sube"><div class="pat-s-ad">'+_patEsc(ad)+'</div>'
+    +'<div class="pat-bos" style="margin-top:8px">Veri alınamadı — bağlantıyı kontrol edin.</div></div>';
+  var toplam=bilgi.kapandi+bilgi.acikTop;
+  var net=bilgi.kapandi-bilgi.gider;
+  var h='<div class="pat-sube">';
+  h+='<div class="pat-s-ust"><div class="pat-s-ad">'+_patEsc(ad)+'</div>'
+    +'<div class="pat-s-rozet'+(bilgi.acik.length?' dolu':'')+'">'+(bilgi.acik.length?bilgi.acik.length+' açık masa':'masa yok')+'</div></div>';
+  h+='<div class="pat-s-krt">'
+    +'<div><div class="sk">Kapanan</div><div class="sv">'+_patFmt(bilgi.kapandi)+'</div><div class="ss">'+bilgi.islemAdet+' işlem</div></div>'
+    +'<div><div class="sk">Açık</div><div class="sv">'+_patFmt(bilgi.acikTop)+'</div><div class="ss">masalarda</div></div>'
+    +'<div><div class="sk">Toplam</div><div class="sv">'+_patFmt(toplam)+'</div><div class="ss">bugün</div></div>'
+    +'</div>';
+  h+='<div class="pat-s-satir">💵 Nakit <b>'+_patFmt(bilgi.nakit)+'</b> · 💳 Kart <b>'+_patFmt(bilgi.kart)+'</b>'
+    +' · 💸 Gider <b>'+_patFmt(bilgi.gider)+'</b> · 📈 Net <b>'+_patFmt(net)+'</b></div>';
+  // Vardiya
+  h+='<div class="pat-etiket">Vardiyada</div>';
+  if(!bilgi.vardiyaOk){
+    h+='<div class="pat-bos">Vardiya bilgisi için yönetim oturumu gerekiyor.</div>';
+  }else if(!bilgi.icerde.length&&!bilgi.cikan.length){
+    h+='<div class="pat-bos">Bugün giriş yapan yok.</div>';
+  }else{
+    h+='<div class="pat-masalar">';
+    bilgi.icerde.forEach(function(a){h+='<span class="pat-kisi">🟢 '+_patEsc(a)+'</span>';});
+    bilgi.cikan.forEach(function(a){h+='<span class="pat-kisi cikti">⚪ '+_patEsc(a)+' <span style="font-size:10px">çıktı</span></span>';});
+    h+='</div>';
+  }
+  // Açık masalar
+  if(bilgi.acik.length){
+    h+='<div class="pat-etiket">Açık masalar</div><div class="pat-masalar">';
+    bilgi.acik.forEach(function(m){
+      var uzun=(m.sure/60000)>=PAT_UZUN_DK;
+      h+='<div class="pat-masa'+(uzun?' uzun':'')+'"><b>'+_patEsc(_patMasaAd(bilgi.sube,m.no))+'</b> '+_patFmt(m.tutar)
+        +'<br><span class="pm-sure">'+(m.sure?_patSureMetin(m.sure):'—')+' · '+m.adet+' ürün</span></div>';
+    });
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+
+function _patRender(veriler){
+  var top={kapandi:0,acikTop:0,nakit:0,kart:0,gider:0,acikMasa:0},urunTop={},eksik=false;
+  veriler.forEach(function(v){
+    if(!v){eksik=true;return;}
+    top.kapandi+=v.kapandi; top.acikTop+=v.acikTop; top.nakit+=v.nakit;
+    top.kart+=v.kart; top.gider+=v.gider; top.acikMasa+=v.acik.length;
+    Object.keys(v.urunler).forEach(function(ad){urunTop[ad]=(urunTop[ad]||0)+v.urunler[ad];});
+  });
+  var toplam=top.kapandi+top.acikTop;
+  document.getElementById('pat-t-val').textContent=_patFmt(toplam);
+  document.getElementById('pat-t-alt').textContent='kapanan '+_patFmt(top.kapandi)+' + açık '+_patFmt(top.acikTop)
+    +(top.acikMasa?' ('+top.acikMasa+' masa)':'');
+  document.getElementById('pat-t-satir').innerHTML=
+     '<div class="pat-t-krt"><div class="pk">Nakit</div><div class="pv">'+_patFmt(top.nakit)+'</div></div>'
+    +'<div class="pat-t-krt"><div class="pk">Kart</div><div class="pv">'+_patFmt(top.kart)+'</div></div>'
+    +'<div class="pat-t-krt gider"><div class="pk">Gider</div><div class="pv">'+_patFmt(top.gider)+'</div></div>'
+    +'<div class="pat-t-krt net"><div class="pk">Net</div><div class="pv">'+_patFmt(top.kapandi-top.gider)+'</div></div>';
+
+  document.getElementById('pat-subeler').innerHTML=veriler.map(function(v,i){
+    return _patSubeKart(v,PAT_SUBELER[i].ad);
+  }).join('');
+
+  var sirali=Object.keys(urunTop).map(function(ad){return {ad:ad,adet:urunTop[ad]};})
+    .sort(function(a,b){return b.adet-a.adet;}).slice(0,8);
+  document.getElementById('pat-urunler').innerHTML=sirali.length
+    ? sirali.map(function(u,i){return '<div class="pat-urun"><div class="pat-urun-no">'+(i+1)+'</div>'
+        +'<div class="pat-urun-ad">'+_patEsc(u.ad)+'</div><div class="pat-urun-adet">'+u.adet+'</div></div>';}).join('')
+    : '<div class="pat-bos">Bugün henüz satış yok.</div>';
+
+  var saat='';
+  try{saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}catch(e){}
+  document.getElementById('pat-not').innerHTML=(eksik?'⚠️ Bir şubenin verisi alınamadı. ':'')
+    +'Son güncelleme '+saat+' · dakikada bir kendini tazeler'
+    +'<br>Açık masa tutarları henüz ödenmemiştir; kapanan ciro ödemesi alınmış işlemlerdir.';
+}
+
+function patronYukle(elle){
+  if(_patCalisiyor) return;
+  _patCalisiyor=true;
+  var btn=document.getElementById('pat-yenile-btn'); if(btn) btn.classList.add('calisiyor');
+  var gun=(typeof isGunu==='function')?isGunu(0):new Date().toISOString().split('T')[0];
+  var et=document.getElementById('pat-tarih');
+  if(et){
+    var etiket=gun;
+    try{etiket=new Date(gun+'T12:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'});}catch(e){}
+    et.textContent=etiket;
+  }
+  Promise.all(PAT_SUBELER.map(function(s){
+    return _patSubeVeri(s.k,gun).catch(function(){return null;});
+  })).then(function(veriler){
+    try{_patRender(veriler);}catch(e){}
+  }).then(function(){
+    _patCalisiyor=false;
+    if(btn) btn.classList.remove('calisiyor');
+  },function(){
+    _patCalisiyor=false;
+    if(btn) btn.classList.remove('calisiyor');
+  });
+}
+
+function patronGoster(){
+  patronYukle();
+  if(_patTimer) clearInterval(_patTimer);
+  _patTimer=setInterval(function(){
+    var s=document.getElementById('scr-pat');
+    if(!s||!s.classList.contains('on')){ clearInterval(_patTimer); _patTimer=null; return; }
+    if(document.hidden) return;               // arka plandayken boşuna istek atma
+    patronYukle();
+  },60000);
+}
 </script>
 <script src="rapor-hook-podyum.js"></script>
 

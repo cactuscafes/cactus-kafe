@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cactus Adisyon — Kurulum</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--zemin:#0a2a1d;--panel:#0e3d2a;--panel2:#124a33;--cizgi:#1e5c40;--altin:#c8a86a;--altin2:#a98a4e;--krem:#fdfaf3;--gri:#c2d3c8;--gri2:#8aa697}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--zemin);color:var(--krem);font-family:'Inter',-apple-system,sans-serif;min-height:100dvh;display:flex;padding:20px}
+.kutu{margin:auto;width:min(460px,100%);background:var(--panel);border:1px solid var(--cizgi);border-radius:18px;padding:32px 26px}
+.logo{display:block;width:190px;margin:0 auto 10px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:20px;color:var(--altin);letter-spacing:5px;text-align:center;margin-bottom:24px}
+.indir{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--altin),var(--altin2));color:#12301f;font-weight:600;padding:16px;border-radius:12px;font-size:16.5px;text-decoration:none;margin-bottom:8px}
+.indir:active{transform:scale(.98)}
+.boyut{text-align:center;font-size:12px;color:var(--gri2);margin-bottom:24px}
+h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:15px;color:var(--gri);letter-spacing:1px;margin:22px 0 10px;padding-top:18px;border-top:1px solid var(--cizgi)}
+ol{padding-left:20px;font-size:14px;line-height:1.85;color:var(--gri)}
+ol strong{color:var(--krem);font-weight:500}
+.not{background:var(--panel2);border-radius:10px;padding:13px 15px;font-size:13px;color:var(--gri);line-height:1.7;margin-top:16px}
+.not b{color:var(--altin)}
+.ios{font-size:13.5px;color:var(--gri);line-height:1.75}
+.ios a{color:var(--altin)}
+.alt{text-align:center;font-size:11.5px;color:var(--gri2);margin-top:26px;line-height:1.7}
+.uyari{display:none;background:#3a2c0e;border:1px solid var(--altin2);border-radius:10px;padding:13px 15px;font-size:13px;color:var(--krem);line-height:1.65;margin-bottom:16px}
+.uyari.goster{display:block}
+.uyari b{color:var(--altin)}
+code{display:block;background:var(--zemin);border:1px solid var(--cizgi);border-radius:7px;padding:9px 10px;font-size:11.5px;color:var(--altin);margin:8px 0 6px;word-break:break-all;font-family:ui-monospace,Menlo,monospace}
+.kopyala{background:var(--panel);border:1px solid var(--cizgi);border-radius:8px;color:var(--gri);padding:8px 14px;font-size:12.5px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="kutu">
+  <img class="logo" src="/logo-light.png" alt="Cactus">
+  <h1>ADİSYON</h1>
+
+  <div class="uyari" id="uygulamaIciUyari">
+    <b>⚠️ Bu sayfayı WhatsApp/Instagram içinden açtınız.</b>
+    Uygulama içi tarayıcılar dosya indirmeye izin vermez — indirme sessizce başarısız olur.
+    Sağ üstteki <b>⋮</b> menüsünden <b>“Tarayıcıda aç”</b> (Chrome) deyin, sonra indirin.
+  </div>
+
+  <a class="indir" href="cactus-adisyon.apk" download="cactus-adisyon.apk">⬇ Android'e Kur</a>
+  <p class="boyut">3,9 MB · Android 6.0 ve üzeri</p>
+
+  <h2>Kurulum</h2>
+  <ol>
+    <li><strong>Chrome ile açın.</strong> Link WhatsApp'tan geldiyse önce
+        <strong>⋮ → Tarayıcıda aç</strong> demeniz gerekir; yoksa dosya inmez.</li>
+    <li>Yukarıdaki düğmeye dokunun. Chrome <em>“Bu dosya türü cihazınıza zarar verebilir”</em>
+        derse <strong>“Yine de indir”</strong>e dokunun — normal, kendi uygulamamız.</li>
+    <li>İnen dosyaya dokunun. Telefon <strong>“bilinmeyen kaynak”</strong> uyarısı verirse
+        <strong>Ayarlar</strong>'a yönlendirir — Chrome için
+        <strong>“Bu kaynağa izin ver”</strong>i açın, geri dönün.</li>
+    <li><strong>Kur</strong>'a dokunun. Bittiğinde ana ekranda <strong>Cactus Adisyon</strong> çıkar.</li>
+  </ol>
+
+  <div class="not" style="font-size:12.5px">
+    <b>Yine inmiyorsa:</b> aşağıdaki adresi kopyalayıp Chrome'un adres çubuğuna yapıştırın.
+    <code id="dogrudanLink">cactuscafes.com/kur-fad12bdb/cactus-adisyon.apk</code>
+    <button class="kopyala" onclick="kopyala()">Kopyala</button>
+  </div>
+
+  <div class="not">
+    <b>İlk açılışta:</b> uygulama <b>şube soracak</b> — <b>Podyum Park</b> veya <b>FSM</b>.
+    Seçim o cihazda kalıcıdır; sonra <b>yönetim parolası</b> girilir.
+    Şubeyi yanlış seçtiyseniz adisyon ekranının sol altındaki
+    <b>⇄ Podyum / ⇄ FSM</b> rozetine dokunup değiştirebilirsiniz.
+  </div>
+
+  <div class="not">
+    <b>Güncelleme gerekmez:</b> uygulama adisyonu canlı olarak açar, yani sitede yapılan
+    her değişiklik cihazlara anında yansır. Yeni APK yalnız uygulama kabuğu değişirse gerekir.
+  </div>
+
+  <h2>iPhone / iPad</h2>
+  <p class="ios">
+    iOS'ta uygulama linkle kurulamaz (Apple izin vermiyor). Aynısını almak için Safari'de
+    <a href="https://cactuscafes.com/adisyon-app.html">cactuscafes.com/adisyon-app.html</a>
+    adresini açın → <strong>Paylaş</strong> → <strong>Ana Ekrana Ekle</strong>.
+    Tam ekran çalışır, ikonu ana ekranda durur.
+  </p>
+
+  <p class="alt">
+    Bu sayfa yalnız Cactus personeli içindir, arama motorlarında listelenmez.<br>
+    Sorun olursa yöneticinize bildirin.
+  </p>
+</div>
+
+<script>
+// Uygulama içi tarayıcı tespiti — APK indirmenin en sık takıldığı yer burası.
+// WhatsApp/Instagram/Facebook görüntüleyicileri dosya indirmeyi engelliyor.
+(function () {
+  var ua = navigator.userAgent || '';
+  var uygulamaIci = /(FBAN|FBAV|FB_IAB|Instagram|Line\/|Twitter|WhatsApp|WebView|; wv\))/i.test(ua);
+  if (uygulamaIci) document.getElementById('uygulamaIciUyari').classList.add('goster');
+})();
+
+function kopyala() {
+  var adres = location.origin + '/kur-fad12bdb/cactus-adisyon.apk';
+  var bitir = function () {
+    var b = document.querySelector('.kopyala');
+    b.textContent = 'Kopyalandı ✓';
+    setTimeout(function () { b.textContent = 'Kopyala'; }, 2000);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(adres).then(bitir).catch(function () {});
+  else {
+    var t = document.createElement('textarea');
+    t.value = adres; document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); bitir(); } catch (e) {}
+    t.remove();
+  }
+}
+</script>
+</body>
+</html>

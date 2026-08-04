@@ -776,6 +776,19 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="surum-rozet" onclick="try{location.replace(location.pathname+'?au='+Date.now())}catch(e){location.reload()}" title="Dokun: bu cihazı güncelle" style="position:fixed;left:6px;bottom:6px;z-index:9998;font-size:10px;font-weight:700;color:var(--k2);background:rgba(255,255,255,.92);border:1px solid var(--kr2);padding:3px 7px;border-radius:8px;cursor:pointer;line-height:1;user-select:none;"><span id="surum-txt">✓ Güncel</span></div>
 <div id="baglanti-rozet" style="position:fixed;left:6px;bottom:30px;z-index:9998;font-size:10px;font-weight:700;color:#fff;background:rgba(31,92,56,.92);padding:3px 8px;border-radius:8px;line-height:1;display:flex;align-items:center;gap:5px;user-select:none;"><span id="bgl-dot" style="width:7px;height:7px;border-radius:50%;background:#5fe08a;display:inline-block;flex:none;"></span><span id="bgl-txt">Bağlı</span></div>
 <script>(function(){var b=document.getElementById('surum-rozet');if(b)b.style.color='#2d5a27';})();</script>
+<!-- ŞUBE ROZETİ: yalnız mobil uygulamadan (adisyon-app.html giriş kapısı) gelenlerde görünür.
+     Tarayıcıdan gelen kullanıcıda cactus_app_sube yoktur → hiç çizilmez.
+     (adisyon.html ile aynı — ikisi birlikte değişmeli) -->
+<script>(function(){
+  var s=null; try{ s=localStorage.getItem('cactus_app_sube'); }catch(e){}
+  if(!s) return;
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;left:6px;bottom:54px;z-index:9998;font-size:10px;font-weight:700;color:#0e3d2a;background:rgba(200,168,106,.95);padding:3px 8px;border-radius:8px;line-height:1;cursor:pointer;user-select:none;';
+  d.textContent='⇄ '+(s==='fsm'?'FSM':'Podyum');
+  d.title='Bu cihazın şubesini değiştir';
+  d.onclick=function(){ if(confirm('Bu cihazın şubesini değiştirmek istiyor musunuz?')) location.replace('/adisyon-app.html?sec=1'); };
+  document.body.appendChild(d);
+})();</script>
 
 <!-- KASİYER -->
 <div class="scr on" id="scr-kas">

@@ -49,7 +49,7 @@
 </script>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>Cactus Kafe — FSM Adisyon</title>
@@ -689,6 +689,83 @@ input,select{font-family:'Inter',sans-serif;}
 .rap-ara-btn{min-height:44px;}
 .kasa-btn{min-height:44px;}
 .acilis-bar-x{padding:8px 12px;}
+
+/* ══════════ MOBİL & UYGULAMA KATMANI ══════════
+   Telefon ve Cactus Adisyon uygulaması (Capacitor kabuğu) için.
+   EN SONDA duruyor — yukarıdaki media query'leri bilerek ezer.
+   adisyon.html ve adisyon-fsm.html'de AYNI — ikisi birlikte değişmeli. */
+
+/* Çentik / ev çubuğu: uygulamada webview çentiğin altına uzanıyor,
+   viewport-fit=cover ile birlikte env() değer üretir. Tarayıcıda 0 kalır. */
+.hdr{padding-top:env(safe-area-inset-top,0px);}
+.kas-wrap{height:calc(100dvh - 62px - env(safe-area-inset-top,0px));}
+.mob-adis-btn{bottom:calc(20px + env(safe-area-inset-bottom,0px));}
+
+/* Masa çekmecesi — mobilde masa panelini örten karartma */
+.masa-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:390;}
+.masa-backdrop.on{display:block;}
+/* Masaları açan yüzen düğme (çekmece ekran dışındayken tek erişim yolu) */
+.masa-fab{display:none;position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom,0px));
+  width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(201,168,76,.5);
+  background:linear-gradient(135deg,var(--al2),var(--al));color:#1a3010;font-size:21px;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);z-index:200;align-items:center;justify-content:center;}
+.masa-fab:active{transform:scale(.94);}
+
+@media(max-width:700px){
+  /* ── Masa paneli artık yer kaplamıyor: soldan kayan çekmece ──
+     Eskiden 120-140px'lik sabit sütundu; 375px'lik ekranda ürün adına yer
+     bırakmıyordu ("Türk Kahvesi" → "Tür k…"). */
+  .masa-pnl{position:fixed;top:0;left:0;bottom:0;width:min(80vw,300px);min-width:0;z-index:400;
+    padding-top:env(safe-area-inset-top,0px);box-shadow:6px 0 24px rgba(0,0,0,.45);
+    transform:translateX(0);transition:transform .22s cubic-bezier(.3,.7,.3,1);}
+  .masa-pnl.kapali{width:min(80vw,300px)!important;min-width:0!important;transform:translateX(-101%);}
+  /* Kapalıyken içeriği gizleyen eski kurallar geçersiz: çekmece zaten ekran dışında,
+     içeriği gizlemek açılış animasyonunu boş kutu gibi gösteriyordu. */
+  .masa-pnl.kapali .masa-pnl-hdr span{display:inline!important;}
+  .masa-pnl.kapali .aktar-btn{display:inline-block!important;}
+  .masa-pnl.kapali .masa-grid{display:grid!important;}
+  .masa-grid{grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;}
+  .mbtn{min-height:68px;}
+  .masa-fab{display:flex;}
+
+  /* ── Kategoriler tek satır, yatay kaydırmalı ──
+     11 kategori ikişerli sarınca ekranın yarısını yiyordu. */
+  .kat-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;padding:8px 10px;gap:7px;}
+  .ktab{scroll-snap-align:start;padding:9px 14px;font-size:12.5px;min-height:42px;}
+
+  /* ── Başlık: sekmelere yer aç ── */
+  .hdr-brand{padding:10px 10px;border-right:none;}
+  .hdr-brand .ttl{display:none;}
+  .htab{min-width:66px;padding:0 8px;font-size:10px;}
+  .htab .tico{font-size:15px;}
+  .htab-eylem{margin:0 5px;padding:8px 11px;}
+
+  /* ── Ürün kartı: ad iki satıra kadar TAM görünür ── */
+  .urun-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px;padding:10px;}
+  .ukrt{display:flex!important;flex-direction:column!important;justify-content:center;
+    align-items:stretch;text-align:center;padding:10px 8px 9px!important;gap:0;min-height:98px;}
+  .ukrt .ue{font-size:24px;margin:0 0 3px!important;}
+  .ukrt .ua{font-size:12.5px;line-height:1.25;margin:0!important;overflow:hidden;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .ukrt .uf{font-size:14px;margin-top:4px!important;}
+  .fav-btn{top:4px!important;right:4px!important;left:auto!important;bottom:auto!important;
+    transform:none!important;width:26px;height:26px;background:rgba(255,255,255,.92)!important;
+    box-shadow:0 1px 3px rgba(0,0,0,.12)!important;}
+  .fav-btn:active{transform:scale(.88)!important;}
+
+  /* ── Alt rozetler: ürünlerin üstünü kapatmasın ── */
+  #surum-rozet,#baglanti-rozet{font-size:9px;padding:2px 6px;}
+  #surum-rozet{bottom:calc(6px + env(safe-area-inset-bottom,0px));}
+  #baglanti-rozet{bottom:calc(28px + env(safe-area-inset-bottom,0px));}
+}
+
+/* Adisyon çekmecesi açıkken alt rozetler gizlensin — "Ödeme Al" düğmesinin
+   üstünü kapatıyorlardı (şube rozetine yanlışlıkla basma riski dahil). */
+body.cekmece-acik #surum-rozet,
+body.cekmece-acik #baglanti-rozet,
+body.cekmece-acik #sube-rozet{display:none!important;}
+
 </style>
 <!-- PWA — FSM şubesi (kendi manifesti ile Podyum'dan ayrı) -->
 <link rel="manifest" href="/manifest-fsm.json">
@@ -783,7 +860,8 @@ document.addEventListener('DOMContentLoaded', function(){
   var s=null; try{ s=localStorage.getItem('cactus_app_sube'); }catch(e){}
   if(!s) return;
   var d=document.createElement('div');
-  d.style.cssText='position:fixed;left:6px;bottom:54px;z-index:9998;font-size:10px;font-weight:700;color:#0e3d2a;background:rgba(200,168,106,.95);padding:3px 8px;border-radius:8px;line-height:1;cursor:pointer;user-select:none;';
+  d.id='sube-rozet';
+  d.style.cssText='position:fixed;left:6px;bottom:calc(50px + env(safe-area-inset-bottom,0px));z-index:9998;font-size:10px;font-weight:700;color:#0e3d2a;background:rgba(200,168,106,.95);padding:3px 8px;border-radius:8px;line-height:1;cursor:pointer;user-select:none;';
   d.textContent='⇄ '+(s==='fsm'?'FSM':'Podyum');
   d.title='Bu cihazın şubesini değiştir';
   d.onclick=function(){ if(confirm('Bu cihazın şubesini değiştirmek istiyor musunuz?')) location.replace('/adisyon-app.html?sec=1'); };
@@ -1101,6 +1179,9 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- MOBİL DRAWER -->
+<!-- Mobil masa çekmecesi: karartma + açma düğmesi (yalnız ≤700px'te görünür) -->
+<div class="masa-backdrop" id="masa-backdrop" onclick="toggleMasa()"></div>
+<button class="masa-fab" id="masa-fab" onclick="toggleMasa()" title="Masalar" aria-label="Masalar">🍽</button>
 <button class="mob-adis-btn" id="mob-btn" onclick="openDrawer()">🧾<span class="mob-adis-badge" id="mob-badge">0</span></button>
 <div class="drawer-overlay" id="d-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
@@ -1676,8 +1757,14 @@ setInterval(function(){if(document.getElementById('scr-kas').classList.contains(
 setInterval(function(){ try{ _masaGridGaranti(); }catch(e){} },4000);
 
 function masaAdi(n){ return 'Masa '+n; }
+function _mobilCekmeceKapat(){
+  if(window.innerWidth>700) return;
+  const p=document.getElementById('masa-pnl');
+  if(p && !p.classList.contains('kapali')) toggleMasa();
+}
 function masaSec(no){
   aktifMasa=no;
+  _mobilCekmeceKapat();
   renderMasalar();renderAdisyon();
   document.getElementById('uyari').classList.remove('on');
   document.getElementById('adis-masa-no').textContent='Masa '+no;
@@ -2377,6 +2464,9 @@ function toggleMasa(){
   const btn=document.getElementById('toggle-btn');
   const kapali=pnl.classList.toggle('kapali');
   btn.textContent=kapali?'▶':'☰';
+  // Mobilde panel çekmece: açıkken arkayı karart, kapanınca kaldır.
+  const bd=document.getElementById('masa-backdrop');
+  if(bd) bd.classList.toggle('on', !kapali && window.innerWidth<=700);
 }
 
 let seciliOdemeTipi='nakit';
@@ -2782,8 +2872,8 @@ function tumMasalariSifirla(){
   });
 }
 
-function openDrawer(){document.getElementById('drawer').classList.add('on');document.getElementById('d-overlay').classList.add('on');}
-function closeDrawer(){document.getElementById('drawer').classList.remove('on');document.getElementById('d-overlay').classList.remove('on');}
+function openDrawer(){document.getElementById('drawer').classList.add('on');document.getElementById('d-overlay').classList.add('on');document.body.classList.add('cekmece-acik');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('on');document.getElementById('d-overlay').classList.remove('on');document.body.classList.remove('cekmece-acik');}
 function closeModal(id){document.getElementById(id).classList.remove('on');}
 
 /* ══════════ RAPORLAR ══════════ */

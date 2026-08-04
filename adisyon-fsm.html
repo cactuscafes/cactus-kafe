@@ -893,13 +893,17 @@ if('serviceWorker' in navigator){
 }
 </script>
 
-<!-- ═══ PERSONEL MODU ═══  (adisyon.html ile aynı — ikisi birlikte değişmeli)
+<!-- ═══ PERSONEL MODU ═══
      Raporlar sekmesini, Günün Cirosu panelini ve "Genel Özet" düğmesini gizler.
      GÜVENLİK ÖNLEMİ DEĞİL, arayüz gizlemedir: personel ve yönetim aynı token'ı
      kullanıyor, bilen biri konsoldan /islem/listele çağırıp ciroyu görebilir.
-     Geri açmak için: PERSONEL_MODU = false -->
+
+     FSM'de BİLEREK KAPALI (kullanıcı isteği, 4 Ağu 2026): Raporlar sekmesi
+     görünüyor. Podyum'da (adisyon.html) hâlâ açık — iki dosya bu satırda
+     BİLEREK ayrışıyor, "senkron değil" diye eşitlemeyin.
+     Raporlar'ı açmak yine de yönetici şifresi ister (goTo içindeki kapı). -->
 <script>
-window.PERSONEL_MODU = true;
+window.PERSONEL_MODU = false;
 document.addEventListener('DOMContentLoaded', function(){
   if(!window.PERSONEL_MODU) return;
   ['tab-rap','btn-genel-ozet'].forEach(function(id){

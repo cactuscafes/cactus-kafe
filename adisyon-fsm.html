@@ -837,6 +837,20 @@ body.patron-acik #surum-rozet,
 body.patron-acik #baglanti-rozet,
 body.patron-acik #sube-rozet{display:none!important;}
 
+/* Dün / geçen hafta karşılaştırma kartları */
+.pat-kars{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.pat-k-krt{background:#fff;border:1.5px solid var(--kr2);border-radius:12px;padding:11px 12px;box-shadow:var(--sh);}
+.pk-ad{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--k2);opacity:.6;}
+.pk-val{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--k1);margin-top:4px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+.pk-alt{font-size:10px;color:var(--k2);opacity:.55;margin-top:3px;}
+.pat-fark{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:100px;white-space:nowrap;}
+.pat-fark.up{background:rgba(46,138,82,.14);color:var(--gr2);}
+.pat-fark.down{background:rgba(181,43,43,.12);color:var(--rd2);}
+.pat-fark.flat{background:var(--kr2);color:var(--k2);}
+.pat-s-kars{font-size:11.5px;color:var(--k2);display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:2px;}
+.pat-s-kars b{color:var(--k1);}
+@media(max-width:340px){.pat-kars{grid-template-columns:1fr;}}
+
 </style>
 <!-- PWA — FSM şubesi (kendi manifesti ile Podyum'dan ayrı) -->
 <link rel="manifest" href="/manifest-fsm.json">
@@ -1166,6 +1180,8 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="pat-t-alt" id="pat-t-alt">yükleniyor…</div>
       <div class="pat-t-satir" id="pat-t-satir"></div>
     </div>
+
+    <div id="pat-kars"></div>
 
     <div id="pat-subeler"></div>
 
@@ -3856,14 +3872,58 @@ function _patJson(url,opt){
   return fetch(url,opt||{}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
 }
 
-/* Tek şubenin bugünkü tablosu: ciro, açık masalar, gider, vardiya. */
-function _patSubeVeri(sube,gun){
+/* ── Karşılaştırma yardımcıları ──
+   Dünün TAMAMIYLA bugünün yarısını kıyaslamak yanıltıcı olur; bu yüzden geçmiş
+   günlerden yalnız "şu ana kadarki" kısım alınır. Saatler iş gününe göre
+   ölçülür: 04:00 iş günü başı, gece 01:30 dünün 21,5. saatidir. */
+function _patGunDk(saat){
+  var m=/^(\d{1,2}):(\d{2})/.exec(String(saat||''));
+  if(!m) return -1;
+  var h=+m[1], d=+m[2];
+  if(h<IS_GUNU_KESIM) h+=24;
+  return (h-IS_GUNU_KESIM)*60+d;
+}
+function _patSimdiDk(){
+  var tr=new Date(Date.now()+3*3600000);           // TR = UTC+3 (yaz saati yok)
+  var h=tr.getUTCHours(); if(h<IS_GUNU_KESIM) h+=24;
+  return (h-IS_GUNU_KESIM)*60+tr.getUTCMinutes();
+}
+function _patCiro(islemler){
+  var t=0; (islemler||[]).forEach(function(s){t+=Number(s.toplam)||0;}); return t;
+}
+/* Geçmiş bir günün cirosu: {tam, ayniSaat} */
+function _patGecmisGun(islemler,kesimDk){
+  var liste=Array.isArray(islemler)?islemler:[];
+  if(typeof _islemDeduplica==='function') liste=_islemDeduplica(liste);
+  var ayni=liste.filter(function(s){
+    var dk=_patGunDk(s.saat);
+    return dk<0 ? false : dk<=kesimDk;         // saati okunamayan kayıt "aynı saat"e girmez
+  });
+  return {tam:_patCiro(liste), ayniSaat:_patCiro(ayni), adet:liste.length};
+}
+/* Yüzde değişim rozeti — taban 0 ise oran yok, yalnız işaret verilir */
+function _patDegisim(simdi,taban){
+  if(!taban) return {yuzde:null,yon:simdi>0?'up':'flat'};
+  var y=Math.round(((simdi-taban)/taban)*100);
+  return {yuzde:y,yon:y>0?'up':(y<0?'down':'flat')};
+}
+function _patDegisimHtml(simdi,taban){
+  var d=_patDegisim(simdi,taban);
+  if(d.yuzde===null) return '<span class="pat-fark flat">'+(simdi>0?'yeni':'—')+'</span>';
+  var ok=d.yon==='up'?'▲':(d.yon==='down'?'▼':'=');
+  return '<span class="pat-fark '+d.yon+'">'+ok+' %'+Math.abs(d.yuzde)+'</span>';
+}
+
+/* Tek şubenin bugünkü tablosu + dün ve geçen hafta karşılaştırması. */
+function _patSubeVeri(sube,gun,dun,gecenHafta,kesimDk){
   var tok=_patToken();
   return Promise.all([
     _patJson(PAT_API+'/islem/listele?sube='+sube+'&baslangic='+gun+'&bitis='+gun),
     _patJson(PAT_API+'/sync/durum?sube='+sube+'&since=0'),
     _patJson(PAT_API+'/menu/cek?sube=harcama_'+sube+'_'+gun),
-    _patJson(PAT_WORKER+'/api/vardiya-gecmis?sube='+sube+'&gun=1',tok?{headers:{'X-Cactus-Key':tok}}:{})
+    _patJson(PAT_WORKER+'/api/vardiya-gecmis?sube='+sube+'&gun=1',tok?{headers:{'X-Cactus-Key':tok}}:{}),
+    _patJson(PAT_API+'/islem/listele?sube='+sube+'&baslangic='+dun+'&bitis='+dun),
+    _patJson(PAT_API+'/islem/listele?sube='+sube+'&baslangic='+gecenHafta+'&bitis='+gecenHafta)
   ]).then(function(r){
     // ── Kapanan ciro (ödemesi alınmış işlemler) ──
     var islemler=Array.isArray(r[0])?r[0]:[];
@@ -3878,7 +3938,8 @@ function _patSubeVeri(sube,gun){
         var t=(s.odeme_tipi||'').toLowerCase();
         if(t.indexOf('kart')>=0||t.indexOf('kredi')>=0) kart+=Number(s.toplam)||0; else nakit+=Number(s.toplam)||0;
       }
-      var det=s.urun_detay||s.urunDetay;
+      // API bazı kayıtlarda diziyi, bazılarında JSON metnini döndürüyor (admin.html de ikisini de karşılıyor)
+      var det=s.urun_detay||s.urun_detay_json||s.urunDetay;
       if(typeof det==='string'){ try{det=JSON.parse(det);}catch(e){det=null;} }
       if(Array.isArray(det)) det.forEach(function(u){
         if(!u||!u.ad) return; urunler[u.ad]=(urunler[u.ad]||0)+(Number(u.adet)||0);
@@ -3913,11 +3974,23 @@ function _patSubeVeri(sube,gun){
     Object.keys(son).forEach(function(ad){ (son[ad].aksiyon==='cikis'?cikan:icerde).push(ad); });
     return {sube:sube,kapandi:kapandi,islemAdet:islemler.length,nakit:nakit,kart:kart,
       acik:acik,acikTop:acikTop,gider:gider,urunler:urunler,
-      icerde:icerde,cikan:cikan,vardiyaOk:!!(r[3]&&r[3].ok),ciroOk:Array.isArray(r[0])};
+      icerde:icerde,cikan:cikan,vardiyaOk:!!(r[3]&&r[3].ok),
+      dun:_patGecmisGun(r[4],kesimDk), gecenHafta:_patGecmisGun(r[5],kesimDk)};
   });
 }
 
-function _patSubeKart(bilgi,ad){
+function _patKarsHtml(kapandi,dun,gh,ghAd){
+  return '<div class="pat-kars">'
+    +'<div class="pat-k-krt"><div class="pk-ad">Dün aynı saat</div>'
+      +'<div class="pk-val">'+_patFmt(dun.ayniSaat)+' '+_patDegisimHtml(kapandi,dun.ayniSaat)+'</div>'
+      +'<div class="pk-alt">dün tamamı '+_patFmt(dun.tam)+'</div></div>'
+    +'<div class="pat-k-krt"><div class="pk-ad">Geçen '+_patEsc(ghAd)+' aynı saat</div>'
+      +'<div class="pk-val">'+_patFmt(gh.ayniSaat)+' '+_patDegisimHtml(kapandi,gh.ayniSaat)+'</div>'
+      +'<div class="pk-alt">o günün tamamı '+_patFmt(gh.tam)+'</div></div>'
+    +'</div>';
+}
+
+function _patSubeKart(bilgi,ad,ghAd){
   if(!bilgi) return '<div class="pat-sube"><div class="pat-s-ad">'+_patEsc(ad)+'</div>'
     +'<div class="pat-bos" style="margin-top:8px">Veri alınamadı — bağlantıyı kontrol edin.</div></div>';
   var toplam=bilgi.kapandi+bilgi.acikTop;
@@ -3932,6 +4005,9 @@ function _patSubeKart(bilgi,ad){
     +'</div>';
   h+='<div class="pat-s-satir">💵 Nakit <b>'+_patFmt(bilgi.nakit)+'</b> · 💳 Kart <b>'+_patFmt(bilgi.kart)+'</b>'
     +' · 💸 Gider <b>'+_patFmt(bilgi.gider)+'</b> · 📈 Net <b>'+_patFmt(net)+'</b></div>';
+  // Dün / geçen hafta (aynı saate kadar, kapanan ciro üzerinden)
+  h+='<div class="pat-s-kars">Dün <b>'+_patFmt(bilgi.dun.ayniSaat)+'</b> '+_patDegisimHtml(bilgi.kapandi,bilgi.dun.ayniSaat)
+    +' · Geçen '+_patEsc(ghAd)+' <b>'+_patFmt(bilgi.gecenHafta.ayniSaat)+'</b> '+_patDegisimHtml(bilgi.kapandi,bilgi.gecenHafta.ayniSaat)+'</div>';
   // Vardiya
   h+='<div class="pat-etiket">Vardiyada</div>';
   if(!bilgi.vardiyaOk){
@@ -3957,12 +4033,15 @@ function _patSubeKart(bilgi,ad){
   return h+'</div>';
 }
 
-function _patRender(veriler){
+function _patRender(veriler,ghAd){
   var top={kapandi:0,acikTop:0,nakit:0,kart:0,gider:0,acikMasa:0},urunTop={},eksik=false;
+  var dunTop={tam:0,ayniSaat:0},ghTop={tam:0,ayniSaat:0};
   veriler.forEach(function(v){
     if(!v){eksik=true;return;}
     top.kapandi+=v.kapandi; top.acikTop+=v.acikTop; top.nakit+=v.nakit;
     top.kart+=v.kart; top.gider+=v.gider; top.acikMasa+=v.acik.length;
+    dunTop.tam+=v.dun.tam; dunTop.ayniSaat+=v.dun.ayniSaat;
+    ghTop.tam+=v.gecenHafta.tam; ghTop.ayniSaat+=v.gecenHafta.ayniSaat;
     Object.keys(v.urunler).forEach(function(ad){urunTop[ad]=(urunTop[ad]||0)+v.urunler[ad];});
   });
   var toplam=top.kapandi+top.acikTop;
@@ -3974,9 +4053,10 @@ function _patRender(veriler){
     +'<div class="pat-t-krt"><div class="pk">Kart</div><div class="pv">'+_patFmt(top.kart)+'</div></div>'
     +'<div class="pat-t-krt gider"><div class="pk">Gider</div><div class="pv">'+_patFmt(top.gider)+'</div></div>'
     +'<div class="pat-t-krt net"><div class="pk">Net</div><div class="pv">'+_patFmt(top.kapandi-top.gider)+'</div></div>';
+  document.getElementById('pat-kars').innerHTML=_patKarsHtml(top.kapandi,dunTop,ghTop,ghAd);
 
   document.getElementById('pat-subeler').innerHTML=veriler.map(function(v,i){
-    return _patSubeKart(v,PAT_SUBELER[i].ad);
+    return _patSubeKart(v,PAT_SUBELER[i].ad,ghAd);
   }).join('');
 
   var sirali=Object.keys(urunTop).map(function(ad){return {ad:ad,adet:urunTop[ad]};})
@@ -3990,7 +4070,8 @@ function _patRender(veriler){
   try{saat=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}catch(e){}
   document.getElementById('pat-not').innerHTML=(eksik?'⚠️ Bir şubenin verisi alınamadı. ':'')
     +'Son güncelleme '+saat+' · dakikada bir kendini tazeler'
-    +'<br>Açık masa tutarları henüz ödenmemiştir; kapanan ciro ödemesi alınmış işlemlerdir.';
+    +'<br>Karşılaştırmalar <b>kapanan ciro</b> üzerinden ve geçmiş günün <b>aynı saatine kadarki</b> kısmıyla yapılır — yarım günü tam güne kıyaslamaz.'
+    +'<br>Açık masa tutarları henüz ödenmemiştir.';
 }
 
 function patronYukle(elle){
@@ -3998,6 +4079,11 @@ function patronYukle(elle){
   _patCalisiyor=true;
   var btn=document.getElementById('pat-yenile-btn'); if(btn) btn.classList.add('calisiyor');
   var gun=(typeof isGunu==='function')?isGunu(0):new Date().toISOString().split('T')[0];
+  var dun=(typeof isGunu==='function')?isGunu(-1):gun;
+  var gecenHafta=(typeof isGunu==='function')?isGunu(-7):gun;
+  var kesimDk=_patSimdiDk();
+  var ghAd='hafta';
+  try{ ghAd=new Date(gecenHafta+'T12:00:00').toLocaleDateString('tr-TR',{weekday:'long'}); }catch(e){}
   var et=document.getElementById('pat-tarih');
   if(et){
     var etiket=gun;
@@ -4005,9 +4091,9 @@ function patronYukle(elle){
     et.textContent=etiket;
   }
   Promise.all(PAT_SUBELER.map(function(s){
-    return _patSubeVeri(s.k,gun).catch(function(){return null;});
+    return _patSubeVeri(s.k,gun,dun,gecenHafta,kesimDk).catch(function(){return null;});
   })).then(function(veriler){
-    try{_patRender(veriler);}catch(e){}
+    try{_patRender(veriler,ghAd);}catch(e){}
   }).then(function(){
     _patCalisiyor=false;
     if(btn) btn.classList.remove('calisiyor');

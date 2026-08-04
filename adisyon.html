@@ -755,6 +755,37 @@ if('serviceWorker' in navigator){
 }
 </script>
 <!-- v1777066974925 -->
+
+<!-- ═══ PERSONEL MODU ═══
+     Raporlar sekmesini, Günün Cirosu panelini ve Gider ekranındaki
+     "Genel Özet" düğmesini gizler. Ciroyu gören her yer bu üçü.
+
+     DİKKAT — bu bir GÜVENLİK ÖNLEMİ DEĞİL, yalnızca arayüz gizlemedir.
+     Personel ile yönetim aynı parolayı ve aynı token'ı kullanıyor; işini
+     bilen biri tarayıcı konsolundan /islem/listele ve /rapor/ozet uçlarını
+     doğrudan çağırıp ciroyu görebilir. Gerçekten kapatmak için worker'a
+     ikinci bir parola (personel rolü) eklenmeli ve o uçlar rol kontrolüne
+     bağlanmalı.
+
+     Yönetim raporlarına admin.html üzerinden bakılıyor; burada gizlemek
+     yönetime hiçbir şey kaybettirmiyor.
+
+     Geri açmak için: PERSONEL_MODU = false
+-->
+<script>
+window.PERSONEL_MODU = true;
+document.addEventListener('DOMContentLoaded', function(){
+  if(!window.PERSONEL_MODU) return;
+  var gizle = ['tab-rap','btn-genel-ozet'];
+  gizle.forEach(function(id){
+    var e = document.getElementById(id);
+    if(e) e.style.display = 'none';
+  });
+  // Günün Cirosu paneli (rap sekmesinin içinde ama ayrıca gizliyoruz)
+  var gc = document.querySelector('.gun-ciro-wrap');
+  if(gc) gc.style.display = 'none';
+});
+</script>
 </head>
 <body>
 
@@ -772,7 +803,7 @@ if('serviceWorker' in navigator){
     <button class="htab" onclick="goTo('var',this);vardiyaGoster();" title="Vardiya giriş/çıkış ve açılış/kapanış kontrol listesi"><span class="tico">🕒</span>Vardiya</button>
     <button class="htab htab-eylem" onclick="kartYildizAc()" title="Masadaki içecekler için sadakat yıldızı ekle"><span class="tico">⭐</span>Yıldız</button>
     <button class="htab" onclick="goTo('tuk',this)" title="Biten ürünleri işaretle"><span class="tico">🚫</span>Tükendi</button>
-    <button class="htab" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
+    <button class="htab" id="tab-rap" onclick="goTo('rap',this)"><span class="tico">📊</span>Raporlar</button>
     <button class="htab" onclick="goTo('har',this);harGoster();"><span class="tico">💸</span>Gider</button>
     <button class="htab" onclick="goTo('yon',this)"><span class="tico">⚙️</span>Yönet</button>
   </div>
@@ -975,7 +1006,7 @@ if('serviceWorker' in navigator){
       <span style="color:var(--kr3);font-weight:700;">→</span>
       <input type="date" id="gider-pdf-bit" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--kr2);border-radius:7px;font-size:14px;color:var(--k1);background:var(--wh);font-family:'Inter',sans-serif;">
       <button onclick="giderPdfRaporu()" style="padding:8px 13px;background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Gider</button>
-      <button onclick="birlesikPdfRaporu()" style="padding:8px 13px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Genel Özet</button>
+      <button id="btn-genel-ozet" onclick="genelOzetKorumali()" style="padding:8px 13px;background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Genel Özet</button>
     </div>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;background:#fff;border:1.5px solid var(--al);border-radius:10px;padding:6px 10px;box-shadow:var(--sh);">
       <span style="font-size:14px;color:var(--k2);padding:0 2px;">🔍</span>
@@ -1619,7 +1650,18 @@ window.sifreDegistir=function(){
 };
 window.sifreCikis=function(){_korumaKapat();if(typeof toast==='function')toast('🔒 Yetki kilitlendi');};
 
+/* Genel Özet ciro, nakit/kart dağılımı ve en çok satan ürünleri gösteriyor —
+   yani rapor ekranıyla aynı bilgiyi veriyor. Gider sekmesi PIN istemediği için
+   bu düğme korumanın dışında kalmıştı; artık aynı yönetici PIN'ini soruyor. */
+function genelOzetKorumali(){
+  if(window.PERSONEL_MODU) return;
+  sifreSor('Genel Özet', function(){ birlesikPdfRaporu(); });
+}
+
 function goTo(id,el){
+  // Personel modunda rapor bölümü hiç açılmasın. Bu kontrol fonksiyonun
+  // EN BAŞINDA olmalı — aşağıda olursa bölüm önce görünür hâle geliyor.
+  if(id==='rap' && window.PERSONEL_MODU){ return; }
   // Yönet ve Raporlar şifre ister
   if((id==='yon'||id==='rap')&&!_korumaAktif()){
     sifreSor(id==='yon'?'Yönet Paneli':'Raporlar',function(){goTo(id,el);});
@@ -3999,8 +4041,8 @@ renderMasalar();renderKatBar();renderUrunler();renderAdisyon();
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ if(guncelVar && bos()) yenile(); else kontrol(); } });
 })();
 // Günün cirosu - başlangıçta tarih yaz, 60sn'de bir arka planda yükle
-gunCiroTarihGoster();renderCanliCiro();
-setInterval(function(){gunCiroYukle();},60000);
+if(!window.PERSONEL_MODU){ gunCiroTarihGoster(); renderCanliCiro(); }
+if(!window.PERSONEL_MODU) setInterval(function(){gunCiroYukle();},60000);
 </script>
 <script src="rapor-hook-podyum.js"></script>
 

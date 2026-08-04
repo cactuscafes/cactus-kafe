@@ -9,6 +9,7 @@ import WebKit
 import UIKit
 import CoreImage.CIFilterBuiltins
 
+let ANASAYFA_URL = URL(string: "https://cactuscafes.com")!
 let MENU_URL = URL(string: "https://cactuscafes.com/menu-podyum.html")!
 let API = "https://cactus-rapor-api.batuhanbulut.workers.dev"
 // Hesap silme ucu site worker'ında (kart-sil, yönetim anahtarını sunucuda tutar)
@@ -34,6 +35,8 @@ struct CactusCoffeeApp: App {
 struct RootView: View {
     var body: some View {
         TabView {
+            AnasayfaTab()
+                .tabItem { Label("Anasayfa", systemImage: "house.fill") }
             MenuTab()
                 .tabItem { Label("Menü", systemImage: "cup.and.saucer.fill") }
             KartTab()
@@ -42,6 +45,23 @@ struct RootView: View {
                 .tabItem { Label("İletişim", systemImage: "phone.fill") }
         }
         .tint(YESIL)
+    }
+}
+
+/// Marka logosu — native ekranların tepesinde emoji yerine gerçek logo.
+/// Web sekmeleri (Anasayfa/Menü) logoyu sayfanın kendi başlığından zaten
+/// gösterdiği için oralarda tekrar edilmiyor; çift logo olmasın.
+struct CactusLogo: View {
+    var genislik: CGFloat = 150
+    /// Koyu zeminde (yeşil kart) açık renkli sürüm kullanılır, yoksa logo kaybolur.
+    var acikSurum = false
+
+    var body: some View {
+        Image(acikSurum ? "LogoLight" : "Logo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: genislik)
+            .accessibilityLabel("Cactus Coffee")
     }
 }
 
@@ -86,28 +106,42 @@ func dokunumBasarili() {
     UINotificationFeedbackGenerator().notificationOccurred(.success)
 }
 
-// ═══════════════════ MENÜ SEKMESİ ═══════════════════
+// ═══════════════════ WEB SEKMELERİ (ANASAYFA + MENÜ) ═══════════════════
 
-struct MenuTab: View {
+/// Sitenin bir sayfasını gösteren sekme. Bağlantı koparsa çevrimdışı ekranı çıkar.
+struct WebSekmesi: View {
+    let url: URL
     @State private var baglantiHatasi = false
+    /// Tekrar Dene'de WKWebView'ı yeniden kurmak için — aynı görünüm kalırsa
+    /// başarısız sayfa ekranda asılı kalıyor.
+    @State private var deneme = 0
 
     var body: some View {
         ZStack {
             KREM.ignoresSafeArea()
             if baglantiHatasi {
-                CevrimdisiEkran { baglantiHatasi = false }
+                CevrimdisiEkran { baglantiHatasi = false; deneme += 1 }
             } else {
-                SiteView(baglantiHatasi: $baglantiHatasi)
+                SiteView(url: url, baglantiHatasi: $baglantiHatasi)
+                    .id(deneme)
             }
         }
     }
+}
+
+struct AnasayfaTab: View {
+    var body: some View { WebSekmesi(url: ANASAYFA_URL) }
+}
+
+struct MenuTab: View {
+    var body: some View { WebSekmesi(url: MENU_URL) }
 }
 
 struct CevrimdisiEkran: View {
     var tekrarDene: () -> Void
     var body: some View {
         VStack(spacing: 14) {
-            Text("🌵").font(.system(size: 56))
+            CactusLogo(genislik: 170)
             Text("Bağlantı kurulamadı").font(.headline).foregroundColor(KOYU)
             Text("İnternet bağlantını kontrol edip tekrar dene.")
                 .font(.subheadline).foregroundColor(SOLGUN)
@@ -127,7 +161,8 @@ struct HataEkrani: View {
     var tekrarDene: () -> Void
     var body: some View {
         VStack(spacing: 14) {
-            Text("⚠️").font(.system(size: 56))
+            CactusLogo(genislik: 150)
+            Text("⚠️").font(.system(size: 34))
             Text("Sorun oluştu").font(.headline).foregroundColor(KOYU)
             Text(mesaj)
                 .font(.subheadline).foregroundColor(SOLGUN)
@@ -143,6 +178,7 @@ struct HataEkrani: View {
 }
 
 struct SiteView: UIViewRepresentable {
+    let url: URL
     @Binding var baglantiHatasi: Bool
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -162,7 +198,7 @@ struct SiteView: UIViewRepresentable {
         yenile.addTarget(context.coordinator, action: #selector(Coordinator.yenile(_:)), for: .valueChanged)
         wv.scrollView.refreshControl = yenile
 
-        wv.load(URLRequest(url: MENU_URL))
+        wv.load(URLRequest(url: url))
         return wv
     }
 
@@ -381,7 +417,7 @@ struct KayitGovde: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 15) {
-                Text("🌵").font(.system(size: 52)).padding(.top, 34)
+                CactusLogo(genislik: 180).padding(.top, 34)
                 Text("Sadakat Kartını Oluştur")
                     .font(.title2.bold()).foregroundColor(YESIL)
                 Text("7 yıldız topla, 1 bedava içecek kazan.\nÜyelik yok, şifre yok — telefonun yeterli.")
@@ -506,7 +542,8 @@ struct KartGovde: View {
     private var dijitalKart: some View {
         VStack(alignment: .leading, spacing: 13) {
             HStack {
-                Text("CACTUS").font(.system(.title3, design: .serif).bold())
+                // Yeşil gradyan üzerinde açık renkli logo
+                CactusLogo(genislik: 120, acikSurum: true)
                 Spacer()
                 Text("☕").font(.title3)
             }
@@ -687,8 +724,7 @@ struct IletisimTab: View {
             KREM.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 12) {
-                    Text("🌵").font(.system(size: 46)).padding(.top, 26)
-                    Text("Cactus Coffee").font(.title2.bold()).foregroundColor(YESIL)
+                    CactusLogo(genislik: 190).padding(.top, 26)
                     Text("Podyumpark AVM · Bursa")
                         .font(.subheadline).foregroundColor(SOLGUN)
                         .padding(.bottom, 6)

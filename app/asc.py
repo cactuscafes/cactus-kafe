@@ -33,6 +33,7 @@ BUILD_NO = os.environ["BUILD_NUMARASI"]
 SURUM = os.environ.get("SURUM", "1.0")
 GONDER = os.environ.get("INCELEMEYE_GONDER", "false").lower() == "true"
 NOT_DOSYASI = os.environ.get("INCELEME_NOTU_DOSYASI", "")
+SURUM_NOTU_DOSYASI = os.environ.get("SURUM_NOTU_DOSYASI", "")
 SADECE_DURUM = os.environ.get("DURUM_RAPORU", "false").lower() == "true"
 
 # Sürüm sayfası düzenlenebilir durumdayken build seçilebilir
@@ -107,15 +108,58 @@ def build_bekle(app_id, dakika=40):
 
 
 def surum_bul(app_id):
+    """SURUM'u bulur; düzenlenebilir değilse hata, hiç yoksa oluşturur.
+
+    Yeni sürüm (örn. 1.0 yayındayken 1.1) App Store Connect'te henüz var
+    olmadığı için eskiden burada duruyorduk — artık kendimiz açıyoruz.
+    """
     c = istek(f"/v1/apps/{app_id}/appStoreVersions?limit=20")
+    mevcut = []
     for v in c.get("data", []):
         a = v["attributes"]
-        if a.get("versionString") == SURUM and a.get("appStoreState") in DUZENLENEBILIR:
-            print(f"✓ Sürüm {SURUM} düzenlenebilir durumda ({a.get('appStoreState')})")
-            return v["id"]
-    mevcut = [(v['attributes'].get('versionString'), v['attributes'].get('appStoreState'))
-              for v in c.get("data", [])]
-    sys.exit(f"❌ {SURUM} sürümü düzenlenebilir değil. Mevcut sürümler: {mevcut}")
+        mevcut.append((a.get("versionString"), a.get("appStoreState")))
+        if a.get("versionString") == SURUM:
+            if a.get("appStoreState") in DUZENLENEBILIR:
+                print(f"✓ Sürüm {SURUM} düzenlenebilir durumda ({a.get('appStoreState')})")
+                return v["id"]
+            sys.exit(f"❌ {SURUM} sürümü düzenlenebilir değil ({a.get('appStoreState')}). "
+                     f"Mevcut sürümler: {mevcut}")
+
+    print(f"… {SURUM} sürümü yok, oluşturuluyor (mevcut: {mevcut})")
+    yeni = istek("/v1/appStoreVersions", "POST", {"data": {
+        "type": "appStoreVersions",
+        "attributes": {"platform": "IOS", "versionString": SURUM},
+        "relationships": {"app": {"data": {"type": "apps", "id": app_id}}},
+    }})
+    print(f"✓ Sürüm {SURUM} oluşturuldu")
+    return yeni["data"]["id"]
+
+
+def surum_notu_yaz(surum_id):
+    """'Bu Sürümdeki Yenilikler' metnini tüm dillere yazar.
+
+    İlk sürümden sonraki her sürüm için Apple bunu zorunlu tutuyor; boş
+    kalırsa gönderim reddediliyor.
+    """
+    if not SURUM_NOTU_DOSYASI or not os.path.exists(SURUM_NOTU_DOSYASI):
+        return
+    with open(SURUM_NOTU_DOSYASI, "r", encoding="utf-8") as f:
+        metin = f.read().strip()
+    if not metin:
+        return
+    c = istek(f"/v1/appStoreVersions/{surum_id}/appStoreVersionLocalizations?limit=50")
+    yazilan = 0
+    for yerel in c.get("data", []):
+        try:
+            istek(f"/v1/appStoreVersionLocalizations/{yerel['id']}", "PATCH", {"data": {
+                "type": "appStoreVersionLocalizations",
+                "id": yerel["id"],
+                "attributes": {"whatsNew": metin},
+            }})
+            yazilan += 1
+        except urllib.error.HTTPError:
+            print(f"⚠️  {yerel['attributes'].get('locale')} için sürüm notu yazılamadı")
+    print(f"✓ Sürüm notu {yazilan} dile yazıldı")
 
 
 def build_sec(surum_id, build_id):
@@ -250,6 +294,7 @@ def main():
     build_id = build_bekle(app_id)
     surum_id = surum_bul(app_id)
     build_sec(surum_id, build_id)
+    surum_notu_yaz(surum_id)
     inceleme_notu_yaz(surum_id)
     if GONDER:
         incelemeye_gonder(app_id, surum_id)

@@ -13,7 +13,11 @@ on:
       build_numarasi:
         description: "Build numarası — her yüklemede artmalı (Apple aynısını 2. kez kabul etmez)"
         required: true
-        default: "3"
+        default: "8"
+      surum:
+        description: "Sürüm (MARKETING_VERSION) — yayındaki sürümün üstüne çıkmalı, örn. 1.1"
+        required: true
+        default: "1.1"
       incelemeye_gonder:
         description: "Yükleme sonrası sürümü App Review'a gönder"
         type: boolean
@@ -70,6 +74,7 @@ jobs:
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CURRENT_PROJECT_VERSION="${{ inputs.build_numarasi }}" \
+            MARKETING_VERSION="${{ inputs.surum }}" \
             CODE_SIGN_STYLE=Automatic
 
       - name: App Store Connect'e yükle
@@ -110,9 +115,10 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           BUNDLE_ID: com.cactuscafes.coffee
           BUILD_NUMARASI: ${{ inputs.build_numarasi }}
-          SURUM: "1.0"
+          SURUM: ${{ inputs.surum }}
           INCELEMEYE_GONDER: ${{ inputs.incelemeye_gonder }}
           INCELEME_NOTU_DOSYASI: app/inceleme-notu.txt
+          SURUM_NOTU_DOSYASI: app/surum-notu.txt
           DURUM_RAPORU: ${{ inputs.sadece_durum }}
         run: |
           set -euo pipefail

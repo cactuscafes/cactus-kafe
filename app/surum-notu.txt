@@ -1,0 +1,3 @@
+Anasayfa sekmesi eklendi — kafenin sitesine artık uygulamadan doğrudan ulaşabilirsin.
+Cactus logosu uygulama genelinde yenilendi.
+Çevrimdışı ekranındaki "Tekrar Dene" düğmesi düzeltildi.

@@ -1,36 +1,38 @@
-Thank you for the feedback regarding Guideline 5.1.1(v) — Data Collection and Storage.
+WHAT CHANGED IN 1.1
+- Added a Home tab that opens our cafe website.
+- Refreshed the Cactus logo across the app's native screens.
+- Fixed the "Try Again" button on the offline screen.
 
-ACCOUNT DELETION (new in this build)
-The Loyalty Card now offers account deletion directly inside the app. No phone call,
-no email, and no website visit is required to complete it.
-
-How to reach it:
+HOW TO TEST THE LOYALTY CARD
 1. Open the "Sadakat Karti" (Loyalty Card) tab.
-2. Create a card by entering a Turkish mobile number together with a name.
+2. Enter a Turkish mobile number together with a name.
    Please use this test number: 0555 111 22 33
-   (Our loyalty database stores Turkish mobile numbers, so the number must be in
-   the 05XX XXX XX XX format. The app accepts it typed as 05551112233,
+   (Our loyalty database stores Turkish mobile numbers, so the number must be
+   in the 05XX XXX XX XX format. The app accepts it typed as 05551112233,
    5551112233 or +90 555 111 22 33 and normalises it for you.)
    No password or sign-in is required.
-3. Scroll to the bottom of the card screen.
-4. Tap "Hesabimi Sil" ("Delete My Account") — the red button below "Cikis Yap".
-5. A confirmation alert appears; tap "Hesabimi Sil" to confirm.
 
-What deletion does: the customer record, the star balance and the full transaction
-history are permanently removed from our server, and the locally cached card is
-cleared. The action is irreversible. "Cikis Yap" ("Log Out") above it is a separate,
-clearly labelled action that only signs out on this device — it is not offered as a
-substitute for deletion.
+ACCOUNT DELETION (unchanged since 1.0, Guideline 5.1.1(v))
+Account deletion is available directly inside the app. No phone call, no email
+and no website visit is required.
+1. Open the "Sadakat Karti" tab and create a card as described above.
+2. Scroll to the bottom of the card screen.
+3. Tap "Hesabimi Sil" ("Delete My Account") — the red button below "Cikis Yap".
+4. Confirm in the alert that appears.
 
-If the server cannot confirm the deletion, the app shows an error and keeps the card
-instead of reporting a deletion that did not happen.
+Deletion permanently removes the customer record, the star balance and the full
+transaction history from our server, and clears the locally cached card. The
+action is irreversible. "Cikis Yap" ("Log Out") above it is a separate, clearly
+labelled action that only signs out on this device.
 
-OTHER NATIVE FUNCTIONALITY (from the previous review, Guideline 4.2)
-1. Loyalty Card tab — a fully native SwiftUI experience. Customers create and view
-   their loyalty card inside the app, see their star progress and free-drink credits,
-   display a scannable QR code and phone number at the counter, review their
-   transaction history, and pull to refresh. Card data is cached on device, so the
-   card remains available offline.
+If the server cannot confirm the deletion, the app shows an error and keeps the
+card instead of reporting a deletion that did not happen.
+
+NATIVE FUNCTIONALITY
+1. Loyalty Card tab — a fully native SwiftUI experience: create and view the
+   card, see star progress and free-drink credits, show a scannable QR code and
+   phone number at the counter, review transaction history, pull to refresh.
+   Card data is cached on device, so the card remains available offline.
 2. Contact tab — native actions: phone call, WhatsApp, Apple Maps directions,
    Instagram, and the system share sheet.
-3. Menu tab — our live cafe menu.
+3. Home and Menu tabs — our website and live cafe menu.

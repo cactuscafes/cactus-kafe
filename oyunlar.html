@@ -89,6 +89,36 @@ h1 em{font-style:italic;color:var(--amber);}
 
 .alt-not{text-align:center;font-size:11px;color:rgba(245,234,216,.5);margin-top:36px;line-height:1.8;font-weight:300;}
 .alt-not a{color:#e8c47a;font-weight:600;text-decoration:none;}
+
+/* ── App Store şeridi ── */
+.as-serit{
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  margin-top:34px;padding:26px 28px;
+  background:rgba(255,255,255,.05);backdrop-filter:blur(16px);
+  border:1px solid rgba(232,160,48,.22);border-radius:20px;
+  text-decoration:none;transition:all .25s;
+}
+.as-serit:hover{background:rgba(255,255,255,.08);border-color:rgba(232,160,48,.45);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.32);}
+.as-ikon{
+  width:62px;height:62px;flex:none;border-radius:15px;
+  background:linear-gradient(150deg,#3d6b2a,#1a3310);
+  border:1px solid rgba(232,160,48,.28);
+  display:flex;align-items:center;justify-content:center;font-size:33px;
+}
+.as-govde{flex:1;min-width:200px;}
+.as-etiket{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#8fc97f;margin-bottom:7px;}
+.as-ad{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--latte);margin-bottom:5px;}
+.as-metin{font-size:12px;color:rgba(245,234,216,.62);line-height:1.7;font-weight:300;}
+.as-btn{
+  flex:none;padding:13px 26px;
+  background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border-radius:11px;
+}
+.as-serit:hover .as-btn{background:linear-gradient(135deg,#d8b87a,var(--amber));}
+@media(max-width:520px){
+  .as-serit{gap:16px;padding:22px;}
+  .as-btn{width:100%;text-align:center;}
+}
 </style>
 </head>
 <body>
@@ -169,7 +199,19 @@ h1 em{font-style:italic;color:var(--amber);}
       </a>
     </div>
 
-    <p class="alt-not">Cactus Jump'ta ödül kazanmak için <a href="kart.html">sadakat üyeliği</a> gerekir — üyelik ücretsiz, telefon numaran yeterli.</p>
+    <!-- App Store — native Cactus Jump. Yukarıdaki dört oyun tarayıcıda çalışır ve
+         limonata ödülü verir; bu ayrı bir uygulama, ödül sistemine dahil değil. -->
+    <a class="as-serit" href="https://apps.apple.com/tr/app/cactus-jump/id6794923490" target="_blank" rel="noopener">
+      <span class="as-ikon">🌵</span>
+      <div class="as-govde">
+        <div class="as-etiket">App Store'da yayında</div>
+        <div class="as-ad">Cactus Jump — iPhone uygulaması</div>
+        <p class="as-metin">Oyunun kendi uygulaması App Store'da, ücretsiz. İnternet gerekmez, rekorun telefonunda saklanır. <b style="color:#e8c47a;font-weight:600;">Limonata ödülü yalnızca yukarıdaki tarayıcı oyunlarında geçerli.</b></p>
+      </div>
+      <span class="as-btn">App Store'dan İndir</span>
+    </a>
+
+    <p class="alt-not">Ödül kazanmak için <a href="kart.html">sadakat üyeliği</a> gerekir — üyelik ücretsiz, telefon numaran yeterli.</p>
   </div>
 </div>
 

@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v59'; // v59: admin'e Limonata Hakları paneli
+const VERSION = 'cactus-v60'; // v60: Cactus Jump App Store linki (oyunlar + anasayfa)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

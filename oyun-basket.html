@@ -17,7 +17,6 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;touch-action:none;u
 <body>
 <canvas id="oyunCanvas"></canvas>
 
-<script src="oyun-odul.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
  * CACTUS BASKET — limonu bardağa fırlat
@@ -151,7 +150,7 @@ function bitir(){
     setTimeout(Ses.rekor, 500);
   }
   Ses.bitti();
-  CactusOdul.bitti(skor, SURE_SN);
+  // Basket ödül sisteminden çıkarıldı — serbest oyun, üyelik gerekmiyor.
 }
 
 /* ══════════════ FİZİK ══════════════ */
@@ -472,6 +471,5 @@ olcekle();
 hazirla();
 requestAnimationFrame(dongu);
 </script>
-<script>CactusOdul.kur({ oyun:'basket', esik:30 });</script>
 </body>
 </html>

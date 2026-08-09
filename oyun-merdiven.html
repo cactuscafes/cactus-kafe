@@ -151,7 +151,6 @@ body{
   </div>
 </div>
 
-<script src="oyun-odul.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
  * KAHVE MERDİVENİ — 2048'in Cactus sürümü
@@ -376,7 +375,7 @@ function hamle(dr, dc){
       document.getElementById('bittiMetin').textContent =
         'Skorun ' + skor + '. En yükseği ' + BASAMAKLAR[enYuksek - 1].ad + ' yaptın.';
       document.getElementById('bittiKat').style.display = 'flex';
-      CactusOdul.bitti(skor, (performance.now() - _odulBas) / 1000);
+      // Ödül sistemi kaldırıldı — oyunlar serbest.
     }
   }, 140);
 }
@@ -429,6 +428,5 @@ sesBtnYaz();
 olc();
 yeniOyun();
 </script>
-<script>CactusOdul.kur({ oyun:'merdiven', esik:2800 });</script>
 </body>
 </html>

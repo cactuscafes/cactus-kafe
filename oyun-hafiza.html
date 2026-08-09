@@ -146,7 +146,6 @@ body{
   </div>
 </div>
 
-<script src="oyun-odul.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
  * CACTUS HAFIZA — menü ürünleriyle kart eşleştirme
@@ -291,7 +290,7 @@ function bitti(){
   document.getElementById('kazanHamle').textContent = String(hamle);
   document.getElementById('kazanSure').textContent = sureYaz(saniye);
   document.getElementById('kazanKat').style.display = 'flex';
-  CactusOdul.bitti(hamle, saniye);
+  // Ödül sistemi kaldırıldı — oyunlar serbest.
 }
 
 /* ── Düğmeler ── */
@@ -312,6 +311,5 @@ sesBtnYaz();
 
 kur();
 </script>
-<script>CactusOdul.kur({ oyun:'hafiza', esik:11, tersYon:true, birim:'hamle' });</script>
 </body>
 </html>

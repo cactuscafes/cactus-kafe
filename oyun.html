@@ -19,7 +19,6 @@ body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:n
 <canvas id="oyunCanvas"></canvas>
 
 
-<script src="oyun-odul.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
  * CACTUS JUMP — web sürümü
@@ -189,7 +188,7 @@ function bitir(){
     try { localStorage.setItem('cactus_oyun_rekor', String(rekor)); } catch(e){}
     setTimeout(Ses.rekor, 550);
   }
-  CactusOdul.bitti(skor, oynananSure);
+  // Ödül sistemi kaldırıldı — oyunlar serbest.
 }
 
 /* ══════════════ ÇİZİM ══════════════ */
@@ -478,7 +477,7 @@ function hazirEkran(){
     cx.fillText('Rekor  ' + rekor, W / 2, y + 84);
   }
   cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
-  cx.fillText('🍋 ' + CactusOdul.esik() + ' skor yap, limonata kazan', W / 2, y + 116);
+  cx.fillText('Rekorunu geçmeye çalış', W / 2, y + 116);
 }
 
 function bittiEkran(){
@@ -528,6 +527,5 @@ olcekle();
 hazirla();
 requestAnimationFrame(dongu);
 </script>
-<script>CactusOdul.kur({ oyun:'jump', esik:32 });</script>
 </body>
 </html>

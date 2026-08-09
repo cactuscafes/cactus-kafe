@@ -139,11 +139,6 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .dk-hediye-no{font-size:12px;color:var(--amber);letter-spacing:1px;font-weight:500;}
 .dk-hediye-txt{font-size:8px;color:rgba(245,234,216,.6);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
 
-/* Oyun ödülü — bekleyen limonata hakkı (varsayılan gizli) */
-.limonata-kutu{display:none;align-items:center;gap:13px;background:linear-gradient(135deg,#f2c94c,#e8b83a);border-radius:16px;padding:15px 17px;margin-bottom:14px;box-shadow:0 6px 22px rgba(232,184,58,.28);}
-.limonata-ikon{font-size:27px;line-height:1;}
-.limonata-bas{font-size:14px;font-weight:700;color:#3a2f10;}
-.limonata-alt{font-size:11px;color:rgba(58,47,16,.75);margin-top:2px;}
 
 /* Oyun daveti */
 .oyun-davet{display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.06);border:1px solid rgba(200,168,106,.28);border-radius:16px;padding:14px 16px;margin-bottom:14px;text-decoration:none;}
@@ -320,14 +315,6 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
         </div>
       </div>
 
-      <!-- Oyundan kazanılmış limonata hakkı -->
-      <div class="limonata-kutu" id="limonataKutu">
-        <div class="limonata-ikon">🍋</div>
-        <div>
-          <div class="limonata-bas">Limonata hakkın var</div>
-          <div class="limonata-alt" id="limonataAlt">Tezgâhta göster, baristaya söyle.</div>
-        </div>
-      </div>
 
       <!-- Oyun daveti -->
       <a class="oyun-davet" href="oyunlar.html">
@@ -535,22 +522,6 @@ function kutlamaPatlat(){
   try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){}
   setTimeout(function(){ if(kap.parentNode) kap.remove(); },4800);
 }
-/* Oyundan kazanılmış, henüz teslim alınmamış limonata hakkını gösterir. */
-function limonataBak(){
-  var kutu=document.getElementById('limonataKutu');
-  if(!kutu || !_kartTel) return;
-  fetch(API+'/kart/oyun-odul-bak?telefon='+encodeURIComponent(_kartTel))
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if(d && d.ok && d.odul){
-        kutu.style.display='flex';
-        document.getElementById('limonataAlt').textContent =
-          d.odul.skor+' skor yaptın — tezgâhta göster, limonatan hazır.';
-      } else {
-        kutu.style.display='none';
-      }
-    }).catch(function(){});
-}
 
 /* Tezgâhta okutulacak QR'ı çizer.
  * Yük "CACTUS:05XXXXXXXXX" — önek sayesinde adisyon, rastgele QR'ları eleyebiliyor.
@@ -602,7 +573,6 @@ function kartGoster(m, oncekiGoster){
   }
 
   kartQrCiz();
-  limonataBak();
 
   // Dürtü: bedavaya kaç kaldı
   var nudge=document.getElementById('dkNudge'), kalan=ESIK-gosterPul;

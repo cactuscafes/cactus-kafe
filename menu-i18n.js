@@ -134,7 +134,9 @@
     'Ana Sayfa': 'Home',
     'İletişim': 'Contact',
     'İş Başvurusu': 'Careers',
-    'Podyumpark Menü': 'Podyumpark Menu',
+    'Menü': 'Menu',
+    '🎖 Sadakat Kartı': '🎖 Loyalty Card',
+    '🎮 Oyun': '🎮 Games',
     'FSM Menü': 'FSM Menu',
     'Tatlılara Bak': 'See Desserts'
   };
@@ -204,6 +206,10 @@
     }
     // Menüde olmayan sayfalara giden nav linkleri
     document.querySelectorAll('#mainNav a, #mainMobMenu a').forEach(function (a) {
+      // Metinsiz bağlantılara DOKUNMA. Logo bağlantısının içinde yalnızca
+      // <img> var; textContent'i '' okunuyor ve geri yazılınca görseli
+      // DOM'dan siliyordu — nav'daki Cactus logosu bu yüzden kayboluyordu.
+      if (!a.textContent.trim()) return;
       var tr = a.dataset.tr || a.textContent.trim();
       if (!a.dataset.tr) a.dataset.tr = tr;
       var en = SOZLUK[tr];

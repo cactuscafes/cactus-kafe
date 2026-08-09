@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v65'; // v65: FSM şubesi siteden kaldırıldı
+const VERSION = 'cactus-v66'; // v66: nav etiketi 'Podyumpark Menü' → 'Menü'
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

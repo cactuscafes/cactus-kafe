@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v64'; // v64: oyun ödül kampanyası tamamen kapatıldı
+const VERSION = 'cactus-v65'; // v65: FSM şubesi siteden kaldırıldı
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

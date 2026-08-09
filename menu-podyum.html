@@ -71,7 +71,7 @@ html[data-initial-sube="podyum"] #menu-fsm{display:none!important;}
 html[data-initial-sube="podyum"] #menu-podyum{display:block!important;}
 html[data-initial-sube="podyum"] #tab-sube-fsm{color:#999!important;border-bottom-color:transparent!important;}
 html[data-initial-sube="podyum"] #tab-sube-podyum{color:var(--dark)!important;border-bottom-color:var(--dark)!important;}
-/* FSM özel banner'lar (gece sakinliği, quiz, kahve falı, welcome toast) Podyum'da görünmesin */
+/* Emekli banner'lar (gece sakinliği, quiz, kahve falı, welcome toast) — FSM şubesine özeldi, şube kapandı. Kurallar duruyor ki elemanlar hiçbir yerde görünmesin. */
 html[data-initial-sube="podyum"] [data-fsm-only]{display:none!important;}
 body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff;}
 
@@ -710,7 +710,6 @@ footer{padding:40px 20px 24px;}
   <a href="index.html" aria-label="Cactus Coffee — Ana Sayfa" style="display:flex;align-items:center;text-decoration:none;"><img src="logo-trans.png" alt="Cactus Coffee" style="height:38px;width:auto;display:block;"></a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
-    <a id="navFsm" href="menu.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">FSM Menü</a>
     <a id="navPod" href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Podyumpark Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
     <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
@@ -751,7 +750,6 @@ footer{padding:40px 20px 24px;}
 </script>
 <div id="mainMobMenu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;">
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
-  <a id="navFsmMob" href="menu.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">FSM Menü</a>
   <a id="navPodMob" href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Podyumpark Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
   <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
@@ -825,7 +823,7 @@ footer{padding:40px 20px 24px;}
   <div class="mh-titles">
     <p class="menu-header-eyebrow">Cactus Coffee</p>
     <h1 class="menu-header-title">C | <em>Menü</em></h1>
-    <p class="menu-header-sub">FSM Şubesi &nbsp;·&nbsp; Podyumpark Şubesi</p>
+    <p class="menu-header-sub">Podyumpark Şubesi</p>
     <button id="dilBtn" onclick="dilDegistir()" aria-label="Change language / Dili değiştir">🇬🇧 English</button>
   </div>
   <a class="menu-google" href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" aria-label="Podyumpark şubesini Google'da değerlendir">
@@ -841,10 +839,6 @@ footer{padding:40px 20px 24px;}
   </a>
 </div>
 
-<div class="sube-tabs">
-  <button class="sube-tab on" id="tab-sube-fsm" onclick="subeGoster('fsm',this)">🏙 FSM Şubesi</button>
-  <button class="sube-tab" id="tab-sube-podyum" onclick="subeGoster('podyum',this)">🌿 Podyumpark</button>
-</div>
 
 
 <div id="menu-podyum">
@@ -911,7 +905,7 @@ footer{padding:40px 20px 24px;}
   </div>
 </div>
 
-<!-- welcome-toast: FSM özel, Podyum'da yok -->
+<!-- welcome-toast: emekli, gösterilmiyor -->
 
 <!-- Kahve Falı Modal -->
 <div class="fal-bg" id="falBg" onclick="if(event.target===this)falKapat()">
@@ -1081,7 +1075,7 @@ async function init() {
     }
   } catch(e) { /* sessizce: menu_public.podyum fallback olarak kalır */ }
   POPUP_DATA=[]; // reset on reload
-  renderMenu('fsm');
+  // FSM paneli kaldırıldı (şube kapandı); boşa veri işlememesi için çağrı da kalktı.
   renderMenu('podyum');
   // ── İlk açılış: AKTIF_SUBE zaten URL'den belirlendi (head'deki inline script).
   //    Sadece DOM'u (menü görünürlüğü + tab class'ı) AKTIF_SUBE ile senkronla.
@@ -1090,7 +1084,7 @@ async function init() {
     var mp=document.getElementById('menu-podyum');  if(mp) mp.style.display='';
     var tf=document.getElementById('tab-sube-fsm');     if(tf) tf.classList.remove('on');
     var tp=document.getElementById('tab-sube-podyum');  if(tp) tp.classList.add('on');
-    // FSM özel elementleri gizle (CSS de yapıyor — bu JS state için)
+    // Emekli elemanları gizle (CSS de yapıyor — bu JS state için)
     if(typeof _subeOzelGoruntule==='function') _subeOzelGoruntule('podyum');
     // Podyum kampanya pop-up'ı — oturumda bir kez (subeGoster ile aynı mantık)
     try{
@@ -1596,7 +1590,7 @@ function subeGoster(sube,btn) {
   setTimeout(function(){altKatBarGuncelle();},20);
   _subeOzelGoruntule(sube);
 }
-// FSM'e özel elementleri (quiz-hero) Podyum'da gizle
+// Emekli elemanları (quiz-hero) gizle
 // + Podyumpark kampanya pop-up'ını sadece Podyum sekmesinde göster (oturumda 1 kez)
 function _subeOzelGoruntule(sube){
   var fsmOnly=document.querySelectorAll('[data-fsm-only]');

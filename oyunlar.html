@@ -77,6 +77,7 @@ h1 em{font-style:italic;color:var(--amber);}
 .ok-rozet{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 10px;border-radius:20px;white-space:nowrap;}
 .ok-rozet.odul{background:rgba(232,184,58,.14);border:1px solid rgba(232,184,58,.4);color:#e8c47a;}
 .ok-rozet.acik{background:rgba(92,163,76,.14);border:1px solid rgba(92,163,76,.4);color:#8fc97f;}
+.ok-rekor{display:block;margin:2px 0 10px;font-size:12px;font-weight:700;color:#e8c47a;letter-spacing:.3px;}
 .ok-ad{font-family:'Fraunces',serif;font-size:26px;font-weight:400;color:var(--latte);margin-bottom:8px;}
 .ok-metin{font-size:12.5px;color:rgba(245,234,216,.68);line-height:1.75;font-weight:300;flex:1;margin-bottom:22px;}
 .ok-metin b{color:#e8c47a;font-weight:600;}
@@ -153,16 +154,18 @@ h1 em{font-style:italic;color:var(--amber);}
   <div class="sayfa-ic">
     <div class="eyebrow">Cactus Oyun Salonu</div>
     <h1>Kahven gelene kadar <em>oyna</em></h1>
-    <p class="sayfa-sub">Telefonundan direkt oynanır — indirme yok, kurulum yok. Dördü de herkese açık — üyelik yok, kayıt yok, sadece oyna.</p>
+    <p class="sayfa-sub">Telefonundan direkt oynanır — indirme yok, kurulum yok. Dördü de herkese açık. Cactus Jump'ta salon rekorunu geçersen limonata senin; yalnızca ödülü işlemek için sadakat kartı gerekiyor.</p>
 
     <div class="oyunlar">
       <a class="oyun-kart" href="oyun.html">
         <div class="ok-ust">
           <span class="ok-ikon">🌵</span>
-          <span class="ok-rozet acik">🎮 Serbest · Herkese açık</span>
+          <span class="ok-rozet odul">🏆 Rekor kırana limonata</span>
         </div>
         <div class="ok-ad">Cactus Jump</div>
-        <p class="ok-metin">Kahve bardağını kaktüslerin arasından uçur. Nereye kadar gidebilirsin? Rekorun cihazında saklanır.</p>
+        <p class="ok-metin">Kahve bardağını kaktüslerin arasından uçur. <b>Salon rekorunu geçen limonata kazanır</b> ve adı tabelaya yazılır — rekor her kırılışta yükselir.</p>
+        <!-- Rekor sunucudan geliyor; sayfaya sabit sayı yazma, iki yer ayrışır. -->
+        <span class="ok-rekor" id="jumpRekor" hidden></span>
         <span class="ok-btn">Oyna →</span>
       </a>
 
@@ -204,7 +207,7 @@ h1 em{font-style:italic;color:var(--amber);}
       <div class="as-govde">
         <div class="as-etiket">App Store'da yayında</div>
         <div class="as-ad">Cactus Jump — iPhone uygulaması</div>
-        <p class="as-metin">Oyunun kendi uygulaması App Store'da, ücretsiz. İnternet gerekmez, rekorun telefonunda saklanır. </p>
+        <p class="as-metin">Oyunun kendi uygulaması App Store'da, ücretsiz. İnternet gerekmez. Limonata kampanyası yalnızca yukarıdaki tarayıcı sürümünde — uygulamadaki rekor telefonunda kalır.</p>
       </div>
       <span class="as-btn">App Store'dan İndir</span>
     </a>
@@ -212,6 +215,26 @@ h1 em{font-style:italic;color:var(--amber);}
     <p class="alt-not"><a href="kart.html">Sadakat kartına</a> üye ol — her 7 yıldızda bir içecek bizden.</p>
   </div>
 </div>
+
+<script>
+/* Cactus Jump salon rekoru. Tek kaynak worker — sayfaya sabit sayı
+   yazılmıyor ki oyun sayfasıyla burası ayrışmasın. Ağ yoksa satır hiç
+   görünmez; kart yine çalışır. */
+(function(){
+  var kutu = document.getElementById('jumpRekor');
+  if (!kutu) return;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/oyun-rekor?oyun=jump')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (!j || !j.ok || !j.aktif) return;
+      kutu.textContent = j.ad
+        ? 'Rekor ' + j.skor + ' · ' + j.ad
+        : 'Rekor ' + j.skor + ' — henüz kıran yok';
+      kutu.hidden = false;
+    })
+    .catch(function(){});
+})();
+</script>
 
 </body>
 </html>

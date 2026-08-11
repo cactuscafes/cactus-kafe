@@ -7,22 +7,35 @@
  *
  * Kullanım (oyun sayfasında):
  *   <script src="oyun-odul.js"></script>
- *   CactusOdul.kur({ oyun:'jump', esik:25 });          // yüksek skor iyi
- *   CactusOdul.kur({ oyun:'hafiza', esik:14, tersYon:true, birim:'hamle' });
+ *   CactusOdul.kur({ oyun:'jump' });
  *   ...oyun bitince:
  *   CactusOdul.bitti(skor, gecenSaniye);
  *
- * Ödülün gerçek doğrulaması sunucuda. Buradaki kapı kampanyayı üyeliğe
- * bağlamak için; üye olmayana zaten hak tanımlanmıyor.
+ * ═══ 2026-08-12: SABİT EŞİK → YÜKSELEN REKOR ═══
+ * Eskiden sabit bir eşiği geçen HERKES kazanıyordu. Artık yalnızca
+ * REKORU KIRAN kazanıyor ve bar her kırılışta yükseliyor. Bu yüzden eşik
+ * artık burada yazılı değil — sunucudan (/kart/oyun-rekor) çekiliyor.
+ * Sayfaya elle eşik yazma; iki yer ayrışır ve oyuncuya yalan söylersin.
+ *
+ * ÜYELİK KAPISI KALDIRILDI: oyunlar "Serbest · Herkese açık". Telefon
+ * yalnızca rekor kırılınca, limonatayı işlemek için soruluyor.
+ *
+ * Ödülün gerçek doğrulaması sunucuda — buradaki kontrol sadece kartı
+ * gereksiz yere açmamak için.
  * ═══════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
 
   var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
   var UYE_ANAHTAR = 'cactus_oyun_uye';
-  var ayar = null;          // { oyun, esik, tersYon, birim }
+  var ayar = null;          // { oyun }
   var uyeTel = null;
   var odulSunuldu = false;  // bir oturumda tek kez teklif et
+  /* Sunucudan gelen güncel rekor: { skor, ad, taban, aktif }.
+     Rekor kırılınca yerel olarak da güncelleniyor ki oyuncu aynı oturumda
+     ikinci kez oynadığında eski barı görmesin. */
+  var rekor = null;
+  var rekorDinleyici = null;
 
   /* ── Stil: sayfaya bir kez enjekte edilir ── */
   function stilEkle() {
@@ -79,76 +92,41 @@
     } catch (e) {}
   }
 
-  /* /kart/bak hız sınırlı olduğu için sonuç 7 gün önbelleklenir —
-   * her oyun açılışında sorgulamak oyuncuyu kendi kapısında kilitlerdi. */
-  function uyeDogrula(tel) {
-    return fetch(API + '/kart/bak?telefon=' + encodeURIComponent(tel))
-      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
-      .then(function (o) {
-        if (o.j && o.j.ok && o.j.musteri) { uyeKaydet(tel); return true; }
-        if (o.s === 429) throw new Error('Çok fazla deneme — birazdan tekrar dene');
-        throw new Error('Bu numara sadakat kartına kayıtlı değil');
-      });
-  }
+  /* Üyelik kapısı (kapiAc + uyeDogrula) 2026-08-12'de kaldırıldı: oyunlar
+     herkese açık, telefon yalnızca rekor kırılınca soruluyor. Kapı geri
+     istenirse git geçmişinde duruyor. */
 
-  function kapiAc() {
-    stilEkle();
-    var k = kat(
-      '<div class="co-ikon">🎖</div>' +
-      '<div class="co-bas">Önce sadakat kartı</div>' +
-      '<div class="co-metin">Bu oyun sadakat üyelerine özel. Telefonunu gir, üyeliğini doğrulayalım.</div>' +
-      '<input class="co-tel" id="coTel" type="tel" inputmode="numeric" maxlength="11" placeholder="05XX XXX XX XX">' +
-      '<button class="co-btn" id="coGir">DOĞRULA VE OYNA</button>' +
-      '<a class="co-btn ikincil" href="kart.html">Üye değilim — kaydol</a>' +
-      '<div class="co-durum" id="coDurum"></div>'
-    );
-    var giris = k.querySelector('#coTel');
-    var btn = k.querySelector('#coGir');
-    var durum = k.querySelector('#coDurum');
-
-    var kayitli = '';
-    try { kayitli = localStorage.getItem('cactus_kart_tel') || ''; } catch (e) {}
-    giris.value = kayitli;
-    if (kayitli.length === 11) {
-      durum.style.color = '#5a5348';
-      durum.textContent = 'Üyelik kontrol ediliyor…';
-      uyeDogrula(kayitli).then(function () { k.remove(); })
-        .catch(function () { durum.textContent = ''; });
-    }
-
-    btn.addEventListener('click', function () {
-      var tel = telDuzelt(giris.value);
-      if (tel.length !== 11) {
-        durum.style.color = '#c0392b'; durum.textContent = 'Geçerli bir numara gir'; return;
-      }
-      btn.disabled = true;
-      durum.style.color = '#5a5348'; durum.textContent = 'Kontrol ediliyor…';
-      uyeDogrula(tel).then(function () {
-        durum.style.color = '#2d7a4f'; durum.textContent = '✓ Hoş geldin!';
-        setTimeout(function () { k.remove(); }, 400);
-      }).catch(function (e) {
-        durum.style.color = '#c0392b'; durum.textContent = e.message;
-        btn.disabled = false;
-      });
-    });
-    giris.addEventListener('keydown', function (e) { if (e.key === 'Enter') btn.click(); });
+  /* ── Rekor ── */
+  function rekorCek() {
+    return fetch(API + '/kart/oyun-rekor?oyun=' + encodeURIComponent(ayar.oyun))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) {
+          rekor = j;
+          if (rekorDinleyici) rekorDinleyici(j);
+        }
+        return rekor;
+      })
+      .catch(function () { return null; });   // ağ yoksa oyun yine oynanır
   }
 
   /* ── Ödül ── */
   function odulAc(skor, sure) {
     stilEkle();
     var k = kat(
-      '<div class="co-ikon">🍋</div>' +
-      '<div class="co-bas">Limonata kazandın!</div>' +
+      '<div class="co-ikon">🏆</div>' +
+      '<div class="co-bas">Rekoru kırdın!</div>' +
       '<div class="co-metin" id="coOdulMetin"></div>' +
       '<input class="co-tel" id="coOdulTel" type="tel" inputmode="numeric" maxlength="11" placeholder="05XX XXX XX XX">' +
       '<button class="co-btn" id="coAl">HAKKIMI AL</button>' +
       '<button class="co-btn ikincil" id="coKapat">Kapat</button>' +
       '<div class="co-durum" id="coOdulDurum"></div>'
     );
-    var birim = ayar.birim || 'skor';
+    var eski = rekor ? rekor.skor : null;
     k.querySelector('#coOdulMetin').textContent =
-      skor + ' ' + birim + ' yaptın! Hakkını sadakat kartına işleyelim, tezgâhta göster ve limonatanı al.';
+      skor + ' yaptın' + (eski ? ' — eski rekor ' + eski + '.' : '.') +
+      ' Sadakat kartına kayıtlı numaranı gir: limonata hakkın işlensin ve ' +
+      'adın rekor tabelasına yazılsın.';
     k.querySelector('#coOdulTel').value = uyeTel || '';
     k.querySelector('#coKapat').addEventListener('click', function () { k.remove(); });
 
@@ -167,9 +145,16 @@
       }).then(function (r) { return r.json(); }).then(function (j) {
         if (j.ok) {
           uyeKaydet(tel);
-          durum.style.color = '#2d7a4f';
-          durum.textContent = '✓ Limonata hakkın kartına işlendi. Tezgâhta göster.';
-          btn.textContent = 'TANIMLANDI';
+          // Tabelayı hemen güncelle: aynı oturumda tekrar oynayan oyuncu
+          // kendi kırdığı rekoru görsün, eskisini değil.
+          rekor = { ok: true, oyun: ayar.oyun, skor: j.skor, ad: j.ad,
+                    taban: rekor ? rekor.taban : j.skor, aktif: true };
+          if (rekorDinleyici) rekorDinleyici(rekor);
+          durum.style.color = j.odul ? '#2d7a4f' : '#8a6a2a';
+          // Haftalık sınıra takılırsa rekor yine yazılır ama limonata çıkmaz;
+          // sunucu bunu `odul:false` + açıklayıcı mesajla bildiriyor.
+          durum.textContent = j.mesaj || '✓ İşlendi.';
+          btn.textContent = j.odul ? 'TANIMLANDI' : 'REKOR YAZILDI';
         } else {
           durum.style.color = '#c0392b';
           durum.textContent = j.error || 'İşlenemedi';
@@ -185,25 +170,36 @@
 
   /* ── Dışa açık API ── */
   global.CactusOdul = {
+    /**
+     * @param o.oyun     sunucudaki oyun anahtarı ('jump')
+     * @param o.rekorGeldi  rekor her değiştiğinde çağrılır ({skor, ad})
+     */
     kur: function (o) {
       ayar = o || {};
+      rekorDinleyici = ayar.rekorGeldi || null;
       var onbellek = onbellekOku();
       if (onbellek) uyeTel = onbellek;
-      else if (document.body) kapiAc();
-      else document.addEventListener('DOMContentLoaded', kapiAc);
+      // Üyelik kapısı YOK — oyun herkese açık. Telefon yalnızca rekor
+      // kırılınca soruluyor.
+      rekorCek();
     },
 
-    /** Oyun bitince çağrılır. Eşik geçildiyse ödül kartını açar. */
+    /** Oyun bitince çağrılır. Rekor kırıldıysa ödül kartını açar. */
     bitti: function (skor, sure) {
       if (!ayar || odulSunuldu) return;
-      var gecti = ayar.tersYon ? (skor > 0 && skor <= ayar.esik) : (skor >= ayar.esik);
-      if (!gecti) return;
+      // Rekor henüz gelmediyse (ağ yavaş) kartı açma: yanlış barla
+      // "kazandın" demek, sunucunun reddiyle sonuçlanır ve oyuncuyu kızdırır.
+      if (!rekor || !rekor.aktif) return;
+      if (skor <= rekor.skor) return;
+      // Sunucunun süre alt sınırıyla aynı mantık — buradan geçemeyecek bir
+      // skoru "kazandın" diye göstermeyelim.
+      if (sure < skor * 0.8) return;
       odulSunuldu = true;
       setTimeout(function () { odulAc(skor, sure); }, 700);
     },
 
-    /** Başlık ekranlarında "X skor yap, limonata kazan" yazmak için. */
-    esik: function () { return ayar ? ayar.esik : null; },
+    /** Ekranda "Rekor 45 — Batuhan B." yazmak için. */
+    rekor: function () { return rekor; },
     uye: function () { return uyeTel; }
   };
 })(window);

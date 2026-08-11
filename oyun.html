@@ -18,6 +18,9 @@ body{font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;touch-action:n
 <body>
 <canvas id="oyunCanvas"></canvas>
 
+<!-- Rekor kampanyası: salon rekorunu çeker, kırılınca limonata kartını açar.
+     Oyunun kendi kodundan bağımsız — modül yüklenmezse oyun yine çalışır. -->
+<script src="oyun-odul.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -137,6 +140,9 @@ var Ses = {
 var DURUM = { HAZIR:0, OYUN:1, BITTI:2 };
 var durum = DURUM.HAZIR;
 var oyuncuY = 0, hizY = 0, skor = 0, rekor = 0, engeller = [], sonSpawn = 0;
+/* Salon rekoru — sunucudan gelen ortak rekor {skor, ad}. Cihazdaki `rekor`
+   ile karıştırma: o localStorage'da, sadece bu telefona ait. */
+var salonRekor = null;
 var yeniRekor = false, olumZamani = 0, basZamani = 0, oynananSure = 0;
 var flash = 0;
 try { rekor = parseInt(localStorage.getItem('cactus_oyun_rekor') || '0', 10) || 0; } catch(e){}
@@ -188,7 +194,10 @@ function bitir(){
     try { localStorage.setItem('cactus_oyun_rekor', String(rekor)); } catch(e){}
     setTimeout(Ses.rekor, 550);
   }
-  // Ödül sistemi kaldırıldı — oyunlar serbest.
+  // Salon rekoru kırıldıysa limonata kartını açar. Cihaz rekoru (yukarıdaki
+  // `rekor`) ile salon rekoru ayrı şeyler — biri localStorage'da, diğeri
+  // sunucuda ve tüm oyuncular arasında ortak.
+  if (window.CactusOdul) CactusOdul.bitti(skor, oynananSure);
 }
 
 /* ══════════════ ÇİZİM ══════════════ */
@@ -476,8 +485,17 @@ function hazirEkran(){
     cx.font = '600 14px Montserrat, sans-serif'; cx.fillStyle = 'rgba(26,51,16,.8)';
     cx.fillText('Rekor  ' + rekor, W / 2, y + 84);
   }
-  cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
-  cx.fillText('Rekorunu geçmeye çalış', W / 2, y + 116);
+  if (salonRekor){
+    // Salon rekoru: tüm oyuncular arasında ortak, sunucudan geliyor.
+    cx.font = '700 14px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
+    cx.fillText('🏆 Salon rekoru  ' + salonRekor.skor +
+                (salonRekor.ad ? '  ·  ' + salonRekor.ad : ''), W / 2, y + 114);
+    cx.font = '600 12px Montserrat, sans-serif'; cx.fillStyle = 'rgba(26,51,16,.6)';
+    cx.fillText('Geçen limonata kazanır', W / 2, y + 136);
+  } else {
+    cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
+    cx.fillText('Rekorunu geçmeye çalış', W / 2, y + 116);
+  }
 }
 
 function bittiEkran(){
@@ -497,6 +515,13 @@ function bittiEkran(){
   if (yeniRekor){
     cx.font = '900 15px Montserrat, sans-serif'; cx.fillStyle = R.altin;
     cx.fillText('YENİ REKOR!', W / 2, py + ph - 74);
+  } else if (salonRekor && skor > 0){
+    // Rekora ne kadar kaldığını göster — tekrar denemeye asıl bu itiyor.
+    var fark = salonRekor.skor - skor + 1;
+    cx.font = '700 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
+    cx.fillText(fark > 0 ? 'Salon rekoruna ' + fark + ' kaldı'
+                         : 'Salon rekoru  ' + salonRekor.skor,
+                W / 2, py + ph - 74);
   }
   cx.font = '600 15px Montserrat, sans-serif'; cx.fillStyle = 'rgba(20,39,29,.7)';
   cx.fillText('Tekrar oynamak için dokun', W / 2, py + ph - 38);
@@ -522,6 +547,14 @@ cv.addEventListener('pointerdown', function(e){ e.preventDefault(); dokun(e.clie
 window.addEventListener('keydown', function(e){ if (e.code === 'Space'){ e.preventDefault(); dokun(-99, -99); } });
 
 /* ══════════════ BAŞLAT ══════════════ */
+if (window.CactusOdul) {
+  CactusOdul.kur({
+    oyun: 'jump',
+    // Rekor sunucudan gelince ve kırılınca çağrılır; çizim döngüsü zaten
+    // her karede okuyor, ayrıca yeniden çizmeye gerek yok.
+    rekorGeldi: function (r) { salonRekor = r; }
+  });
+}
 ustPayOlc();
 olcekle();
 hazirla();

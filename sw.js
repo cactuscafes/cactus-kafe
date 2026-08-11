@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v70'; // v70: Podyum popup — Tatlı+İçecek kampanyası yerine Bubble Waffle tanıtımı (fotoğraflı)
+const VERSION = 'cactus-v71'; // v71: waffle popup ekrana sığdı + Kapat bağlantısı (i18n güncel)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',

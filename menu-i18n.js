@@ -187,6 +187,7 @@
       "Sıcacık bubble waffle'ın üzerine taptaze çilek, muz ve dilediğin sos — bitter çikolatadan Antep fıstığına, lotustan beyaz çikolataya. Her kase siparişinle hazırlanır.",
       'Warm bubble waffle topped with fresh strawberries, banana and your choice of sauce — dark chocolate, pistachio, Lotus or white chocolate. Every bowl is made to order.'],
     ['.kampanya-cta', "Waffle'lara Bak", 'See Waffles'],
+    ['.kampanya-gec', 'Kapat', 'Close'],
     ['.pop-badge', '🧇&nbsp; Günlük taze', '🧇&nbsp; Fresh daily', true]
   ];
 

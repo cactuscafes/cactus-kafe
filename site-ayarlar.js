@@ -135,20 +135,9 @@
           if (sb && a.popup_fsm.metin) sb.innerHTML = md(a.popup_fsm.metin);
         }
       }
-      // ── Podyum kampanya popup içeriği ──
-      if (a.popup_podyum) {
-        var kb = document.getElementById('kampanyaBg');
-        if (kb) {
-          var ke = kb.querySelector('.kampanya-eyebrow'), kt = kb.querySelector('.kampanya-title'),
-              kf = kb.querySelector('.kampanya-price'), ks = kb.querySelector('.kampanya-sub'),
-              kn = kb.querySelector('.kampanya-note');
-          if (ke && a.popup_podyum.eyebrow) ke.textContent = a.popup_podyum.eyebrow;
-          if (kt && a.popup_podyum.baslik) kt.innerHTML = md(a.popup_podyum.baslik);
-          if (kf && a.popup_podyum.fiyat) kf.innerHTML = md(String(a.popup_podyum.fiyat)) + '<small>₺</small>';
-          if (ks && a.popup_podyum.metin) ks.innerHTML = md(a.popup_podyum.metin);
-          if (kn && a.popup_podyum.not) kn.textContent = a.popup_podyum.not;
-        }
-      }
+      // ── Podyum popup: metinler artık sabit (Bubble Waffle tanıtımı) ──
+      // Eski Tatlı+İçecek kampanya metin ezmesi kaldırıldı; admin'in
+      // popup_podyum.acik / bitis kontrolü kampanyaAc() içinde çalışmaya devam ediyor.
       // ── schema.org JSON-LD (ana sayfa): saat + telefon tazele ──
       try {
         var ld = document.querySelector('script[type="application/ld+json"]');

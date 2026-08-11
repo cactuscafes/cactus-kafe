@@ -138,7 +138,7 @@
     '🎖 Sadakat Kartı': '🎖 Loyalty Card',
     '🎮 Oyun': '🎮 Games',
     'FSM Menü': 'FSM Menu',
-    'Tatlılara Bak': 'See Desserts'
+    "Waffle'lara Bak": 'See Waffles'
   };
 
   var dil = 'tr';
@@ -184,10 +184,10 @@
     ['.mg-cta', 'Yorum Yap →', 'Write a Review →'],
     ['.kampanya-eyebrow', "Podyumpark'a Özel", 'Podyumpark Exclusive'],
     ['.kampanya-sub',
-      'Menüden dilediğiniz tatlı ile dilediğiniz içecek bir arada — tek fiyatla.',
-      'Any dessert plus any drink from the menu — one price.'],
-    ['.kampanya-cta', 'Tatlılara Bak', 'See Desserts'],
-    ['.pop-badge', '⏳&nbsp; Stoklarla sınırlı', '⏳&nbsp; While stocks last', true]
+      "Sıcacık bubble waffle'ın üzerine taptaze çilek, muz ve dilediğin sos — bitter çikolatadan Antep fıstığına, lotustan beyaz çikolataya. Her kase siparişinle hazırlanır.",
+      'Warm bubble waffle topped with fresh strawberries, banana and your choice of sauce — dark chocolate, pistachio, Lotus or white chocolate. Every bowl is made to order.'],
+    ['.kampanya-cta', "Waffle'lara Bak", 'See Waffles'],
+    ['.pop-badge', '🧇&nbsp; Günlük taze', '🧇&nbsp; Fresh daily', true]
   ];
 
   function sabitleriUygula() {

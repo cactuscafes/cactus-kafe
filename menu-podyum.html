@@ -487,6 +487,22 @@ footer{padding:40px 20px 24px;}
 .kampanya-icecek b{color:#1a3010;}
 .kampanya-note{font-family:'Inter',sans-serif;font-size:10px;color:#a89b7e;letter-spacing:1px;margin-top:18px;text-transform:uppercase;}
 @media(max-width:480px){.kampanya-inner{padding:24px 20px 20px;}.kampanya-title{font-size:24px;}.kampanya-price{font-size:44px;}.kampanya-foto{margin:2px 0 12px;}.kmp-logo{height:38px!important;}.kampanya-inner .pop-badge{margin-bottom:12px;}.kampanya-brand{margin-bottom:12px;}}
+/* Mobil: popup kayan şeridin ALTINDA başlar (nav 60 + şerit 34 + pay), biraz kompakt */
+@media(max-width:768px){
+  .kampanya-bg{padding:110px 16px 16px;align-items:flex-start;}
+  .kampanya-modal{max-height:calc(100dvh - 126px);}
+  .kampanya-foto{width:min(100%,34dvh);margin:2px auto 10px;}
+  .kampanya-inner{padding:18px 16px 14px;}
+  .kampanya-inner .pop-badge{margin-bottom:10px;}
+  .kmp-logo{height:32px!important;}
+  .kampanya-brand{margin-bottom:10px;}
+  .kampanya-eyebrow{margin-bottom:6px;}
+  .kampanya-title{font-size:22px;margin-bottom:6px;}
+  .kampanya-sub{font-size:12.5px;line-height:1.55;margin-bottom:10px;}
+  .kampanya-icecek{font-size:12px;padding:8px 14px;margin:0 auto 10px;}
+  .kampanya-cta{padding:12px 26px;}
+  .kampanya-gec{margin-top:8px;padding:4px 10px;}
+}
 
 /* ═══ Hoşgeldin Toast ═══ */
 .welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#1a3010,#2d5a27);color:#fdfaf3;padding:14px 22px;border-radius:100px;box-shadow:0 10px 32px rgba(45,90,39,.4);font-size:13.5px;font-weight:600;letter-spacing:.3px;z-index:200;display:flex;align-items:center;gap:10px;transition:transform .5s cubic-bezier(.2,.7,.2,1);max-width:90vw;}

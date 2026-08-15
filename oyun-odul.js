@@ -200,6 +200,16 @@
 
     /** Ekranda "Rekor 45 — Batuhan B." yazmak için. */
     rekor: function () { return rekor; },
-    uye: function () { return uyeTel; }
+    uye: function () { return uyeTel; },
+
+    /** SALT OKUNUR: ödül sistemine bağlanmadan yalnızca salon rekorunu çeker.
+     *  Web'deki Cactus Jump bunu kullanır — kampanya yalnızca App Store
+     *  uygulamasında geçerli olduğu için skor gönderimi/telefon penceresi yok. */
+    rekorOku: function (oyun, cb) {
+      fetch(API + '/kart/oyun-rekor?oyun=' + encodeURIComponent(oyun))
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (j && j.ok && cb) cb(j); })
+        .catch(function () {});
+    }
   };
 })(window);

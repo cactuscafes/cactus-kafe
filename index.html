@@ -460,15 +460,6 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       </div>
       <a href="kart.html" style="display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#c8a86a';this.style.transform='translateY(0)'">Kartımı Gör →</a>
 
-      <!-- App Store — native oyun. Ödül sistemine dahil değil, o yüzden ayrı ve daha sönük. -->
-      <a href="https://apps.apple.com/tr/app/cactus-jump/id6794923490" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;margin-top:10px;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid rgba(200,168,106,.22);border-radius:14px;text-decoration:none;max-width:380px;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
-        <span style="font-size:26px;line-height:1;">🌵</span>
-        <span style="flex:1;">
-          <span style="display:block;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#f0e1c3;">Cactus Jump artık App Store'da</span>
-          <span style="display:block;font-family:'Inter',sans-serif;font-size:11px;color:rgba(240,225,195,.6);margin-top:3px;font-weight:300;">iPhone uygulaması olarak ücretsiz indir. İnternetsiz oynanır, rekorun telefonunda saklanır.</span>
-        </span>
-        <span style="font-size:20px;color:#c8a86a;line-height:1;">›</span>
-      </a>
     </div>
 
     <!-- Sağ: Kart görseli -->
@@ -579,6 +570,90 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       basla();
     }
   });
+})();
+</script>
+
+<!-- CACTUS JUMP — UYGULAMA TANITIMI (limonata kampanyası yalnızca uygulamada) -->
+<style>
+.app-sec{background:#0e1f08;padding:88px 60px;position:relative;overflow:hidden;color:#f7f2ea;}
+.app-sec::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(127,176,105,.14) 0%,transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(200,168,106,.12) 0%,transparent 55%);pointer-events:none;}
+.app-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center;position:relative;z-index:1;}
+.app-eyebrow{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;}
+.app-title{font-family:'Fraunces',serif;font-size:clamp(32px,4vw,54px);font-weight:300;line-height:1.08;margin-bottom:16px;letter-spacing:-.5px;}
+.app-title em{font-style:italic;color:#e8c47a;}
+.app-sub{font-size:14px;line-height:1.85;color:rgba(240,230,210,.72);font-weight:300;max-width:52ch;margin-bottom:26px;}
+.app-odul{display:flex;align-items:center;gap:14px;background:rgba(200,168,106,.10);border:1px solid rgba(232,196,122,.45);border-radius:14px;padding:14px 18px;margin-bottom:26px;max-width:520px;}
+.app-odul .ai{font-size:30px;line-height:1;flex:none;}
+.app-odul b{display:block;font-size:14px;color:#f3dca0;margin-bottom:2px;}
+.app-odul span{font-size:12px;color:rgba(240,230,210,.7);line-height:1.55;}
+.app-adim{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px;max-width:560px;}
+.app-adim>div{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;}
+.app-adim>div>.n{font-family:'Fraunces',serif;font-size:22px;color:#c8a86a;line-height:1;background:none;border:none;padding:0;margin:0;display:block;}
+.app-adim p{font-size:11.5px;color:rgba(240,230,210,.75);line-height:1.5;margin:0;}
+.app-cta{display:inline-flex;align-items:center;gap:12px;background:#f7f2ea;color:#0e1f08;text-decoration:none;padding:14px 22px 14px 16px;border-radius:14px;font-family:'Inter',sans-serif;transition:transform .2s,box-shadow .2s;}
+.app-cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35);}
+.app-cta svg{width:26px;height:26px;flex:none;}
+.app-cta small{display:block;font-size:10px;letter-spacing:.5px;color:#5c6650;line-height:1.1;}
+.app-cta b{display:block;font-size:16px;font-weight:600;line-height:1.15;}
+.app-not{font-size:11px;color:rgba(240,230,210,.5);margin-top:14px;max-width:52ch;line-height:1.6;}
+.app-not b{color:rgba(240,230,210,.8);font-weight:600;}
+.app-gorsel{display:flex;justify-content:center;}
+.app-tel{width:min(300px,100%);aspect-ratio:9/19;border-radius:38px;background:linear-gradient(160deg,#2c4a1e 0%,#1a3310 55%,#0b1a07 100%);border:6px solid #1c2416;box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.06);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.app-tel::before{content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);width:96px;height:26px;background:#1c2416;border-radius:16px;}
+.app-tel .kaktus{font-size:74px;line-height:1;filter:drop-shadow(0 10px 20px rgba(0,0,0,.4));animation:appZipla 2.4s ease-in-out infinite;}
+@keyframes appZipla{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.app-tel .cup{font-size:40px;line-height:1;}
+.app-tel .ad{font-family:'Fraunces',serif;font-size:22px;color:#f7f2ea;letter-spacing:1px;}
+.app-tel .rk{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#e8c47a;font-weight:700;}
+.app-tel .rk-no{font-family:'Fraunces',serif;font-size:44px;color:#f7f2ea;line-height:1;}
+.app-tel .rk-alt{font-size:10px;color:rgba(240,230,210,.6);}
+@media(prefers-reduced-motion:reduce){.app-tel .kaktus{animation:none;}}
+@media(max-width:900px){.app-sec{padding:64px 24px;}.app-inner{grid-template-columns:1fr;gap:40px;}.app-gorsel{order:-1;}.app-tel{width:min(240px,100%);}.app-adim{grid-template-columns:1fr;}}
+</style>
+<section class="app-sec" id="uygulama">
+  <div class="app-inner">
+    <div>
+      <div class="app-eyebrow">Cactus Jump · iPhone Uygulaması</div>
+      <h2 class="app-title">Rekoru kır,<br><em>limonata senin.</em></h2>
+      <p class="app-sub">Cactus Jump artık App Store'da — kahve bardağını kaktüslerin arasından uçur, salon rekorunu geç. Rekoru kırdığın an uygulama sadakat kartına kayıtlı numaranı sorar; limonata hakkın anında işlenir, adın tabelaya yazılır. Rekor her kırılışta yükselir.</p>
+      <div class="app-odul">
+        <span class="ai">🍋</span>
+        <div><b>Rekor kırana limonata</b><span>Kampanya yalnızca App Store uygulamasında geçerli — ödülünü kasada, telefon numaranı söyleyerek alırsın.</span></div>
+      </div>
+      <div class="app-adim">
+        <div><div class="n">1</div><p>Uygulamayı ücretsiz indir</p></div>
+        <div><div class="n">2</div><p>Salon rekorunu geç</p></div>
+        <div><div class="n">3</div><p>Numaranı gir, limonatan hazır</p></div>
+      </div>
+      <a class="app-cta" href="https://apps.apple.com/tr/app/cactus-jump/id6794923490" target="_blank" rel="noopener" aria-label="Cactus Jump'ı App Store'dan indir">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.42 2.2-1.24 3.06-.98 1.05-2.16 1.66-3.4 1.55-.05-1.1.42-2.24 1.22-3.09.86-.93 2.3-1.6 3.42-1.52zM20.6 17.3c-.55 1.27-.82 1.84-1.53 2.96-.99 1.57-2.39 3.53-4.12 3.55-1.54.02-1.94-1.01-4.03-1-2.09.01-2.53 1.02-4.07 1-1.73-.02-3.05-1.78-4.04-3.35C.05 16.9-.24 12.15 1.53 9.6c1.26-1.8 3.25-2.86 5.12-2.86 1.9 0 3.1 1.04 4.67 1.04 1.53 0 2.46-1.05 4.66-1.05 1.66 0 3.42.9 4.68 2.47-4.11 2.25-3.44 8.12-.06 8.1z"/></svg>
+        <span><small>App Store'dan</small><b>Ücretsiz İndir</b></span>
+      </a>
+      <p class="app-not"><b>Not:</b> Sitedeki tarayıcı sürümü serbest oynanır, ödül vermez. Limonata için uygulamada oyna. Sadakat kartın yoksa <a href="kart.html" style="color:#e8c47a;">30 saniyede oluştur</a>.</p>
+    </div>
+    <div class="app-gorsel">
+      <div class="app-tel" aria-hidden="true">
+        <span class="kaktus">🌵</span>
+        <span class="cup">☕</span>
+        <span class="ad">CACTUS JUMP</span>
+        <span class="rk">Salon rekoru</span>
+        <span class="rk-no" id="appRekorNo">—</span>
+        <span class="rk-alt" id="appRekorAd">geçen limonata kazanır</span>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+// Salon rekorunu canlı göster (salt okunur uç; sayfaya sabit sayı yazma)
+(function(){
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/oyun-rekor?oyun=jump')
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j||!j.ok) return;
+      var n=document.getElementById('appRekorNo'), a=document.getElementById('appRekorAd');
+      if(n&&j.skor!=null) n.textContent=j.skor;
+      if(a&&j.ad) a.textContent=j.ad+' · geçen limonata kazanır';
+    }).catch(function(){});
 })();
 </script>
 

@@ -96,10 +96,11 @@ h1 em{font-style:italic;color:var(--amber);}
   display:flex;align-items:center;gap:22px;flex-wrap:wrap;
   margin-top:34px;padding:26px 28px;
   background:rgba(255,255,255,.05);backdrop-filter:blur(16px);
-  border:1px solid rgba(232,160,48,.22);border-radius:20px;
+  border:1.5px solid rgba(232,196,122,.55);border-radius:20px;
+  box-shadow:0 0 0 1px rgba(232,196,122,.12),0 12px 36px rgba(0,0,0,.28);
   text-decoration:none;transition:all .25s;
 }
-.as-serit:hover{background:rgba(255,255,255,.08);border-color:rgba(232,160,48,.45);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.32);}
+.as-serit:hover{background:rgba(255,255,255,.08);border-color:rgba(232,196,122,.85);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.32);}
 .as-ikon{
   width:62px;height:62px;flex:none;border-radius:15px;
   background:linear-gradient(150deg,#3d6b2a,#1a3310);
@@ -107,7 +108,7 @@ h1 em{font-style:italic;color:var(--amber);}
   display:flex;align-items:center;justify-content:center;font-size:33px;
 }
 .as-govde{flex:1;min-width:200px;}
-.as-etiket{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#8fc97f;margin-bottom:7px;}
+.as-etiket{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#e8c47a;margin-bottom:7px;}
 .as-ad{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--latte);margin-bottom:5px;}
 .as-metin{font-size:12px;color:rgba(245,234,216,.62);line-height:1.7;font-weight:300;}
 .as-btn{
@@ -154,16 +155,16 @@ h1 em{font-style:italic;color:var(--amber);}
   <div class="sayfa-ic">
     <div class="eyebrow">Cactus Oyun Salonu</div>
     <h1>Kahven gelene kadar <em>oyna</em></h1>
-    <p class="sayfa-sub">Telefonundan direkt oynanır — indirme yok, kurulum yok. Dördü de herkese açık. Cactus Jump'ta salon rekorunu geçersen limonata senin; yalnızca ödülü işlemek için sadakat kartı gerekiyor.</p>
+    <p class="sayfa-sub">Telefonundan direkt oynanır — indirme yok, kurulum yok. Dördü de herkese açık. <b>Limonata kampanyası Cactus Jump'ın App Store uygulamasında:</b> uygulamada salon rekorunu geçen limonata kazanır.</p>
 
     <div class="oyunlar">
       <a class="oyun-kart" href="oyun.html">
         <div class="ok-ust">
           <span class="ok-ikon">🌵</span>
-          <span class="ok-rozet odul">🏆 Rekor kırana limonata</span>
+          <span class="ok-rozet acik">🎮 Serbest · Tarayıcı sürümü</span>
         </div>
         <div class="ok-ad">Cactus Jump</div>
-        <p class="ok-metin">Kahve bardağını kaktüslerin arasından uçur. <b>Salon rekorunu geçen limonata kazanır</b> ve adı tabelaya yazılır — rekor her kırılışta yükselir.</p>
+        <p class="ok-metin">Kahve bardağını kaktüslerin arasından uçur. Burada serbest oyna; <b>limonata ödülü ve rekor tabelası App Store uygulamasında</b> — aşağıdan indir.</p>
         <!-- Rekor sunucudan geliyor; sayfaya sabit sayı yazma, iki yer ayrışır. -->
         <span class="ok-rekor" id="jumpRekor" hidden></span>
         <span class="ok-btn">Oyna →</span>
@@ -205,9 +206,9 @@ h1 em{font-style:italic;color:var(--amber);}
     <a class="as-serit" href="https://apps.apple.com/tr/app/cactus-jump/id6794923490" target="_blank" rel="noopener">
       <span class="as-ikon">🌵</span>
       <div class="as-govde">
-        <div class="as-etiket">App Store'da yayında</div>
+        <div class="as-etiket">🏆 Rekor kırana limonata · yalnızca uygulamada</div>
         <div class="as-ad">Cactus Jump — iPhone uygulaması</div>
-        <p class="as-metin">Oyunun kendi uygulaması App Store'da, ücretsiz. İnternet gerekmez. Limonata kampanyası yalnızca yukarıdaki tarayıcı sürümünde — uygulamadaki rekor telefonunda kalır.</p>
+        <p class="as-metin">Ücretsiz indir, salon rekorunu geç, limonatanı kap: rekoru kırınca uygulama sadakat kartına kayıtlı numaranı sorar, hakkın anında işlenir ve adın tabelaya yazılır. Kampanya sadece uygulamada geçerli.</p>
       </div>
       <span class="as-btn">App Store'dan İndir</span>
     </a>

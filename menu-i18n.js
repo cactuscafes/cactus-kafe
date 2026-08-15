@@ -179,7 +179,6 @@
       'Yıldız kazanmak için sipariş verirken <strong>telefon numaranı kasiyere söylemeyi unutma!</strong>',
       'To earn a star, <strong>give your phone number to the cashier</strong> when you order.', true],
     ['.menu-header-title', 'C | <em>Menü</em>', 'C | <em>Menu</em>', true],
-    ['.menu-header-sub', 'FSM Şubesi &nbsp;·&nbsp; Podyumpark Şubesi', 'FSM &nbsp;·&nbsp; Podyumpark', true],
     ['.spotlight-title', 'Öne Çıkanlar', 'Featured'],
     ['.mg-cta', 'Yorum Yap →', 'Write a Review →'],
     ['.kampanya-eyebrow', "Podyumpark'a Özel", 'Podyumpark Exclusive'],

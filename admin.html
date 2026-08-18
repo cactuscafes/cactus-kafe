@@ -946,6 +946,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <button onclick="kartFilterSec('yeni',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🆕 Bugün Kayıt</button>
             <button onclick="kartFilterSec('bedava',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🎁 Bedava Hakkı</button>
           </div>
+          <select id="kartSirala" onchange="kartListeRender()" title="Sıralama" style="padding:7px 12px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;font-family:inherit;color:#1a1a1a;cursor:pointer;">
+            <option value="kayit_yeni">↓ En son kayıt olan</option>
+            <option value="kayit_eski">↑ İlk kayıt olanlar</option>
+            <option value="yildiz_cok">⭐ En çok yıldız</option>
+            <option value="yildiz_az">⭐ En az yıldız</option>
+            <option value="aktif_pul">🎁 Kartta en çok pul (bedavaya en yakın)</option>
+            <option value="son_islem">🕒 Son işlem (en yakın)</option>
+            <option value="ad">🔤 Ada göre (A→Z)</option>
+          </select>
           <span id="kartSayac" style="font-size:12px;color:var(--mist);"></span>
         </div>
         <!-- Özet kartlar -->
@@ -3967,6 +3976,19 @@ function kartListeRender(){
   } else {
     data = _kartVerisi;
   }
+  // ── Sıralama (kullanıcı seçimi) ──
+  var _sira = document.getElementById('kartSirala') ? document.getElementById('kartSirala').value : 'kayit_yeni';
+  var _ts = function(t){ var d=t?new Date(t).getTime():0; return isNaN(d)?0:d; };
+  var _sirala = {
+    kayit_yeni: function(a,b){ return _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
+    kayit_eski: function(a,b){ return _ts(a.kayit_tarih)-_ts(b.kayit_tarih); },
+    yildiz_cok: function(a,b){ return (b.toplam_kazanilan||0)-(a.toplam_kazanilan||0) || _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
+    yildiz_az:  function(a,b){ return (a.toplam_kazanilan||0)-(b.toplam_kazanilan||0) || _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
+    aktif_pul:  function(a,b){ return (b.pul||0)-(a.pul||0) || _ts(b.son_islem)-_ts(a.son_islem); },
+    son_islem:  function(a,b){ return _ts(b.son_islem)-_ts(a.son_islem); },
+    ad:         function(a,b){ return String(a.ad||'').localeCompare(String(b.ad||''),'tr'); }
+  }[_sira] || null;
+  if(_sirala) data = data.slice().sort(_sirala);
   if(!data.length){
     listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
     return;

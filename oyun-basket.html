@@ -416,8 +416,42 @@ function bittiEkran(){
 
 /* ══════════════ DÖNGÜ ══════════════ */
 var sonAn = 0;
-function dongu(an){
+var donguAcik = true, kareBekliyor = false;
+
+/* Tek kare kuyruğu: durdur/devam hızlı ard arda gelirse (visibilitychange +
+   pageshow birlikte tetiklenebiliyor) iki rAF zinciri birden başlar ve oyun
+   iki kat hızlanır. Bu bayrak onu imkânsız kılıyor. */
+function kareIste(){
+  if (kareBekliyor) return;
+  kareBekliyor = true;
   requestAnimationFrame(dongu);
+}
+
+/* Sayfa gizlenince döngüyü ve sesi durdur — oyun.html ile aynı sebep:
+   menü standalone bir PWA; oyundan çıkınca arka planda dönen rAF ve açık
+   AudioContext, iOS'ta geri dönüşü kilitleyip açılış ekranını (cactus
+   logosu) takılı bırakıyor. Ayrıca boşuna pil yakıyor. */
+function donguDurdur(){
+  donguAcik = false;
+  try { if (AC && AC.state === 'running') AC.suspend(); } catch(e){}
+}
+function donguDevam(){
+  try { if (AC && AC.state === 'suspended' && sesAcik) AC.resume(); } catch(e){}
+  if (donguAcik) return;
+  donguAcik = true;
+  sonAn = 0;                 // dt sıfırlanmazsa dönüşte dev bir sıçrama olur
+  kareIste();
+}
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden) donguDurdur(); else donguDevam();
+});
+window.addEventListener('pagehide', donguDurdur);
+window.addEventListener('pageshow', donguDevam);
+
+function dongu(an){
+  kareBekliyor = false;
+  if (!donguAcik) return;
+  kareIste();
   if (!sonAn){ sonAn = an; return; }
   var dt = Math.min((an - sonAn) / 1000, 1 / 30);
   sonAn = an;
@@ -469,7 +503,7 @@ cv.addEventListener('pointerup', function(){
 ustPayOlc();
 olcekle();
 hazirla();
-requestAnimationFrame(dongu);
+kareIste();
 </script>
 </body>
 </html>

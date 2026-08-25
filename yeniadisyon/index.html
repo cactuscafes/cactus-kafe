@@ -4,71 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Cactus Adisyon — Yeni Sistem</title>
+<title>Cactus Adisyon</title>
 <link rel="icon" href="/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Personel tek dokunuşla giriş ekranına düşsün diye doğrudan yönlendirme.
+     Kurulum anlatımı /yeniadisyon/kurulum/ altında duruyor; adisyonun giriş
+     ekranından da linkleniyor. JS kapalıysa meta refresh devreye girer. -->
+<meta http-equiv="refresh" content="0; url=https://cactus-adisyon.batuhanbulut.workers.dev/adisyon">
+<link rel="canonical" href="https://cactus-adisyon.batuhanbulut.workers.dev/adisyon">
 <style>
-:root{--zemin:#0a2a1d;--panel:#0e3d2a;--panel2:#124a33;--cizgi:#1e5c40;--altin:#c8a86a;--altin2:#a98a4e;--krem:#fdfaf3;--gri:#c2d3c8;--gri2:#8aa697}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--zemin);color:var(--krem);font-family:'Inter',-apple-system,sans-serif;min-height:100dvh;display:flex;padding:20px}
-.kutu{margin:auto;width:min(460px,100%);background:var(--panel);border:1px solid var(--cizgi);border-radius:18px;padding:32px 26px}
-.logo{display:block;width:190px;margin:0 auto 8px}
-h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:20px;color:var(--altin);letter-spacing:5px;text-align:center;margin-bottom:22px}
-.ac{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--altin),var(--altin2));color:#12301f;font-weight:600;padding:17px;border-radius:12px;font-size:17px;text-decoration:none}
-.ac:active{transform:scale(.98)}
-.altyazi{text-align:center;font-size:12.5px;color:var(--gri2);margin-top:10px}
-h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:15px;color:var(--gri);letter-spacing:1px;margin:24px 0 10px;padding-top:20px;border-top:1px solid var(--cizgi)}
-p,li{font-size:14px;line-height:1.8;color:var(--gri)}
-ol{padding-left:20px}
-strong{color:var(--krem);font-weight:600}
-.not{background:var(--panel2);border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--gri);line-height:1.75;margin-top:14px}
-.not b{color:var(--altin)}
-.apk{display:block;text-align:center;background:var(--panel2);border:1px solid var(--cizgi);color:var(--krem);padding:14px;border-radius:11px;font-size:15px;text-decoration:none;margin-top:12px}
-.alt{text-align:center;font-size:11.5px;color:var(--gri2);margin-top:26px;line-height:1.7}
-code{display:block;background:var(--zemin);border:1px solid var(--cizgi);border-radius:7px;padding:9px 10px;font-size:11.5px;color:var(--altin);margin:8px 0 0;word-break:break-all;font-family:ui-monospace,Menlo,monospace}
+body{margin:0;min-height:100dvh;min-height:100vh;display:flex;align-items:center;justify-content:center;
+     background:#0a2a1d;color:#c2d3c8;font-family:-apple-system,system-ui,sans-serif;text-align:center;padding:24px}
+a{color:#c8a86a}
 </style>
+<script>location.replace('https://cactus-adisyon.batuhanbulut.workers.dev/adisyon');</script>
 </head>
 <body>
-<div class="kutu">
-  <img class="logo" src="/logo-light.png" alt="Cactus">
-  <h1>ADİSYON</h1>
-
-  <a class="ac" id="acBtn" href="https://cactus-adisyon.batuhanbulut.workers.dev/adisyon">Adisyonu Aç →</a>
-  <p class="altyazi">Kendi telefon numaran ve şifrenle gir</p>
-
-  <div class="not">
-    <b>Girişte:</b> telefon numaran (başında 0 ile) ve yöneticinin sana verdiği
-    şifre. <b>Beni Hatırla</b> işaretliyse bir daha şifre sormaz.
-  </div>
-
-  <h2>Telefona kur — iPhone</h2>
-  <ol>
-    <li>Bu sayfayı <strong>Safari</strong>'de aç (Chrome'da ekleme seçeneği yok).
-        WhatsApp'tan geldiysen sağ alttaki <strong>Safari'de aç</strong>'a dokun.</li>
-    <li><strong>Önce yukarıdaki “Adisyonu Aç”a dokun</strong> — ekleme
-        işlemini adisyon ekranındayken yapacaksın.</li>
-    <li>Alttaki <strong>Paylaş</strong> (⬆) düğmesine dokun.</li>
-    <li><strong>Ana Ekrana Ekle</strong> → <strong>Ekle</strong>.</li>
-  </ol>
-  <p style="margin-top:8px">Simge ana ekranda çıkar, uygulama gibi tam ekran açılır.</p>
-
-  <h2>Telefona kur — Android</h2>
-  <p>
-    <strong>Adisyonu Aç</strong>'a dokun, sonra Chrome'da
-    <strong>⋮ → Uygulamayı yükle</strong> de. Bluetooth fiş yazıcısı
-    bağlayacaksan bunun yerine uygulamayı kur:
-  </p>
-  <a class="apk" href="https://cactus-adisyon.batuhanbulut.workers.dev/kur-a7d3f0e1/">⬇ Android uygulaması ve kurulum</a>
-
-  <h2>Adresi elle yazmak istersen</h2>
-  <code>cactus-adisyon.batuhanbulut.workers.dev</code>
-
-  <p class="alt">
-    Bu sayfa yalnız Cactus personeli içindir, arama motorlarında listelenmez.<br>
-    Giriş yapamıyorsan yöneticine bildir.
-  </p>
+<div>
+  <p>Adisyon açılıyor…</p>
+  <p><a href="https://cactus-adisyon.batuhanbulut.workers.dev/adisyon">Açılmazsa buraya dokun</a></p>
 </div>
 </body>
 </html>

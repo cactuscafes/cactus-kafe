@@ -6,7 +6,7 @@
  * istendiğinde tek dosya yeter (worker'daki eşikler de aynı tutulmalı).
  *
  * Kullanım (oyun sayfasında):
- *   <script src="oyun-odul.js"></script>
+ *   <script src="odul.js"></script>
  *   CactusOdul.kur({ oyun:'jump' });
  *   ...oyun bitince:
  *   CactusOdul.bitti(skor, gecenSaniye);

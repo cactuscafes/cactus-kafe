@@ -7,11 +7,19 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
 - **Ana dizin:** `/Users/bulut/Desktop/cactus-site`
 - **Yayın:** Cloudflare Pages → cactuscafes.com (push → otomatik deploy, ~1-2 dk)
 
+## Bölümler
+
+Repo içindeki bölümlerin (Oyunlar, Yeni Adisyon, ana site, POS, worker,
+uygulamalar) tam haritası: [`PROJELER.md`](PROJELER.md).
+Ayrı proje olan `vivaldimenu.com` / `vivaldiprofessional.com` de orada anlatılıyor.
+
 ## Dosyalar
 - `adisyon.html` — Podyumpark POS/adisyon (`SUBE='podyum'`)
 - `adisyon-fsm.html` — FSM POS/adisyon (`SUBE='fsm'`)
 - `admin.html` — yönetim paneli (raporlar, menü, e-posta, WhatsApp test)
 - `index.html`, `menu.html`, `kart.html` (sadakat kartı), `iletisim.html`, `galeri.html`
+- `oyunlar/` — oyunlar bölümü (`index`, `jump`, `hafiza`, `merdiven`, `basket`, `odul.js`); kökteki `oyun*.html` sadece eski URL yönlendirmesi
+- `yeniadisyon/` — yeni adisyon karşılama + kurulum sayfası
 - `sw.js` (service worker v3), `manifest.json` (Podyum PWA), `manifest-fsm.json` (FSM PWA), `_headers` (cache control)
 
 ## Backend

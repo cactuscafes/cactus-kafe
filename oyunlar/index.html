@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="theme-color" content="#0b1a07">
+<title>Oyunlar — Cactus Coffee</title>
+<meta name="description" content="Cactus Coffee oyunları — dört oyun, hepsi ücretsiz ve herkese açık.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cactus Coffee">
+<meta property="og:title" content="Oyunlar — Cactus Coffee">
+<meta property="og:description" content="Dört oyun, hepsi ücretsiz ve herkese açık.">
+<meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
+<meta property="og:url" content="https://cactuscafes.com/oyunlar/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="manifest" href="../manifest-site.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --amber:#c8a86a;
+  --amber2:#b8965a;
+  --amber3:#a07840;
+  --espresso:#0b1a07;
+  --coffee:#1a3310;
+  --latte:#f0ece4;
+  --mocha:#2c4a1e;
+}
+body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte);min-height:100vh;overflow-x:hidden;}
+
+/* ── NAV (kart.html ile aynı) ── */
+#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
+#mainNav a.logo{text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;transition:color .2s;}
+.nav-links a:hover{color:var(--amber);}
+.nav-links a.aktif{color:var(--amber);}
+.nav-links a.nav-cta{background:var(--amber);color:#fff;padding:9px 18px;font-weight:600;}
+.nav-links a.nav-cta:hover{background:var(--amber2);color:#fff;}
+#mainBurger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+#mainBurger span{width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;}
+#mainMobMenu{display:none;position:fixed;inset:0;background:rgba(255,255,255,.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
+#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;transition:color .2s;}
+#mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber);}
+#mainMobMenu a.nav-cta{background:var(--amber);color:#fff;padding:14px 36px;font-weight:700;}
+@media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
+
+/* ── SAYFA ── */
+.sayfa-wrap{position:relative;min-height:100vh;padding:120px 24px 60px;overflow:hidden;}
+.sayfa-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,rgba(44,74,30,.6) 0%,transparent 55%),radial-gradient(ellipse at 15% 75%,rgba(26,51,16,.5) 0%,transparent 50%),linear-gradient(160deg,#2c4a1e 0%,#1a3310 45%,#0b1a07 100%);}
+.sayfa-bg::before{content:'';position:absolute;top:10%;right:8%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.09),transparent 70%);pointer-events:none;}
+.sayfa-ic{position:relative;z-index:1;max-width:760px;margin:0 auto;}
+
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
+.eyebrow::before,.eyebrow::after{content:'';width:32px;height:1px;background:rgba(232,160,48,.4);}
+h1{font-family:'Fraunces',serif;font-size:clamp(36px,6vw,56px);font-weight:300;color:var(--latte);line-height:1;text-align:center;letter-spacing:-1px;margin-bottom:10px;}
+h1 em{font-style:italic;color:var(--amber);}
+.sayfa-sub{font-size:13px;color:rgba(245,234,216,.72);line-height:1.8;font-weight:300;text-align:center;max-width:440px;margin:0 auto 40px;}
+
+/* ── Oyun kartları ── */
+.oyunlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.oyun-kart{
+  display:flex;flex-direction:column;
+  background:rgba(255,255,255,.06);backdrop-filter:blur(16px);
+  border:1px solid rgba(232,160,48,.18);border-radius:20px;
+  padding:30px 28px 26px;text-decoration:none;
+  transition:all .25s;
+}
+.oyun-kart:hover{background:rgba(255,255,255,.09);border-color:rgba(232,160,48,.4);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.35);}
+.ok-ust{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.ok-ikon{font-size:40px;line-height:1;}
+.ok-rozet{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 10px;border-radius:20px;white-space:nowrap;}
+.ok-rozet.odul{background:rgba(232,184,58,.14);border:1px solid rgba(232,184,58,.4);color:#e8c47a;}
+.ok-rozet.acik{background:rgba(92,163,76,.14);border:1px solid rgba(92,163,76,.4);color:#8fc97f;}
+.ok-rekor{display:block;margin:2px 0 10px;font-size:12px;font-weight:700;color:#e8c47a;letter-spacing:.3px;}
+.ok-ad{font-family:'Fraunces',serif;font-size:26px;font-weight:400;color:var(--latte);margin-bottom:8px;}
+.ok-metin{font-size:12.5px;color:rgba(245,234,216,.68);line-height:1.75;font-weight:300;flex:1;margin-bottom:22px;}
+.ok-metin b{color:#e8c47a;font-weight:600;}
+.ok-btn{
+  align-self:flex-start;padding:12px 30px;
+  background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;border-radius:10px;
+}
+.oyun-kart:hover .ok-btn{background:linear-gradient(135deg,#d8b87a,var(--amber));}
+
+.alt-not{text-align:center;font-size:11px;color:rgba(245,234,216,.5);margin-top:36px;line-height:1.8;font-weight:300;}
+.alt-not a{color:#e8c47a;font-weight:600;text-decoration:none;}
+
+/* ── App Store şeridi ── */
+.as-serit{
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  margin-top:34px;padding:26px 28px;
+  background:rgba(255,255,255,.05);backdrop-filter:blur(16px);
+  border:1.5px solid rgba(232,196,122,.55);border-radius:20px;
+  box-shadow:0 0 0 1px rgba(232,196,122,.12),0 12px 36px rgba(0,0,0,.28);
+  text-decoration:none;transition:all .25s;
+}
+.as-serit:hover{background:rgba(255,255,255,.08);border-color:rgba(232,196,122,.85);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.32);}
+.as-ikon{
+  width:62px;height:62px;flex:none;border-radius:15px;
+  background:linear-gradient(150deg,#3d6b2a,#1a3310);
+  border:1px solid rgba(232,160,48,.28);
+  display:flex;align-items:center;justify-content:center;font-size:33px;
+}
+.as-govde{flex:1;min-width:200px;}
+.as-etiket{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#e8c47a;margin-bottom:7px;}
+.as-ad{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--latte);margin-bottom:5px;}
+.as-metin{font-size:12px;color:rgba(245,234,216,.62);line-height:1.7;font-weight:300;}
+.as-btn{
+  flex:none;padding:13px 26px;
+  background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border-radius:11px;
+}
+.as-serit:hover .as-btn{background:linear-gradient(135deg,#d8b87a,var(--amber));}
+@media(max-width:520px){
+  .as-serit{gap:16px;padding:22px;}
+  .as-btn{width:100%;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="../index.html" class="logo" aria-label="Cactus Coffee — Ana Sayfa" style="display:flex;align-items:center;"><img src="../logo-trans.png" alt="Cactus Coffee" style="height:34px;width:auto;display:block;"></a>
+  <div class="nav-links">
+    <a href="../index.html">Ana Sayfa</a>
+    <a href="../menu-podyum.html">Menü</a>
+    <a href="../iletisim.html">İletişim</a>
+    <a href="../kart.html">🎖 Sadakat Kartı</a>
+    <a href="index.html" class="aktif">🎮 Oyun</a>
+    <a href="../iletisim.html#basvuru" class="nav-cta">İş Başvurusu</a>
+  </div>
+  <button id="mainBurger" onclick="toggleMainNav()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div id="mainMobMenu">
+  <a href="../index.html" onclick="toggleMainNav()">Ana Sayfa</a>
+  <a href="../menu-podyum.html" onclick="toggleMainNav()">Menü</a>
+  <a href="../iletisim.html" onclick="toggleMainNav()">İletişim</a>
+  <a href="../kart.html" onclick="toggleMainNav()">🎖 Sadakat Kartı</a>
+  <a href="index.html" onclick="toggleMainNav()" class="aktif">🎮 Oyun</a>
+  <a href="../iletisim.html#basvuru" onclick="toggleMainNav()" class="nav-cta">İş Başvurusu</a>
+</div>
+<script>function toggleMainNav(){var m=document.getElementById('mainMobMenu');m.style.display=m.style.display==='flex'?'none':'flex';}</script>
+
+<div class="sayfa-wrap">
+  <div class="sayfa-bg"></div>
+  <div class="sayfa-ic">
+    <div class="eyebrow">Cactus Oyun Salonu</div>
+    <h1>Kahven gelene kadar <em>oyna</em></h1>
+    <p class="sayfa-sub">Telefonundan direkt oynanır — indirme yok, kurulum yok. Dördü de herkese açık. <b>Limonata kampanyası Cactus Jump'ın App Store uygulamasında:</b> uygulamada salon rekorunu geçen limonata kazanır.</p>
+
+    <div class="oyunlar">
+      <a class="oyun-kart" href="jump.html">
+        <div class="ok-ust">
+          <span class="ok-ikon">🌵</span>
+          <span class="ok-rozet acik">🎮 Serbest · Tarayıcı sürümü</span>
+        </div>
+        <div class="ok-ad">Cactus Jump</div>
+        <p class="ok-metin">Kahve bardağını kaktüslerin arasından uçur. Burada serbest oyna; <b>limonata ödülü ve rekor tabelası App Store uygulamasında</b> — aşağıdan indir.</p>
+        <!-- Rekor sunucudan geliyor; sayfaya sabit sayı yazma, iki yer ayrışır. -->
+        <span class="ok-rekor" id="jumpRekor" hidden></span>
+        <span class="ok-btn">Oyna →</span>
+      </a>
+
+      <a class="oyun-kart" href="hafiza.html">
+        <div class="ok-ust">
+          <span class="ok-ikon">🃏</span>
+          <span class="ok-rozet acik">🎮 Serbest · Herkese açık</span>
+        </div>
+        <div class="ok-ad">Cactus Hafıza</div>
+        <p class="ok-metin">Menümüzdeki ürünlerle kart eşleştirme. Her elde farklı 8 çift — en az hamlede bitirmeye çalış.</p>
+        <span class="ok-btn">Oyna →</span>
+      </a>
+
+      <a class="oyun-kart" href="merdiven.html">
+        <div class="ok-ust">
+          <span class="ok-ikon">🪜</span>
+          <span class="ok-rozet acik">🎮 Serbest · Herkese açık</span>
+        </div>
+        <div class="ok-ad">Kahve Merdiveni</div>
+        <p class="ok-metin">2048'in Cactus hâli: aynı iki ürünü birleştir, menüde yüksel. En yükseğe kim çıkacak?</p>
+        <span class="ok-btn">Oyna →</span>
+      </a>
+
+      <a class="oyun-kart" href="basket.html">
+        <div class="ok-ust">
+          <span class="ok-ikon">🏀</span>
+          <span class="ok-rozet acik">🎮 Serbest · Herkese açık</span>
+        </div>
+        <div class="ok-ad">Cactus Basket</div>
+        <p class="ok-metin">Limonu geri çek, bırak — kahve bardağına bas! 60 saniyede kaç sayı yapabilirsin? Temiz girerse <b>+2</b>. Üyelik gerekmez, sadece keyfine oyna.</p>
+        <span class="ok-btn">Oyna →</span>
+      </a>
+    </div>
+
+    <!-- App Store — native Cactus Jump. Yukarıdaki dört oyun tarayıcıda
+         çalışır; bu ayrı bir uygulama. -->
+    <a class="as-serit" href="https://apps.apple.com/tr/app/cactus-jump/id6794923490" target="_blank" rel="noopener">
+      <span class="as-ikon">🌵</span>
+      <div class="as-govde">
+        <div class="as-etiket">🏆 Rekor kırana limonata · yalnızca uygulamada</div>
+        <div class="as-ad">Cactus Jump — iPhone uygulaması</div>
+        <p class="as-metin">Ücretsiz indir, salon rekorunu geç, limonatanı kap: rekoru kırınca uygulama sadakat kartına kayıtlı numaranı sorar, hakkın anında işlenir ve adın tabelaya yazılır. Kampanya sadece uygulamada geçerli.</p>
+      </div>
+      <span class="as-btn">App Store'dan İndir</span>
+    </a>
+
+    <p class="alt-not"><a href="../kart.html">Sadakat kartına</a> üye ol — her 7 yıldızda bir içecek bizden.</p>
+  </div>
+</div>
+
+<script>
+/* Cactus Jump salon rekoru. Tek kaynak worker — sayfaya sabit sayı
+   yazılmıyor ki oyun sayfasıyla burası ayrışmasın. Ağ yoksa satır hiç
+   görünmez; kart yine çalışır. */
+(function(){
+  var kutu = document.getElementById('jumpRekor');
+  if (!kutu) return;
+  fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/kart/oyun-rekor?oyun=jump')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (!j || !j.ok || !j.aktif) return;
+      kutu.textContent = j.ad
+        ? 'Rekor ' + j.skor + ' · ' + j.ad
+        : 'Rekor ' + j.skor + ' — henüz kıran yok';
+      kutu.hidden = false;
+    })
+    .catch(function(){});
+})();
+</script>
+
+</body>
+</html>

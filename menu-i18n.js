@@ -181,15 +181,14 @@
     ['.menu-header-title', 'C | <em>Menü</em>', 'C | <em>Menu</em>', true],
     ['.spotlight-title', 'Öne Çıkanlar', 'Featured'],
     ['.mg-cta', 'Yorum Yap →', 'Write a Review →'],
-    ['.kampanya-eyebrow', "Podyumpark'a Özel", 'Podyumpark Exclusive'],
     ['.kampanya-sub',
       "Sıcacık bubble waffle'ın üzerine taptaze çilek, muz ve dilediğin sos — bitter çikolatadan Antep fıstığına, lotustan beyaz çikolataya. Her kase siparişinle hazırlanır.",
       'Warm bubble waffle topped with fresh strawberries, banana and your choice of sauce — dark chocolate, pistachio, Lotus or white chocolate. Every bowl is made to order.'],
     ['.kampanya-cta', "Waffle'lara Bak", 'See Waffles'],
-    ['.kampanya-gec', 'Kapat', 'Close'],
     ['.menu-dipnot', '💧 Su ve soda yalnızca gel-al veya sipariş yanında servis edilir.', '💧 Water and soda are served to-go or alongside an order only.'],
-    ['.kampanya-icecek', "🥤 Waffle'ının yanında dilediğin içecek <b>yalnızca 150₺</b>", '🥤 Any drink with your waffle — <b>just 150₺</b>', true],
-    ['.pop-badge', '🧇&nbsp; Günlük taze', '🧇&nbsp; Fresh daily', true]
+    ['.kampanya-icecek-txt', "Waffle'ının yanında dilediğin içecek", 'Any drink with your waffle'],
+    ['.kampanya-yalnizca', 'yalnızca', 'just'],
+    ['.pop-badge', 'Günlük Taze', 'Fresh Daily']
   ];
 
   function sabitleriUygula() {

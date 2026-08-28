@@ -197,7 +197,11 @@ function bitir(){
   // Salon rekoru kırıldıysa limonata kartını açar. Cihaz rekoru (yukarıdaki
   // `rekor`) ile salon rekoru ayrı şeyler — biri localStorage'da, diğeri
   // sunucuda ve tüm oyuncular arasında ortak.
-  // Ödül gönderimi yok — kampanya sadece uygulamada.
+  // Kart yalnızca salon rekoru KESİN geçildiyse açılır; kararı CactusOdul
+  // veriyor (sunucudaki barla aynı mantık), burada koşul tekrarlanmıyor.
+  if (window.CactusOdul && CactusOdul.bitti) {
+    try { CactusOdul.bitti(skor, oynananSure); } catch (e) {}
+  }
 }
 
 /* ══════════════ ÇİZİM ══════════════ */
@@ -528,7 +532,7 @@ function hazirEkran(){
     cx.fillText('🏆 Salon rekoru  ' + salonRekor.skor +
                 (salonRekor.ad ? '  ·  ' + salonRekor.ad : ''), W / 2, y + 114);
     cx.font = '600 12px Montserrat, sans-serif'; cx.fillStyle = 'rgba(26,51,16,.6)';
-    cx.fillText('Uygulamada geçen limonata kazanır', W / 2, y + 136);
+    cx.fillText('Rekoru geçen limonata kazanır', W / 2, y + 136);
   } else {
     cx.font = '600 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
     cx.fillText('Limonata için App Store uygulamasında oyna', W / 2, y + 116);
@@ -556,7 +560,7 @@ function bittiEkran(){
     // Rekora ne kadar kaldığını göster — tekrar denemeye asıl bu itiyor.
     var fark = salonRekor.skor - skor + 1;
     cx.font = '700 13px Montserrat, sans-serif'; cx.fillStyle = '#8a6a2a';
-    cx.fillText(fark > 0 ? 'Salon rekoruna ' + fark + ' kaldı — limonata için uygulamada oyna'
+    cx.fillText(fark > 0 ? 'Salon rekoruna ' + fark + ' kaldı'
                          : 'Salon rekoru  ' + salonRekor.skor,
                 W / 2, py + ph - 74);
   }
@@ -584,11 +588,14 @@ cv.addEventListener('pointerdown', function(e){ e.preventDefault(); dokun(e.clie
 window.addEventListener('keydown', function(e){ if (e.code === 'Space'){ e.preventDefault(); dokun(-99, -99); } });
 
 /* ══════════════ BAŞLAT ══════════════ */
-/* Limonata kampanyası YALNIZCA App Store uygulamasında geçerli — web sürümü
-   ödül sistemine bağlanmıyor (skor gönderilmez, telefon sorulmaz). Salon rekoru
-   yalnızca göstermek için okunur; oyuncuyu uygulamaya yönlendirir. */
-if (window.CactusOdul && CactusOdul.rekorOku) {
-  try { CactusOdul.rekorOku('jump', function (r) { salonRekor = r; }); } catch (e) {}
+/* Kampanya tarayıcıda da açık (28 Ağustos 2026). Önceden yalnızca App Store
+   uygulamasında geçerliydi; ama kampanyalı uygulama sürümü hiç yayınlanmamıştı,
+   dolayısıyla rekor hiçbir yerden kırılamıyordu — tabela 20 gün donuk kaldı.
+   `kur()` hem tabelayı besliyor hem rekor kırılınca kartı açıyor. */
+if (window.CactusOdul && CactusOdul.kur) {
+  try {
+    CactusOdul.kur({ oyun: 'jump', rekorGeldi: function (r) { salonRekor = r; } });
+  } catch (e) {}
 }
 ustPayOlc();
 olcekle();

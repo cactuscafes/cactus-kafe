@@ -128,8 +128,8 @@
     var eski = rekor ? rekor.skor : null;
     k.querySelector('#coOdulMetin').textContent =
       skor + ' yaptın' + (eski ? ' — eski rekor ' + eski + '.' : '.') +
-      ' Sadakat kartına kayıtlı numaranı gir: limonata hakkın işlensin ve ' +
-      'adın rekor tabelasına yazılsın.';
+      ' Numaranı gir: adın rekor tabelasına yazılsın ve limonata hakkın ' +
+      'işlensin. Sadakat kartın yoksa bir sonraki adımda açıyoruz.';
     k.querySelector('#coOdulTel').value = uyeTel || '';
     k.querySelector('#coKapat').addEventListener('click', function () { k.remove(); });
 

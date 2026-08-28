@@ -53,6 +53,9 @@
       '.co-tel{width:100%;padding:13px;border:1.5px solid #d8cfbc;border-radius:12px;font-family:inherit;' +
       'font-size:15px;text-align:center;margin-bottom:10px;outline:none;}' +
       '.co-tel:focus{border-color:#C8A86A;}' +
+      '.co-onay{display:flex;gap:8px;align-items:flex-start;text-align:left;font-size:13px;' +
+        'color:#5a5348;line-height:1.45;margin:10px 0 4px;}' +
+      '.co-onay input{margin-top:2px;flex:none;}' +
       '.co-btn{display:block;width:100%;padding:14px;border:none;border-radius:14px;background:#2D5A27;' +
       'color:#fff;font-family:inherit;font-size:13px;letter-spacing:1.5px;cursor:pointer;margin-bottom:9px;}' +
       '.co-btn:disabled{opacity:.55;cursor:default;}' +
@@ -132,14 +135,34 @@
 
     var btn = k.querySelector('#coAl');
     var durum = k.querySelector('#coOdulDurum');
-    btn.addEventListener('click', function () {
-      var tel = telDuzelt(k.querySelector('#coOdulTel').value);
-      if (tel.length !== 11) {
-        durum.style.color = '#c0392b'; durum.textContent = 'Geçerli bir telefon numarası gir'; return;
-      }
-      btn.disabled = true;
-      durum.style.color = '#5a5348'; durum.textContent = 'Gönderiliyor…';
-      fetch(API + '/kart/oyun-odul', {
+    var kayitModu = false;      // sunucu "önce kaydol" dediyse true
+
+    /* Rekoru kıran ama sadakat kartında olmayan oyuncu için: adını alıp
+       burada kaydediyoruz, sonra aynı skoru tekrar gönderiyoruz. Oyuncuyu
+       "git kaydol, sonra gel" diye göndermek rekorun kaybolması demekti —
+       26 Ağustos 2026'da 46'lık bir rekor tam böyle düştü. */
+    function kayitAlaniAc(mesaj) {
+      kayitModu = true;
+      durum.style.color = '#8a6a2a';
+      durum.textContent = mesaj || 'Rekoru yazmak için bir kerelik kaydolman gerekiyor.';
+      if (k.querySelector('#coOdulAd')) { btn.disabled = false; return; }
+      var ad = document.createElement('input');
+      ad.className = 'co-tel'; ad.id = 'coOdulAd'; ad.type = 'text';
+      ad.placeholder = 'Adın Soyadın'; ad.autocomplete = 'name';
+      ad.style.marginTop = '10px';
+      btn.parentNode.insertBefore(ad, btn);
+      var onay = document.createElement('label');
+      onay.className = 'co-onay';
+      onay.innerHTML = '<input type="checkbox" id="coOdulKvkk"> Sadakat kartı için ' +
+        'adım ve numaramın saklanmasını kabul ediyorum.';
+      btn.parentNode.insertBefore(onay, btn);
+      btn.textContent = 'KAYDOL VE REKORU YAZ';
+      btn.disabled = false;
+      ad.focus();
+    }
+
+    function odulGonder(tel) {
+      return fetch(API + '/kart/oyun-odul', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telefon: tel, oyun: ayar.oyun, skor: skor, sure: Math.round(sure || 0) })
       }).then(function (r) { return r.json(); }).then(function (j) {
@@ -155,11 +178,55 @@
           // sunucu bunu `odul:false` + açıklayıcı mesajla bildiriyor.
           durum.textContent = j.mesaj || '✓ İşlendi.';
           btn.textContent = j.odul ? 'TANIMLANDI' : 'REKOR YAZILDI';
+        } else if (j.kayitGerek) {
+          kayitAlaniAc(j.error);
         } else {
           durum.style.color = '#c0392b';
           durum.textContent = j.error || 'İşlenemedi';
           btn.disabled = false;
         }
+      }).catch(function () {
+        durum.style.color = '#c0392b';
+        durum.textContent = 'Bağlantı hatası — tekrar dene';
+        btn.disabled = false;
+      });
+    }
+
+    btn.addEventListener('click', function () {
+      var tel = telDuzelt(k.querySelector('#coOdulTel').value);
+      if (tel.length !== 11) {
+        durum.style.color = '#c0392b'; durum.textContent = 'Geçerli bir telefon numarası gir'; return;
+      }
+      if (!kayitModu) {
+        btn.disabled = true;
+        durum.style.color = '#5a5348'; durum.textContent = 'Gönderiliyor…';
+        odulGonder(tel);
+        return;
+      }
+      // Kayıt modu: önce sadakat kaydı, hemen ardından aynı skor
+      var ad = (k.querySelector('#coOdulAd').value || '').trim();
+      var kvkk = k.querySelector('#coOdulKvkk').checked;
+      if (ad.length < 2) {
+        durum.style.color = '#c0392b'; durum.textContent = 'Adını yaz'; return;
+      }
+      if (!kvkk) {
+        durum.style.color = '#c0392b'; durum.textContent = 'Kaydolmak için onay kutusunu işaretle'; return;
+      }
+      btn.disabled = true;
+      durum.style.color = '#5a5348'; durum.textContent = 'Kaydediliyor…';
+      fetch(API + '/kart/kayit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telefon: tel, ad: ad, kvkk: true })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j.ok) {
+          durum.style.color = '#c0392b';
+          durum.textContent = j.error || 'Kayıt yapılamadı';
+          btn.disabled = false;
+          return;
+        }
+        durum.textContent = 'Rekor yazılıyor…';
+        kayitModu = false;
+        return odulGonder(tel);
       }).catch(function () {
         durum.style.color = '#c0392b';
         durum.textContent = 'Bağlantı hatası — tekrar dene';

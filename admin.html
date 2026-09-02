@@ -4721,7 +4721,7 @@ if('serviceWorker' in navigator){
     var pEl=document.getElementById('vadPersonel');
     if(pEl){
       var pers=_vadConf.personel||[];
-      pEl.innerHTML=pers.length? pers.map(function(p,i){ return '<div class="vad-li"><span class="txt">'+esc(p.ad)+'</span><span style="font-size:12px;color:var(--mist);letter-spacing:2px;margin-left:8px;">'+(p.pin?('🔑 '+esc(p.pin)):'🔓 şifresiz')+'</span><button onclick="vardiyaPinDegistir('+i+')" title="Şifre koy / değiştir / kaldır">✏️</button><button onclick="vardiyaSil(\'personel\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
+      pEl.innerHTML=pers.length? pers.map(function(p,i){ return '<div class="vad-li"><span class="txt">'+esc(p.ad)+'</span><span id="vadPin'+i+'" style="font-size:12px;color:var(--mist);letter-spacing:2px;margin-left:8px;">'+(p.pin?'🔑 ••••':'🔓 şifresiz')+'</span>'+(p.pin?'<button onclick="vardiyaPinGoster('+i+')" title="Şifreyi 5 saniye göster">👁</button>':'')+'<button onclick="vardiyaPinDegistir('+i+')" title="Şifre koy / değiştir / kaldır">✏️</button><button onclick="vardiyaSil(\'personel\','+i+')" title="Sil">🗑</button></div>'; }).join('') : '<div class="vad-bos">Boş.</div>';
     }
     ['acilis','kapanis','malzeme'].forEach(function(tur){
       var el=document.getElementById('vad'+tur.charAt(0).toUpperCase()+tur.slice(1)); if(!el) return;
@@ -4748,6 +4748,18 @@ if('serviceWorker' in navigator){
     _vadConf[tur].push(v); inp2.value=''; vardiyaEditorRender(); inp2.focus();
   };
   window.vardiyaSil=function(tur,idx){ if(Array.isArray(_vadConf[tur])){ _vadConf[tur].splice(idx,1); vardiyaEditorRender(); } };
+  // PIN'ler listede maskeli durur; 👁 ile 5 saniyeliğine açılır. Amaç, panelin
+  // açık unutulduğu kasa ekranında tüm personel şifrelerinin sürekli görünmemesi.
+  var _vadPinZaman={};
+  window.vardiyaPinGoster=function(idx){
+    var p=(_vadConf.personel||[])[idx]; if(!p||!p.pin) return;
+    var el=document.getElementById('vadPin'+idx); if(!el) return;
+    el.textContent='🔑 '+p.pin; // textContent — HTML olarak yorumlanmaz
+    if(_vadPinZaman[idx]) clearTimeout(_vadPinZaman[idx]);
+    _vadPinZaman[idx]=setTimeout(function(){
+      var e2=document.getElementById('vadPin'+idx); if(e2) e2.textContent='🔑 ••••';
+    },5000);
+  };
   window.vardiyaPinDegistir=function(idx){
     var p=(_vadConf.personel||[])[idx]; if(!p) return;
     var yeni=prompt('"'+p.ad+'" için yeni şifre (boş bırak = şifresiz giriş):', p.pin||'');

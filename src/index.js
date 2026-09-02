@@ -82,6 +82,69 @@ async function ensureVardiyaTable(env) {
     `CREATE TABLE IF NOT EXISTS vardiya_ayar (sube TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at INTEGER)`
   ).run();
 }
+
+// ─── Giriş deneme sayacı — PIN deneme-yanılma koruması ───
+// 4 haneli PIN yalnızca 10.000 ihtimal demek; sınırsız deneme onu değersiz kılar.
+// Sayaç (sube|ad) bazında tutulur: bir kişiyi hedefleyen saldırı hızla yavaşlar,
+// şifresini yanlış yazan personel ise diğerlerini kilitlemez. Başarılı girişte
+// sıfırlanır; GIRIS_UNUT kadar deneme olmazsa kendiliğinden düşer.
+const GIRIS_ESIK = 5;        // bu kadar üst üste hatadan sonra kilit başlar
+const GIRIS_UNUT = 1800000;  // 30 dk deneme yoksa sayaç sıfırlanır
+function girisKilitSuresi(sayac) {
+  if (sayac < GIRIS_ESIK) return 0;
+  if (sayac < 10) return 60000;   // 1 dk
+  if (sayac < 20) return 300000;  // 5 dk
+  return 900000;                  // 15 dk — tavan
+}
+async function ensureGirisTable(env) {
+  await env.ADISYON_DB.prepare(
+    `CREATE TABLE IF NOT EXISTS giris_deneme (anahtar TEXT PRIMARY KEY, sayac INTEGER NOT NULL DEFAULT 0, son_ts INTEGER NOT NULL DEFAULT 0, kilit_bitis INTEGER NOT NULL DEFAULT 0)`
+  ).run();
+}
+// Sayaç okunamazsa giriş ENGELLENMEZ: D1 çökmüşse personel config'i de gelmiyor
+// demektir (giriş zaten başarısız olur); üstüne kasayı büsbütün kilitlemenin
+// operasyonel maliyeti güvenlik kazancından büyük.
+async function girisKilitDurumu(env, anahtar, now) {
+  try {
+    const row = await env.ADISYON_DB.prepare(
+      `SELECT sayac, son_ts, kilit_bitis FROM giris_deneme WHERE anahtar = ?`
+    ).bind(anahtar).first();
+    if (!row) return { kilitli: false, sayac: 0 };
+    if (now - Number(row.son_ts || 0) > GIRIS_UNUT) return { kilitli: false, sayac: 0 };
+    const bitis = Number(row.kilit_bitis || 0);
+    if (bitis > now) return { kilitli: true, kalanSn: Math.ceil((bitis - now) / 1000), sayac: Number(row.sayac || 0) };
+    return { kilitli: false, sayac: Number(row.sayac || 0) };
+  } catch (e) { return { kilitli: false, sayac: 0 }; }
+}
+async function girisHataKaydet(env, anahtar, now) {
+  try {
+    const row = await env.ADISYON_DB.prepare(`SELECT sayac, son_ts FROM giris_deneme WHERE anahtar = ?`).bind(anahtar).first();
+    const taze = row && (now - Number(row.son_ts || 0) <= GIRIS_UNUT);
+    const sayac = (taze ? Number(row.sayac || 0) : 0) + 1;
+    const kilit = sayac >= GIRIS_ESIK ? now + girisKilitSuresi(sayac) : 0;
+    await env.ADISYON_DB.prepare(
+      `INSERT INTO giris_deneme (anahtar, sayac, son_ts, kilit_bitis) VALUES (?, ?, ?, ?)
+       ON CONFLICT(anahtar) DO UPDATE SET sayac = excluded.sayac, son_ts = excluded.son_ts, kilit_bitis = excluded.kilit_bitis`
+    ).bind(anahtar, sayac, now, kilit).run();
+    return { sayac: sayac, kilit: kilit };
+  } catch (e) { return { sayac: 0, kilit: 0 }; }
+}
+async function girisSayacSifirla(env, anahtar) {
+  try { await env.ADISYON_DB.prepare(`DELETE FROM giris_deneme WHERE anahtar = ?`).bind(anahtar).run(); } catch (e) {}
+}
+// Sabit zamanlı karşılaştırma — ilk farklı karakterde erken dönmez, böylece
+// yanıt süresi doğru önekin uzunluğunu ele vermez.
+function sabitZamanEsit(a, b) {
+  const s1 = String(a == null ? '' : a), s2 = String(b == null ? '' : b);
+  const n = Math.max(s1.length, s2.length);
+  let fark = s1.length ^ s2.length;
+  for (let i = 0; i < n; i++) fark |= (s1.charCodeAt(i) || 0) ^ (s2.charCodeAt(i) || 0);
+  return fark === 0;
+}
+function sureMetni(sn) {
+  if (sn >= 60) return Math.ceil(sn / 60) + ' dakika';
+  return Math.max(1, sn) + ' saniye';
+}
 async function getVardiyaCfg(env, sube) {
   try {
     const row = await env.ADISYON_DB.prepare(`SELECT data FROM vardiya_ayar WHERE sube = ?`).bind(sube).first();
@@ -622,6 +685,7 @@ export default {
     // GET  ?sube=X            → PUBLIC: { personel:[ad], acilis, kapanis } (PIN'siz)
     // GET  ?sube=X&full=1     → AUTH (X-Cactus-Key): tam config (PIN + bildirim numarası dahil)
     // POST { sube, personel:[{ad,pin}], acilis, kapanis, wa_phone } → AUTH: kaydet
+    //       (kayıt o şubenin giriş deneme sayaçlarını da sıfırlar — kilit tahliyesi)
     if (url.pathname === '/api/vardiya') {
       try {
         await ensureVardiyaTable(env);
@@ -671,6 +735,13 @@ export default {
             `INSERT INTO vardiya_ayar (sube, data, updated_at) VALUES (?, ?, ?)
              ON CONFLICT(sube) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
           ).bind(sube, JSON.stringify(cfg), Date.now()).run();
+          // Ayar kaydı aynı zamanda kilit tahliyesidir: yönetici personel/PIN
+          // listesini kaydettiğinde o şubenin deneme sayaçları sıfırlanır. Yanlışlıkla
+          // kilitlenen personelin süre dolmasını beklemeden girebilmesi için.
+          try {
+            await ensureGirisTable(env);
+            await env.ADISYON_DB.prepare(`DELETE FROM giris_deneme WHERE anahtar LIKE ?`).bind(sube + '|%').run();
+          } catch (e) {}
           // Green API kimliği (genel, iki şube için ortak) — verildiyse '_wa_' satırına yaz.
           // Boş string GÖNDERİLİRSE korunur (yanlışlıkla silmeyi önlemek için sadece dolu değerler güncellenir).
           if (typeof body.green_instance === 'string' || typeof body.green_token === 'string' || typeof body.wa_default === 'string') {
@@ -918,6 +989,7 @@ export default {
     // ─── /api/vardiya-giris — giriş/çıkış (şifre isteğe bağlı: kişide şifre varsa doğrulanır) ───
     // POST { sube, ad, pin?, aksiyon('giris'|'cikis'), cihaz_id }
     //   → kişinin şifresi varsa eşleşme zorunlu; yoksa şifresiz kabul.
+    //     Şifreli girişte deneme-yanılma koruması: 5 hatadan sonra artan süreli kilit.
     //     Vardiya event'i kaydeder; girişte WhatsApp bildirimi gönderir.
     if (url.pathname === '/api/vardiya-giris' && request.method === 'POST') {
       try {
@@ -932,8 +1004,26 @@ export default {
         const cfg = await getVardiyaCfg(env, sube);
         const kisi = (cfg.personel || []).find(function (p) { return p && p.ad === ad; });
         if (!kisi) return json({ ok: false, error: 'Personel bulunamadı' }, 200, NO_STORE);
-        if (kisi.pin && kisi.pin !== pin) return json({ ok: false, error: 'Şifre hatalı' }, 200, NO_STORE);
         const now = Date.now();
+        // Şifresi olan kişilerde deneme-yanılma koruması. Yanıt biçimi değişmiyor
+        // (200 + ok:false + error) — adisyon ekranları error'ı olduğu gibi gösterir.
+        const girisAnahtar = sube + '|' + ad;
+        if (kisi.pin) {
+          await ensureGirisTable(env);
+          const kilit = await girisKilitDurumu(env, girisAnahtar, now);
+          if (kilit.kilitli) {
+            return json({ ok: false, kilitli: true, kalan: kilit.kalanSn,
+              error: 'Çok fazla hatalı deneme. ' + sureMetni(kilit.kalanSn) + ' sonra tekrar deneyin.' }, 200, NO_STORE);
+          }
+          if (!sabitZamanEsit(kisi.pin, pin)) {
+            const h = await girisHataKaydet(env, girisAnahtar, now);
+            let ek = '';
+            if (h.kilit > now) ek = '. Çok fazla deneme: ' + sureMetni(Math.ceil((h.kilit - now) / 1000)) + ' beklemen gerekiyor.';
+            else if (GIRIS_ESIK - h.sayac > 0 && GIRIS_ESIK - h.sayac <= 2) ek = ' — ' + (GIRIS_ESIK - h.sayac) + ' deneme hakkın kaldı';
+            return json({ ok: false, error: 'Şifre hatalı' + ek }, 200, NO_STORE);
+          }
+          await girisSayacSifirla(env, girisAnahtar);
+        }
         const evtId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v' + now + '-' + Math.round(now % 1e6));
         await env.ADISYON_DB.prepare(
           `INSERT OR IGNORE INTO adisyon_events (id, sube, type, masa, payload, ts, server_ts, cihaz_id)

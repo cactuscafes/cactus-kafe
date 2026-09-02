@@ -69,3 +69,10 @@ Turnstile/altyapı ayarları. Bunlar dışında her günlük operasyon yukarıda
 - **"Yayınla hata verdi"** — internet bağlantısını kontrol et, tekrar dene; sorun sürerse
   diğer şubenin menüsü korunur, veri kaybolmaz (yayın diğer şubeyi okuyamazsa kendini iptal eder).
 - **Yönetim parolası** — worker'da tanımlı (`ADMIN_PASS`); değiştirmek kod/terminal işi.
+- **"Personel giriş yapamıyor / çok fazla deneme diyor"** — şifresini üst üste 5 kez yanlış
+  giren kişi kısa süre kilitlenir (önce 1 dakika; ısrarla yanlış girilirse süre uzar). Bu,
+  4 haneli şifrelerin tek tek denenerek kırılmasını önler. Beklemek istemezsen:
+  Admin → **Vardiya** → **💾 Kaydet**'e bas — kayıt o şubenin kilitlerini de açar.
+- **"Personelin şifresini unuttum"** — Admin → **Vardiya** → kişinin yanındaki **👁** ile
+  5 saniyeliğine görürsün. Liste normalde `••••` gösterir; şifreler kasa ekranında sürekli
+  açıkta durmasın diye böyle.

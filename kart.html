@@ -166,7 +166,6 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 @keyframes bedavaPop{0%{transform:scale(.55);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
 .bedava-banner.kutla .bedava-ikon{animation:bedavaZipla 1s ease .5s 2;}
 @keyframes bedavaZipla{0%,100%{transform:translateY(0);}35%{transform:translateY(-7px) rotate(-8deg);}65%{transform:translateY(-3px) rotate(6deg);}}
-@media(prefers-reduced-motion:reduce){.konf{display:none;}.bedava-banner.kutla,.bedava-banner.kutla .bedava-ikon{animation:none;}}
 .bedava-ikon{font-size:32px;flex-shrink:0;}
 .bedava-txt .bedava-baslik{font-size:14px;color:var(--latte);font-weight:600;margin-bottom:3px;}
 .bedava-txt .bedava-alt{font-size:11px;color:rgba(245,234,216,.6);}
@@ -503,7 +502,6 @@ function kartGecmisCek(tel){
 var _kartTel=null, _kartPul=0, _kartPoll=null, _kartPollKuruldu=false;
 /* Kutlama konfetisi — marka renklerinde, 4.5 sn'de kendini temizler */
 function kutlamaPatlat(){
-  try{ if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
   var eski=document.getElementById('konfetiKap'); if(eski) eski.remove();
   var kap=document.createElement('div'); kap.id='konfetiKap';
   var renkler=['#c8a86a','#e8c47a','#f7f2ea','#7fb069','#d4b87a','#4a7a3a'];

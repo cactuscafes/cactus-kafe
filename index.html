@@ -301,14 +301,6 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .hero-content{transition:transform .15s ease-out;}
 
 /* 19. Erişilebilirlik — hareket istemeyenler */
-@media (prefers-reduced-motion: reduce){
-  .hero-bg{animation:none;}
-  .hero-letter{animation:none;opacity:1;transform:none;}
-  .hero-tagline,.hero-subtitle,.hero-btn,.hero-scroll{animation:none;opacity:1;transform:none;}
-  .hero-btn::after,.steam-blob,#sadakat-section,footer::before{animation:none;}
-  .fade-up{opacity:1;transform:none;transition:none;}
-  .section-divider{transform:scaleX(1);transition:none;}
-}
 </style>
 <script type="application/ld+json">
 {
@@ -607,7 +599,6 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .app-tel .rk{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#e8c47a;font-weight:700;}
 .app-tel .rk-no{font-family:'Fraunces',serif;font-size:44px;color:#f7f2ea;line-height:1;}
 .app-tel .rk-alt{font-size:10px;color:rgba(240,230,210,.6);}
-@media(prefers-reduced-motion:reduce){.app-tel .kaktus{animation:none;}}
 @media(max-width:900px){.app-sec{padding:64px 24px;}.app-inner{grid-template-columns:1fr;gap:40px;}.app-gorsel{order:-1;}.app-tel{width:min(240px,100%);}.app-adim{grid-template-columns:1fr;}}
 </style>
 <section class="app-sec" id="uygulama">
@@ -923,7 +914,7 @@ function toggleMainNav(){
 <script>
 (function(){
   // Erişilebilirlik — hareket istemeyenler
-  var azHareket=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var azHareket=false; // hareket-azaltma muafiyeti: efektler herkeste
 
   // ─── 1. REVEAL ON SCROLL (IntersectionObserver) ───
   if('IntersectionObserver' in window){
@@ -1187,10 +1178,6 @@ function toggleMainNav(){
 }
 
 /* Erişilebilirlik */
-@media (prefers-reduced-motion: reduce){
-  .hero-bokeh,#sadakat-kart-gorsel.mob-float > div,.menu-grid.swipe-hint > .menu-card:first-child,#mainBurger::after{animation:none!important;}
-  #scroll-prog{transition:none;}
-}
 </style>
 
 <div id="scroll-prog" aria-hidden="true"></div>
@@ -1198,7 +1185,7 @@ function toggleMainNav(){
 <script>
 (function(){
   var isMob=function(){return window.innerWidth<=768;};
-  var noMot=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var noMot=false; // hareket-azaltma muafiyeti: efektler herkeste
 
   /* ── 1. SCROLL PROGRESS BAR ── */
   var prog=document.getElementById('scroll-prog');

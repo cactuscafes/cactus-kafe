@@ -612,7 +612,7 @@ footer{padding:40px 20px 24px;}
 @keyframes absBurst{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--dx),var(--dy)) scale(.4) rotate(var(--r));opacity:0;}}
 @keyframes absBoing{0%{transform:scale(1);}30%{transform:scale(1.25,.75);}55%{transform:scale(.85,1.15);}75%{transform:scale(1.08,.94);}100%{transform:scale(1);}}
 @keyframes absZzz{0%{opacity:0;transform:translate(0,0) scale(.6);}30%{opacity:1;}100%{opacity:0;transform:translate(14px,-34px) scale(1.15);}}
-#absKaktus{position:fixed;bottom:6px;left:-70px;z-index:590;width:44px;height:44px;color:#2d5a27;pointer-events:none;animation:absWalk 16s linear forwards;}
+#absKaktus{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:-70px;z-index:10003;width:54px;height:54px;color:#2d5a27;pointer-events:none;filter:drop-shadow(0 2px 6px rgba(255,255,255,.55)) drop-shadow(0 1px 3px rgba(0,0,0,.25));animation:absWalk 16s linear forwards;}
 #absKaktus svg{width:100%;height:100%;animation:absWobble .7s ease-in-out infinite;}
 .abs-dus{position:fixed;top:-60px;z-index:585;width:34px;height:34px;color:#a8873f;pointer-events:none;animation:absFall var(--t,3.2s) linear forwards;}
 .abs-parca{position:fixed;z-index:585;width:20px;height:20px;color:#1a3010;pointer-events:none;animation:absBurst .8s cubic-bezier(.2,.7,.3,1) forwards;}
@@ -2144,8 +2144,18 @@ document.documentElement.classList.add('js');
     document.body.appendChild(d);
     setTimeout(function(){d.remove();},16500);
   }
-  setTimeout(kaktusYuru,600);
-  setInterval(kaktusYuru,50000);
+  // Popup açıkken yürüme — ekranı kapatıyor ve kimse görmüyor; kapanınca başlat
+  function popupAcikMi(){var b=document.getElementById('kampanyaBg');return !!(b&&b.classList.contains('on'));}
+  function kaktusBasla(){
+    if(!popupAcikMi()){kaktusYuru();return;}
+    var b=document.getElementById('kampanyaBg');
+    var mo=new MutationObserver(function(){
+      if(!b.classList.contains('on')){mo.disconnect();setTimeout(kaktusYuru,900);}
+    });
+    mo.observe(b,{attributes:true,attributeFilter:['class']});
+  }
+  setTimeout(kaktusBasla,600);
+  setInterval(function(){if(!popupAcikMi())kaktusYuru();},35000);
 
   var tik=0,son=0;
   function yagmur(){

@@ -816,9 +816,9 @@ footer{padding:40px 20px 24px;}
 @keyframes pmScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 #promoMarquee .pm-seg{text-transform:uppercase;letter-spacing:1.6px;}
 #promoMarquee .pm-logo{height:24px;width:auto;vertical-align:middle;margin:0 14px 0 0;}
-#promoMarquee .pm-track:hover{animation-play-state:paused;}
+@media(hover:hover) and (pointer:fine){#promoMarquee .pm-track:hover{animation-play-state:paused;}}
 @media(max-width:768px){#promoMarquee{height:30px;}#promoMarquee .pm-seg{font-size:11px;letter-spacing:1px;}#promoMarquee .pm-logo{height:20px;margin-right:10px;}#promoMarquee .pm-track{animation-duration:18s;}}
-@media(prefers-reduced-motion:reduce){#promoMarquee .pm-track{animation-duration:80s;}}
+@media(prefers-reduced-motion:reduce){#promoMarquee .pm-track{animation-duration:40s;}}
 </style>
 <script>
 (function(){

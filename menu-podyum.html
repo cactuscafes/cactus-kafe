@@ -371,13 +371,6 @@ footer{padding:40px 20px 24px;}
 }
 
 /* Erişilebilirlik — hareket istemeyenler */
-@media (prefers-reduced-motion: reduce){
-  .product-card,.spotlight-card,.upop,.sk-stamp,#cat-aktif-bant,#yukari-btn{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}
-  /* FAB/popup görünürlüğü opacity ile yönetiliyor — burada opacity dayatma, sadece animasyonu kapat */
-  #kat-fab,#kat-popup,#kat-popup-bg{transition:none!important;animation:none!important;}
-  .product-card img,.spotlight-card img{opacity:1!important;}
-  .sk-img,.sk-line{animation:none!important;}
-}
 /* ── İŞ BAŞVURUSU POPUP — sayfa paletiyle uyumlu (açık tema, yeşil vurgu) ── */
 #isBasvuruPop{position:fixed;inset:0;z-index:99998;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 32px;pointer-events:none;opacity:0;transition:opacity .35s ease;}
 #isBasvuruPop.on{opacity:1;pointer-events:auto;}
@@ -473,7 +466,6 @@ footer{padding:40px 20px 24px;}
 .kampanya-icecek b{font-family:'Fraunces',serif;font-size:25px;font-weight:600;line-height:1;color:#1f3a2b;}
 .kampanya-cta{font-family:'Inter',sans-serif;width:100%;background:#1f3a2b;color:#fdfaf2;border:none;padding:14px 20px;border-radius:999px;font-size:11.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 12px 24px -14px rgba(31,58,43,.9);}
 .kampanya-cta:hover{background:#16251c;transform:translateY(-1px);box-shadow:0 18px 30px -14px rgba(31,58,43,.95);}
-@media(prefers-reduced-motion:reduce){.kampanya-modal{transition:opacity .2s;}}
 .menu-dipnot{text-align:center;font-size:11.5px;color:#9a958a;font-family:'Inter',sans-serif;letter-spacing:.3px;margin:16px 20px 0;line-height:1.6;}
 /* Mobil: popup kayan şeridin ALTINDA başlar (nav 60 + şerit 34 + pay) */
 @media(max-width:768px){
@@ -602,7 +594,6 @@ footer{padding:40px 20px 24px;}
 .sk-stamp.dolu:nth-child(3){animation-delay:.16s;}
 .spotlight-card .spotlight-img-wrap,.spotlight-card img{will-change:transform;}
 .cat-arrow{transition:transform .3s cubic-bezier(.2,.8,.2,1);}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;}.js .arv{opacity:1;transform:none;}.js .cat-section::before{transform:scaleX(1);}}
 @media print{#cbar{display:none;}.js .arv{opacity:1!important;transform:none!important;}}
 
 /* --- absurt katman --- */
@@ -621,7 +612,6 @@ footer{padding:40px 20px 24px;}
 .product-card:hover .product-price{display:inline-block;animation:absBoing .5s cubic-bezier(.2,.8,.2,1);}
 .spotlight-card:hover .spotlight-card-name{display:inline-block;animation:absBoing .5s cubic-bezier(.2,.8,.2,1);}
 .nav-logo img{cursor:pointer;}
-@media(prefers-reduced-motion:reduce){#absKaktus,.abs-dus,.abs-parca,.abs-zzz{display:none!important;}}
 @media print{#absKaktus,.abs-dus,.abs-parca,.abs-zzz{display:none!important;}}
 
 /* --- kampanya popup animasyonlari --- */
@@ -643,7 +633,6 @@ footer{padding:40px 20px 24px;}
 .kampanya-icecek:hover .kampanya-icecek-fiyat b{transform:scale(1.12) rotate(-2deg);}
 .kmp-dus{position:absolute;top:-10px;width:26px;height:26px;color:#a8873f;pointer-events:none;z-index:1;animation:kpDus var(--t,2.6s) linear forwards;}
 .kampanya-foto-band{overflow:hidden;}
-@media(prefers-reduced-motion:reduce){.kampanya-bg.on .pop-badge,.kampanya-bg.on .kampanya-brand,.kampanya-bg.on .kampanya-title,.kampanya-bg.on .kampanya-foto,.kampanya-bg.on .kampanya-sub,.kampanya-bg.on .kampanya-icecek,.kampanya-bg.on .kampanya-cta,.kampanya-bg.on .kampanya-icecek-fiyat b{animation:none;opacity:1;transform:none;}.kmp-dus{display:none!important;}}
 
 /* --- popup yanma efekti --- */
 @keyframes yanMask{from{-webkit-mask-position:0 0;mask-position:0 0;}to{-webkit-mask-position:0 -200%;mask-position:0 -200%;}}
@@ -652,7 +641,6 @@ footer{padding:40px 20px 24px;}
 .kampanya-modal.yaniyor{-webkit-mask-image:linear-gradient(to top,transparent 0%,transparent 38%,#000 62%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,transparent 38%,#000 62%,#000 100%);-webkit-mask-size:100% 300%;mask-size:100% 300%;-webkit-mask-position:0 0;mask-position:0 0;animation:yanMask .9s cubic-bezier(.4,.1,.6,.9) forwards;pointer-events:none;}
 .yan-cizgi{position:absolute;left:-4%;right:-4%;height:26px;top:104%;z-index:5;pointer-events:none;filter:blur(1px);background:radial-gradient(60% 100% at 20% 50%,rgba(255,150,40,.95),transparent 70%),radial-gradient(50% 100% at 45% 50%,rgba(255,200,90,.9),transparent 70%),radial-gradient(55% 100% at 72% 50%,rgba(255,120,20,.95),transparent 70%),radial-gradient(45% 100% at 92% 50%,rgba(255,190,80,.85),transparent 70%);box-shadow:0 0 24px 6px rgba(255,140,30,.5);animation:yanCizgi .9s cubic-bezier(.4,.1,.6,.9) forwards;}
 .yan-kivilcim{position:fixed;width:5px;height:5px;border-radius:50%;z-index:520;pointer-events:none;background:radial-gradient(circle,#ffd27a,#ff8c1e 70%,transparent);animation:yanKivilcim var(--t,.8s) ease-out forwards;}
-@media(prefers-reduced-motion:reduce){.kampanya-modal.yaniyor{animation:none;-webkit-mask-image:none;mask-image:none;}.yan-cizgi,.yan-kivilcim{display:none!important;}}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 <script src="site-ayarlar.js?v=2" defer></script>
@@ -818,7 +806,6 @@ footer{padding:40px 20px 24px;}
 #promoMarquee .pm-logo{height:24px;width:auto;vertical-align:middle;margin:0 14px 0 0;}
 @media(hover:hover) and (pointer:fine){#promoMarquee .pm-track:hover{animation-play-state:paused;}}
 @media(max-width:768px){#promoMarquee{height:30px;}#promoMarquee .pm-seg{font-size:11px;letter-spacing:1px;}#promoMarquee .pm-logo{height:20px;margin-right:10px;}#promoMarquee .pm-track{animation-duration:18s;}}
-@media(prefers-reduced-motion:reduce){#promoMarquee .pm-track{animation-duration:40s;}}
 </style>
 <script>
 (function(){
@@ -2136,7 +2123,6 @@ document.documentElement.classList.add('js');
 
 <script>
 (function(){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   function ico(id,cls){var s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 48 48');var u=document.createElementNS('http://www.w3.org/2000/svg','use');u.setAttribute('href','#ci-'+id);s.appendChild(u);return s;}
   function kaktusYuru(){
     if(document.getElementById('absKaktus'))return;
@@ -2222,7 +2208,6 @@ document.documentElement.classList.add('js');
 
 <script>
 (function(){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   var bg=document.getElementById('kampanyaBg');
   if(!bg)return;
   function ico(id){var s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 48 48');var u=document.createElementNS('http://www.w3.org/2000/svg','use');u.setAttribute('href','#ci-'+id);s.appendChild(u);return s;}
@@ -2253,7 +2238,7 @@ document.documentElement.classList.add('js');
 
 <script>
 (function(){
-  var az=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var az=false; // hareket-azaltma muafiyeti: efekt herkeste oynasin
   function sarmala(){
     var orijinal=window.kampanyaKapat;
     if(typeof orijinal!=='function')return false;

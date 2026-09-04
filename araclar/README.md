@@ -19,3 +19,17 @@ python3 araclar/earsiv_ayikla.py <klasor> -o e-arsiv-nisan --vkn <kendi VKN'niz>
 * `--vkn` verilirse her satırı ALIŞ / SATIŞ olarak işaretler.
 
 Fatura olmayan ekler (imza, reklam görseli vb.) atlanır ve özet çıktıda listelenir.
+
+## gmail_indir.py
+
+Gmail bağlayıcısının `get_message(messageFormat="RAW")` çıktısını (base64url
+kodlu tam MIME) `.eml` dosyalarına çevirir; böylece bağlayıcıdan gelen iletiler
+doğrudan `earsiv_ayikla.py`'ye girdi olur.
+
+```bash
+python3 araclar/gmail_indir.py <raw_json...> -d gelen/
+python3 araclar/earsiv_ayikla.py gelen/ -o e-arsiv --vkn <kendi VKN'niz>
+```
+
+RAW biçimi ek dosyaların ham baytlarını da taşıdığı için PDF/XML/ZIP ekleri
+eksiksiz çıkar; ayrı bir ek indirme adımı gerekmez.

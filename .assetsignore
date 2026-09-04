@@ -19,3 +19,6 @@ schema-adisyon-events.sql
 wrangler.toml
 package.json
 package-lock.json
+
+# Muhasebe yardımcı betikleri - statik servis edilmesin
+araclar/

@@ -1,0 +1,65 @@
+name: Claude Kod İncelemesi
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths-ignore:
+      - '**.png'
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.svg'
+      - '**.zip'
+
+# Aynı PR'a arka arkaya push atılırsa önceki incelemeyi iptal et
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude incelemesi
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          use_sticky_comment: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Bu pull request'i incele. Depo; statik HTML/CSS/JS sayfaları
+            (adisyon, admin, menü, oyunlar) ve Cloudflare Workers backend'i
+            (app/, src/, wrangler.toml) içeriyor. Build adımı yok, dosyalar
+            doğrudan yayına gidiyor.
+
+            Şunlara odaklan:
+            - Hatalar ve bozulan davranışlar (özellikle adisyon/sipariş akışı)
+            - Güvenlik: XSS, innerHTML kullanımı, kaçırılmamış kullanıcı girdisi,
+              koda gömülmüş anahtar/token, Worker endpoint'lerinde eksik yetki kontrolü
+            - Tarayıcı uyumluluğu ve mobil davranış
+            - Gereksiz karmaşıklık, tekrar eden kod
+
+            Yalnızca gerçekten önemli bulguları bildir; stil tercihlerine takılma.
+            Bulgu yoksa bunu tek cümleyle söyle.
+            Yorumları Türkçe yaz.
+
+            Not: PR dalı zaten çalışma dizininde checkout edilmiş durumda.
+
+            Genel değerlendirme için `gh pr comment` kullan.
+            Belirli satırlara değinmek için `mcp__github_inline_comment__create_inline_comment`
+            aracını (`confirmed: true` ile) kullan.
+            Sadece GitHub yorumu bırak - inceleme metnini mesaj olarak döndürme.
+
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

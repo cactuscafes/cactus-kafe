@@ -16,3 +16,7 @@ qrcode-gen.js
 # Türetilmiş / geçici
 graphify-out/
 .DS_Store
+
+# Araç dosyaları — projenin kendi içeriği değil
+.claude/skills/
+.serena/

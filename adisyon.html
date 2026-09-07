@@ -4686,12 +4686,11 @@ function patronGoster(){
 <script id="cactus-patch">
 /* CACTUS PATCH v2 — iskonto, not, masa tasima, arama, renkler, sure sayaci */
 (function() {
-  // KRİTİK FIX: _iskonto hiç var ile tanımlanmamıştı.
-  // renderAdisyon wrapper'ı (`if(topRow && _iskonto > 0)`) ReferenceError fırlatıyordu
-  // → masaSec → renderAdisyon → ÇÖKÜYOR → masa seçimi/sipariş işlevsiz.
-  // Implicit global yerine açık deklarasyon.
-  if(typeof window._iskonto==='undefined') window._iskonto=0;
-  var _iskonto=window._iskonto; // bu IIFE'de de eriş
+  // NOT: burada eskiden bir `_iskonto` değişkeni ve onu adisyon panelinde gösteren
+  // bir renderAdisyon wrapper'ı vardı. Değişkene 0'dan başka değer hiç atanmıyordu,
+  // yani gösterim dalı hiç çalışmadı; üstelik içindeki hesaplaToplamHam() bu dosyada
+  // hiç tanımlı değil — çalışsaydı ReferenceError verecekti. İkisi de kaldırıldı.
+  // İskonto ödeme modalinde yönetiliyor: #iskonto-tl + _iskontoHesapla().
   /* ===== 1. ISKONTO — modal içinde yönetiliyor ===== */
   function iskontoUygula() {
     // İskonto artık ödeme modalinde — ödeme al butonuna yönlendir
@@ -5045,34 +5044,9 @@ function patronGoster(){
       /* Arama kutusu */
       aramaKutusuEkle();
 
-      /* renderAdisyon'u wrap et — iskonto + not göster */
-      var origRender = window.renderAdisyon;
-      if (origRender && !origRender._patched) {
-        window.renderAdisyon = function() {
-          origRender.apply(this, arguments);
-          /* İskonto satırı güncelle */
-          var topRow = document.querySelector('.oz-top');
-          if (topRow && _iskonto > 0) {
-            var existing = document.getElementById('iskonto-row');
-            if (!existing) {
-              existing = document.createElement('div');
-              existing.id = 'iskonto-row';
-              existing.className = 'oz-row';
-              existing.style.color = '#ffc107';
-              topRow.parentNode.insertBefore(existing, topRow);
-            }
-            existing.textContent = 'İskonto: -₺' + _iskonto;
-            /* Toplam metnini güncelle */
-            var toplam = hesaplaToplamHam();
-            if (topRow) topRow.querySelector('span:last-child,b,[class*="tutar"]') && (topRow.lastElementChild ? topRow.lastElementChild.textContent = '₺' + (toplam - _iskonto) : null);
-          } else {
-            var ex = document.getElementById('iskonto-row');
-            if (ex) ex.remove();
-          }
-          /* Not butonu artık renderAdisyon içinde her ürüne doğrudan ekleniyor (.ai-not) */
-        };
-        window.renderAdisyon._patched = true;
-      }
+      /* renderAdisyon wrapper'ı kaldırıldı: gövdesi tamamen ölü iskonto gösterimiydi
+         (yukarıdaki nota bak). Not butonu zaten renderAdisyon içinde her ürüne
+         doğrudan ekleniyor (.ai-not), burada yapılacak iş kalmadı. */
 
       /* masaSec wrap — arama temizle + kutuyu güncelle */
       var origMasaSec = window.masaSec;

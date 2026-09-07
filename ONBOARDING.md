@@ -99,10 +99,8 @@ silme de artık birer olay.
 ## Bilinen durum / bekleyen işler
 - `ITEM_GONDER` yalnızca `adisyon.html`'in reducer'ında bir `case` olarak duruyor; hiçbir yerde
   üretilmiyor, FSM reducer'ında hiç yok. Ölü dal.
-- `adisyon.html`'in patch katmanında `window._iskonto` diye bir değişken var ama `0`
-  başlangıç değerinden başka hiçbir yerde atanmıyor → adisyon panelindeki
-  `if (topRow && _iskonto > 0)` iskonto gösterim dalı hiç çalışmıyor (ölü kod).
-  `adisyon-fsm.html`'de bu değişken hiç yok. Temizlenebilir.
+- `ITEM_GONDER` dışında bilinen ölü kod kalmadı; `_iskonto` kalıntısı temizlendi
+  (aşağıdaki "Tamamlananlar"a bak).
 - Server'da eski bug'dan kalma stale masalar olabilir → gece 04:00 cron temizler veya **Yönet > 🌙 Gün Sonu** ile elle
 - Eski duplicate ciro kayıtları server'da duruyor; ciro hesabı `_islemDeduplica` ile bunları saymıyor (gösterimde temiz)
 - **WhatsApp gece raporu (CallMeBot) KURULMADI** — kullanıcının CallMeBot apikey vermesi bekleniyor (telefon: 905380146600)
@@ -151,6 +149,12 @@ Kalıcı bir "masa iskontosu" **yok** — iskonto ödeme oturumuna ait:
 
 Sonuç: iskonto masadan masaya sızamaz, masa aktarımında ayrıca sıfırlamaya gerek yok.
 (Bu not, "aktarımda iskonto sıfırlansın mı?" sorusu tekrar gündeme gelmesin diye burada.)
+
+`adisyon.html`'in patch katmanında eskiden ikinci bir `_iskonto` değişkeni ve onu adisyon
+panelinde gösteren bir `renderAdisyon` wrapper'ı vardı; değişkene `0`'dan başka değer hiç
+atanmadığı için gösterim hiç çalışmadı ve içindeki `hesaplaToplamHam()` bu dosyada hiç
+tanımlı değildi. İkisi de kaldırıldı — panelde iskonto satırı göstermek gerekirse
+`_iskontoHesapla()` üzerinden yeniden yazılmalı, eski wrapper geri getirilmemeli.
 
 ## Test
 - Preview config: `.claude/launch.json` → ad `cactus-main`, port 4203, ana dizini serve eder

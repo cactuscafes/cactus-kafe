@@ -4,6 +4,11 @@
 # Vendor / üçüncü parti kütüphaneler (bizim kodumuz değil, grafiği şişirir)
 jsqr.js
 qrcode-gen.js
+# Paketlenmiş three.js — tek başına grafiğin %41'iydi (908/2234 dügüm) ve
+# god-nodes listesini tx()/Me()/nx() gibi minified isimlerle dolduruyordu.
+# HoopLegend'in sahne köprüsü hooplegend/index.html'deki UC/Sahne3D
+# düğümlerinden hâlâ görünüyor.
+hooplegend/sahne3d.js
 
 # Medya ve binary — LLM geçişinde vision maliyeti çıkarır, yapı bilgisi vermez
 *.png

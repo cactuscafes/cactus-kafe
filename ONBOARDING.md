@@ -97,14 +97,10 @@ silme de artık birer olay.
 - **Atıl:** `cactus_masalar_mv` / `cactus_masa_mv_<sube>` — v9 kalıntısı, artık yazılmıyor
 
 ## Bilinen durum / bekleyen işler
-- **`masaAktar` olay günlüğünü atlıyor (hata).** `masalar`'ı doğrudan değiştirip `saveMasalar()`
-  çağırıyor, hiç olay üretmiyor → yaptığı aktarım bir sonraki `_rebuildMasalar` ile geri alınır
-  ve diğer cihazlara hiç gitmez. Doğrusu `transferYap`: kaynağa `MASA_CLEAR`, hedefe `ITEM_ADD`
-  olayı basıyor (koddaki yorum bu düzeltmenin sebebini yazıyor). `adisyon-fsm.html`'de ayrıca
-  patch katmanındaki `masaTasi` da aynı hatayı yapıyor. Aktarım yolu tek bir event-sourced
-  fonksiyonda birleştirilmeli.
 - `ITEM_GONDER` yalnızca `adisyon.html`'in reducer'ında bir `case` olarak duruyor; hiçbir yerde
   üretilmiyor, FSM reducer'ında hiç yok. Ölü dal.
+- `_iskonto` aktif masaya bağlı bir değişken ama masa aktarımında sıfırlanmıyor — aktarım
+  sonrası eski masanın iskontosu yeni masada duruyor olabilir. İncelenmedi.
 - Server'da eski bug'dan kalma stale masalar olabilir → gece 04:00 cron temizler veya **Yönet > 🌙 Gün Sonu** ile elle
 - Eski duplicate ciro kayıtları server'da duruyor; ciro hesabı `_islemDeduplica` ile bunları saymıyor (gösterimde temiz)
 - **WhatsApp gece raporu (CallMeBot) KURULMADI** — kullanıcının CallMeBot apikey vermesi bekleniyor (telefon: 905380146600)
@@ -112,6 +108,15 @@ silme de artık birer olay.
 ### Tamamlananlar (eski "bekleyen" kayıtları)
 - ✅ Kişi başı bölme yapıldı: "Ödeme Al"da **👥 Kişi** seçeneği var (`odemeSecim('kisi')`,
   `kisiSay`/`kisiGuncelle`, en az 2 kişi). Ödeme tipleri: Nakit / Kart / Böl / Kişi.
+- ✅ Masa aktarımı tek yola indirildi: **`_masaTransferEt(kaynak, hedef)`** (her iki adisyon
+  dosyasında, `transferYap`'ın hemen üstünde). `transferYap`, `masaAktar` ve `masaTasi` artık
+  yalnızca girdi toplayıp bu fonksiyonu çağıran ince sarmalayıcılar.
+  **Yeni bir aktarım girişi eklenecekse yine buradan geçmeli** — doğrudan `masalar` mutasyonu
+  `_rebuildMasalar` replay'inde geri alınır.
+  - `masaAktar` (Yönet paneli) olay üretmiyordu → aktarımlar geri alınıyor, diğer cihazlara gitmiyordu.
+  - `masaTasi` ("↔ Taşı" butonu, **her iki dosyada**) `window.aktifMasa` okuyordu; `aktifMasa`
+    `let` ile tanımlı olduğu için window'a hiç bağlanmaz → fonksiyon her çağrıda erken dönüyordu.
+    Buton bugüne kadar hiçbir şey yapmıyordu, artık çalışıyor.
 
 ## Graphify (bilgi grafiği)
 Repoyu grep'lemek yerine sorgulanabilir bir grafiğe çeviren `/graphify` skill'i kurulu:

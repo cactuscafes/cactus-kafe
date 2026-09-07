@@ -99,8 +99,10 @@ silme de artık birer olay.
 ## Bilinen durum / bekleyen işler
 - `ITEM_GONDER` yalnızca `adisyon.html`'in reducer'ında bir `case` olarak duruyor; hiçbir yerde
   üretilmiyor, FSM reducer'ında hiç yok. Ölü dal.
-- `_iskonto` aktif masaya bağlı bir değişken ama masa aktarımında sıfırlanmıyor — aktarım
-  sonrası eski masanın iskontosu yeni masada duruyor olabilir. İncelenmedi.
+- `adisyon.html`'in patch katmanında `window._iskonto` diye bir değişken var ama `0`
+  başlangıç değerinden başka hiçbir yerde atanmıyor → adisyon panelindeki
+  `if (topRow && _iskonto > 0)` iskonto gösterim dalı hiç çalışmıyor (ölü kod).
+  `adisyon-fsm.html`'de bu değişken hiç yok. Temizlenebilir.
 - Server'da eski bug'dan kalma stale masalar olabilir → gece 04:00 cron temizler veya **Yönet > 🌙 Gün Sonu** ile elle
 - Eski duplicate ciro kayıtları server'da duruyor; ciro hesabı `_islemDeduplica` ile bunları saymıyor (gösterimde temiz)
 - **WhatsApp gece raporu (CallMeBot) KURULMADI** — kullanıcının CallMeBot apikey vermesi bekleniyor (telefon: 905380146600)
@@ -139,6 +141,16 @@ Paket adı `graphifyy`, komut `graphify`. Python 3.10+ ister.
 - Şu an commit'li grafik yok: `graphify-out/` .gitignore'da (yeniden üretilebilir, ~2.6 MB).
 - `.graphifyignore` vendor dosyaları (`jsqr.js`, `qrcode-gen.js`) ve medyayı eler.
 - `.sql` şeması için ek gerekir: `pip install "graphifyy[sql]"` (yoksa `schema-adisyon-events.sql` atlanır).
+
+## İskonto nasıl çalışıyor (sorulmadan cevap)
+Kalıcı bir "masa iskontosu" **yok** — iskonto ödeme oturumuna ait:
+- Değer `#iskonto-tl` DOM input'unda durur; `_iskontoHesapla()` bunu `_secKalemler` ile birlikte okur.
+- `odemeAl()` ödeme modalı her açıldığında input'u temizler (`// İskonto sıfırla`) — her iki dosyada.
+- Ödeme modalı `.moverlay` ile tam ekran engelleyici katman (`inset:0; z-index:500`), yani modal
+  açıkken masa aktarımı tıklanamaz.
+
+Sonuç: iskonto masadan masaya sızamaz, masa aktarımında ayrıca sıfırlamaya gerek yok.
+(Bu not, "aktarımda iskonto sıfırlansın mı?" sorusu tekrar gündeme gelmesin diye burada.)
 
 ## Test
 - Preview config: `.claude/launch.json` → ad `cactus-main`, port 4203, ana dizini serve eder

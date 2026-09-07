@@ -11,3 +11,6 @@ package-lock.json
 
 # Claude Code session worktrees (never commit)
 .claude/worktrees/
+
+# Graphify bilgi grafigi ciktisi (yeniden uretilebilir, ~2.6MB)
+graphify-out/

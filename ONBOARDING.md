@@ -52,6 +52,28 @@ Eski item-level CRDT kırılgandı (masalar kayboluyor + ödenen masalar geri a�
 - **Yarım kalan istek:** "Ödeme Al"a hesabı 2/3/4'e bölme (kişi başı eşit bölme) seçeneği eklenecekti — henüz başlanmadı
   - Mevcut ödeme tipleri: Nakit / Kredi Kartı / Böl (nakit+kart tutar bölme). İstenen: kişi sayısına bölme.
 
+## Graphify (bilgi grafiği)
+Repoyu grep'lemek yerine sorgulanabilir bir grafiğe çeviren `/graphify` skill'i kurulu:
+`.claude/skills/graphify/` (proje kapsamında — repoyu klonlayan herkeste çalışır).
+
+**CLI kurulumu (her makinede bir kez):** `pip install graphifyy` (macOS'ta gerekirse `pipx install graphifyy`).
+Paket adı `graphifyy`, komut `graphify`. Python 3.10+ ister.
+
+**Kullanım:**
+- `/graphify .` — Claude Code içinden tam tarama (HTML/MD dahil; kavram çıkarımını asistan yapar)
+- `graphify update .` — kod değişince artımlı tazeleme, LLM/API maliyeti yok
+- `graphify query "soru"` · `graphify path "A" "B"` · `graphify explain "X"` · `graphify god-nodes`
+- `graphify hook install` — post-commit hook, grafiği commit sonrası günceller (lokal, commit'lenmez)
+
+**Bu repoda bilinmesi gerekenler:**
+- `.html` graphify'da *doc* sayılır → AST ile değil, LLM kavram çıkarımıyla işlenir. Yani
+  `--code-only` çalıştırırsan `admin.html`, `adisyon*.html`, `index.html`, `menu-podyum.html`,
+  `kart.html` grafiğe **girmez** — projenin asıl mantığı bu dosyalarda olduğu için tam tarama
+  (`/graphify .`) daha değerli.
+- Şu an commit'li grafik yok: `graphify-out/` .gitignore'da (yeniden üretilebilir, ~2.6 MB).
+- `.graphifyignore` vendor dosyaları (`jsqr.js`, `qrcode-gen.js`) ve medyayı eler.
+- `.sql` şeması için ek gerekir: `pip install "graphifyy[sql]"` (yoksa `schema-adisyon-events.sql` atlanır).
+
 ## Test
 - Preview config: `.claude/launch.json` → ad `cactus-main`, port 4203, ana dizini serve eder
 - `preview_start` ile başlat, `preview_eval` ile gerçek server'a karşı test

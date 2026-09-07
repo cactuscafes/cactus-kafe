@@ -1,0 +1,18 @@
+# Graphify — grafiğe girmeyecek dosyalar
+# .gitignore zaten uygulanıyor; burası ona ek olarak gürültüyü eler.
+
+# Vendor / üçüncü parti kütüphaneler (bizim kodumuz değil, grafiği şişirir)
+jsqr.js
+qrcode-gen.js
+
+# Medya ve binary — LLM geçişinde vision maliyeti çıkarır, yapı bilgisi vermez
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.zip
+*.mp4
+
+# Türetilmiş / geçici
+graphify-out/
+.DS_Store

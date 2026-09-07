@@ -26,3 +26,6 @@ qr-podyumpark.png
 og-image.png
 og-image.jpg
 Arşiv.zip
+
+# Graphify ciktisi — graph.json 1.4MB, ham okunmaz; `graphify query` ile sorgulanir
+graphify-out/

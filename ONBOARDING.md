@@ -26,6 +26,19 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
   - `/rapor/*`, `/siparis/hazir`, `/basvuru/*`, `/sikayet/*`, `/ziyaret/*`
 - **Dikkat:** `/sync/durum` yanıtındaki `guncelleme` alanı GLOBAL (per-masa değil) → conflict çözümünde kullanılamaz.
 
+## Yedekleme (D1)
+- **Otomatik:** `.github/workflows/d1-yedek.yml` — her gün 03:00'te `cactus-adisyon-events`
+  veritabanının tam dump'ını alır, gzip'leyip deponun `d1-yedek` dalına işler.
+  Saklama: son 30 gün bire bir, öncesinde her ayın 1'i (24 ay). Actions sekmesinden
+  elle de tetiklenebilir (**Run workflow**).
+- **Elle:** `npm run d1:yedek` → `d1-yedek-<tarih>.sql` (gitignore'da, commit'lenmez).
+- **Geri yükleme:** `d1-yedek` dalındaki `README.md`. Son 30 gün içindeki kazalar için
+  önce Cloudflare Time Travel denenmeli: `npx wrangler d1 time-travel restore <db> --timestamp <ts>`.
+- **Gereken secret'lar:** `CLOUDFLARE_API_TOKEN` (D1 okuma yetkisi şart), `CLOUDFLARE_ACCOUNT_ID`
+  — deploy ile aynı secret'lar. Token'da D1 yetkisi yoksa iş hata verir ve GitHub e-posta atar.
+- **Kapsam dışı:** menü/ayar/rapor verileri D1'de değil, `cactus-rapor-api` worker'ının
+  KV'sinde tutuluyor; onların yedeği bu akışta yok.
+
 ## Adisyon Sync Mimarisi — Per-Masa Last-Write-Wins (v9)
 Eski item-level CRDT kırılgandı (masalar kayboluyor + ödenen masalar geri açılıyordu). Kökten yeniden yazıldı:
 - Her masaya versiyon: `_mv[i]` = son değişiklik ms. localStorage: `cactus_masalar_mv` / cloud key: `cactus_masa_mv_<sube>`

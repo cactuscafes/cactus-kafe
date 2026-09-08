@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "d1:yedek": "wrangler d1 export cactus-adisyon-events --remote --output d1-yedek-$(date -u +%Y-%m-%d).sql --skip-confirmation"
   },
   "keywords": ["cafe", "menu", "ordering"],
   "author": "Cactus Cafe",

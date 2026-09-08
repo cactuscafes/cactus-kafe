@@ -69,3 +69,7 @@ Turnstile/altyapı ayarları. Bunlar dışında her günlük operasyon yukarıda
 - **"Yayınla hata verdi"** — internet bağlantısını kontrol et, tekrar dene; sorun sürerse
   diğer şubenin menüsü korunur, veri kaybolmaz (yayın diğer şubeyi okuyamazsa kendini iptal eder).
 - **Yönetim parolası** — worker'da tanımlı (`ADMIN_PASS`); değiştirmek kod/terminal işi.
+- **"Adisyon kayıtları / geçmiş siparişler kayboldu"** — panik yok, adisyon veritabanının
+  yedeği her gece otomatik alınıyor (GitHub'da `d1-yedek` dalı, son 30 gün gün gün +
+  2 yıl boyunca aylık). Geri yükleme kod/terminal işi; geliştiriciye "d1-yedek dalından
+  <tarih> yedeğini geri yükle" demek yeterli.

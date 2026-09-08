@@ -1,0 +1,229 @@
+name: D1 yedekleme
+
+# cactus-adisyon-events (adisyon event log) veritabanının günlük yedeği.
+#
+# Dump'lar bu deponun `d1-yedek` adlı AYRI dalında gzip'li tutulur — ana dalın
+# geçmişini şişirmez, GitHub'da durur, bilgisayar bozulsa da erişilebilir.
+# Geri yükleme talimatı `d1-yedek` dalındaki README.md dosyasındadır.
+#
+# NOT: Cloudflare'in kendi "Time Travel" özelliği son 30 günü zaten tutar
+# (npx wrangler d1 time-travel restore). Buradaki yedekler 30 günü aşan
+# geçmiş ve Cloudflare hesabının tamamen kaybı senaryosu içindir.
+#
+# Gerekli secret'lar: CLOUDFLARE_API_TOKEN (D1 okuma yetkili), CLOUDFLARE_ACCOUNT_ID
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # her gün 03:00 (Europe/Istanbul = UTC+3)
+  workflow_dispatch:
+
+concurrency:
+  group: d1-yedek
+  cancel-in-progress: false
+
+env:
+  DB_ADI: cactus-adisyon-events
+  YEDEK_DALI: d1-yedek
+  BEKLENEN_TABLO: adisyon_events
+  GUNLUK_SAKLAMA: "30"     # son kaç günün yedeği bire bir tutulsun
+  AYLIK_SAKLAMA: "24"      # kaç ay boyunca ayın 1'ine ait yedek tutulsun
+
+jobs:
+  yedekle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Bağımlılıkları kur
+        run: npm install
+
+      - name: D1'i dışa aktar
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret'ı tanımlı değil."
+            exit 1
+          fi
+          npx wrangler d1 export "$DB_ADI" \
+            --remote \
+            --output "$RUNNER_TEMP/dump.sql" \
+            --skip-confirmation
+
+      - name: Dump'ı doğrula
+        id: dogrula
+        run: |
+          set -euo pipefail
+          DUMP="$RUNNER_TEMP/dump.sql"
+
+          if [ ! -s "$DUMP" ]; then
+            echo "::error::Dump dosyası boş — yedek alınamadı, dal güncellenmeyecek."
+            exit 1
+          fi
+          if ! grep -q "CREATE TABLE.*${BEKLENEN_TABLO}" "$DUMP"; then
+            echo "::error::Dump içinde '${BEKLENEN_TABLO}' tablosunun şeması yok — bozuk yedek, dal güncellenmeyecek."
+            head -20 "$DUMP"
+            exit 1
+          fi
+
+          SATIR=$(grep -c '^INSERT INTO' "$DUMP" || true)
+          BOYUT=$(du -h "$DUMP" | cut -f1)
+          echo "satir=$SATIR" >> "$GITHUB_OUTPUT"
+          echo "boyut=$BOYUT" >> "$GITHUB_OUTPUT"
+
+          if [ "$SATIR" -eq 0 ]; then
+            echo "::warning::Dump'ta hiç INSERT satırı yok — veritabanı gerçekten boş mu, kontrol et."
+          fi
+
+          gzip -9 -c "$DUMP" > "$RUNNER_TEMP/dump.sql.gz"
+          echo "✓ Doğrulandı — $SATIR INSERT satırı, $BOYUT (sıkıştırılmamış)"
+
+      - name: Yedek dalına işle
+        run: |
+          set -euo pipefail
+          TARIH=$(date -u +%Y-%m-%d)
+          WT="$RUNNER_TEMP/yedek-dali"
+          HEDEF="yedek/${DB_ADI}-${TARIH}.sql.gz"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Dal varsa üzerine ekle, yoksa geçmişsiz (orphan) olarak yarat.
+          if git ls-remote --exit-code --heads origin "$YEDEK_DALI" >/dev/null 2>&1; then
+            git fetch --depth=1 origin "$YEDEK_DALI"
+            git worktree add "$WT" -B "$YEDEK_DALI" "origin/$YEDEK_DALI"
+          else
+            git worktree add --detach "$WT"
+            git -C "$WT" checkout --orphan "$YEDEK_DALI"
+            git -C "$WT" rm -rf --quiet . >/dev/null 2>&1 || true
+          fi
+
+          mkdir -p "$WT/yedek"
+          cp "$RUNNER_TEMP/dump.sql.gz" "$WT/$HEDEF"
+
+          # Eskileri buda: son N günü bire bir, sonrasında yalnız ayın 1'ini tut.
+          python3 - "$WT/yedek" "$GUNLUK_SAKLAMA" "$AYLIK_SAKLAMA" <<'PY'
+          import os, re, sys
+          from datetime import date, timedelta
+
+          dizin, gunluk, aylik = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+          bugun = date.today()
+          gun_siniri = bugun - timedelta(days=gunluk)
+          ay_siniri = bugun - timedelta(days=aylik * 31)
+
+          desen = re.compile(r"-(\d{4})-(\d{2})-(\d{2})\.sql\.gz$")
+          for ad in sorted(os.listdir(dizin)):
+              m = desen.search(ad)
+              if not m:
+                  continue
+              d = date(*map(int, m.groups()))
+              if d >= gun_siniri:          # son 30 gün: hepsi kalsın
+                  continue
+              if d.day == 1 and d >= ay_siniri:   # eskiler: ayın 1'i, 24 ay
+                  continue
+              os.remove(os.path.join(dizin, ad))
+              print(f"budandı: {ad}")
+          PY
+
+          # Geri yükleme rehberi (dalda yoksa yaz).
+          if [ ! -f "$WT/README.md" ]; then
+            cat > "$WT/README.md" <<EOF
+          # D1 yedekleri — $DB_ADI
+
+          Bu dal **otomatik** doldurulur (\`.github/workflows/d1-yedek.yml\`, her gün 03:00).
+          Elle commit atma; buraya atılan şey bir sonraki budamada silinebilir.
+
+          - \`yedek/${DB_ADI}-YYYY-AA-GG.sql.gz\` — o günün tam dump'ı (şema + veri)
+          - Saklama: son ${GUNLUK_SAKLAMA} gün bire bir, öncesinde her ayın 1'i (${AYLIK_SAKLAMA} ay)
+
+          ## Bir yedeğin içine bakmak
+
+          \`\`\`bash
+          git fetch origin $YEDEK_DALI && git checkout $YEDEK_DALI
+          gunzip -c yedek/${DB_ADI}-2026-01-01.sql.gz | less
+          \`\`\`
+
+          ## Geri yükleme
+
+          **Önce dene:** son 30 gün içindeki bir kaza için Cloudflare'in Time Travel'ı
+          daha hızlı ve kayıpsızdır:
+
+          \`\`\`bash
+          npx wrangler d1 time-travel info $DB_ADI
+          npx wrangler d1 time-travel restore $DB_ADI --timestamp <unix-ts>
+          \`\`\`
+
+          **Yedekten dönmek** (30 günü aşan geçmiş ya da veritabanının tümden kaybı):
+
+          \`\`\`bash
+          gunzip -k yedek/${DB_ADI}-2026-01-01.sql.gz
+
+          # 1) Güvenli yol — yeni bir veritabanına yükleyip içeriğe bak:
+          npx wrangler d1 create ${DB_ADI}-geri-yukleme
+          npx wrangler d1 execute ${DB_ADI}-geri-yukleme --remote \\
+            --file yedek/${DB_ADI}-2026-01-01.sql
+
+          # 2) Canlı veritabanının üzerine yazmak (DİKKAT: mevcut veri gider).
+          #    Dump CREATE TABLE IF NOT EXISTS + INSERT içerir; id sütunu UNIQUE
+          #    olduğu için önce tabloyu düşürmen gerekir:
+          npx wrangler d1 execute $DB_ADI --remote --command "DROP TABLE ${BEKLENEN_TABLO};"
+          npx wrangler d1 execute $DB_ADI --remote --file yedek/${DB_ADI}-2026-01-01.sql
+          \`\`\`
+
+          2. yolu uygulamadan önce mutlaka o anın yedeğini al
+          (\`npx wrangler d1 export $DB_ADI --remote --output acil.sql\`).
+          EOF
+          fi
+
+          git -C "$WT" add -A
+          if git -C "$WT" diff --cached --quiet; then
+            echo "Değişiklik yok — commit atlanıyor."
+            exit 0
+          fi
+          git -C "$WT" commit -q -m "D1 yedek: $TARIH"
+
+          # Ağ hatasına karşı artan bekleme ile yeniden dene.
+          for bekle in 2 4 8 16 0; do
+            if git -C "$WT" push -u origin "$YEDEK_DALI"; then
+              echo "✓ $HEDEF gönderildi"
+              exit 0
+            fi
+            [ "$bekle" -eq 0 ] && break
+            echo "Push başarısız — ${bekle}s sonra tekrar denenecek."
+            sleep "$bekle"
+          done
+          echo "::error::Yedek dalına push edilemedi."
+          exit 1
+
+      - name: Yedeği artifact olarak da sakla
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-yedek-${{ github.run_id }}
+          path: ${{ runner.temp }}/dump.sql.gz
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Özet
+        if: always()
+        run: |
+          {
+            echo "## D1 yedekleme"
+            echo
+            echo "- Veritabanı: \`$DB_ADI\`"
+            echo "- INSERT satırı: ${{ steps.dogrula.outputs.satir || 'yok' }}"
+            echo "- Dump boyutu: ${{ steps.dogrula.outputs.boyut || 'yok' }}"
+            echo "- Dal: [\`$YEDEK_DALI\`](../tree/$YEDEK_DALI/yedek)"
+          } >> "$GITHUB_STEP_SUMMARY"

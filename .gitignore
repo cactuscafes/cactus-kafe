@@ -11,3 +11,7 @@ package-lock.json
 
 # Claude Code session worktrees (never commit)
 .claude/worktrees/
+
+# elle alinan D1 dump'lari (otomatik yedek `d1-yedek` dalinda)
+d1-yedek-*.sql
+d1-yedek-*.sql.gz

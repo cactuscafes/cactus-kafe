@@ -57,10 +57,13 @@ jobs:
             echo "::error::CLOUDFLARE_API_TOKEN secret'ı tanımlı değil."
             exit 1
           fi
-          npx wrangler d1 export "$DB_ADI" \
-            --remote \
-            --output "$RUNNER_TEMP/dump.sql" \
-            --skip-confirmation
+          if ! npx wrangler d1 export "$DB_ADI" \
+                 --remote \
+                 --output "$RUNNER_TEMP/dump.sql" \
+                 --skip-confirmation; then
+            echo "::error::D1 export başarısız. En sık nedeni: CLOUDFLARE_API_TOKEN'da D1 yetkisi yok (yukarıda 'Authentication error [code: 10000]' görünür). Çözüm: dash.cloudflare.com/profile/api-tokens → token'ı düzenle → Permissions'a 'Account · D1 · Edit' ekle → kaydet. Token yenilendiyse GitHub'daki CLOUDFLARE_API_TOKEN secret'ını da güncelle."
+            exit 1
+          fi
 
       - name: Dump'ı doğrula
         id: dogrula

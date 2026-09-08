@@ -34,8 +34,11 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
 - **Elle:** `npm run d1:yedek` → `d1-yedek-<tarih>.sql` (gitignore'da, commit'lenmez).
 - **Geri yükleme:** `d1-yedek` dalındaki `README.md`. Son 30 gün içindeki kazalar için
   önce Cloudflare Time Travel denenmeli: `npx wrangler d1 time-travel restore <db> --timestamp <ts>`.
-- **Gereken secret'lar:** `CLOUDFLARE_API_TOKEN` (D1 okuma yetkisi şart), `CLOUDFLARE_ACCOUNT_ID`
-  — deploy ile aynı secret'lar. Token'da D1 yetkisi yoksa iş hata verir ve GitHub e-posta atar.
+- **Gereken secret'lar:** `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` — deploy ile aynı
+  secret'lar. Token'da **Account · D1 · Edit** izni olmalı: export bir POST endpoint'i, salt
+  okuma yetmiyor. İzin yoksa `Authentication error [code: 10000]` ile düşer (iş hata verir,
+  yedek dalına hiçbir şey yazılmaz, GitHub e-posta atar).
+  İzin ekleme: dash.cloudflare.com/profile/api-tokens → token → Permissions.
 - **Kapsam dışı:** menü/ayar/rapor verileri D1'de değil, `cactus-rapor-api` worker'ının
   KV'sinde tutuluyor; onların yedeği bu akışta yok.
 

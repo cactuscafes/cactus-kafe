@@ -30,3 +30,8 @@
 
 /*.woff2
   Cache-Control: public, max-age=2592000
+
+# GEÇİCİ — Play Console'a görsel aktarımı için CORS (yükleme bitince silinecek)
+/play-gecici/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=60

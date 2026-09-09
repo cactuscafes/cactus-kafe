@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "stitch": {
+      "command": "npx",
+      "args": ["-y", "@_davideast/stitch-mcp", "proxy"]
+    },
+    "nano-banana": {
+      "command": "npx",
+      "args": ["-y", "@rafarafarafa/nano-banana-pro-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_API_KEY:-}"
+      }
+    },
+    "21st": {
+      "type": "http",
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${API_KEY_21ST:-}"
+      }
+    }
+  }
+}

@@ -67,3 +67,4 @@ inceleme çalışmaz; değişiklik `main`'e indikten sonra normale döner.
 | `ios.yml` | Elle | iOS uygulamasını derleyip App Store Connect'e yükler; istenirse sürümü App Review'a gönderir |
 | `hesap-silme-kaydi.yml` | Elle | Hesap silme akışını iOS simülatöründe oynatıp ekran videosu kaydeder (artifact olarak iner) |
 | `kart-sil-dogrula.yml` | Elle | Canlıdaki `/api/kart-sil` ucunun gerçekten sildiğini uçtan uca test eder; sahte numara kullanır |
+| `d1-yedek.yml` | Her gün 03:00 + elle | Adisyon veritabanını (D1) yedekler; dump'ı `d1-yedek` dalına işler. Detay: `ONBOARDING.md` → Yedekleme |

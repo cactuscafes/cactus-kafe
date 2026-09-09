@@ -27,20 +27,26 @@ Bu doküman projeye yeni bir Claude Code sohbetinde devam etmek için hazırlanm
 - **Dikkat:** `/sync/durum` yanıtındaki `guncelleme` alanı GLOBAL (per-masa değil) → conflict çözümünde kullanılamaz.
 
 ## Yedekleme (D1)
-- **Otomatik:** `.github/workflows/d1-yedek.yml` — her gün 03:00'te `cactus-adisyon-events`
-  veritabanının tam dump'ını alır, gzip'leyip deponun `d1-yedek` dalına işler.
-  Saklama: son 30 gün bire bir, öncesinde her ayın 1'i (24 ay). Actions sekmesinden
-  elle de tetiklenebilir (**Run workflow**).
-- **Elle:** `npm run d1:yedek` → `d1-yedek-<tarih>.sql` (gitignore'da, commit'lenmez).
-- **Geri yükleme:** `d1-yedek` dalındaki `README.md`. Son 30 gün içindeki kazalar için
-  önce Cloudflare Time Travel denenmeli: `npx wrangler d1 time-travel restore <db> --timestamp <ts>`.
-- **Gereken secret'lar:** `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` — deploy ile aynı
-  secret'lar. Token'da **Account · D1 · Edit** izni olmalı: export bir POST endpoint'i, salt
-  okuma yetmiyor. İzin yoksa `Authentication error [code: 10000]` ile düşer (iş hata verir,
-  yedek dalına hiçbir şey yazılmaz, GitHub e-posta atar).
-  İzin ekleme: dash.cloudflare.com/profile/api-tokens → token → Permissions.
+`.github/workflows/d1-yedek.yml` — her gün 03:00. İki yöntemi sırayla dener:
+
+1. **`wrangler d1 export`** → tam SQL dump (şema + veri), `.sql.gz`.
+   Token'da **Account · D1 · Edit** izni ister; export bir POST endpoint'i, salt okuma yetmiyor.
+   İzin yoksa `Authentication error [code: 10000]` ile düşer.
+2. **Worker API'si** → `GET /api/events?sube=&since=&limit=` sayfalanarak taranır, `.ndjson.gz`.
+   Token gerektirmez, 1. yol düşünce otomatik devreye girer. Veri-only; şema `schema-adisyon-events.sql`.
+   Betik: `.github/scripts/d1-yedek-api.sh` (şube listesi workflow'daki `SUBELER` env'i).
+
+İzin eklenince akış kendiliğinden 1. yola döner — workflow'u değiştirmek gerekmez.
+
+- **Nerede:** deponun orphan `d1-yedek` dalı, `yedek/<db>-<tarih>.{sql,ndjson}.gz`.
+  Saklama: son 30 gün bire bir, öncesinde her ayın 1'i (24 ay). Ayrıca 14 günlük artifact.
+- **Doğrulama:** boş/bozuk yedek dala YAZILMAZ (SQL'de şema aranır, NDJSON'da zorunlu alanlar).
+- **Geri yükleme:** `d1-yedek` dalındaki `README.md`. NDJSON→SQL çevirici:
+  `.github/scripts/ndjson-to-sql.py` (INSERT OR IGNORE, tekrar çalıştırmak güvenli).
+  Son 30 gün içindeki kazalar için önce Cloudflare Time Travel denenmeli.
+- **Elle:** `npm run d1:yedek` (wrangler yolu, D1 izni ister). Çıktı gitignore'da.
 - **Kapsam dışı:** menü/ayar/rapor verileri D1'de değil, `cactus-rapor-api` worker'ının
-  KV'sinde tutuluyor; onların yedeği bu akışta yok.
+  KV'sinde; onların yedeği bu akışta yok.
 
 ## Adisyon Sync Mimarisi — Per-Masa Last-Write-Wins (v9)
 Eski item-level CRDT kırılgandı (masalar kayboluyor + ödenen masalar geri açılıyordu). Kökten yeniden yazıldı:

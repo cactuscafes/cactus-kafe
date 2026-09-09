@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="theme-color" content="#0b1a07">
+<!-- Test cagrisi gecici bir sayfa; aramalarda cikmasin. -->
+<meta name="robots" content="noindex,nofollow">
+<title>Cactus Jump Test Grubu — Cactus Coffee</title>
+<meta name="description" content="Cactus Jump'ı Google Play'e çıkarıyoruz. 14 günlük test grubuna katıl.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cactus Coffee">
+<meta property="og:title" content="Cactus Jump test grubu">
+<meta property="og:description" content="Oyunu Play Store'a çıkarıyoruz — 14 gün test et, rekoru kır, limonatayı kap.">
+<meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
+<meta property="og:url" content="https://cactuscafes.com/cactus-jump-test.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--amber:#c8a86a;--amber2:#b8965a;--espresso:#0b1a07;--coffee:#1a3310;--latte:#f0ece4;}
+body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte);min-height:100vh;overflow-x:hidden;}
+
+#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-weight:400;transition:color .2s;}
+.nav-links a:hover,.nav-links a.aktif{color:var(--amber);}
+#mainBurger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+#mainBurger span{width:24px;height:1.5px;background:#1a1a1a;display:block;}
+#mainMobMenu{display:none;position:fixed;inset:0;background:rgba(255,255,255,.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
+#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;}
+@media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
+
+.sayfa-wrap{position:relative;min-height:100vh;padding:120px 24px 70px;overflow:hidden;}
+.sayfa-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,rgba(44,74,30,.6) 0%,transparent 55%),radial-gradient(ellipse at 15% 75%,rgba(26,51,16,.5) 0%,transparent 50%),linear-gradient(160deg,#2c4a1e 0%,#1a3310 45%,#0b1a07 100%);}
+.sayfa-ic{position:relative;z-index:1;max-width:680px;margin:0 auto;}
+
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
+.eyebrow::before,.eyebrow::after{content:'';width:32px;height:1px;background:rgba(232,160,48,.4);}
+h1{font-family:'Fraunces',serif;font-size:clamp(34px,6vw,52px);font-weight:300;line-height:1.05;text-align:center;letter-spacing:-1px;margin-bottom:14px;}
+h1 em{font-style:italic;color:var(--amber);}
+.sayfa-sub{font-size:14px;color:rgba(245,234,216,.75);line-height:1.85;font-weight:300;text-align:center;max-width:470px;margin:0 auto 40px;}
+.sayfa-sub b{color:#e8c47a;font-weight:600;}
+
+.kutu{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1px solid rgba(232,160,48,.18);border-radius:20px;padding:30px 28px;margin-bottom:20px;}
+.kutu h2{font-family:'Fraunces',serif;font-size:23px;font-weight:400;margin-bottom:20px;}
+
+.adimlar{list-style:none;counter-reset:a;}
+.adimlar li{counter-increment:a;position:relative;padding-left:52px;margin-bottom:22px;font-size:14px;line-height:1.75;color:rgba(245,234,216,.85);font-weight:300;}
+.adimlar li:last-child{margin-bottom:0;}
+.adimlar li::before{content:counter(a);position:absolute;left:0;top:-2px;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);font-family:'Fraunces',serif;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+.adimlar b{color:#e8c47a;font-weight:600;}
+
+.katil-btn{display:block;text-align:center;padding:19px 30px;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;border-radius:13px;text-decoration:none;transition:all .25s;box-shadow:0 10px 28px rgba(0,0,0,.3);}
+.katil-btn:hover{background:linear-gradient(135deg,#d8b87a,var(--amber));transform:translateY(-2px);}
+.katil-btn.pasif{background:rgba(255,255,255,.08);color:rgba(245,234,216,.45);box-shadow:none;cursor:default;border:1px dashed rgba(232,160,48,.3);}
+.katil-btn.pasif:hover{transform:none;background:rgba(255,255,255,.08);}
+.btn-alt{text-align:center;font-size:11.5px;color:rgba(245,234,216,.5);margin-top:13px;line-height:1.7;font-weight:300;}
+
+.uyari{display:flex;gap:16px;align-items:flex-start;background:rgba(232,184,58,.09);border:1px solid rgba(232,184,58,.38);border-radius:16px;padding:22px 24px;margin-bottom:20px;}
+.uyari-ikon{font-size:24px;line-height:1.2;flex:none;}
+.uyari-govde{font-size:13.5px;line-height:1.8;color:rgba(245,234,216,.85);font-weight:300;}
+.uyari-govde b{color:#e8c47a;font-weight:700;}
+
+.qr-kutu{text-align:center;}
+.qr-kutu svg{width:190px;height:190px;border-radius:14px;display:block;margin:0 auto 16px;}
+.qr-not{font-size:11.5px;color:rgba(245,234,216,.5);line-height:1.7;font-weight:300;}
+
+.sss dt{font-size:14px;font-weight:600;color:#e8c47a;margin-top:20px;}
+.sss dt:first-child{margin-top:0;}
+.sss dd{font-size:13.5px;line-height:1.8;color:rgba(245,234,216,.78);font-weight:300;margin-top:6px;}
+
+.alt-not{text-align:center;font-size:12px;color:rgba(245,234,216,.55);margin-top:34px;line-height:1.9;font-weight:300;}
+.alt-not a{color:#e8c47a;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="logo" aria-label="Cactus Coffee — Ana Sayfa" style="display:flex;align-items:center;"><img src="logo-trans.png" alt="Cactus Coffee" style="height:34px;width:auto;display:block;"></a>
+  <div class="nav-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="menu-podyum.html">Menü</a>
+    <a href="iletisim.html">İletişim</a>
+    <a href="kart.html">🎖 Sadakat Kartı</a>
+    <a href="oyunlar.html">🎮 Oyun</a>
+  </div>
+  <button id="mainBurger" onclick="toggleMainNav()"><span></span><span></span><span></span></button>
+</nav>
+<div id="mainMobMenu">
+  <a href="index.html" onclick="toggleMainNav()">Ana Sayfa</a>
+  <a href="menu-podyum.html" onclick="toggleMainNav()">Menü</a>
+  <a href="iletisim.html" onclick="toggleMainNav()">İletişim</a>
+  <a href="kart.html" onclick="toggleMainNav()">🎖 Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()">🎮 Oyun</a>
+</div>
+<script>function toggleMainNav(){var m=document.getElementById('mainMobMenu');m.style.display=m.style.display==='flex'?'none':'flex';}</script>
+
+<div class="sayfa-wrap">
+  <div class="sayfa-bg"></div>
+  <div class="sayfa-ic">
+
+    <div class="eyebrow">Android Test Grubu</div>
+    <h1>Cactus Jump'ı <em>Play Store'a</em> çıkarıyoruz</h1>
+    <p class="sayfa-sub">Google, oyunu herkese açmadan önce <b>12 kişilik bir test grubunun 14 gün denemesini</b> şart koşuyor. Sen de içinde ol — hem oyun bir an önce yayınlansın, hem rekor tabelasında adın olsun.</p>
+
+    <div class="kutu">
+      <h2>Nasıl katılırım?</h2>
+      <ol class="adimlar">
+        <li>Aşağıdaki butona bas ve <b>"Testçi ol"</b> de. Telefonundaki Play Store hesabıyla açılması gerekiyor.</li>
+        <li>Açılan sayfadan oyunu <b>Play Store'dan kur</b>.</li>
+        <li><b>14 gün telefonunda kalsın</b> ve ara sıra açıp oyna. Hepsi bu.</li>
+      </ol>
+    </div>
+
+    <a id="katilBtn" class="katil-btn pasif" href="#" aria-disabled="true">Link hazırlanıyor</a>
+    <p class="btn-alt" id="btnAlt">Adresini gönderdiysen link birazdan burada olacak — sayfayı sonra tekrar aç.</p>
+
+    <div class="uyari" style="margin-top:26px;">
+      <span class="uyari-ikon">⏳</span>
+      <div class="uyari-govde">
+        <b>14 gün boyunca silme.</b> Google testçilerin oyunu gerçekten kullandığını kontrol ediyor. Kurup unutulursa ya da erken silinirse başvurumuz reddediliyor ve sayaç sıfırdan başlıyor. Ara sıra bir tur atman yeterli.
+      </div>
+    </div>
+
+    <div class="kutu qr-kutu">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37" shape-rendering="crispEdges" role="img" aria-label="QR kod"><rect width="37" height="37" fill="#f0ece4"/><path d="M2 2h7v1h-7zM10 2h1v1h-1zM13 2h1v1h-1zM15 2h1v1h-1zM17 2h2v1h-2zM20 2h1v1h-1zM23 2h3v1h-3zM28 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM12 3h1v1h-1zM15 3h2v1h-2zM18 3h1v1h-1zM20 3h2v1h-2zM24 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM13 4h2v1h-2zM16 4h2v1h-2zM19 4h3v1h-3zM23 4h4v1h-4zM28 4h1v1h-1zM30 4h3v1h-3zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h2v1h-2zM13 5h1v1h-1zM17 5h3v1h-3zM23 5h3v1h-3zM28 5h1v1h-1zM30 5h3v1h-3zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h4v1h-4zM18 6h2v1h-2zM21 6h1v1h-1zM25 6h1v1h-1zM28 6h1v1h-1zM30 6h3v1h-3zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM16 7h2v1h-2zM19 7h1v1h-1zM22 7h2v1h-2zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h7v1h-7zM10 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM19 9h5v1h-5zM25 9h2v1h-2zM2 10h1v1h-1zM6 10h1v1h-1zM8 10h3v1h-3zM12 10h3v1h-3zM16 10h4v1h-4zM22 10h4v1h-4zM27 10h5v1h-5zM34 10h1v1h-1zM4 11h2v1h-2zM7 11h1v1h-1zM11 11h1v1h-1zM13 11h2v1h-2zM16 11h5v1h-5zM23 11h1v1h-1zM25 11h1v1h-1zM27 11h1v1h-1zM31 11h3v1h-3zM3 12h1v1h-1zM5 12h4v1h-4zM11 12h1v1h-1zM15 12h4v1h-4zM20 12h1v1h-1zM25 12h1v1h-1zM31 12h1v1h-1zM33 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM9 13h2v1h-2zM13 13h1v1h-1zM15 13h1v1h-1zM17 13h1v1h-1zM21 13h2v1h-2zM24 13h5v1h-5zM33 13h1v1h-1zM3 14h4v1h-4zM8 14h2v1h-2zM12 14h2v1h-2zM15 14h1v1h-1zM18 14h1v1h-1zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h4v1h-4zM34 14h1v1h-1zM2 15h1v1h-1zM5 15h2v1h-2zM10 15h2v1h-2zM16 15h1v1h-1zM19 15h4v1h-4zM25 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM2 16h2v1h-2zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM16 16h2v1h-2zM19 16h2v1h-2zM22 16h1v1h-1zM24 16h2v1h-2zM27 16h2v1h-2zM30 16h1v1h-1zM33 16h1v1h-1zM3 17h1v1h-1zM9 17h1v1h-1zM13 17h1v1h-1zM15 17h1v1h-1zM17 17h4v1h-4zM23 17h1v1h-1zM25 17h4v1h-4zM30 17h1v1h-1zM3 18h2v1h-2zM6 18h3v1h-3zM11 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM18 18h7v1h-7zM28 18h1v1h-1zM30 18h2v1h-2zM33 18h1v1h-1zM3 19h1v1h-1zM7 19h1v1h-1zM11 19h1v1h-1zM17 19h2v1h-2zM20 19h1v1h-1zM22 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM31 19h2v1h-2zM2 20h3v1h-3zM8 20h1v1h-1zM10 20h2v1h-2zM15 20h3v1h-3zM19 20h1v1h-1zM22 20h6v1h-6zM29 20h1v1h-1zM31 20h1v1h-1zM33 20h1v1h-1zM2 21h2v1h-2zM5 21h1v1h-1zM7 21h1v1h-1zM10 21h1v1h-1zM12 21h1v1h-1zM15 21h2v1h-2zM18 21h4v1h-4zM23 21h1v1h-1zM29 21h1v1h-1zM34 21h1v1h-1zM3 22h2v1h-2zM8 22h2v1h-2zM16 22h1v1h-1zM20 22h3v1h-3zM27 22h2v1h-2zM30 22h2v1h-2zM33 22h1v1h-1zM2 23h4v1h-4zM10 23h3v1h-3zM14 23h1v1h-1zM16 23h1v1h-1zM18 23h2v1h-2zM21 23h1v1h-1zM24 23h2v1h-2zM27 23h1v1h-1zM29 23h1v1h-1zM32 23h2v1h-2zM6 24h5v1h-5zM12 24h2v1h-2zM18 24h1v1h-1zM20 24h2v1h-2zM23 24h3v1h-3zM29 24h3v1h-3zM33 24h1v1h-1zM4 25h3v1h-3zM12 25h1v1h-1zM16 25h1v1h-1zM19 25h5v1h-5zM25 25h1v1h-1zM27 25h2v1h-2zM30 25h2v1h-2zM33 25h1v1h-1zM2 26h2v1h-2zM6 26h1v1h-1zM8 26h4v1h-4zM16 26h2v1h-2zM19 26h1v1h-1zM23 26h8v1h-8zM10 27h1v1h-1zM13 27h1v1h-1zM16 27h5v1h-5zM23 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h2v1h-2zM2 28h7v1h-7zM10 28h8v1h-8zM20 28h1v1h-1zM22 28h1v1h-1zM26 28h1v1h-1zM28 28h1v1h-1zM30 28h2v1h-2zM33 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM11 29h1v1h-1zM16 29h3v1h-3zM22 29h1v1h-1zM24 29h1v1h-1zM26 29h1v1h-1zM30 29h1v1h-1zM33 29h1v1h-1zM2 30h1v1h-1zM4 30h3v1h-3zM8 30h1v1h-1zM10 30h5v1h-5zM16 30h1v1h-1zM18 30h1v1h-1zM21 30h1v1h-1zM24 30h1v1h-1zM26 30h6v1h-6zM2 31h1v1h-1zM4 31h3v1h-3zM8 31h1v1h-1zM11 31h2v1h-2zM20 31h3v1h-3zM25 31h2v1h-2zM28 31h4v1h-4zM33 31h1v1h-1zM2 32h1v1h-1zM4 32h3v1h-3zM8 32h1v1h-1zM12 32h2v1h-2zM17 32h1v1h-1zM22 32h1v1h-1zM25 32h1v1h-1zM28 32h3v1h-3zM2 33h1v1h-1zM8 33h1v1h-1zM12 33h1v1h-1zM14 33h2v1h-2zM17 33h4v1h-4zM23 33h6v1h-6zM2 34h7v1h-7zM10 34h1v1h-1zM14 34h1v1h-1zM19 34h1v1h-1zM21 34h7v1h-7zM31 34h1v1h-1zM34 34h1v1h-1z" fill="#0b1a07"/></svg>
+      <p class="qr-not">Bu sayfayı paylaşmak için: kodu okut ya da<br><b>cactuscafes.com/cactus-jump-test.html</b></p>
+    </div>
+
+    <div class="kutu">
+      <h2>Merak edilenler</h2>
+      <dl class="sss">
+        <dt>iPhone'um var, katılabilir miyim?</dt>
+        <dd>Bu test yalnızca Android için. Cactus Jump'ın iPhone sürümü zaten App Store'da — oradan indirebilirsin.</dd>
+
+        <dt>Neden Gmail adresimi istiyorsunuz?</dt>
+        <dd>Play Store test grubu e-posta üzerinden işliyor; Google, adresi listede olmayan kimseye test sürümünü göstermiyor. Adres yalnızca bu liste için kullanılır, başka hiçbir yere geçmez.</dd>
+
+        <dt>Her gün oynamak zorunda mıyım?</dt>
+        <dd>Hayır. Ama tamamen dokunmadan bırakma — arada birkaç tur at, Google'ın istediği bu.</dd>
+
+        <dt>Bir hata görürsem ne yapayım?</dt>
+        <dd>Yaz bize, en çok işimize yarayacak şey o. Play Store'daki test sayfasından da doğrudan geri bildirim gönderebilirsin.</dd>
+
+        <dt>Limonata olayı ne?</dt>
+        <dd>Salon rekorunu geçen, kafede bir limonata kazanıyor. Rekor tabelası tüm oyuncular arasında ortak ve ilk 5'e girenlerin adı yazıyor.</dd>
+      </dl>
+    </div>
+
+    <p class="alt-not">
+      Takıldığın yerde yaz:
+      <a href="https://wa.me/905380146600">WhatsApp</a> ·
+      <a href="mailto:batuhanbulut@cactuscafes.com">batuhanbulut@cactuscafes.com</a><br>
+      <a href="cactus-jump-gizlilik.html">Gizlilik politikası</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+/* Play Console'daki "opt-in" adresi. Testçiler listeye eklenmeden Google bu
+   linki üretmiyor; o yüzden sayfa linksiz de dogru gorunecek sekilde yaziliyor.
+   Link gelince ASAGIDAKI TEK SATIRI doldurmak yeterli. */
+const KATIL_LINK = '';
+
+(function () {
+  if (!KATIL_LINK) return;
+  const b = document.getElementById('katilBtn');
+  b.classList.remove('pasif');
+  b.removeAttribute('aria-disabled');
+  b.href = KATIL_LINK;
+  b.textContent = 'Testçi ol →';
+  document.getElementById('btnAlt').textContent =
+    'Play Store hesabınla açılmalı. Buton çalışmazsa linki kopyalayıp tarayıcıya yapıştır.';
+})();
+</script>
+
+</body>
+</html>

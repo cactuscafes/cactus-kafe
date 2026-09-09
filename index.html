@@ -22,8 +22,8 @@
 <link rel="manifest" href="manifest-site.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="foto-hero-podyum2.jpg" fetchpriority="high" media="(min-width:769px)">
-<link rel="preload" as="image" href="foto-hero-podyum-mobil2.jpg" fetchpriority="high" media="(max-width:768px)">
+<link rel="preload" as="image" type="image/avif" href="foto-hero-podyum2.avif" fetchpriority="high" media="(min-width:769px)">
+<link rel="preload" as="image" type="image/avif" href="foto-hero-podyum-mobil2.avif" fetchpriority="high" media="(max-width:768px)">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;
@@ -365,8 +365,8 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
     <a href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">🎮 Oyun</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Sadakat Kartı</a>
+    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Oyun</a>
     <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
@@ -379,8 +379,8 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
   <a href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">🎮 Oyun</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">Oyun</a>
   <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
@@ -394,7 +394,11 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 <section class="hero">
   <picture class="hero-pic">
+    <source media="(max-width:768px)" type="image/avif" srcset="foto-hero-podyum-mobil2.avif">
+    <source media="(max-width:768px)" type="image/webp" srcset="foto-hero-podyum-mobil2.webp">
     <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
+    <source type="image/avif" srcset="foto-hero-podyum2.avif">
+    <source type="image/webp" srcset="foto-hero-podyum2.webp">
     <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" width="1250" height="1563" fetchpriority="high" decoding="async">
   </picture>
   <div class="hero-overlay"></div>
@@ -729,8 +733,8 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
           <span class="branch-saat" data-ayar="saat-podyum">Hafta içi <b>16:00–01:00</b> · Hafta sonu <b>14:00–02:00</b></span>
         </div>
         <div class="branch-actions">
-          <a href="tel:+905380146600" class="bmini ara">📞 Ara</a>
-          <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="bmini yol">🧭 Yol Tarifi</a>
+          <a href="tel:+905380146600" class="bmini ara"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Ara</a>
+          <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="bmini yol"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Yol Tarifi</a>
         </div>
       </div>
     </div>

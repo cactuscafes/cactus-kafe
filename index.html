@@ -26,19 +26,17 @@
 <link rel="preload" as="image" href="foto-hero-podyum-mobil2.jpg" fetchpriority="high" media="(max-width:768px)">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;}
+:root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;
+  /* --gold dekoratif (cizgi, kenarlik, koyu zemin). Acik zeminde METIN/BUTON icin --gold-ink:
+     #c8a86a beyaz uzerinde 2.3:1 ile WCAG AA'yi gecemiyor; --gold-ink 4.9:1. */
+  --gold-ink:#8a6b2f;
+  /* Tek bosluk olcegi: bolum ici dikey nefes + sayfa kenar bosugu. Mobil override gerekmez. */
+  --sp-section:clamp(72px,9vw,120px);
+  --sp-gutter:clamp(20px,5vw,60px);}
 body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.98);border-bottom:1px solid rgba(0,0,0,0.08);}
-.nav-logo{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;}
-.nav-logo-main{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--dark);text-transform:uppercase;}
-.nav-logo-sub{font-size:8px;letter-spacing:4px;color:#888;text-transform:uppercase;margin-top:2px;}
-.nav-links{display:flex!important;gap:40px;list-style:none;visibility:visible!important;opacity:1!important;} .nav-links a{color:var(--dark)!important;opacity:1!important;}
-.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dark);font-weight:400;transition:color .3s;}
-.nav-links a:hover{color:var(--gold);}
-.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
-.nav-burger span{width:24px;height:1px;background:var(--dark);display:block;}
 
 /* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;}
@@ -64,14 +62,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 
 
 /* MENU SECTION */
-.section-menu{padding:100px 60px;}
+.section-menu{padding:var(--sp-section) var(--sp-gutter);}
 .section-header{text-align:center;margin-bottom:60px;}
-.section-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:400;}
+.section-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-ink);margin-bottom:16px;font-weight:400;}
 .section-title{font-family:'Fraunces',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;}
 .section-title span{font-style:italic;}
 .section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
 
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:2px;max-width:900px;margin-inline:auto;}
 .menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
 .menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
 .menu-card:hover img{transform:scale(1.05);}
@@ -82,30 +80,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .menu-card:hover .menu-card-link{color:#fff;border-color:#fff;}
 
 /* ABOUT */
-.section-about{padding:120px 60px;background:var(--light);}
+.section-about{padding:var(--sp-section) var(--sp-gutter);background:var(--light);}
 .about-inner{max-width:900px;margin:0 auto;text-align:center;}
-.about-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.about-eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-ink);margin-bottom:24px;}
 .about-title{font-family:'Fraunces',serif;font-size:clamp(32px,4vw,48px);font-weight:300;line-height:1.3;letter-spacing:1px;margin-bottom:40px;}
 .about-title em{font-style:italic;}
 .about-text{font-size:13px;line-height:2;color:#555;font-weight:300;max-width:680px;margin:0 auto 48px;}
 .about-btn{display:inline-block;padding:16px 48px;background:var(--dark);color:#fff;text-decoration:none;font-size:10px;letter-spacing:4px;text-transform:uppercase;transition:background .3s;}
-.about-btn:hover{background:var(--gold);}
+.about-btn:hover{background:var(--gold-ink);}
 
 /* INSTAGRAM */
-.ig-section{padding:100px 60px;background:#fff;}
-.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;}
+.ig-section{padding:var(--sp-section) var(--sp-gutter);background:#fff;}
+.ig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:24px;max-width:900px;margin:0 auto;}
 .ig-card{text-decoration:none;display:flex;flex-direction:column;align-items:center;padding:48px 24px;border:1px solid #eee;transition:border-color .3s;}
 .ig-card:hover{border-color:var(--gold);}
 .ig-card.ig-center{background:#fafafa;}
 @media(max-width:768px){
-  .ig-section{padding:60px 16px;}
-  .ig-grid{grid-template-columns:repeat(3,1fr);gap:10px;max-width:100%;}
+  .ig-grid{gap:10px;max-width:100%;}
   .ig-card{padding:28px 10px;}
 }
 
 /* BRANCHES */
-.section-branches{padding:100px 60px;}
-.branches-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:60px;}
+.section-branches{padding:var(--sp-section) var(--sp-gutter);}
+.branches-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:2px;margin-top:60px;max-width:1000px;margin-inline:auto;}
 .branch-card{position:relative;aspect-ratio:16/9;overflow:hidden;}
 .branch-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
 .branch-card:hover img{transform:scale(1.04);}
@@ -120,8 +117,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .branch-actions{display:flex;gap:10px;}
 .bmini{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px 16px;font-size:13px;font-weight:500;letter-spacing:.3px;text-decoration:none;transition:all .2s;font-family:'Inter',sans-serif;}
 .bmini.ara{background:#fff;border:1.5px solid #d8d2c6;color:#1a1a1a;}
-.bmini.ara:hover{border-color:var(--gold);color:var(--gold);}
-.bmini.yol{background:var(--gold);border:1.5px solid var(--gold);color:#fff;}
+.bmini.ara:hover{border-color:var(--gold-ink);color:var(--gold-ink);}
+.bmini.yol{background:var(--gold-ink);border:1.5px solid var(--gold-ink);color:#fff;}
 .bmini.yol:hover{filter:brightness(1.07);}
 .acik-rozet{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.4px;padding:5px 13px;border-radius:20px;}
 .acik-rozet::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;}
@@ -146,20 +143,14 @@ footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
 /* MOBILE */
 @media(max-width:768px){
 nav{padding:18px 24px;}
-.nav-links{display:none;}
-.nav-burger{display:flex;}
 .hero-title{font-size:48px;}
-.section-menu,.section-about,.section-branches{padding:70px 24px;}
-.menu-grid{grid-template-columns:repeat(3,1fr);gap:1px;}
+.menu-grid{gap:1px;}
 .menu-card{aspect-ratio:2/3;}
 .menu-card-title{font-size:14px;}
 .menu-card-label{font-size:7px;}
 .menu-card-overlay{padding:12px 10px;}
 .menu-card-link{font-size:7px;margin-top:6px;}
-.branches-grid{grid-template-columns:1fr;}
 .footer-inner{grid-template-columns:1fr;gap:40px;}
-footer{padding:60px 24px 30px;}
-.section-menu,.section-about{padding:70px 24px;}
 }
 
 
@@ -272,7 +263,7 @@ footer{padding:60px 24px 30px;}
 #mainNavLinks a{position:relative;transition:color .25s;}
 #mainNavLinks a:not([style*="background"])::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;background:#c8a86a;transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1);}
 #mainNavLinks a:not([style*="background"]):hover::after{transform:scaleX(1);}
-#mainNavLinks a:not([style*="background"]):hover{color:#c8a86a!important;}
+#mainNavLinks a:not([style*="background"]):hover{color:#8a6b2f!important;}
 
 /* 14. ABOUT/HERO BTN — letter-spacing on hover */
 .about-btn{transition:background .3s,color .3s,letter-spacing .3s,transform .3s;}
@@ -369,14 +360,14 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);border-bottom:1px solid rgba(0,0,0,0.08);">
-  <a href="index.html" style="display:flex;align-items:center;text-decoration:none;" aria-label="Cactus Coffee — Ana Sayfa"><img src="logo-trans.png" alt="Cactus Coffee" style="height:38px;width:auto;display:block;"></a>
+  <a href="index.html" style="display:flex;align-items:center;text-decoration:none;" aria-label="Cactus Coffee — Ana Sayfa"><img src="logo-trans.png" alt="Cactus Coffee" width="491" height="126" style="height:38px;width:auto;display:block;"></a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
-    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
+    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
     <a href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎮 Oyun</a>
-    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
+    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">🎮 Oyun</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
     <span id="bs1" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
@@ -388,9 +379,9 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
   <a href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎮 Oyun</a>
-  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">🎮 Oyun</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
 @media(max-width:768px){
@@ -404,7 +395,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <section class="hero">
   <picture class="hero-pic">
     <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
-    <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">
+    <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" width="1250" height="1563" fetchpriority="high" decoding="async">
   </picture>
   <div class="hero-overlay"></div>
   <div class="steam-wrap" aria-hidden="true">
@@ -427,7 +418,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 </section>
 
 <!-- SADAKAT KARTI TANITIM -->
-<section id="sadakat-section" style="background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 45%,#0e1f08 100%);padding:80px 60px;overflow:hidden;position:relative;">
+<section id="sadakat-section" style="background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 45%,#0e1f08 100%);padding:var(--sp-section) var(--sp-gutter);overflow:hidden;position:relative;">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(200,168,106,.1) 0%,transparent 60%);pointer-events:none;"></div>
   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" id="sadakat-inner">
 
@@ -656,15 +647,15 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   </div>
   <div class="menu-grid">
     <div class="menu-card fade-up fade-up-d1" onclick="location.href='menu-podyum.html'" style="cursor:pointer;">
-      <img src="foto-podyum-park-dikey.jpg" alt="Podyumpark Şubesi — dönme dolap manzaralı bahçe" data-as-key="img_2">
+      <img src="foto-podyum-park-dikey.jpg" alt="Podyumpark Şubesi — dönme dolap manzaralı bahçe" width="975" height="1300" loading="lazy" decoding="async" data-as-key="img_2">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Şube</span>
-        <h3 class="menu-card-title">Menü</h3>
+        <h3 class="menu-card-title">Podyumpark</h3>
         <a href="menu-podyum.html" class="menu-card-link">Menü</a>
       </div>
     </div>
     <div class="menu-card fade-up fade-up-d2" onclick="location.href='menu-podyum.html'" style="cursor:pointer;">
-      <img src="foto-podyum-waffle.jpg" alt="Cactus Waffle — Podyumpark Stand" data-as-key="img_3">
+      <img src="foto-podyum-waffle.jpg" alt="Cactus Waffle — Podyumpark Stand" width="1200" height="800" loading="lazy" decoding="async" data-as-key="img_3">
       <div class="menu-card-overlay">
         <span class="menu-card-label">Koleksiyon</span>
         <h3 class="menu-card-title">Podyumpark Waffle</h3>
@@ -675,7 +666,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 </section>
 
 <!-- ÖNE ÇIKAN ÜRÜNLER -->
-<section class="section-menu" style="padding-top:40px;background:var(--light);">
+<section class="section-menu" style="padding-top:clamp(40px,5vw,64px);background:var(--light);">
   <div class="section-header">
     <p class="section-eyebrow fade-up">Favoriler</p>
     <h2 class="section-title fade-up fade-up-d1">Öne Çıkan <span>Lezzetler</span></h2>
@@ -697,7 +688,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .oncu-card:hover .oncu-img img{transform:scale(1.07);}
 .oncu-body{padding:18px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
 .oncu-name{font-family:'Fraunces',serif;font-size:21px;font-weight:400;color:var(--dark);letter-spacing:.5px;line-height:1.2;}
-.oncu-price{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:500;}
+.oncu-price{font-size:11px;letter-spacing:2px;color:var(--gold-ink);font-weight:500;}
 @media(max-width:900px){.oncu-grid{grid-template-columns:repeat(2,1fr);gap:14px;}}
 @media(max-width:768px){.oncu-grid{padding:0 4px;}.oncu-name{font-size:18px;}}
 </style>
@@ -726,7 +717,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   <div class="branches-grid">
     <div class="branch-wrap">
       <a class="branch-card fade-up fade-up-d1" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" style="text-decoration:none;">
-        <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" data-as-key="img_5">
+        <img src="https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1776750192197-l2m93f75d9g.jpg" alt="Podyumpark Şubesi" loading="lazy" decoding="async" data-as-key="img_5">
         <div class="branch-overlay">
           <div class="branch-name">Podyumpark</div>
           <div class="branch-sub">Podyumpark AVM</div>
@@ -751,7 +742,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <!-- === INSTAGRAM === -->
 <section class="ig-section">
   <div style="text-align:center;margin-bottom:60px;" class="fade-up">
-    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
+    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#8a6b2f;margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
     <h2 style="font-family:'Fraunces',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi <em style="font-style:italic;">Takip Edin</em></h2>
     <div style="width:60px;height:1px;background:#c8a86a;margin:20px auto 0;"></div>
   </div>
@@ -794,7 +785,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .gpuan-yildiz{font-size:13px;letter-spacing:2px;color:#e8c47a;}
 .gpuan-alt{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(240,225,195,.6);margin-top:2px;}
 </style>
-<footer style="background:#111;color:#fff;padding:80px 60px 0;">
+<footer style="background:#111;color:#fff;padding:var(--sp-section) var(--sp-gutter) 0;">
   <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:56px;margin-bottom:64px;">
 
     <!-- Marka -->
@@ -1115,8 +1106,8 @@ function toggleMainNav(){
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
     gap:10px!important;
-    margin:0 -24px!important;
-    padding:4px 24px 14px!important;
+    margin:0 calc(var(--sp-gutter) * -1)!important;
+    padding:4px var(--sp-gutter) 14px!important;
   }
   .menu-grid::-webkit-scrollbar{display:none;}
   .menu-card{

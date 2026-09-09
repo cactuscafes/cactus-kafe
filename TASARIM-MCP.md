@@ -167,7 +167,7 @@ Değişikliği uygula, sonra kontrol et:
 
 | Sayfa | Şu anki durum | Ne yapılacak | Hangi araç |
 |---|---|---|---|
-| `index.html` | Hero + menü + hakkında + şubeler + IG şeridi | Tipografi ölçeği ve boşluk ritmini yeniden kur; `.section-about` iki kez tekrar ediyor, ayrıştır | Stitch → 21st |
+| `index.html` | Hero + menü + hakkında + şubeler + IG şeridi | **1. tur yapıldı** — grid/kontrast/ritim düzeltildi. Sırada: hero görseli ve tipografi ölçeği | Stitch → Nano Banana |
 | `menu.html` / `menu-podyum.html` | 161 KB, ürün listesi | Kategori navigasyonu + ürün kartı; ürün görselleri eksik | 21st + Nano Banana |
 | `iletisim.html` | Basit iletişim | Harita/saat/şube kartı düzeni | 21st |
 | `kart.html` | Sadakat kartı | Damga grid'i görsel dil olarak zayıf | Stitch |

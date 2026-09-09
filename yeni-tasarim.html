@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="tr"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- PROTOTİP: onaylanana kadar arama motorlarına kapalı -->
+<meta name="robots" content="noindex, nofollow">
+<title>Cactus Coffee — Yeni Tasarım Prototipi</title>
+<meta name="theme-color" content="#08140b">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="foto-hero-podyum2.jpg" fetchpriority="high" media="(min-width:769px)">
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   CACTUS — YENİ TASARIM PROTOTİPİ
+   Dört tarz bir arada:
+   1) scroll animasyonları  2) WebGL sıvı gradyan
+   3) bento + cam efekti    4) kinetik tipografi
+   Harici JS/CSS kütüphanesi YOK. Tek dosya.
+   ═══════════════════════════════════════════════════════════ */
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --gold:#c8a86a;
+  --gold-soft:#e0c894;
+  --deep:#08140b;      /* en koyu zemin */
+  --green:#0e1f08;     /* marka yeşili (mevcut theme-color) */
+  --cream:#f8f6f2;
+  --ink:#1a1a1a;
+  --line:rgba(232,220,198,.14);
+  --glass:rgba(255,255,255,.045);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --pad:clamp(20px,5vw,72px);
+}
+
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--deep);
+  color:var(--cream);
+  overflow-x:clip;               /* hidden yerine clip: sticky'yi bozmaz */
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+
+.eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);font-weight:400;}
+.serif{font-family:'Fraunces',Georgia,serif;font-weight:300;}
+
+/* ─────────── 1. INTRO / PERDE ─────────── */
+#intro{
+  position:fixed;inset:0;z-index:9999;background:var(--deep);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:26px;
+  transition:transform 1s var(--ease),opacity .6s ease .35s;
+}
+#intro.done{transform:translateY(-101%);opacity:0;pointer-events:none;}
+.intro-word{display:flex;overflow:hidden;}
+.intro-word span{
+  font-family:'Fraunces',serif;font-size:clamp(34px,8vw,72px);font-weight:300;
+  letter-spacing:.14em;color:var(--cream);
+  transform:translateY(110%);animation:introUp .8s var(--ease) forwards;
+}
+@keyframes introUp{to{transform:translateY(0);}}
+.intro-count{font-size:11px;letter-spacing:4px;color:var(--gold);font-variant-numeric:tabular-nums;}
+.intro-bar{width:min(220px,50vw);height:1px;background:rgba(232,220,198,.18);overflow:hidden;}
+.intro-bar i{display:block;height:100%;width:0;background:var(--gold);}
+
+/* ─────────── 2. NAV + SCROLL ÇUBUĞU ─────────── */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;z-index:200;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--gold-soft));}
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:150;
+  padding:20px var(--pad);display:flex;align-items:center;justify-content:space-between;
+  transition:background .45s ease,backdrop-filter .45s ease,padding .45s ease,border-color .45s ease;
+  border-bottom:1px solid transparent;
+}
+nav.stuck{
+  background:rgba(8,20,11,.72);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  border-bottom-color:var(--line);padding-top:14px;padding-bottom:14px;
+}
+.brand{display:flex;flex-direction:column;line-height:1;}
+.brand b{font-family:'Fraunces',serif;font-size:22px;font-weight:400;letter-spacing:.34em;text-transform:uppercase;}
+.brand small{font-size:7.5px;letter-spacing:.4em;text-transform:uppercase;color:rgba(248,246,242,.5);margin-top:5px;}
+.nav-links{display:flex;gap:34px;list-style:none;}
+.nav-links a{font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:rgba(248,246,242,.72);transition:color .3s;position:relative;}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--gold);transition:width .35s var(--ease);}
+.nav-links a:hover{color:var(--cream);}
+.nav-links a:hover::after{width:100%;}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px;}
+.burger span{width:22px;height:1px;background:var(--cream);display:block;transition:transform .3s,opacity .3s;}
+
+#sheet{
+  position:fixed;inset:0;z-index:140;background:rgba(8,20,11,.96);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  opacity:0;pointer-events:none;transition:opacity .4s ease;
+}
+#sheet.open{opacity:1;pointer-events:auto;}
+#sheet a{font-family:'Fraunces',serif;font-size:26px;font-weight:300;letter-spacing:.08em;}
+
+/* ─────────── 3. HERO — WebGL sıvı gradyan + kinetik başlık ─────────── */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;}
+/* WebGL yoksa / kapalıysa devreye giren yedek zemin */
+.hero-fallback{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 20% 20%,#14351c 0%,transparent 60%),
+    radial-gradient(90% 70% at 80% 70%,rgba(200,168,106,.42) 0%,transparent 62%),
+    linear-gradient(160deg,var(--deep) 0%,var(--green) 55%,#05100a 100%);
+}
+.hero-photo{
+  position:absolute;inset:0;background:url(foto-hero-podyum2.jpg) center 30%/cover no-repeat;
+  opacity:.14;mix-blend-mode:luminosity;
+}
+.hero-vignette{position:absolute;inset:0;background:radial-gradient(75% 65% at 50% 45%,transparent 0%,rgba(4,9,5,.72) 100%);}
+.hero-inner{position:relative;z-index:3;text-align:center;padding:120px var(--pad) 140px;width:100%;}
+.hero-inner .eyebrow{opacity:0;animation:softIn .9s var(--ease) .15s forwards;}
+h1.kinetic{
+  font-family:'Fraunces',serif;font-weight:300;
+  font-size:clamp(46px,10.5vw,148px);line-height:.94;letter-spacing:-.01em;
+  margin:22px 0 18px;
+}
+h1.kinetic em{font-style:italic;color:var(--gold-soft);}
+/* harf harf maske açılışı */
+.ln{display:block;overflow:hidden;padding-bottom:.06em;}
+.ch{display:inline-block;transform:translateY(115%) rotate(4deg);}
+.ch.go{animation:chIn .95s var(--ease) forwards;}
+@keyframes chIn{to{transform:translateY(0) rotate(0);}}
+.hero-sub{
+  font-size:12.5px;line-height:2;letter-spacing:.02em;color:rgba(248,246,242,.62);
+  max-width:44ch;margin:0 auto 44px;font-weight:300;
+  opacity:0;animation:softIn 1s var(--ease) 1.05s forwards;
+}
+@keyframes softIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;opacity:0;animation:softIn 1s var(--ease) 1.25s forwards;}
+
+.btn{
+  --bg:transparent;--fg:var(--cream);--bd:rgba(248,246,242,.34);
+  position:relative;overflow:hidden;isolation:isolate;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:17px 38px;border:1px solid var(--bd);border-radius:100px;
+  background:var(--bg);color:var(--fg);
+  font-size:10px;letter-spacing:3.4px;text-transform:uppercase;font-weight:500;
+  transition:color .35s ease,border-color .35s ease,transform .3s var(--ease);
+}
+.btn::before{
+  content:"";position:absolute;inset:0;z-index:-1;background:var(--gold);
+  transform:translateY(101%);transition:transform .45s var(--ease);
+}
+.btn:hover{color:var(--green);border-color:var(--gold);}
+.btn:hover::before{transform:translateY(0);}
+.btn:active{transform:scale(.97);}
+.btn.solid{--bg:var(--cream);--fg:var(--green);--bd:var(--cream);}
+.btn.solid::before{background:var(--gold-soft);}
+
+.scroll-cue{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  font-size:8.5px;letter-spacing:3.5px;text-transform:uppercase;color:rgba(248,246,242,.45);
+}
+.scroll-cue i{width:1px;height:44px;background:linear-gradient(var(--gold),transparent);animation:cue 2.2s ease-in-out infinite;transform-origin:top;}
+@keyframes cue{0%,100%{transform:scaleY(.35);opacity:.4;}50%{transform:scaleY(1);opacity:1;}}
+
+/* ─────────── 4. KİNETİK MARQUEE BANDI ─────────── */
+.band{padding:26px 0;border-block:1px solid var(--line);background:rgba(14,31,8,.4);overflow:hidden;}
+.band + .band{border-top:0;}
+.marquee{display:flex;width:max-content;will-change:transform;animation:slide 34s linear infinite;}
+.marquee.rev{animation-direction:reverse;animation-duration:42s;}
+@keyframes slide{to{transform:translateX(-50%);}}
+.marquee span{
+  font-family:'Fraunces',serif;font-size:clamp(26px,4.4vw,56px);font-weight:300;
+  letter-spacing:.04em;padding:0 .5em;white-space:nowrap;color:rgba(248,246,242,.9);
+}
+.marquee span em{font-style:italic;color:var(--gold);}
+.marquee span.out{color:transparent;-webkit-text-stroke:1px rgba(200,168,106,.55);}
+
+/* ─────────── 5. SCROLL İLE BÜYÜYEN STICKY BÖLÜM ─────────── */
+.stage{position:relative;height:230vh;}
+.stage-pin{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center;}
+.stage-media{
+  --p:0;
+  position:absolute;
+  width:calc(38% + 62% * var(--p));
+  height:calc(46% + 54% * var(--p));
+  border-radius:calc(26px - 26px * var(--p));
+  overflow:hidden;
+}
+.stage-media img{width:100%;height:100%;object-fit:cover;transform:scale(calc(1.22 - .22 * var(--p)));}
+.stage-media::after{content:"";position:absolute;inset:0;background:rgba(4,9,5,calc(.18 + .62 * var(--p)));}
+.stage-copy{
+  position:relative;z-index:4;text-align:center;padding:0 var(--pad);max-width:900px;
+  opacity:var(--p);
+}
+/* Fotoğraf parlak olduğunda metni ayakta tutan yumuşak perde */
+.stage-copy::before{
+  content:"";position:absolute;inset:-14% -8%;z-index:-1;
+  background:radial-gradient(62% 58% at 50% 50%,rgba(4,9,5,.78) 0%,rgba(4,9,5,.45) 55%,transparent 100%);
+}
+.stage-copy h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(30px,5.4vw,74px);line-height:1.08;letter-spacing:-.01em;text-shadow:0 2px 30px rgba(0,0,0,.55);}
+.stage-copy h2 em{font-style:italic;color:var(--gold-soft);}
+.stage-copy p{margin-top:22px;font-size:13px;line-height:2;color:rgba(248,246,242,.82);font-weight:300;max-width:52ch;margin-inline:auto;text-shadow:0 1px 16px rgba(0,0,0,.7);}
+
+/* ─────────── 6. BENTO + CAM EFEKTİ ─────────── */
+.sec{padding:clamp(80px,11vw,150px) var(--pad);}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:52px;}
+.sec-head h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(30px,4.6vw,62px);line-height:1.05;letter-spacing:-.01em;margin-top:16px;}
+.sec-head h2 em{font-style:italic;color:var(--gold-soft);}
+
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.cell{
+  position:relative;overflow:hidden;isolation:isolate;
+  background:var(--glass);border:1px solid var(--line);border-radius:22px;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  padding:30px;min-height:200px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:22px;
+  transition:transform .55s var(--ease),border-color .45s ease,background .45s ease;
+}
+.cell::before{ /* imleci takip eden ışık */
+  content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .45s ease;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(200,168,106,.20),transparent 62%);
+}
+.cell:hover{transform:translateY(-5px);border-color:rgba(200,168,106,.42);background:rgba(255,255,255,.07);}
+.cell:hover::before{opacity:1;}
+.cell.w2{grid-column:span 2;}
+.cell.has-photo{min-height:264px;}
+.cell.h2{grid-row:span 2;min-height:0;}
+.cell-top{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.cell-ico{display:flex;align-items:center;}
+.ico{width:19px;height:19px;color:var(--gold);opacity:.9;}
+/* Fotoğraflı kartta üst yazıların okunurluğu */
+.cell-photo::after{content:"";position:absolute;inset:0;}
+.cell h3{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(21px,2.4vw,30px);line-height:1.18;letter-spacing:.01em;}
+.cell h3 em{font-style:italic;color:var(--gold-soft);}
+.cell p{font-size:12.5px;line-height:1.85;color:rgba(248,246,242,.6);font-weight:300;}
+.cell .go-arrow{font-size:9.5px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:8px;}
+.cell .go-arrow svg{transition:transform .35s var(--ease);}
+.cell:hover .go-arrow svg{transform:translateX(5px);}
+.cell-photo{position:absolute;inset:0;z-index:-2;}
+.cell-photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform .8s var(--ease);}
+.cell:hover .cell-photo img{transform:scale(1.11);}
+.cell-photo::after{background:linear-gradient(to top,rgba(4,9,5,.94) 6%,rgba(4,9,5,.55) 55%,rgba(4,9,5,.78) 100%);}
+
+/* yıldız / sayaç mini görseller */
+.stars{color:var(--gold);letter-spacing:3px;font-size:14px;}
+.big-num{font-family:'Fraunces',serif;font-size:clamp(44px,6vw,78px);font-weight:300;line-height:1;letter-spacing:-.02em;}
+.big-num small{font-size:.28em;letter-spacing:.28em;text-transform:uppercase;color:rgba(248,246,242,.5);display:block;margin-top:12px;font-family:'Inter',sans-serif;}
+.dots{display:flex;gap:7px;flex-wrap:wrap;}
+.dots i{width:11px;height:11px;border-radius:50%;border:1px solid var(--gold);display:block;}
+.dots i.on{background:var(--gold);}
+.hours{display:flex;flex-direction:column;gap:12px;}
+.hours div{display:flex;justify-content:space-between;gap:14px;font-size:12px;border-bottom:1px solid var(--line);padding-bottom:10px;}
+.hours span:last-child{color:var(--gold-soft);font-variant-numeric:tabular-nums;}
+
+/* ─────────── 7. YATAY GALERİ ─────────── */
+.rail{position:relative;height:300vh;}
+.rail-pin{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;gap:clamp(22px,4vh,44px);
+  padding-top:76px;
+}
+.rail-track{display:flex;gap:16px;padding-inline:var(--pad);will-change:transform;align-items:flex-start;}
+.frame{position:relative;flex:0 0 auto;width:min(74vw,440px);height:54svh;border-radius:20px;overflow:hidden;}
+.frame:nth-child(even){height:44svh;align-self:flex-end;}
+.frame img{width:100%;height:100%;object-fit:cover;}
+.frame::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(4,9,5,.72) 0%,transparent 34%);pointer-events:none;}
+.frame figcaption{
+  position:absolute;left:20px;bottom:18px;right:20px;z-index:2;
+  font-size:9.5px;letter-spacing:3.2px;text-transform:uppercase;color:rgba(248,246,242,.9);
+  text-shadow:0 2px 14px rgba(0,0,0,.65);
+}
+.rail-label{padding-inline:var(--pad);flex:0 0 auto;}
+
+/* ─────────── 8. KİNETİK KAPANIŞ ─────────── */
+.closer{padding:clamp(90px,13vw,180px) var(--pad);text-align:center;position:relative;overflow:hidden;}
+.closer::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(70% 60% at 50% 100%,rgba(200,168,106,.16),transparent 70%);
+}
+.word{display:flex;justify-content:center;flex-wrap:wrap;position:relative;}
+.word b{
+  font-family:'Fraunces',serif;font-weight:300;
+  font-size:clamp(56px,17vw,220px);line-height:.9;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1px rgba(248,246,242,.42);
+  transition:color .4s ease,-webkit-text-stroke-color .4s ease,transform .5s var(--ease);
+  cursor:default;
+}
+.word b:hover{color:var(--gold);-webkit-text-stroke-color:var(--gold);transform:translateY(-12px) rotate(-3deg);}
+.closer p{margin:32px auto 40px;font-size:13px;line-height:2;color:rgba(248,246,242,.62);max-width:46ch;font-weight:300;}
+
+footer{padding:60px var(--pad) 44px;border-top:1px solid var(--line);}
+.foot-grid{display:flex;justify-content:space-between;gap:36px;flex-wrap:wrap;align-items:flex-start;}
+.foot-grid ul{list-style:none;display:flex;flex-direction:column;gap:12px;}
+.foot-grid a,.foot-grid li{font-size:11.5px;letter-spacing:.04em;color:rgba(248,246,242,.6);}
+.foot-grid a:hover{color:var(--gold);}
+.foot-note{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:rgba(248,246,242,.38);}
+
+/* ─────────── SCROLL REVEAL ─────────── */
+.rv{opacity:0;transform:translateY(38px);transition:opacity 1s var(--ease),transform 1s var(--ease);}
+.rv.in{opacity:1;transform:none;}
+.rv.d1{transition-delay:.09s;} .rv.d2{transition-delay:.18s;} .rv.d3{transition-delay:.27s;} .rv.d4{transition-delay:.36s;}
+
+/* ─────────── ÖZEL İMLEÇ (sadece fare) ─────────── */
+#ring{
+  position:fixed;top:0;left:0;width:30px;height:30px;border:1px solid rgba(200,168,106,.75);
+  border-radius:50%;pointer-events:none;z-index:9998;opacity:0;
+  transition:opacity .3s ease,width .28s var(--ease),height .28s var(--ease),background .28s ease;
+  transform:translate(-50%,-50%);
+}
+#ring.on{opacity:1;}
+#ring.grow{width:62px;height:62px;background:rgba(200,168,106,.14);}
+@media (hover:none),(pointer:coarse){#ring{display:none;}}
+
+/* ─────────── MOBİL ─────────── */
+@media(max-width:1000px){
+  .bento{grid-template-columns:repeat(2,1fr);}
+  .cell.w2{grid-column:span 2;}
+  .cell.h2{grid-row:span 1;min-height:200px;}
+}
+@media(max-width:760px){
+  .nav-links{display:none;}
+  .burger{display:flex;}
+  .bento{grid-template-columns:1fr;}
+  .cell.w2{grid-column:span 1;}
+  .cell{padding:24px;border-radius:18px;min-height:170px;}
+  .stage{height:220vh;}
+  .stage-media{width:calc(68% + 32% * var(--p));height:calc(40% + 60% * var(--p));}
+  /* Yatay galeri: mobilde scroll ele geçirmek yerine doğal kaydırma + snap */
+  .rail{height:auto;}
+  .rail-pin{position:static;height:auto;padding:10px 0 30px;gap:22px;}
+  .rail-track{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;transform:none!important;padding-bottom:6px;}
+  .rail-track::-webkit-scrollbar{display:none;}
+  .frame{width:78vw;height:56svh;scroll-snap-align:center;}
+  .frame:nth-child(even){height:56svh;align-self:auto;}
+}
+
+/* ─────────── HAREKET AZALTMA ─────────── */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}
+  .ch{transform:none!important;}
+  .rv{opacity:1!important;transform:none!important;}
+  .stage{height:auto;}
+  .stage-pin{position:static;height:auto;padding:80px 0;}
+  .stage-media{position:relative;width:100%;height:56svh;border-radius:18px;}
+  .stage-copy{opacity:1!important;margin-top:40px;}
+  .rail{height:auto;}
+  .rail-pin{position:static;height:auto;}
+  .rail-track{overflow-x:auto;transform:none!important;}
+  #intro{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ INTRO PERDESİ ══════ -->
+<div id="intro" aria-hidden="true">
+  <div class="intro-word">
+    <span style="animation-delay:.05s">C</span><span style="animation-delay:.11s">A</span><span style="animation-delay:.17s">C</span><span style="animation-delay:.23s">T</span><span style="animation-delay:.29s">U</span><span style="animation-delay:.35s">S</span>
+  </div>
+  <div class="intro-bar"><i id="introBar"></i></div>
+  <div class="intro-count"><span id="introNum">00</span> / 100</div>
+</div>
+
+<div class="progress" id="prog"></div>
+<div id="ring"></div>
+
+<!-- ══════ NAV ══════ -->
+<nav id="nav">
+  <a class="brand" href="index.html" aria-label="Cactus Coffee ana sayfa">
+    <b>Cactus</b><small>Coffee · Bursa</small>
+  </a>
+  <ul class="nav-links">
+    <li><a href="menu-podyum.html">Menü</a></li>
+    <li><a href="#deneyim">Deneyim</a></li>
+    <li><a href="kart.html">Sadakat</a></li>
+    <li><a href="oyunlar.html">Oyunlar</a></li>
+    <li><a href="iletisim.html">İletişim</a></li>
+  </ul>
+  <button class="burger" id="burger" aria-label="Menüyü aç" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div id="sheet">
+  <a href="menu-podyum.html">Menü</a>
+  <a href="#deneyim">Deneyim</a>
+  <a href="kart.html">Sadakat Kartı</a>
+  <a href="oyunlar.html">Oyunlar</a>
+  <a href="iletisim.html">İletişim</a>
+</div>
+
+<!-- ══════ HERO — WebGL sıvı gradyan ══════ -->
+<header class="hero">
+  <div class="hero-fallback"></div>
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <div class="hero-photo" aria-hidden="true"></div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <p class="eyebrow">Podyumpark AVM · Nilüfer, Bursa</p>
+    <h1 class="kinetic">
+      <span class="ln" data-split>Her fincan</span>
+      <span class="ln" data-split><em>bir hikâye</em></span>
+    </h1>
+    <p class="hero-sub">Espresso, soğuk demleme ve el yapımı waffle. Kahven gelene kadar oyna, her yedi içecekte biri bizden.</p>
+    <div class="hero-cta">
+      <a class="btn solid" href="menu-podyum.html">Menüyü Gör</a>
+      <a class="btn" href="kart.html">Sadakat Kartı</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue" aria-hidden="true"><span>Kaydır</span><i></i></div>
+</header>
+
+<!-- ══════ KİNETİK MARQUEE ══════ -->
+<section class="band" aria-hidden="true">
+  <div class="marquee" id="mq1">
+    <span>Espresso</span><span class="out">·</span><span><em>Soğuk Demleme</em></span><span class="out">·</span><span>Waffle</span><span class="out">·</span><span><em>Cheesecake</em></span><span class="out">·</span><span>Filtre</span><span class="out">·</span>
+  </div>
+</section>
+<section class="band" aria-hidden="true">
+  <div class="marquee rev" id="mq2">
+    <span class="out">Her 7 içecekte 1 bedava</span><span>—</span><span class="out">Rekor kırana limonata</span><span>—</span>
+  </div>
+</section>
+
+<!-- ══════ SCROLL İLE BÜYÜYEN SAHNE ══════ -->
+<section class="stage" id="deneyim">
+  <div class="stage-pin">
+    <figure class="stage-media" id="stageMedia">
+      <img src="foto-podyum-waffle.jpg" alt="Cactus Coffee Podyumpark — waffle ve kahve" loading="lazy" decoding="async">
+    </figure>
+    <div class="stage-copy" id="stageCopy">
+      <h2>Kahveyi bekleme,<br><em>onunla vakit geçir</em></h2>
+      <p>Masaya oturduğun andan kalktığın ana kadar her detay planlı: QR menü, kasada telefon numarasıyla eklenen yıldız, beklerken oynanan salon oyunları.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ BENTO + CAM ══════ -->
+<section class="sec">
+  <div class="sec-head rv">
+    <div>
+      <p class="eyebrow">Cactus'te neler var</p>
+      <h2>Bir kahveden<br><em>fazlası</em></h2>
+    </div>
+    <a class="btn" href="iletisim.html">Bize Ulaş</a>
+  </div>
+
+  <div class="bento">
+    <a class="cell w2 h2 rv" href="kart.html">
+      <div class="cell-top">
+        <span class="eyebrow">Üyelere özel</span>
+        <span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="14.5" r="6.5"/><path d="m12 11.4 1.1 2.2 2.4.35-1.75 1.7.42 2.4L12 16.92l-2.17 1.14.41-2.4-1.74-1.7 2.4-.36z"/><path d="M8.5 8.2 6.6 2.8h10.8L15.5 8.2"/></svg></span>
+      </div>
+      <div>
+        <h3>Her kahve seni <em>bedavaya</em> götürür</h3>
+        <p>Kasiyere telefon numaranı söyle, yıldızın otomatik eklenir. 7 yıldız dolduğunda içeceğin bizden.</p>
+        <div class="dots" style="margin-top:20px" aria-hidden="true">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+      </div>
+      <span class="go-arrow">Kartımı gör
+        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M0 4h14M10.5 .5 14.5 4l-4 3.5" stroke="currentColor" stroke-width="1"/></svg>
+      </span>
+    </a>
+
+    <a class="cell w2 has-photo rv d1" href="menu-podyum.html">
+      <div class="cell-photo"><img src="foto-waffle-kase.jpg" alt="Waffle kâsesi" loading="lazy" decoding="async"></div>
+      <div class="cell-top"><span class="eyebrow">Menü</span><span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3.5 8h13v6.5a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5z"/><path d="M16.5 9.5h2.2a2.3 2.3 0 0 1 0 4.6h-2.2"/><path d="M6 4.6c.9-.9.9-1.9 0-2.6M10 4.6c.9-.9.9-1.9 0-2.6M14 4.6c.9-.9.9-1.9 0-2.6"/><path d="M2 22h16"/></svg></span></div>
+      <div>
+        <h3>Öne çıkan <em>lezzetler</em></h3>
+        <p>Podyumpark menüsünün tamamı — fiyatlar güncel, fotoğraflı.</p>
+      </div>
+      <span class="go-arrow">Menüyü aç
+        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M0 4h14M10.5 .5 14.5 4l-4 3.5" stroke="currentColor" stroke-width="1"/></svg>
+      </span>
+    </a>
+
+    <div class="cell rv d2">
+      <div class="cell-top"><span class="eyebrow">Google</span><span class="stars" aria-hidden="true">★★★★<span style="opacity:.42">★</span></span></div>
+      <div>
+        <div class="big-num">4.5<small>54 yorum</small></div>
+      </div>
+    </div>
+
+    <a class="cell rv d3" href="oyunlar.html">
+      <div class="cell-top"><span class="eyebrow">Oyun salonu</span><span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="1.6" y="6.8" width="20.8" height="10.4" rx="5.2"/><path d="M6.4 10v4.2M4.3 12.1h4.2"/><circle cx="16" cy="11.3" r="1.05" fill="currentColor" stroke="none"/><circle cx="18.3" cy="13.6" r="1.05" fill="currentColor" stroke="none"/></svg></span></div>
+      <div>
+        <h3>Kahven gelene kadar <em>oyna</em></h3>
+      </div>
+      <span class="go-arrow">Salona gir
+        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M0 4h14M10.5 .5 14.5 4l-4 3.5" stroke="currentColor" stroke-width="1"/></svg>
+      </span>
+    </a>
+
+    <div class="cell w2 rv d2">
+      <div class="cell-top"><span class="eyebrow">Çalışma saatleri</span><span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="12" r="9.4"/><path d="M12 6.6V12l4 2.4"/></svg></span></div>
+      <div class="hours">
+        <div><span>Hafta içi</span><span>16:00 — 01:00</span></div>
+        <div style="border-bottom:0;padding-bottom:0"><span>Hafta sonu</span><span>14:00 — 02:00</span></div>
+      </div>
+    </div>
+
+    <a class="cell rv d3" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
+      <div class="cell-top"><span class="eyebrow">Instagram</span><span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="2.8" y="2.8" width="18.4" height="18.4" rx="5.4"/><circle cx="12" cy="12" r="4.4"/><circle cx="17.2" cy="6.9" r="1.15" fill="currentColor" stroke="none"/></svg></span></div>
+      <div><h3>@cactuscafe<em>.tr</em></h3></div>
+      <span class="go-arrow">Takip et
+        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M0 4h14M10.5 .5 14.5 4l-4 3.5" stroke="currentColor" stroke-width="1"/></svg>
+      </span>
+    </a>
+
+    <a class="cell rv d4" href="tel:+905380146600">
+      <div class="cell-top"><span class="eyebrow">Rezervasyon</span><span class="cell-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" aria-hidden="true"><path d="M7.4 2.9 9.9 7 8 9.1a13.4 13.4 0 0 0 6.9 6.9l2.1-1.9 4.1 2.5-1.4 3.2a2.1 2.1 0 0 1-2.3 1.2C11.3 19.9 4.1 12.7 2.9 5.6A2.1 2.1 0 0 1 4.1 3.3z"/></svg></span></div>
+      <div><h3>0538 014 <em>66 00</em></h3><p>Podyumpark AVM, Nilüfer / Bursa</p></div>
+    </a>
+  </div>
+</section>
+
+<!-- ══════ YATAY GALERİ ══════ -->
+<section class="rail" id="rail">
+  <div class="rail-pin">
+    <div class="rail-label">
+      <p class="eyebrow">Mekân</p>
+      <h2 class="serif" style="font-size:clamp(26px,3.6vw,46px);margin-top:12px">Podyumpark<br>şubemiz</h2>
+    </div>
+    <div class="rail-track" id="railTrack">
+      <figure class="frame"><img src="foto-hero-podyum2.jpg" alt="Cactus Coffee Podyumpark dış görünüm" loading="lazy" decoding="async"><figcaption>Giriş · Podyumpark</figcaption></figure>
+      <figure class="frame"><img src="foto-podyum-park-dikey.jpg" alt="Cactus Coffee iç mekân" loading="lazy" decoding="async"><figcaption>Oturma alanı</figcaption></figure>
+      <figure class="frame"><img src="foto-podyum-waffle.jpg" alt="Waffle ve kahve sunumu" loading="lazy" decoding="async"><figcaption>Waffle · El yapımı</figcaption></figure>
+      <figure class="frame"><img src="foto-waffle-kase.jpg" alt="Waffle kâsesi" loading="lazy" decoding="async"><figcaption>Kâse waffle</figcaption></figure>
+      <figure class="frame"><img src="foto-hero-podyum-mobil2.jpg" alt="Cactus Coffee bar" loading="lazy" decoding="async"><figcaption>Bar · Espresso</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ KİNETİK KAPANIŞ ══════ -->
+<section class="closer">
+  <p class="eyebrow rv">Görüşmek üzere</p>
+  <div class="word rv d1" aria-label="Cactus">
+    <b aria-hidden="true">C</b><b aria-hidden="true">A</b><b aria-hidden="true">C</b><b aria-hidden="true">T</b><b aria-hidden="true">U</b><b aria-hidden="true">S</b>
+  </div>
+  <p class="rv d2">Podyumpark AVM, Nilüfer / Bursa. Hafta içi 16:00'dan, hafta sonu 14:00'ten itibaren açığız.</p>
+  <div class="hero-cta rv d3" style="animation:none;opacity:1">
+    <a class="btn solid" href="iletisim.html">Yol Tarifi</a>
+    <a class="btn" href="menu-podyum.html">Menü</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <a class="brand" href="index.html"><b>Cactus</b><small>Coffee · Bursa</small></a>
+    </div>
+    <ul>
+      <li><a href="menu-podyum.html">Menü</a></li>
+      <li><a href="kart.html">Sadakat Kartı</a></li>
+      <li><a href="oyunlar.html">Oyunlar</a></li>
+    </ul>
+    <ul>
+      <li><a href="iletisim.html">İletişim</a></li>
+      <li><a href="iletisim.html#basvuru">İş Başvurusu</a></li>
+      <li><a href="gizlilik.html">Gizlilik</a></li>
+    </ul>
+    <ul>
+      <li><a href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">@cactuscafe.tr</a></li>
+      <li><a href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">@cactuscafe.waffle</a></li>
+      <li><a href="tel:+905380146600">0538 014 66 00</a></li>
+    </ul>
+  </div>
+  <div class="foot-note">
+    <span>© <span id="yil">2026</span> Cactus Coffee</span>
+    <span>Tasarım prototipi</span>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   Tüm etkileşim tek dosyada, harici kütüphane yok.
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById('yil').textContent = new Date().getFullYear();
+
+  /* ─── 1. Kinetik başlık: harflere böl ─── */
+  document.querySelectorAll('[data-split]').forEach(function(el){
+    var html = '', i = 0;
+    // <em> etiketini koru: içeriğini ayrı ayrı sarmalıyoruz
+    Array.prototype.forEach.call(el.childNodes, function(node){
+      var metin = node.textContent, italik = node.nodeType === 1;
+      var parca = '';
+      for (var k = 0; k < metin.length; k++){
+        var c = metin[k];
+        parca += c === ' '
+          ? '<span class="ch" style="animation-delay:' + (0.25 + i*0.035) + 's">&nbsp;</span>'
+          : '<span class="ch" style="animation-delay:' + (0.25 + i*0.035) + 's">' + c + '</span>';
+        i++;
+      }
+      html += italik ? '<em>' + parca + '</em>' : parca;
+    });
+    el.innerHTML = html;
+  });
+  function harfleriBaslat(){
+    document.querySelectorAll('.ch').forEach(function(c){ c.classList.add('go'); });
+  }
+
+  /* ─── 2. Intro perdesi ─── */
+  var intro = document.getElementById('intro');
+  function perdeyiKaldir(){
+    intro.classList.add('done');
+    harfleriBaslat();
+    setTimeout(function(){ if (intro.parentNode) intro.parentNode.removeChild(intro); }, 1400);
+  }
+  if (azHareket || sessionStorage.getItem('cactusIntro') === '1'){
+    if (intro.parentNode) intro.parentNode.removeChild(intro);
+    harfleriBaslat();
+  } else {
+    sessionStorage.setItem('cactusIntro', '1');
+    var num = document.getElementById('introNum'), bar = document.getElementById('introBar');
+    var t0 = performance.now(), sure = 1150;
+    (function say(now){
+      var p = Math.min((now - t0) / sure, 1);
+      var v = Math.round(p * 100);
+      num.textContent = v < 10 ? '0' + v : String(v);
+      bar.style.width = (p * 100) + '%';
+      if (p < 1) requestAnimationFrame(say); else setTimeout(perdeyiKaldir, 180);
+    })(t0);
+    // Güvenlik ağı: bir şey ters giderse perde 4 sn içinde mutlaka kalkar
+    setTimeout(function(){ if (!intro.classList.contains('done')) perdeyiKaldir(); }, 4000);
+  }
+
+  /* ─── 3. Mobil menü ─── */
+  var burger = document.getElementById('burger'), sheet = document.getElementById('sheet');
+  burger.addEventListener('click', function(){
+    var acik = sheet.classList.toggle('open');
+    burger.setAttribute('aria-expanded', acik ? 'true' : 'false');
+    document.body.style.overflow = acik ? 'hidden' : '';
+  });
+  sheet.addEventListener('click', function(e){
+    if (e.target.tagName === 'A'){
+      sheet.classList.remove('open');
+      burger.setAttribute('aria-expanded','false');
+      document.body.style.overflow = '';
+    }
+  });
+
+  /* ─── 4. Scroll reveal ───
+     IntersectionObserver yerine kaydirma dongusune bagli: buyuk atlamalarda
+     (End tusu, capa baglantisi, sekme geri yukleme) IO tetiklenmedigi icin
+     icerik opacity:0 kalabiliyordu. Burada gecilen her element mutlaka acilir. */
+  var bekleyen = Array.prototype.slice.call(document.querySelectorAll('.rv'));
+  if (azHareket){
+    bekleyen.forEach(function(el){ el.classList.add('in'); });
+    bekleyen.length = 0;
+  }
+  function revealTara(vh){
+    for (var i = bekleyen.length - 1; i >= 0; i--){
+      if (bekleyen[i].getBoundingClientRect().top < vh * 0.9){
+        bekleyen[i].classList.add('in');
+        bekleyen.splice(i, 1);
+      }
+    }
+  }
+
+
+  /* ─── 5. Tek rAF döngüsü: nav, progress, sticky sahne, yatay ray ─── */
+  var nav   = document.getElementById('nav');
+  var prog  = document.getElementById('prog');
+  var stage = document.getElementById('deneyim');
+  var media = document.getElementById('stageMedia');
+  var copy  = document.getElementById('stageCopy');
+  var rail  = document.getElementById('rail');
+  var track = document.getElementById('railTrack');
+  var bekliyor = false;
+  var mobil = window.matchMedia('(max-width:760px)').matches;
+
+  function kelepce(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  function cizim(){
+    bekliyor = false;
+    var y = window.pageYOffset || document.documentElement.scrollTop;
+    var vh = window.innerHeight;
+
+    nav.classList.toggle('stuck', y > 40);
+
+    var toplam = document.documentElement.scrollHeight - vh;
+    prog.style.transform = 'scaleX(' + (toplam > 0 ? kelepce(y / toplam) : 0) + ')';
+
+    if (bekleyen.length) revealTara(vh);
+
+    if (!azHareket){
+      /* Sticky sahne: bölüm içindeki ilerleme 0 → 1 */
+      var sr = stage.getBoundingClientRect();
+      var sp = kelepce(-sr.top / (stage.offsetHeight - vh));
+      // ilk %65'te büyüsün, kalanında sabit dursun
+      var buyume = kelepce(sp / 0.60);
+      media.style.setProperty('--p', buyume.toFixed(4));
+      copy.style.setProperty('--p', kelepce((sp - 0.34) / 0.26).toFixed(4));
+
+      /* Yatay ray */
+      if (!mobil){
+        var rr = rail.getBoundingClientRect();
+        var rp = kelepce(-rr.top / (rail.offsetHeight - vh));
+        var kayma = Math.max(0, track.scrollWidth - window.innerWidth);
+        track.style.transform = 'translate3d(' + (-kayma * rp).toFixed(2) + 'px,0,0)';
+      }
+    }
+  }
+  function tetik(){ if (!bekliyor){ bekliyor = true; requestAnimationFrame(cizim); } }
+
+  /* Ray bölümünün yüksekligi = tam bir ekran + yatay tasma kadar.
+     Sabit 340vh verilince fazladan bos kaydirma olusuyordu. */
+  function rayBoyut(){
+    if (mobil){ rail.style.height = ''; track.style.transform = ''; return; }
+    var tasma = Math.max(0, track.scrollWidth - window.innerWidth);
+    rail.style.height = (window.innerHeight + tasma * 1.1) + 'px';
+  }
+
+  window.addEventListener('scroll', tetik, {passive:true});
+  window.addEventListener('resize', function(){
+    mobil = window.matchMedia('(max-width:760px)').matches;
+    if (mobil) track.style.transform = '';
+    rayBoyut(); tetik();
+  });
+  window.addEventListener('load', function(){ rayBoyut(); tetik(); });
+  rayBoyut();
+  cizim();
+
+  /* ─── 6. Bento kartlarında imleç ışığı + özel imleç ─── */
+  var ince = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if (ince){
+    document.querySelectorAll('.cell').forEach(function(cell){
+      cell.addEventListener('pointermove', function(e){
+        var r = cell.getBoundingClientRect();
+        cell.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        cell.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+
+    var ring = document.getElementById('ring'), rx = 0, ry = 0, tx = 0, ty = 0, aktif = false;
+    window.addEventListener('pointermove', function(e){
+      tx = e.clientX; ty = e.clientY;
+      if (!aktif){ aktif = true; ring.classList.add('on'); rx = tx; ry = ty; halka(); }
+    }, {passive:true});
+    function halka(){
+      rx += (tx - rx) * 0.18; ry += (ty - ry) * 0.18;
+      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+      requestAnimationFrame(halka);
+    }
+    document.querySelectorAll('a,button,.word b').forEach(function(el){
+      el.addEventListener('pointerenter', function(){ ring.classList.add('grow'); });
+      el.addEventListener('pointerleave', function(){ ring.classList.remove('grow'); });
+    });
+  }
+
+  /* ─── 7. Marquee'yi kusursuz döngü için ikiye katla ─── */
+  ['mq1','mq2'].forEach(function(id){
+    var m = document.getElementById(id);
+    if (m) m.innerHTML += m.innerHTML;
+  });
+
+  /* ─── 8. WebGL sıvı gradyan (Three.js yok, ham shader) ─── */
+  (function webgl(){
+    if (azHareket) return;
+    var cv = document.getElementById('gl');
+    var gl = null;
+    try {
+      gl = cv.getContext('webgl', {antialias:false, alpha:false, powerPreference:'low-power'})
+        || cv.getContext('experimental-webgl');
+    } catch(e){ gl = null; }
+    if (!gl){ cv.style.display = 'none'; return; }   // yedek CSS gradyan görünür kalır
+
+    var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    var fs = [
+      'precision mediump float;',
+      'uniform vec2 u_res;uniform float u_t;uniform vec2 u_m;',
+      'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
+      'float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);',
+      ' return mix(mix(hash(i),hash(i+vec2(1.,0.)),u.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),u.x),u.y);}',
+      'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}',
+      'void main(){',
+      ' vec2 uv=gl_FragCoord.xy/u_res;',
+      ' vec2 q=uv;q.x*=u_res.x/u_res.y;',
+      ' vec2 mo=(u_m-.5)*.4;',
+      ' float t=u_t*.042;',
+      ' float f=fbm(q*1.7+vec2(t,-t*.7)+mo);',
+      ' float g=fbm(q*3.2-vec2(t*.6,t*.42)+f*.65);',
+      ' vec3 deep=vec3(0.031,0.078,0.043);',
+      ' vec3 green=vec3(0.070,0.200,0.098);',
+      ' vec3 gold=vec3(0.784,0.659,0.416);',
+      ' vec3 cream=vec3(0.973,0.965,0.949);',
+      ' vec3 col=mix(deep,green,smoothstep(.12,.88,f));',
+      ' col=mix(col,gold,pow(smoothstep(.42,.96,g),2.3)*.60);',
+      ' col+=cream*pow(smoothstep(.70,1.,f*g*1.7),3.)*.30;',
+      ' col*=1.-length(uv-vec2(.5))*.72;',
+      ' col+=hash(gl_FragCoord.xy+u_t)*.028-.014;',
+      ' gl_FragColor=vec4(col,1.);',
+      '}'
+    ].join('\n');
+
+    function derle(tur, kod){
+      var s = gl.createShader(tur);
+      gl.shaderSource(s, kod); gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    }
+    var v = derle(gl.VERTEX_SHADER, vs), f = derle(gl.FRAGMENT_SHADER, fs);
+    if (!v || !f){ cv.style.display = 'none'; return; }
+    var pr = gl.createProgram();
+    gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)){ cv.style.display = 'none'; return; }
+    gl.useProgram(pr);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(pr, 'p');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    var uRes = gl.getUniformLocation(pr, 'u_res');
+    var uT   = gl.getUniformLocation(pr, 'u_t');
+    var uM   = gl.getUniformLocation(pr, 'u_m');
+    var fare = [0.5, 0.5], hedef = [0.5, 0.5];
+
+    function boyut(){
+      // DPR 1.5'te sınırlı: mobilde pil ve GPU dostu
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      var w = Math.floor(cv.clientWidth * dpr), h = Math.floor(cv.clientHeight * dpr);
+      if (cv.width !== w || cv.height !== h){
+        cv.width = w; cv.height = h;
+        gl.viewport(0, 0, w, h);
+        gl.uniform2f(uRes, w, h);
+      }
+    }
+    window.addEventListener('resize', boyut);
+    window.addEventListener('pointermove', function(e){
+      hedef[0] = e.clientX / window.innerWidth;
+      hedef[1] = 1 - e.clientY / window.innerHeight;
+    }, {passive:true});
+
+    // Hero ekrandan çıkınca çizimi durdur
+    var gorunur = true;
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(g){ gorunur = g[0].isIntersecting; })
+        .observe(document.querySelector('.hero'));
+    }
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) son = performance.now();
+    });
+
+    var t = 0, son = performance.now();
+    (function kare(now){
+      var dt = Math.min((now - son) / 1000, 0.05); son = now;
+      if (gorunur){
+        t += dt;
+        fare[0] += (hedef[0] - fare[0]) * 0.045;
+        fare[1] += (hedef[1] - fare[1]) * 0.045;
+        boyut();
+        gl.uniform1f(uT, t);
+        gl.uniform2f(uM, fare[0], fare[1]);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      requestAnimationFrame(kare);
+    })(son);
+  })();
+})();
+</script>
+</body></html>

@@ -1,0 +1,104 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
+[ext_resource type="Script" path="res://betikler/hud.gd" id="2_hud"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
+sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
+ground_bottom_color = Color(0.35, 0.37, 0.34, 1)
+ground_horizon_color = Color(0.72, 0.75, 0.71, 1)
+
+[sub_resource type="Sky" id="Gok"]
+sky_material = SubResource("Mat_gok")
+
+[sub_resource type="Environment" id="Ortam"]
+background_mode = 2
+sky = SubResource("Gok")
+tonemap_mode = 2
+
+[sub_resource type="PlaneMesh" id="Mesh_zemin"]
+size = Vector2(60, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_zemin"]
+albedo_color = Color(0.847, 0.859, 0.827, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="Sekil_zemin"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="BoxMesh" id="Mesh_basamak"]
+size = Vector3(4, 1, 4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_basamak"]
+albedo_color = Color(0.76, 0.66, 0.47, 1)
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="Sekil_basamak"]
+size = Vector3(4, 1, 4)
+
+[node name="Ana" type="Node3D"]
+
+[node name="Ortam" type="WorldEnvironment" parent="."]
+environment = SubResource("Ortam")
+
+[node name="Gunes" type="DirectionalLight3D" parent="."]
+position = Vector3(0, 8, 0)
+rotation_degrees = Vector3(-52, -38, 0)
+light_energy = 1.1
+shadow_enabled = true
+
+[node name="Zemin" type="StaticBody3D" parent="."]
+
+[node name="Gorsel" type="MeshInstance3D" parent="Zemin"]
+mesh = SubResource("Mesh_zemin")
+material_override = SubResource("Mat_zemin")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Zemin"]
+position = Vector3(0, -0.5, 0)
+shape = SubResource("Sekil_zemin")
+
+[node name="Basamak1" type="StaticBody3D" parent="."]
+position = Vector3(6, 0.5, -5)
+
+[node name="Gorsel" type="MeshInstance3D" parent="Basamak1"]
+mesh = SubResource("Mesh_basamak")
+material_override = SubResource("Mat_basamak")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Basamak1"]
+shape = SubResource("Sekil_basamak")
+
+[node name="Basamak2" type="StaticBody3D" parent="."]
+position = Vector3(6, 1.5, -9)
+
+[node name="Gorsel" type="MeshInstance3D" parent="Basamak2"]
+mesh = SubResource("Mesh_basamak")
+material_override = SubResource("Mat_basamak")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Basamak2"]
+shape = SubResource("Sekil_basamak")
+
+[node name="Basamak3" type="StaticBody3D" parent="."]
+position = Vector3(-7, 0.5, 4)
+
+[node name="Gorsel" type="MeshInstance3D" parent="Basamak3"]
+mesh = SubResource("Mesh_basamak")
+material_override = SubResource("Mat_basamak")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Basamak3"]
+shape = SubResource("Sekil_basamak")
+
+[node name="Oyuncu" parent="." instance=ExtResource("1_oyuncu")]
+position = Vector3(0, 2, 0)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("2_hud")
+
+[node name="Bilgi" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 520.0
+offset_bottom = 108.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 6
+text = "FPS"

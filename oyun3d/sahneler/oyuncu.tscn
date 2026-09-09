@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://betikler/oyuncu.gd" id="1_oyuncu"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_govde"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_govde"]
+albedo_color = Color(0.145, 0.42, 0.298, 1)
+roughness = 0.6
+
+[sub_resource type="BoxShape3D" id="Sekil_govde"]
+
+[node name="Oyuncu" type="CharacterBody3D"]
+script = ExtResource("1_oyuncu")
+
+[node name="Govde" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_govde")
+material_override = SubResource("Mat_govde")
+
+[node name="Carpisma" type="CollisionShape3D" parent="."]
+shape = SubResource("Sekil_govde")
+
+[node name="KameraYayi" type="Node3D" parent="."]
+position = Vector3(0, 0.6, 0)
+
+[node name="Kamera" type="Camera3D" parent="KameraYayi"]
+position = Vector3(0, 1.5, 4.5)
+rotation_degrees = Vector3(-12, 0, 0)
+current = true
+fov = 70.0

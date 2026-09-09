@@ -1,0 +1,56 @@
+name: 3B Oyun — Web Derlemesi
+
+# Elle tetiklenir. Amaç: dışa aktarım zincirinin makineden bağımsız çalıştığını
+# kanıtlamak. "Bende çalışıyor" bir kanıt değildir.
+on:
+  workflow_dispatch:
+    inputs:
+      surum:
+        description: 'Godot sürümü (ör. 4.7.2)'
+        required: true
+        default: '4.7.2'
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    env:
+      SURUM: ${{ github.event.inputs.surum }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Godot ve dışa aktarım şablonlarını indir
+        run: |
+          set -euo pipefail
+          temel="https://github.com/godotengine/godot/releases/download/${SURUM}-stable"
+          curl -fsSL -o godot.zip  "${temel}/Godot_v${SURUM}-stable_linux.x86_64.zip"
+          curl -fsSL -o sablon.tpz "${temel}/Godot_v${SURUM}-stable_export_templates.tpz"
+          unzip -q godot.zip
+          sudo mv "Godot_v${SURUM}-stable_linux.x86_64" /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          mkdir -p "$HOME/.local/share/godot/export_templates/${SURUM}.stable"
+          unzip -q sablon.tpz -d /tmp/sablon
+          mv /tmp/sablon/templates/* "$HOME/.local/share/godot/export_templates/${SURUM}.stable/"
+
+      - name: Kaynakları içe aktar
+        working-directory: oyun3d
+        run: |
+          cp export_presets.cfg.ornek export_presets.cfg
+          # İlk içe aktarım .godot/ önbelleğini kurar; hata kodu döndürebilir,
+          # asıl doğrulama bir sonraki adımdaki dışa aktarım.
+          godot --headless --import || true
+
+      - name: Web olarak dışa aktar
+        working-directory: oyun3d
+        run: |
+          set -euo pipefail
+          mkdir -p ../cikti/web
+          godot --headless --export-release "Web" ../cikti/web/index.html
+          ls -la ../cikti/web
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oyun3d-web
+          path: cikti/web
+          retention-days: 14

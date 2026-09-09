@@ -97,6 +97,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - Godot 4.7 kur, Blender kur, Git LFS'i `*.glb *.blend *.png *.wav` için ayarla.
 - "Merhaba küp": kamera, ışık, zemin, hareket eden bir küp. Web + Windows + Android dışa aktar.
 - **Çıktı:** üç platformda da çalışan boş sahne. Dışa aktarım zincirini ilk günden kur.
+- **Durum: iskelet hazır** → [`oyun3d/`](oyun3d/README.md). Godot projesi, "merhaba küp"
+  sahnesi, kare bütçesi HUD'ı, üç hedefin dışa aktarım şablonu, `oyun3d/` altına
+  kapsamlı Git LFS kuralları ve web derlemesini doğrulayan CI iş akışı kurulu.
+  Geriye Godot'yu kurup projeyi açmak ve `oyun3d/README.md` içindeki kontrol
+  listesini işaretlemek kalıyor.
 
 ### Faz 1 — Temeller (Ay 1)
 - `CharacterBody3D` ile üçüncü şahıs karakter: yürüme, koşma, zıplama, eğim, kamera yayı.

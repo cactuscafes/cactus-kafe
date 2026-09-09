@@ -1,0 +1,19 @@
+# Git LFS — yalnızca oyun projesi altındaki ikili varlıklar için.
+# Sitedeki mevcut görseller (foto-*.jpg, logo-*.png ...) bilinçli olarak
+# kapsam dışı: onlar normal git nesnesi olarak kalmalı.
+#
+# Kullanmadan önce bir kez:  git lfs install
+
+oyun3d/**/*.glb   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.gltf  filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.fbx   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.blend filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.obj   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.png   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.jpg   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.exr   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.hdr   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.ktx2  filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.wav   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.ogg   filter=lfs diff=lfs merge=lfs -text
+oyun3d/**/*.mp3   filter=lfs diff=lfs merge=lfs -text

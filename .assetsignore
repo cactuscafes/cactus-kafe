@@ -19,3 +19,7 @@ schema-adisyon-events.sql
 wrangler.toml
 package.json
 package-lock.json
+
+# Godot oyun projesi kaynagi - statik servis edilmesin
+oyun3d/
+cikti/

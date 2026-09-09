@@ -15,3 +15,12 @@ package-lock.json
 # elle alinan D1 dump'lari (otomatik yedek `d1-yedek` dalinda)
 d1-yedek-*.sql
 d1-yedek-*.sql.gz
+
+# Godot oyun projesi (oyun3d/)
+oyun3d/.godot/
+oyun3d/android/
+oyun3d/export_presets.cfg
+oyun3d/*.tmp
+cikti/
+*.keystore
+*.jks

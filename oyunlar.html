@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -58,7 +59,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .sayfa-bg::before{content:'';position:absolute;top:10%;right:8%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.09),transparent 70%);pointer-events:none;}
 .sayfa-ic{position:relative;z-index:1;max-width:760px;margin:0 auto;}
 
-.eyebrow{font-size:10px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
+.eyebrow{font-size:var(--t-micro);font-weight:700;letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
 .eyebrow::before,.eyebrow::after{content:'';width:32px;height:1px;background:rgba(232,160,48,.4);}
 h1{font-family:'Fraunces',serif;font-size:clamp(36px,6vw,56px);font-weight:300;color:var(--latte);line-height:1;text-align:center;letter-spacing:-1px;margin-bottom:10px;}
 h1 em{font-style:italic;color:var(--amber);}
@@ -76,7 +77,7 @@ h1 em{font-style:italic;color:var(--amber);}
 .oyun-kart:hover{background:rgba(255,255,255,.09);border-color:rgba(232,160,48,.4);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.35);}
 .ok-ust{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
 .ok-ikon{font-size:40px;line-height:1;}
-.ok-rozet{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 10px;border-radius:20px;white-space:nowrap;}
+.ok-rozet{font-size:var(--t-micro);font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px;border-radius:20px;white-space:nowrap;}
 .ok-rozet.odul{background:rgba(232,184,58,.14);border:1px solid rgba(232,184,58,.4);color:#e8c47a;}
 .ok-rozet.acik{background:rgba(92,163,76,.14);border:1px solid rgba(92,163,76,.4);color:#8fc97f;}
 .ok-rekor{display:block;margin:2px 0 10px;font-size:12px;font-weight:700;color:#e8c47a;letter-spacing:.3px;}
@@ -86,7 +87,7 @@ h1 em{font-style:italic;color:var(--amber);}
 .ok-btn{
   align-self:flex-start;padding:12px 30px;
   background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);
-  font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;border-radius:10px;
+  font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;border-radius:10px;
 }
 .oyun-kart:hover .ok-btn{background:linear-gradient(135deg,#d8b87a,var(--amber));}
 
@@ -110,13 +111,13 @@ h1 em{font-style:italic;color:var(--amber);}
   display:flex;align-items:center;justify-content:center;font-size:33px;
 }
 .as-govde{flex:1;min-width:200px;}
-.as-etiket{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#e8c47a;margin-bottom:7px;}
+.as-etiket{font-size:var(--t-micro);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#e8c47a;margin-bottom:7px;}
 .as-ad{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--latte);margin-bottom:5px;}
 .as-metin{font-size:12px;color:rgba(245,234,216,.62);line-height:1.7;font-weight:300;}
 .as-btn{
   flex:none;padding:13px 26px;
   background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);
-  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border-radius:11px;
+  font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;border-radius:11px;
 }
 .as-serit:hover .as-btn{background:linear-gradient(135deg,#d8b87a,var(--amber));}
 @media(max-width:520px){

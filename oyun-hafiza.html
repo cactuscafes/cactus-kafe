@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}
@@ -41,7 +42,7 @@ body{
   background:rgba(247,239,222,.85);border:1.5px solid #C8A86A;border-radius:12px;
   padding:7px 14px;text-align:center;min-width:86px;
 }
-.hud .etiket{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a6a2a;font-weight:600;}
+.hud .etiket{font-size:var(--t-micro);letter-spacing:.14em;text-transform:uppercase;color:#8a6a2a;font-weight:600;}
 .hud .deger{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#1A3310;margin-top:1px;}
 
 /* ── Kart ızgarası ── */
@@ -69,7 +70,7 @@ body{
   padding:6px 4px;
 }
 .yuz.on .cic{width:38px;height:38px;color:#1A3310;}
-.yuz.on .ad{font-size:10px;font-weight:600;color:#5a5348;text-align:center;line-height:1.25;}
+.yuz.on .ad{font-size:var(--t-micro);font-weight:600;color:#5a5348;text-align:center;line-height:1.25;}
 .kart.esti .yuz.on{border-color:#3F7A34;box-shadow:0 0 0 2px rgba(63,122,52,.35),0 3px 10px rgba(26,51,16,.18);}
 .kart.esti{cursor:default;}
 @keyframes salla{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
@@ -84,7 +85,7 @@ body{
 .kazan-bas{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#1A3310;margin:8px 0 4px;}
 .kazan-rekor{font-size:12px;font-weight:700;color:#C8A86A;letter-spacing:1.5px;text-transform:uppercase;min-height:16px;margin-bottom:10px;}
 .kazan-sonuc{display:flex;justify-content:center;gap:26px;margin-bottom:18px;}
-.kazan-sonuc .etiket{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8a6a2a;font-weight:600;}
+.kazan-sonuc .etiket{font-size:var(--t-micro);letter-spacing:.14em;text-transform:uppercase;color:#8a6a2a;font-weight:600;}
 .kazan-sonuc .deger{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:#1A3310;}
 .kazan-btn{display:block;width:100%;padding:14px;border:none;border-radius:14px;background:#2D5A27;color:#fff;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:1.5px;cursor:pointer;margin-bottom:9px;}
 .kazan-btn.ikincil{background:transparent;color:#5a5348;border:1.5px solid #d8cfbc;text-decoration:none;line-height:1.2;}

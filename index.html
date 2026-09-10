@@ -24,6 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="preload" as="image" type="image/avif" href="foto-hero-podyum2.avif" fetchpriority="high" media="(min-width:769px)">
 <link rel="preload" as="image" type="image/avif" href="foto-hero-podyum-mobil2.avif" fetchpriority="high" media="(max-width:768px)">
+<link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;
@@ -32,21 +33,7 @@
   --gold-ink:#8a6b2f;
   /* Tek bosluk olcegi: bolum ici dikey nefes + sayfa kenar bosugu. Mobil override gerekmez. */
   --sp-section:clamp(72px,9vw,120px);
-  --sp-gutter:clamp(20px,5vw,60px);
-
-  /* ── TİPOGRAFİ ÖLÇEĞİ ── oran ~1.22, taban 15px.
-     Taban 11px: bunun altındaki metin (özellikle buton) okunmuyordu. */
-  --t-micro:11px;   /* büyük harf etiket/eyebrow — ölçeğin tabanı */
-  --t-small:13px;   /* meta, yardımcı metin */
-  --t-body:15px;    /* düz metin */
-  --t-lead:17px;
-  --t-h3:21px;
-  --t-h2:clamp(32px,4vw,52px);      /* tüm bölüm başlıkları tek clamp */
-  --t-h1:clamp(56px,8vw,110px);     /* hero */
-  /* İzleme em cinsinden — punto degisince orani korur */
-  --ls-caps:.28em;        /* büyük harf mikro metin */
-  --ls-caps-wide:.4em;    /* hero gibi bilerek havadar yerler */
-  --lh-body:1.75;}
+  --sp-gutter:clamp(20px,5vw,60px);}
 body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden;}
 
 /* NAV */

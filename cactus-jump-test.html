@@ -21,6 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--amber:#c8a86a;--amber2:#b8965a;--amber-ink:#8a6b2f;--espresso:#0b1a07;--coffee:#1a3310;--latte:#f0ece4;}
@@ -40,7 +41,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .sayfa-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,rgba(44,74,30,.6) 0%,transparent 55%),radial-gradient(ellipse at 15% 75%,rgba(26,51,16,.5) 0%,transparent 50%),linear-gradient(160deg,#2c4a1e 0%,#1a3310 45%,#0b1a07 100%);}
 .sayfa-ic{position:relative;z-index:1;max-width:680px;margin:0 auto;}
 
-.eyebrow{font-size:10px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
+.eyebrow{font-size:var(--t-micro);font-weight:700;letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;}
 .eyebrow::before,.eyebrow::after{content:'';width:32px;height:1px;background:rgba(232,160,48,.4);}
 h1{font-family:'Fraunces',serif;font-size:clamp(34px,6vw,52px);font-weight:300;line-height:1.05;text-align:center;letter-spacing:-1px;margin-bottom:14px;}
 h1 em{font-style:italic;color:var(--amber);}

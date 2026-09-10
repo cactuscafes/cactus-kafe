@@ -28,9 +28,9 @@
 .page-hero{background:var(--ink);padding:160px 32px 80px;text-align:center;position:relative;overflow:hidden;}
 .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,#0a0a0a);}
 .page-hero-content{position:relative;z-index:1;}
-.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block;}
+.page-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold-ink);margin-bottom:20px;display:block;}
 .page-title{font-family:'Fraunces',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:#f8f6f2;line-height:.95;letter-spacing:-2px;}
-.page-title em{font-style:italic;color:var(--gold);}
+.page-title em{font-style:italic;color:var(--gold-ink);}
 
 /* İletişim içerik */
 .iletisim-wrap{max-width:1100px;margin:0 auto;padding:80px 32px;}
@@ -44,7 +44,7 @@
 .sube-kart:hover::before{transform:scaleX(1);}
 .sk-no{font-family:'Fraunces',serif;font-size:56px;font-weight:300;color:rgba(10,10,10,.06);line-height:1;margin-bottom:20px;}
 .sk-ad{font-family:'Fraunces',serif;font-size:24px;font-weight:400;color:var(--ink);margin-bottom:6px;}
-.sk-tur{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.sk-tur{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold-ink);margin-bottom:24px;}
 .sk-info{display:flex;flex-direction:column;gap:14px;}
 .sk-info-row{display:flex;align-items:flex-start;gap:12px;}
 .sk-info-ico{flex-shrink:0;margin-top:2px;line-height:0;color:var(--gold-ink);}
@@ -62,8 +62,8 @@
 .sk-yol:hover{filter:brightness(1.06);}
 .acik-rozet{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.4px;padding:5px 13px;border-radius:20px;}
 .acik-rozet::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;}
-.acik-rozet.acik{background:rgba(39,150,80,.14);color:#1e8e4f;}
-.acik-rozet.kapali{background:rgba(180,60,60,.12);color:#b04545;}
+.acik-rozet.acik{background:rgba(39,150,80,.14);color:#14663a;}
+.acik-rozet.kapali{background:rgba(180,60,60,.12);color:#8f3434;}
 
 /* İletişim formu */
 .form-sec{
@@ -71,7 +71,7 @@
   padding:80px 0;border-top:1px solid var(--stone);
 }
 .form-intro .sec-title{margin-bottom:16px;}
-.form-intro p{font-size:14px;font-weight:300;color:#888;line-height:1.8;}
+.form-intro p{font-size:14px;font-weight:300;color:#6f6f6f;line-height:1.8;}
 .form{display:flex;flex-direction:column;gap:16px;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .form-group{display:flex;flex-direction:column;gap:6px;}
@@ -93,7 +93,7 @@
 .form-success{display:none;padding:16px;background:rgba(31,92,56,.08);border:1px solid rgba(31,92,56,.2);font-size:14px;color:#1F5C38;}
 .kvkk-onay{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#777;line-height:1.6;cursor:pointer;font-weight:300;}
 .kvkk-onay input{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--gold);cursor:pointer;}
-.kvkk-onay em{font-style:normal;color:#aaa;font-size:11px;}
+.kvkk-onay em{font-style:normal;color:#6f6f6f;font-size:11px;}
 .cf-turnstile{margin:2px 0;}
 
 /* Responsive */
@@ -166,7 +166,7 @@
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
+          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold-ink);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -191,7 +191,7 @@
         </div>
         <div class="sk-info-row">
           <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
+          <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold-ink);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">

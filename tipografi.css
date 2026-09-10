@@ -1,0 +1,30 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CACTUS — TİPOGRAFİ ÖLÇEĞİ
+
+   Bu dosyada YALNIZCA :root token'ları var, tek bir seçici bile yok.
+   Bu bilinçli: her sayfanın kendi <style> bloğu ve kendi :root'u var;
+   seçici içermeyen bir dosya hiçbir sayfanın stiliyle çakışamaz.
+
+   Kullanım: sayfanın <head>'ine <link rel="stylesheet" href="tipografi.css">
+   ekle, sonra kendi kurallarında var(--t-body) gibi kullan.
+
+   Ölçek ~1.22 oranında, tabanı 11px. Taban neden 11px: ölçümde 8-10px
+   metinler (butonlar dahil) okunmuyordu.
+
+   İzleme neden em: letter-spacing:4px, 8px metinde 0.5em (kelime harf
+   dizisine dönüşür), 16px metinde 0.25em. px cinsinden izleme punto
+   değişince oranı bozar; em korur.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --t-micro:11px;                  /* büyük harf etiket/eyebrow — taban */
+  --t-small:13px;                  /* meta, yardımcı metin */
+  --t-body:15px;                   /* düz metin */
+  --t-lead:17px;                   /* giriş paragrafı */
+  --t-h3:21px;
+  --t-h2:clamp(32px,4vw,52px);     /* bölüm başlıkları */
+  --t-h1:clamp(56px,8vw,110px);    /* hero */
+
+  --ls-caps:.28em;                 /* büyük harf mikro metin */
+  --ls-caps-wide:.4em;             /* bilerek havadar yerler (hero) */
+  --lh-body:1.75;                  /* gövde satır yüksekliği */
+}

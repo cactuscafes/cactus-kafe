@@ -21,10 +21,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="renkler.css">
 <link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-:root{--amber:#c8a86a;--amber2:#b8965a;--amber-ink:#8a6b2f;--espresso:#0b1a07;--coffee:#1a3310;--latte:#f0ece4;}
+:root{--amber:var(--c-altin);--amber2:var(--c-altin-orta);--amber-ink:var(--c-altin-ink);--espresso:var(--c-espresso);--coffee:var(--c-coffee);--latte:var(--c-latte);}
 body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte);min-height:100vh;overflow-x:hidden;}
 
 #mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}

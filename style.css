@@ -3,16 +3,16 @@
 ═══════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --ink:#0a0a0a;
-  --paper:#f8f6f2;
+  --ink:var(--c-ink-derin);
+  --paper:var(--c-kagit);
   --stone:#e8e4dd;
   --mist:#c8c2b8;
   /* --mist dekoratif/kenarlik. Etiket METNI icin okunabilir esi (5.2:1). */
-  --label-ink:#6b675f;
-  --accent:#1a1a1a;
-  --gold:#b8965a;
+  --label-ink:var(--c-etiket-ink);
+  --accent:var(--c-ink);
+  --gold:var(--c-altin-orta);
   /* --gold dekoratif. Acik zeminde METIN/BUTON icin --gold-ink (beyazda 4.97:1). */
-  --gold-ink:#8a6b2f;
+  --gold-ink:var(--c-altin-ink);
 }
 html{scroll-behavior:smooth;}
 body{

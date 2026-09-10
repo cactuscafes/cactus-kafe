@@ -33,6 +33,7 @@ var _kojot := 0.0
 var _tampon := 0.0
 var _dogum := Vector3.ZERO
 var _onceki_dikey := 0.0
+var _adim_yolu := 0.0
 
 @onready var _kol: SpringArm3D = $KameraKolu
 @onready var _yon: Node3D = $Yon
@@ -60,8 +61,25 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_floor() and not yerde:
 		yere_indi.emit(absf(_onceki_dikey))
+		# Hafif inişte ses çıkarmak gürültü olur; eşik koyuyoruz.
+		if absf(_onceki_dikey) > 3.0:
+			Ses.cal("inis", 1.0)
+	_adim_sesi(delta)
 
 	_animasyon(yerde)
+
+## Adım sesi zamana değil KAT EDİLEN YOLA bağlı: koşarken sıklaşır,
+## yavaşlarken seyrelir, dururken kesilir. Zamana bağlarsan yürürken de
+## koşarken de aynı ritimde tıkırdar ve kulağa yanlış gelir.
+func _adim_sesi(delta: float) -> void:
+	const ADIM_ARALIGI := 2.1  # metre
+	if not is_on_floor():
+		_adim_yolu = ADIM_ARALIGI * 0.6  # yere değer değmez ilk adım gelsin
+		return
+	_adim_yolu += Vector2(velocity.x, velocity.z).length() * delta
+	if _adim_yolu >= ADIM_ARALIGI:
+		_adim_yolu = 0.0
+		Ses.adim_cal()
 
 func _dikey(delta: float, yerde: bool) -> void:
 	if not yerde:
@@ -76,6 +94,7 @@ func _dikey(delta: float, yerde: bool) -> void:
 		_tampon = 0.0
 		_kojot = 0.0
 		_durum.travel("zipla")
+		Ses.cal("zipla", 1.5)
 	elif velocity.y > 0.0 and Input.is_action_just_released("ziplama"):
 		velocity.y *= kisa_ziplama_orani
 
@@ -117,6 +136,7 @@ func dogum_noktasi_ayarla(nokta: Vector3) -> void:
 	_dogum = nokta
 
 func oldur() -> void:
+	Ses.cal("olum")
 	olduruldu.emit()
 	global_position = _dogum
 	velocity = Vector3.ZERO

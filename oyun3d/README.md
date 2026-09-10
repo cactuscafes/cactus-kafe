@@ -1,14 +1,15 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 2** bitti: oynanabilir bölüm artık kutulardan değil, modellenmiş
-varlıklardan oluşuyor.
+Şu an **Faz 3** bitti: menüsü, sesi, ayarları ve kaydı olan, başından sonuna
+oynanan bir oyun.
 
 | Faz | Ne geldi |
 |---|---|
 | **0** | Godot projesi, "merhaba küp", üç platforma dışa aktarım zinciri, CI |
 | **1** | Üçüncü şahıs karakter + animasyon durum makinesi, parkur bölümü, toplanabilir/tuzak/kontrol noktası/hareketli platform, bölüm akışı, davranış testleri |
 | **2** | Blender varlık hattı: 5 modellenmiş nesne, ortak doku atlası, UV paketleme, glTF dışa/içe aktarım, ölçek-eksen-yoğunluk testleri, Git LFS |
+| **3** | Ana menü, duraklatma, ayarlar, bitiş ekranı, ses (10 parça, sentezlenmiş), ayar/rekor kaydı, arayüz testleri, itch.io paketi |
 
 ---
 
@@ -32,6 +33,11 @@ varlıklardan oluşuyor.
 
 Oyun kolu da tanımlı: sol çubuk hareket, sağ çubuk kamera, A zıplama, LB koşma.
 
+### Oyunun akışı
+
+Ana menü → bölüm → (Esc ile duraklatma) → bitiş ekranı → tekrar ya da menü.
+Ayarlar hem menüden hem duraklatmadan açılıyor; aynı panel, tek yerde.
+
 ### Bölümün amacı
 
 8 çiçeği topla, dikenli alana düşmeden parkuru geç, sondaki altın platforma çık.
@@ -43,9 +49,15 @@ sayısı üstte; bölüm bitince ikisi de yazılır. Yaklaşık 2–3 dakikalık
 ## Testler
 
 ```bash
-godot --headless --path oyun3d --script res://testler/bolum_testi.gd    # oynanış
-godot --headless --path oyun3d --script res://testler/varlik_testi.gd   # varlıklar
+godot --headless --path oyun3d res://testler/bolum_testi.tscn    # oynanış
+godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
+godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
 ```
+
+Testler `--script` ile değil **sahne olarak** koşuyor. Sebebi: `--script`
+kipinde autoload'lar kurulmadan derleme yapılıyor, `Ses` ve `Ayarlar`
+tanımsız kalıyor. Sahne olarak koşunca oyun gerçekte nasıl çalışıyorsa test de
+öyle çalışır — zaten istenen de bu.
 
 Pencere açmadan çalışır, davranışları **sayıyla** ölçer:
 
@@ -66,6 +78,13 @@ testleri bu dosyaya birikir — Faz 2'de Blender'dan gelen modelin ölçeği ve
 Ekran görüntüsü kanıt değildir, sayı kanıttır: "zıplama iyi hissettiriyor"
 tartışılır, "zıplama 1.68 m" tartışılmaz.
 
+**`arayuz_testi.gd`** Faz 3'ün "görünür ama denenmesi sıkıcı" işlerini ölçer:
+autoload'lar ve ses bus'ları yerinde mi, ayar diske gerçekten yazılıyor mu ve
+bus seviyesine düşüyor mu, rekor doğru güncelleniyor mu (daha kötü süre rekoru
+bozmamalı), Esc ağacı duraklatıyor mu, duraklatma menüsü `PROCESS_MODE_ALWAYS`
+mı (değilse menü de donar ve oyun bir daha açılmaz), çiçekler eksikken bölüm
+bitiyor mu, bitişte ekran açılıp rekor kaydediliyor mu.
+
 **`varlik_testi.gd`** ise Blender ile Godot arasındaki sözleşmeyi denetler —
 içe aktarımda en sık sessizce kaybedilen şeyler:
 
@@ -79,6 +98,41 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Ses (Faz 3)
+
+```bash
+python3 oyun3d/araclar/sesler.py
+```
+
+On parça sentezlenir (`ses/`): iki ayak sesi, zıplama, iniş, toplama, ölüm,
+kontrol noktası, bitiş fanfarı, arayüz tıklaması ve 16 saniyelik müzik döngüsü.
+Dış bağımlılık yok, toplam 820 KB.
+
+> Normalde ses **indirilir**: freesound.org, Kenney, itch.io ses paketleri. Faz
+> 3'ün asıl dersi lisans okumak ve ses seçmektir; bu ortamda o siteler kapalı
+> olduğu için üretildi. Gerçek sesle değiştirirken dosya adlarını koruyun, oyun
+> kodunda değişiklik gerekmez.
+
+**Bus yapısı** (`default_bus_layout.tres`): Master → SFX (-6 dB) ve Müzik
+(-10 dB). Ayarlar ekranındaki üç kaydırıcı doğrudan bu bus'ların desibelini
+yazıyor; oyun kodu ses seviyesiyle hiç ilgilenmiyor.
+
+**Adım sesi zamana değil kat edilen yola bağlı.** Zamana bağlarsan yürürken de
+koşarken de aynı ritimde tıkırdar ve kulağa yanlış gelir; yola bağlayınca
+koşarken sıklaşır, yavaşlarken seyrelir, dururken kesilir. Sesler ayrıca her
+çalışta hafifçe farklı perdeden çalıyor — aynı örneğin tıpatıp tekrarı yapay
+duyuluyor.
+
+## Ayarlar ve kayıt
+
+İkisi de `user://` altında `ConfigFile`: `ayarlar.cfg` (ses seviyeleri, fare
+hassasiyeti, tam ekran) ve `kayit.cfg` (en iyi süre, o turdaki ölüm, oynanma
+sayısı). `user://` her platformda oyuna ait yazılabilir klasördür — Windows'ta
+AppData, tarayıcıda IndexedDB. Proje klasörüne yazmak dışa aktarılmış oyunda
+çalışmaz; geliştirirken fark edilmeyen, çıktıktan sonra patlayan bir hatadır.
 
 ---
 
@@ -212,6 +266,9 @@ oyun3d/
 │   └── hareketli_platform.tscn
 ├── betikler/
 │   ├── girdi.gd             Autoload: klavye + oyun kolu eylemleri
+│   ├── ses.gd               Autoload: ses havuzu, müzik, bus seviyeleri
+│   ├── ayarlar.gd           Autoload: ayar + rekor kalıcılığı
+│   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
 │   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
 │   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
 │   ├── oyun.gd              Bölüm akışı: sayaç, süre, ölüm, bitiş
@@ -219,15 +276,20 @@ oyun3d/
 │   ├── toplanabilir.gd · tuzak.gd · kontrol_noktasi.gd · bitis.gd
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
+├── ses/                     Sentezlenmiş ses efektleri ve müzik
+├── arayuz/tema.tres         Ortak buton/etiket teması
+├── default_bus_layout.tres  Master / SFX / Müzik bus'ları
 ├── varliklar/               Modellenmiş nesneler (.gltf + .bin) ve atlas.png
 │   └── olcum.json           Blender'ın raporu = Godot testinin sözleşmesi
 ├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
 ├── araclar/
 │   ├── animasyon_uret.gd    Animasyon üretici (Godot)
-│   └── modeller.py          Varlık üretici (Blender/bpy)
+│   ├── modeller.py          Varlık üretici (Blender/bpy)
+│   └── sesler.py            Ses üretici
 └── testler/
     ├── bolum_testi.gd       Oynanış davranışları
-    └── varlik_testi.gd      Varlık hattı
+    ├── varlik_testi.gd      Varlık hattı
+    └── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -296,6 +358,7 @@ LFS dışında**:
 | `*.gltf` | 1–2 KB | Metin (JSON); diff'i okunabilir kalsın |
 | `*.bin` | 2–12 KB | LFS işaretçisi 130 bayt — bu boyutta LFS sadece bağımlılık |
 | `atlas.png` | 1.4 MB | Depoda tutulacak kadar küçük |
+| `ses/*.wav` | 820 KB | Kısa efektler; uzun müzik `.ogg`'a çevrilip LFS'e |
 
 Atlas ilk hâlinde 6.75 MB'tı: her piksele ayrı gürültü koyuyordum. O gürültü bir
 metre öteden zaten görünmüyor ama PNG'yi sıkıştırılamaz yapıyor. Kaba kafes
@@ -317,19 +380,46 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 |---|---|
 | `--headless --import` | ✅ hatasız |
 | Bölüm testleri (7 test) | ✅ hepsi geçti |
+| Varlık testleri (5 varlık) | ✅ hepsi geçti |
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
-| Tarayıcıda açılış | ✅ Chromium'da WebGL2, parkur ve HUD çizildi |
+| Arayüz testleri (6 grup) | ✅ hepsi geçti |
+| Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
 | Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
 
 ---
 
-## Faz 3'te sırada ne var
+## itch.io'ya yayınlama
 
-Yol haritasına göre Faz 3 **bitmiş küçük oyun**: menü, ayarlar, ses, kayıt,
-kredi ekranı ve itch.io yayını. Bu fazın açık kalan uçları oraya taşınıyor:
+Faz 3'ün son adımı oyunu yayınlamak. Web derlemesi hazır:
 
-- **Ses** — proje hâlâ tamamen sessiz. Adım, zıplama, toplama, düşme.
+1. **Paketi al** — Actions → *3B Oyun — Web Derlemesi* → çalıştır → artifact'ten
+   `cactus3d-web.zip`. (Yerelde: `cd cikti/web && zip -r ../cactus3d-web.zip .`)
+   `index.html` zip'in **kökünde** olmalı, klasörün içinde değil.
+2. **itch.io'da yeni proje** — Kind of project: **HTML**. Zip'i yükle,
+   "This file will be played in the browser" işaretle.
+3. **Embed ayarları** — Viewport 1280×720, fullscreen butonu açık.
+4. **SharedArrayBuffer support: AÇIK.** Bu şart. Web ön ayarında
+   `thread_support` açık olduğu için oyun `Cross-Origin-Opener-Policy` ve
+   `Cross-Origin-Embedder-Policy` başlıklarını ister; itch.io bu kutucuk
+   işaretlenmezse o başlıkları göndermez ve oyun beyaz ekranda kalır.
+   (Alternatif: ön ayarda `thread_support` kapatılıp tek iş parçacıklı şablonla
+   dışa aktarmak — daha yavaş ama başlık istemez.)
+5. **Sayfa metni** — kontroller, süre, "tarayıcıda oynanır" notu ve bir GIF.
+   Oynanış GIF'i olmayan itch sayfası tıklanmıyor.
+
+Sonra yol haritasının dediğini yapın: **20 kişiye oynatın ve izleyin.** Nerede
+takıldıklarını not alın; konuşmadan izlemek, sorulan sorudan daha çok şey
+söyler.
+
+---
+
+## Faz 4'te sırada ne var
+
+Yol haritasına göre Faz 4 **animasyon, yapay zekâ ve seviye tasarımı**: durum
+makineli düşman, NavigationAgent3D ile takip, root motion, ayak IK, hasar geri
+bildirimi (ekran sarsıntısı, hit-stop, parçacık). Açık kalan uçlar:
+
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
 - **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
@@ -337,3 +427,5 @@ kredi ekranı ve itch.io yayını. Bu fazın açık kalan uçları oraya taşın
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.
 - **Malzeme paylaşımı** — beş nesnenin beş ayrı malzemesi var, hepsi aynı
   atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).
+- **İkinci bölüm** — şu an tek bölüm var; `oyun.gd` bölüm yükleyicisine
+  dönüşecek.

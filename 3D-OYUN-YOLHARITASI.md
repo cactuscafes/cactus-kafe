@@ -131,6 +131,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
   kayıt, ölüm/yeniden başlama, kredi ekranı — yani **cilalı**.
 - itch.io'da yayınla, 20 kişiye oynat, geri bildirim topla.
 - **Çıktı:** ilk *bitmiş* 3B oyun. Bu, üçüncü sınıf bir prototipten daha değerli.
+- **Durum: oyun hazır, yayın sende** → [`oyun3d/`](oyun3d/README.md). Ana menü,
+  duraklatma, ayarlar (ses/fare/tam ekran, diske yazılıyor), bitiş ekranı ve
+  rekor kaydı, 10 parçalık ses (sentezlenmiş) ve müzik döngüsü, arayüz testleri,
+  CI'dan çıkan itch.io zip'i. Kalan tek adım itch.io'ya yüklemek ve 20 kişiye
+  oynatmak — README'deki adımlar.
 
 ### Faz 4 — Animasyon, yapay zekâ, seviye tasarımı (Ay 4–5)
 - Durum makineli düşman: devriye → fark et → kovala → saldır → geri çekil (NavigationAgent3D).

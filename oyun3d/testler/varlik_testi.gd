@@ -1,7 +1,7 @@
-extends SceneTree
+extends Node
 ## Varlık hattı testleri — Blender'ın ürettiği ölçüler Godot'ya aynı mı geliyor?
 ##
-##   godot --headless --path oyun3d --script res://testler/varlik_testi.gd
+##   godot --headless --path oyun3d res://testler/varlik_testi.tscn
 ##
 ## İçe aktarımda en sık kaybedilen üç şey: ölçek (santimetre/metre karışması),
 ## eksen (Blender Z-up, Godot Y-up) ve UV. Üçü de sessizce bozulur: sahne açılır,
@@ -13,11 +13,11 @@ const ATLAS := "res://varliklar/atlas.png"
 
 var _hatalar: Array[String] = []
 
-func _initialize() -> void:
+func _ready() -> void:
 	var dosya := FileAccess.open(OLCUM, FileAccess.READ)
 	if dosya == null:
 		printerr("  ! %s okunamadı — önce araclar/modeller.py çalıştırılmalı" % OLCUM)
-		quit(1)
+		get_tree().quit(1)
 		return
 	var rapor: Dictionary = JSON.parse_string(dosya.get_as_text())
 	var bant: Dictionary = rapor["_bant"]
@@ -29,12 +29,12 @@ func _initialize() -> void:
 
 	if _hatalar.is_empty():
 		print("VARLIK TESTI: GECTI")
-		quit(0)
+		get_tree().quit(0)
 	else:
 		for h: String in _hatalar:
 			printerr("  ! " + h)
 		print("VARLIK TESTI: KALDI (%d)" % _hatalar.size())
-		quit(1)
+		get_tree().quit(1)
 
 func _dogrula(kosul: bool, mesaj: String) -> void:
 	if not kosul:

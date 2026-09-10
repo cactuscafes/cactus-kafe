@@ -7,13 +7,15 @@ config_version=5
 
 config/name="Cactus 3B — Faz 0"
 config/description="Merhaba küp: kamera, ışık, zemin ve hareket eden bir karakter."
-run/main_scene="res://sahneler/ana.tscn"
+run/main_scene="res://sahneler/ana_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Girdi="*res://betikler/girdi.gd"
+Ses="*res://betikler/ses.gd"
+Ayarlar="*res://betikler/ayarlar.gd"
 
 [display]
 

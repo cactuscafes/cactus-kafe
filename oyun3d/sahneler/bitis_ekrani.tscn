@@ -1,0 +1,69 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://betikler/menu/bitis_ekrani.gd" id="betik"]
+[ext_resource type="Theme" path="res://arayuz/tema.tres" id="tema"]
+
+[node name="BitisEkrani" type="CanvasLayer"]
+layer = 11
+script = ExtResource("betik")
+
+[node name="Karartma" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.043, 0.059, 0.051, 0.78)
+
+[node name="Merkez" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("tema")
+
+[node name="Kutu" type="VBoxContainer" parent="Merkez"]
+theme_override_constants/separation = 8
+
+[node name="Baslik" type="Label" parent="Merkez/Kutu"]
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(0.404, 0.702, 0.529, 1)
+horizontal_alignment = 1
+text = "Bölüm tamam"
+
+[node name="Rekor" type="Label" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.949, 0.808, 0.404, 1)
+horizontal_alignment = 1
+text = "Yeni rekor!"
+
+[node name="Bosluk" type="Control" parent="Merkez/Kutu"]
+custom_minimum_size = Vector2(0, 10)
+
+[node name="Sure" type="Label" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+text = "Süre"
+
+[node name="Olum" type="Label" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+text = "Ölüm"
+
+[node name="EnIyi" type="Label" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.6, 0.639, 0.596, 1)
+horizontal_alignment = 1
+text = "En iyi"
+
+[node name="Bosluk2" type="Control" parent="Merkez/Kutu"]
+custom_minimum_size = Vector2(0, 16)
+
+[node name="Tekrar" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Tekrar oyna"
+
+[node name="AnaMenu" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Ana menü"

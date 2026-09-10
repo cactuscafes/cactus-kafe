@@ -15,6 +15,8 @@ var _serbest := false
 func _ready() -> void:
 	# Kol, karakterin dönüşünden etkilenmemeli: kamerayı oyuncu çevirir.
 	top_level = true
+	hassasiyet = Ayarlar.hassasiyet
+	Ayarlar.degisti.connect(func() -> void: hassasiyet = Ayarlar.hassasiyet)
 	kilitle(true)
 
 func _process(delta: float) -> void:
@@ -30,12 +32,10 @@ func _process(delta: float) -> void:
 func _unhandled_input(olay: InputEvent) -> void:
 	if olay is InputEventMouseMotion and not _serbest:
 		_cevir((olay as InputEventMouseMotion).relative * hassasiyet)
-	elif olay.is_action_pressed("fare_birak"):
-		kilitle(_serbest)
 	elif olay is InputEventMouseButton:
 		# Tarayıcı ve mobilde fare kilidi ancak kullanıcı tıklamasıyla açılır.
 		var dugme := olay as InputEventMouseButton
-		if dugme.pressed and _serbest:
+		if dugme.pressed and _serbest and not get_tree().paused:
 			kilitle(true)
 
 func _cevir(miktar: Vector2) -> void:

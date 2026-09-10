@@ -12,7 +12,6 @@ oyun3d/**/*.jpg   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.exr   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.hdr   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.ktx2  filter=lfs diff=lfs merge=lfs -text
-oyun3d/**/*.wav   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.ogg   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.mp3   filter=lfs diff=lfs merge=lfs -text
 
@@ -20,5 +19,6 @@ oyun3d/**/*.mp3   filter=lfs diff=lfs merge=lfs -text
 #   *.gltf  metin (JSON) — diff'i okunabilir kalsın
 #   *.bin   2-12 KB — LFS işaretçisi 130 bayt; bu boyutta LFS sadece bağımlılık
 #   *.png   üretilen atlas 1.4 MB — depoda tutulacak kadar küçük
+#   *.wav   kısa efektler (toplam 820 KB); uzun müzik .ogg'a çevrilip LFS'e
 # Doku büyürse ya da ikinci bir atlas gelirse *.png buraya taşınmalı.
 oyun3d/**/*.gltf  text

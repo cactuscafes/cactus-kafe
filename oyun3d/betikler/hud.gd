@@ -39,6 +39,6 @@ func _olcumu_yaz() -> void:
 	var cizim := RenderingServer.get_rendering_info(
 		RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME
 	)
-	_olcum.text = "%d FPS · %.1f ms (bütçe %.1f) · %d draw call · %s\nWASD hareket · Shift koş · Space zıpla · R yeniden · Esc fare" % [
+	_olcum.text = "%d FPS · %.1f ms (bütçe %.1f) · %d draw call · %s\nWASD hareket · Shift koş · Space zıpla · R yeniden · Esc duraklat" % [
 		fps, ms, BUTCE_MS, cizim, OS.get_name(),
 	]

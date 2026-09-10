@@ -44,8 +44,9 @@ jobs:
       - name: Bölüm testleri (pencere açmadan)
         working-directory: oyun3d
         run: |
-          godot --headless --script res://testler/varlik_testi.gd
-          godot --headless --script res://testler/bolum_testi.gd
+          godot --headless res://testler/varlik_testi.tscn
+          godot --headless res://testler/bolum_testi.tscn
+          godot --headless res://testler/arayuz_testi.tscn
 
       - name: Web olarak dışa aktar
         working-directory: oyun3d
@@ -55,8 +56,17 @@ jobs:
           godot --headless --export-release "Web" ../cikti/web/index.html
           ls -la ../cikti/web
 
+      # itch.io yüklemesi klasörü değil zip'i istiyor; index.html kökte olmalı.
+      - name: itch.io paketi
+        run: |
+          cd cikti/web
+          zip -qr ../cactus3d-web.zip .
+          ls -lh ../cactus3d-web.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: oyun3d-web
-          path: cikti/web
+          path: |
+            cikti/web
+            cikti/cactus3d-web.zip
           retention-days: 14

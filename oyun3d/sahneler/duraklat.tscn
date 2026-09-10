@@ -1,0 +1,55 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://betikler/menu/duraklat.gd" id="betik"]
+[ext_resource type="Theme" path="res://arayuz/tema.tres" id="tema"]
+[ext_resource type="PackedScene" path="res://sahneler/ayarlar_paneli.tscn" id="ayarlar"]
+
+[node name="Duraklat" type="CanvasLayer"]
+layer = 10
+script = ExtResource("betik")
+
+[node name="Karartma" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.043, 0.059, 0.051, 0.72)
+
+[node name="Merkez" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("tema")
+
+[node name="Kutu" type="VBoxContainer" parent="Merkez"]
+unique_name_in_owner = true
+theme_override_constants/separation = 10
+
+[node name="Baslik" type="Label" parent="Merkez/Kutu"]
+theme_override_font_sizes/font_size = 34
+horizontal_alignment = 1
+text = "Duraklatıldı"
+
+[node name="Bosluk" type="Control" parent="Merkez/Kutu"]
+custom_minimum_size = Vector2(0, 14)
+
+[node name="Devam" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Devam et"
+
+[node name="AyarlarButonu" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Ayarlar"
+
+[node name="Yeniden" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Bölümü yeniden başlat"
+
+[node name="AnaMenu" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Ana menü"
+
+[node name="AyarlarPaneli" parent="." instance=ExtResource("ayarlar")]
+unique_name_in_owner = true
+visible = false

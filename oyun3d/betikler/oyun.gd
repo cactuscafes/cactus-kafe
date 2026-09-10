@@ -6,6 +6,7 @@ extends Node
 ## dönüşecek, ama arayüz aynı kalacak.
 
 signal durum_degisti
+signal bolum_bitti(rekor: bool)
 
 @export var oyuncu_yolu: NodePath = ^"../Oyuncu"
 @export var hedef_toplanabilir := 0
@@ -30,7 +31,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not bitti:
 		sure += delta
-	if Input.is_action_just_pressed("yeniden"):
+	if not bitti and Input.is_action_just_pressed("yeniden"):
 		get_tree().reload_current_scene()
 
 func _toplayinca() -> void:
@@ -53,7 +54,10 @@ func bitirmeyi_dene() -> void:
 		]
 	else:
 		bitti = true
-		mesaj = "Bölüm tamam — %.1f sn, %d ölüm.  R ile yeniden" % [sure, olum]
+		mesaj = ""
+		Ses.cal("bitis")
+		var rekor := Ayarlar.sonuc_kaydet(sure, olum)
+		bolum_bitti.emit(rekor)
 	durum_degisti.emit()
 
 func kontrol_noktasi(nokta: Vector3) -> void:

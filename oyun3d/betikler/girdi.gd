@@ -16,7 +16,7 @@ const TUSLAR := {
 	"sag": [KEY_D, KEY_RIGHT],
 	"ziplama": [KEY_SPACE],
 	"kosma": [KEY_SHIFT],
-	"fare_birak": [KEY_ESCAPE],
+	"duraklat": [KEY_ESCAPE],
 	"yeniden": [KEY_R],
 	"bak_sol": [],
 	"bak_sag": [],
@@ -40,7 +40,7 @@ const DUGMELER := {
 	"ziplama": JOY_BUTTON_A,
 	"kosma": JOY_BUTTON_LEFT_SHOULDER,
 	"yeniden": JOY_BUTTON_Y,
-	"fare_birak": JOY_BUTTON_START,
+	"duraklat": JOY_BUTTON_START,
 }
 
 func _ready() -> void:

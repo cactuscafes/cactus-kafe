@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -13,6 +13,8 @@
 [ext_resource type="PackedScene" path="res://varliklar/kaktus.gltf" id="11_kaktus"]
 [ext_resource type="PackedScene" path="res://varliklar/tabela.gltf" id="12_tabela"]
 [ext_resource type="PackedScene" path="res://varliklar/sandik.gltf" id="13_sandik"]
+[ext_resource type="PackedScene" path="res://sahneler/duraklat.tscn" id="14_duraklat"]
+[ext_resource type="PackedScene" path="res://sahneler/bitis_ekrani.tscn" id="15_bitis"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -275,3 +277,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 14
 text = "ölçüm"
+
+[node name="Duraklat" parent="." instance=ExtResource("14_duraklat")]
+
+[node name="BitisEkrani" parent="." instance=ExtResource("15_bitis")]

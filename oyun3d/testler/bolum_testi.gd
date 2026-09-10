@@ -1,7 +1,7 @@
-extends SceneTree
+extends Node
 ## Bölüm davranış testleri — pencere açmadan çalışır.
 ##
-##   godot --headless --path oyun3d --script res://testler/bolum_testi.gd
+##   godot --headless --path oyun3d res://testler/bolum_testi.tscn
 ##
 ## Her fazın testleri buraya birikir. Her test bir davranışı sayıyla ölçer: zıplama gerçekten ayarlanan yüksekliğe
 ## çıkıyor mu, karakter rampayı tırmanıyor mu, tuzak doğum noktasına yolluyor
@@ -13,14 +13,15 @@ var _oyuncu: CharacterBody3D
 var _oyun: Node
 var _hatalar: Array[String] = []
 
-func _initialize() -> void:
+func _ready() -> void:
+	# Ağaç kurulurken add_child yapılamaz ("parent is busy setting up
+	# children"): bir kare bekleyip öyle başla.
+	await get_tree().process_frame
 	_baslat()
 
 func _baslat() -> void:
-	# --script kipinde autoload yüklenmez; motorun yaptığını elle yapıyoruz.
-	root.add_child(load("res://betikler/girdi.gd").new())
 	_sahne = load("res://sahneler/ana.tscn").instantiate()
-	root.add_child(_sahne)
+	get_tree().root.add_child(_sahne)
 	_oyuncu = _sahne.get_node("Oyuncu")
 	_oyun = _sahne.get_node("Oyun")
 	await _bekle(30)
@@ -35,16 +36,16 @@ func _baslat() -> void:
 
 	if _hatalar.is_empty():
 		print("BOLUM TESTI: GECTI")
-		quit(0)
+		get_tree().quit(0)
 	else:
 		for h: String in _hatalar:
 			printerr("  ! " + h)
 		print("BOLUM TESTI: KALDI (%d)" % _hatalar.size())
-		quit(1)
+		get_tree().quit(1)
 
 func _bekle(kare: int) -> void:
 	for i in kare:
-		await physics_frame
+		await get_tree().physics_frame
 
 func _isinla(nokta: Vector3) -> void:
 	_oyuncu.velocity = Vector3.ZERO
@@ -73,7 +74,7 @@ func _ziplama_testi() -> void:
 	Input.action_press("ziplama")
 	var tepe := taban
 	for i in 70:
-		await physics_frame
+		await get_tree().physics_frame
 		tepe = maxf(tepe, _oyuncu.global_position.y)
 		if i == 30:
 			Input.action_release("ziplama")
@@ -125,7 +126,7 @@ func _tuzak_testi() -> void:
 	_dogrula(uzaklik < 2.0, "Karakter doğum noktasına dönmedi (%.2f m)" % uzaklik)
 
 func _toplanabilir_testi() -> void:
-	var kalanlar := get_nodes_in_group("toplanabilir")
+	var kalanlar := get_tree().get_nodes_in_group("toplanabilir")
 	_dogrula(not kalanlar.is_empty(), "Sahnede toplanabilir kalmadı")
 	if kalanlar.is_empty():
 		return

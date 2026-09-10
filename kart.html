@@ -211,6 +211,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .sayfa{display:none;}.sayfa.on{display:block;}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
+<script src="reklam-takip.js?v=1"></script>
 </head>
 <body>
 
@@ -470,13 +471,18 @@ function girisYap(){
   hata.textContent='';
   document.getElementById('girisBtn').disabled=true;
   sayfa('sayfaYukl');
-  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad,kvkk:true})})
+  // Reklamdan geldiyse kaynağı kayda iliştir (worker bugün yok sayıyor;
+  // kaydetmeye başladığında reklam → gerçek ciro zinciri tamamlanacak).
+  var _kaynak = (window.cactusReklam && cactusReklam.kaynak()) || null;
+  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad,kvkk:true,kaynak:_kaynak})})
     .then(function(r){return r.json();})
     .then(function(d){
       if(!d.ok){throw new Error(d.error||'Hata');}
       localStorage.setItem('cactus_kart_tel',tel);
       if(d.yeni){
         // Hoş geldin yıldızı (+1) artık sunucuda /kart/kayit içinde veriliyor (tek sefer, telefon doğrulamalı)
+        // Dönüşüm: yalnızca YENİ kartta bildirilir — mevcut kartla giriş dönüşüm değildir.
+        try{ if(window.cactusReklam) cactusReklam.olay('KartOlusturuldu'); }catch(e){}
         kartGoster(d.musteri);
         kartGecmisCek(tel);
         kartToast('🎁 Hoş geldin! İlk yıldızın hesabına eklendi.');

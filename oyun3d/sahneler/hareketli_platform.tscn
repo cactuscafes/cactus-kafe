@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://betikler/hareketli_platform.gd" id="1_hp"]
+
+[sub_resource type="BoxMesh" id="Mesh_hp"]
+size = Vector3(3.5, 0.4, 3.5)
+
+[sub_resource type="BoxShape3D" id="Sekil_hp"]
+size = Vector3(3.5, 0.4, 3.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_hp"]
+albedo_color = Color(0.427, 0.376, 0.482, 1)
+roughness = 0.7
+
+[node name="HareketliPlatform" type="AnimatableBody3D"]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("1_hp")
+
+[node name="Gorsel" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_hp")
+material_override = SubResource("Mat_hp")
+
+[node name="Carpisma" type="CollisionShape3D" parent="."]
+shape = SubResource("Sekil_hp")

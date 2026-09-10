@@ -1,69 +1,127 @@
 extends CharacterBody3D
-## Faz 0 karakteri: yerçekimi, kamera yönüne göre hareket, zıplama.
+## Faz 1 karakteri: yürüme/koşma, zıplama, eğim, animasyon durum makinesi.
 ##
-## Faz 1'de bunun yerine gerçek bir karakter gelecek (AnimationTree ile
-## yürü/koş/zıpla geçişleri). Buradaki iskelet aynen kalabilir.
+## Faz 0'daki sürümden farkı, "çalışıyor" ile "iyi hissettiriyor" arasındaki
+## fark: coyote süresi, zıplama tamponu, değişken zıplama yüksekliği, havada
+## azaltılmış kontrol ve karakterin gittiği yöne yumuşak dönmesi. Hiçbiri
+## oyuncunun fark ettiği şeyler değil; yokluğu fark ediliyor.
 
-@export var hiz := 5.0
-@export var kosma_carpani := 1.7
-@export var ziplama_hizi := 4.8
-@export var ivme := 14.0
-@export var fare_hassasiyeti := 0.0022
-## Bu yüksekliğin altına düşen karakter başlangıca döner.
-@export var dusme_siniri := -20.0
+signal olduruldu
+signal yere_indi(hiz: float)
+
+@export_group("Hareket")
+@export var yurume_hizi := 4.2
+@export var kosma_hizi := 7.4
+@export var yer_ivmesi := 60.0
+@export var hava_ivmesi := 22.0
+@export var yer_surtunmesi := 55.0
+@export var donus_hizi := 12.0
+
+@export_group("Zıplama")
+@export var ziplama_yuksekligi := 1.65
+## Zemini terk ettikten sonra zıplamanın hâlâ kabul edildiği süre.
+@export var kojot_suresi := 0.12
+## Havadayken basılan zıplamanın yere değince hatırlanma süresi.
+@export var tampon_suresi := 0.14
+## Zıplama tuşu erken bırakılınca dikey hız bu oranla kesilir.
+@export var kisa_ziplama_orani := 0.45
+@export var dusme_carpani := 1.35
 
 var _yercekimi: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-var _baslangic := Vector3.ZERO
-var _fare_serbest := false
+var _ziplama_hizi := 0.0
+var _kojot := 0.0
+var _tampon := 0.0
+var _dogum := Vector3.ZERO
+var _onceki_dikey := 0.0
 
-@onready var _yay: Node3D = $KameraYayi
+@onready var _kol: SpringArm3D = $KameraKolu
+@onready var _yon: Node3D = $Yon
+@onready var _agac: AnimationTree = $AnimationTree
+@onready var _zemin_isini: RayCast3D = $ZeminIsini
+
+var _durum: AnimationNodeStateMachinePlayback
 
 func _ready() -> void:
-	_baslangic = global_position
-	_fare_kilitle(true)
-
-func _unhandled_input(olay: InputEvent) -> void:
-	if olay is InputEventMouseMotion and not _fare_serbest:
-		var fare := olay as InputEventMouseMotion
-		_yay.rotation.y -= fare.relative.x * fare_hassasiyeti
-		_yay.rotation.x = clampf(
-			_yay.rotation.x - fare.relative.y * fare_hassasiyeti,
-			deg_to_rad(-55.0),
-			deg_to_rad(25.0)
-		)
-	elif olay.is_action_pressed("fare_birak"):
-		_fare_kilitle(_fare_serbest)
-	elif olay is InputEventMouseButton:
-		# Tarayıcı ve mobilde fare kilidi ancak kullanıcı tıklamasıyla açılabilir.
-		var dugme := olay as InputEventMouseButton
-		if dugme.pressed and _fare_serbest:
-			_fare_kilitle(true)
+	_dogum = global_position
+	_ziplama_hizi = sqrt(2.0 * _yercekimi * ziplama_yuksekligi)
+	_agac.active = true
+	_durum = _agac.get("parameters/playback")
 
 func _physics_process(delta: float) -> void:
-	if not is_on_floor():
-		velocity.y -= _yercekimi * delta
-	elif Input.is_action_just_pressed("ziplama"):
-		velocity.y = ziplama_hizi
+	var yerde := is_on_floor()
+	_kojot = kojot_suresi if yerde else maxf(_kojot - delta, 0.0)
+	_tampon = tampon_suresi if Input.is_action_just_pressed("ziplama") else maxf(_tampon - delta, 0.0)
 
-	# Girdi, kameranın baktığı yöne göre dünya yönüne çevrilir.
+	_dikey(delta, yerde)
+	_yatay(delta, yerde)
+	_onceki_dikey = velocity.y
+
+	move_and_slide()
+
+	if is_on_floor() and not yerde:
+		yere_indi.emit(absf(_onceki_dikey))
+
+	_animasyon(yerde)
+
+func _dikey(delta: float, yerde: bool) -> void:
+	if not yerde:
+		# Düşerken yerçekimini artırmak zıplamayı "ağır" değil "canlı" hissettirir.
+		var carpan := dusme_carpani if velocity.y < 0.0 else 1.0
+		velocity.y -= _yercekimi * carpan * delta
+	elif velocity.y < 0.0:
+		velocity.y = 0.0
+
+	if _tampon > 0.0 and _kojot > 0.0:
+		velocity.y = _ziplama_hizi
+		_tampon = 0.0
+		_kojot = 0.0
+		_durum.travel("zipla")
+	elif velocity.y > 0.0 and Input.is_action_just_released("ziplama"):
+		velocity.y *= kisa_ziplama_orani
+
+func _yatay(delta: float, yerde: bool) -> void:
 	var girdi := Input.get_vector("sol", "sag", "ileri", "geri")
-	var taban := _yay.global_transform.basis
+	var taban := _kol.global_transform.basis
 	var yon := taban.x * girdi.x + taban.z * girdi.y
 	yon.y = 0.0
 	if yon.length_squared() > 0.0:
 		yon = yon.normalized()
 
-	var carpan := kosma_carpani if Input.is_action_pressed("kosma") else 1.0
-	var hedef := yon * hiz * carpan
-	velocity.x = move_toward(velocity.x, hedef.x, ivme * delta)
-	velocity.z = move_toward(velocity.z, hedef.z, ivme * delta)
+	var hiz := kosma_hizi if Input.is_action_pressed("kosma") else yurume_hizi
+	var hedef := yon * hiz
+	var degisim := (yer_ivmesi if yerde else hava_ivmesi) * delta
+	if yon == Vector3.ZERO and yerde:
+		degisim = yer_surtunmesi * delta
 
-	move_and_slide()
+	velocity.x = move_toward(velocity.x, hedef.x, degisim)
+	velocity.z = move_toward(velocity.z, hedef.z, degisim)
 
-	if global_position.y < dusme_siniri:
-		global_position = _baslangic
-		velocity = Vector3.ZERO
+	if yon != Vector3.ZERO:
+		var hedef_aci := atan2(-yon.x, -yon.z)
+		_yon.rotation.y = lerp_angle(_yon.rotation.y, hedef_aci, donus_hizi * delta)
 
-func _fare_kilitle(kilitli: bool) -> void:
-	_fare_serbest = not kilitli
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if kilitli else Input.MOUSE_MODE_VISIBLE
+func _animasyon(yerde: bool) -> void:
+	var yatay := Vector2(velocity.x, velocity.z).length()
+	# 0 = boşta, 0.45 = yürüme, 1 = koşma. Blend space arasını dolduruyor.
+	var oran := remap(yatay, 0.0, kosma_hizi, 0.0, 1.0)
+	_agac.set("parameters/yer/blend_position", clampf(oran, 0.0, 1.0))
+
+	if yerde:
+		if _durum.get_current_node() != "yer":
+			_durum.travel("yer")
+	elif velocity.y < -0.5 and _durum.get_current_node() != "dusme":
+		_durum.travel("dusme")
+
+## Tuzağa düşen ya da haritadan çıkan karakteri son kontrol noktasına döndürür.
+func dogum_noktasi_ayarla(nokta: Vector3) -> void:
+	_dogum = nokta
+
+func oldur() -> void:
+	olduruldu.emit()
+	global_position = _dogum
+	velocity = Vector3.ZERO
+	_kojot = 0.0
+	_tampon = 0.0
+
+func zeminde_mi() -> bool:
+	return is_on_floor() or _zemin_isini.is_colliding()

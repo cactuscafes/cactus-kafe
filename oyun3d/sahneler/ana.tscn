@@ -1,7 +1,14 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
-[ext_resource type="Script" path="res://betikler/hud.gd" id="2_hud"]
+[ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
+[ext_resource type="PackedScene" path="res://sahneler/toplanabilir.tscn" id="3_top"]
+[ext_resource type="PackedScene" path="res://sahneler/kontrol_noktasi.tscn" id="4_kn"]
+[ext_resource type="PackedScene" path="res://sahneler/hareketli_platform.tscn" id="5_hp"]
+[ext_resource type="Script" path="res://betikler/hud.gd" id="6_hud"]
+[ext_resource type="Script" path="res://betikler/oyun.gd" id="7_oyun"]
+[ext_resource type="Script" path="res://betikler/tuzak.gd" id="8_tuzak"]
+[ext_resource type="Script" path="res://betikler/bitis.gd" id="9_bitis"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -18,27 +25,42 @@ tonemap_mode = 4
 tonemap_white = 6.0
 fog_enabled = true
 fog_light_color = Color(0.702, 0.741, 0.729, 1)
-fog_density = 0.004
+fog_density = 0.0035
 
 [sub_resource type="PlaneMesh" id="Mesh_zemin"]
-size = Vector2(60, 60)
+size = Vector2(140, 140)
 
 [sub_resource type="StandardMaterial3D" id="Mat_zemin"]
 albedo_color = Color(0.514, 0.545, 0.494, 1)
 roughness = 0.95
 
 [sub_resource type="BoxShape3D" id="Sekil_zemin"]
-size = Vector3(60, 1, 60)
+size = Vector3(140, 1, 140)
 
-[sub_resource type="BoxMesh" id="Mesh_basamak"]
-size = Vector3(4, 1, 4)
+[sub_resource type="BoxMesh" id="Mesh_tuzak"]
+size = Vector3(90, 0.6, 12)
 
-[sub_resource type="StandardMaterial3D" id="Mat_basamak"]
-albedo_color = Color(0.502, 0.427, 0.298, 1)
-roughness = 0.85
+[sub_resource type="StandardMaterial3D" id="Mat_tuzak"]
+albedo_color = Color(0.353, 0.196, 0.212, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.6, 0.2, 0.19, 1)
+emission_energy_multiplier = 0.25
 
-[sub_resource type="BoxShape3D" id="Sekil_basamak"]
-size = Vector3(4, 1, 4)
+[sub_resource type="BoxShape3D" id="Sekil_tuzak"]
+size = Vector3(90, 0.6, 12)
+
+[sub_resource type="BoxShape3D" id="Sekil_bitis"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxMesh" id="Mesh_bitis"]
+size = Vector3(4, 0.12, 4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_bitis"]
+albedo_color = Color(0.949, 0.808, 0.404, 1)
+emission_enabled = true
+emission = Color(0.949, 0.808, 0.404, 1)
+emission_energy_multiplier = 0.7
 
 [node name="Ana" type="Node3D"]
 
@@ -46,12 +68,14 @@ size = Vector3(4, 1, 4)
 environment = SubResource("Ortam")
 
 [node name="Gunes" type="DirectionalLight3D" parent="."]
-position = Vector3(0, 8, 0)
+position = Vector3(0, 12, 0)
 rotation_degrees = Vector3(-52, -38, 0)
 light_energy = 0.85
 shadow_enabled = true
 
 [node name="Zemin" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
 
 [node name="Gorsel" type="MeshInstance3D" parent="Zemin"]
 mesh = SubResource("Mesh_zemin")
@@ -61,48 +85,157 @@ material_override = SubResource("Mat_zemin")
 position = Vector3(0, -0.5, 0)
 shape = SubResource("Sekil_zemin")
 
-[node name="Basamak1" type="StaticBody3D" parent="."]
-position = Vector3(6, 0.5, -5)
+[node name="Tuzak" type="Area3D" parent="."]
+position = Vector3(0, 0.3, -7)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("8_tuzak")
 
-[node name="Gorsel" type="MeshInstance3D" parent="Basamak1"]
-mesh = SubResource("Mesh_basamak")
-material_override = SubResource("Mat_basamak")
+[node name="Gorsel" type="MeshInstance3D" parent="Tuzak"]
+mesh = SubResource("Mesh_tuzak")
+material_override = SubResource("Mat_tuzak")
 
-[node name="Carpisma" type="CollisionShape3D" parent="Basamak1"]
-shape = SubResource("Sekil_basamak")
+[node name="Carpisma" type="CollisionShape3D" parent="Tuzak"]
+shape = SubResource("Sekil_tuzak")
 
-[node name="Basamak2" type="StaticBody3D" parent="."]
-position = Vector3(6, 1.5, -9)
+[node name="Parkur" type="Node3D" parent="."]
 
-[node name="Gorsel" type="MeshInstance3D" parent="Basamak2"]
-mesh = SubResource("Mesh_basamak")
-material_override = SubResource("Mat_basamak")
+[node name="Tas1" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(0, 1.3, -3.5)
+olcu = Vector3(2.4, 0.5, 2.4)
+renk = Color(0.58, 0.5, 0.36, 1)
 
-[node name="Carpisma" type="CollisionShape3D" parent="Basamak2"]
-shape = SubResource("Sekil_basamak")
+[node name="Tas2" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(1.5, 2.0, -7)
+olcu = Vector3(2.4, 0.5, 2.4)
+renk = Color(0.58, 0.5, 0.36, 1)
 
-[node name="Basamak3" type="StaticBody3D" parent="."]
-position = Vector3(-7, 0.5, 4)
+[node name="Tas3" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(0, 2.7, -10.5)
+olcu = Vector3(2.4, 0.5, 2.4)
+renk = Color(0.58, 0.5, 0.36, 1)
 
-[node name="Gorsel" type="MeshInstance3D" parent="Basamak3"]
-mesh = SubResource("Mesh_basamak")
-material_override = SubResource("Mat_basamak")
+[node name="Rampa" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(4, 2.4, -19)
+rotation_degrees = Vector3(18, 0, 0)
+olcu = Vector3(6, 0.4, 10)
+renk = Color(0.5, 0.44, 0.33, 1)
 
-[node name="Carpisma" type="CollisionShape3D" parent="Basamak3"]
-shape = SubResource("Sekil_basamak")
+[node name="UstPlatform" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(4, 3.9, -28)
+olcu = Vector3(10, 0.5, 8)
+renk = Color(0.53, 0.46, 0.34, 1)
+
+[node name="Kule" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(4, 3.9, -45)
+olcu = Vector3(8, 0.5, 8)
+renk = Color(0.53, 0.46, 0.34, 1)
+
+[node name="Basamak" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(4, 4.4, -46)
+olcu = Vector3(3, 0.5, 3)
+renk = Color(0.58, 0.5, 0.36, 1)
+
+[node name="SonPlatform" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(4, 5.5, -52)
+olcu = Vector3(6, 0.5, 6)
+renk = Color(0.45, 0.52, 0.42, 1)
+
+[node name="HareketliPlatform" parent="." instance=ExtResource("5_hp")]
+position = Vector3(4, 3.9, -35.5)
+uc = Vector3(0, 0, -8)
+tur_suresi = 6.0
+
+[node name="Toplananlar" type="Node3D" parent="."]
+
+[node name="Cicek1" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(2.5, 1.0, 1.5)
+
+[node name="Cicek2" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(0, 2.3, -3.5)
+
+[node name="Cicek3" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(1.5, 3.0, -7)
+
+[node name="Cicek4" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(0, 3.7, -10.5)
+
+[node name="Cicek5" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(4, 3.4, -19)
+
+[node name="Cicek6" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(4, 5.1, -28)
+
+[node name="Cicek7" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(4, 4.9, -39.5)
+
+[node name="Cicek8" parent="Toplananlar" instance=ExtResource("3_top")]
+position = Vector3(7, 5.1, -45)
+
+[node name="KontrolNoktalari" type="Node3D" parent="."]
+
+[node name="KN1" parent="KontrolNoktalari" instance=ExtResource("4_kn")]
+position = Vector3(4, 4.15, -26)
+
+[node name="KN2" parent="KontrolNoktalari" instance=ExtResource("4_kn")]
+position = Vector3(7, 4.15, -42)
+
+[node name="Bitis" type="Area3D" parent="."]
+position = Vector3(4, 6.9, -52)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("9_bitis")
+oyun_yolu = NodePath("../Oyun")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Bitis"]
+shape = SubResource("Sekil_bitis")
+
+[node name="Gorsel" type="MeshInstance3D" parent="Bitis"]
+position = Vector3(0, -1.13, 0)
+mesh = SubResource("Mesh_bitis")
+material_override = SubResource("Mat_bitis")
 
 [node name="Oyuncu" parent="." instance=ExtResource("1_oyuncu")]
-position = Vector3(0, 2, 0)
+position = Vector3(0, 1.5, 6)
+
+[node name="Oyun" type="Node" parent="."]
+script = ExtResource("7_oyun")
+oyuncu_yolu = NodePath("../Oyuncu")
 
 [node name="HUD" type="CanvasLayer" parent="."]
-script = ExtResource("2_hud")
+script = ExtResource("6_hud")
+oyun_yolu = NodePath("../Oyun")
 
-[node name="Bilgi" type="Label" parent="HUD"]
-offset_left = 16.0
-offset_top = 12.0
+[node name="Durum" type="Label" parent="HUD"]
+offset_left = 18.0
+offset_top = 14.0
 offset_right = 520.0
-offset_bottom = 108.0
+offset_bottom = 44.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
 theme_override_constants/outline_size = 6
-text = "FPS"
+theme_override_font_sizes/font_size = 20
+text = "0 / 0"
+
+[node name="Mesaj" type="Label" parent="HUD"]
+anchor_right = 1.0
+offset_top = 96.0
+offset_bottom = 130.0
+theme_override_colors/font_color = Color(1, 0.949, 0.847, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Olcum" type="Label" parent="HUD"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -62.0
+offset_right = 720.0
+offset_bottom = -14.0
+theme_override_colors/font_color = Color(0.902, 0.925, 0.898, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 14
+text = "ölçüm"

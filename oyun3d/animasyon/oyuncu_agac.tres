@@ -1,0 +1,54 @@
+[gd_resource type="AnimationNodeStateMachine" format=3]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8iq7b"]
+animation = &"dusme"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_6c2x8"]
+animation = &"bosta"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_p1kcn"]
+animation = &"yurume"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hog31"]
+animation = &"kosma"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_fu2wi"]
+min_space = 0.0
+blend_point_0/node = SubResource("AnimationNodeAnimation_6c2x8")
+blend_point_0/pos = 0.0
+blend_point_0/name = &"bosta"
+blend_point_1/node = SubResource("AnimationNodeAnimation_p1kcn")
+blend_point_1/pos = 0.45
+blend_point_1/name = &"yurume"
+blend_point_2/node = SubResource("AnimationNodeAnimation_hog31")
+blend_point_2/pos = 1.0
+blend_point_2/name = &"kosma"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tu6fa"]
+animation = &"zipla"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_rdprc"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_wtgtm"]
+xfade_time = 0.08
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ahih6"]
+xfade_time = 0.16
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_t2oms"]
+xfade_time = 0.18
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ep21a"]
+xfade_time = 0.12
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_g241c"]
+xfade_time = 0.1
+
+[resource]
+states/dusme/node = SubResource("AnimationNodeAnimation_8iq7b")
+states/dusme/position = Vector2(560, 200)
+states/yer/node = SubResource("AnimationNodeBlendSpace1D_fu2wi")
+states/yer/position = Vector2(340, 120)
+states/zipla/node = SubResource("AnimationNodeAnimation_tu6fa")
+states/zipla/position = Vector2(560, 40)
+transitions = ["Start", "yer", SubResource("AnimationNodeStateMachineTransition_rdprc"), "yer", "zipla", SubResource("AnimationNodeStateMachineTransition_wtgtm"), "yer", "dusme", SubResource("AnimationNodeStateMachineTransition_ahih6"), "zipla", "dusme", SubResource("AnimationNodeStateMachineTransition_t2oms"), "zipla", "yer", SubResource("AnimationNodeStateMachineTransition_ep21a"), "dusme", "yer", SubResource("AnimationNodeStateMachineTransition_g241c")]

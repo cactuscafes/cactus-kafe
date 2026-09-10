@@ -22,6 +22,15 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[layer_names]
+
+3d_physics/layer_1="zemin"
+3d_physics/layer_2="oyuncu"
+3d_physics/layer_3="tuzak"
+3d_physics/layer_4="toplanabilir"
+3d_physics/layer_5="kontrol"
+3d_physics/layer_6="platform"
+
 [rendering]
 
 renderer/rendering_method="forward_plus"

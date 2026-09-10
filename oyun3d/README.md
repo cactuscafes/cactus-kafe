@@ -1,20 +1,20 @@
-# Cactus 3B — Faz 0
+# Cactus 3B — oyun projesi
 
-[3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın **Faz 0** çıktısı: kamera, ışık,
-zemin ve hareket eden bir küp — üç platforma dışa aktarılabilir hâlde.
+[3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
+Şu an **Faz 1** bitti: oynanabilir bir platform bölümü var.
 
-Amaç oyun yapmak değil. Amaç **zinciri kurmak**: proje açılıyor, çalışıyor,
-Windows/Web/Android olarak paketleniyor ve bunu CI de yapabiliyor. Bu zincir
-ilk günden kurulmazsa, altıncı ayda oyununu paketleyemediğin gün öğrenirsin.
+| Faz | Ne geldi |
+|---|---|
+| **0** | Godot projesi, "merhaba küp", üç platforma dışa aktarım zinciri, CI |
+| **1** | Üçüncü şahıs karakter + animasyon durum makinesi, parkur bölümü, toplanabilir/tuzak/kontrol noktası/hareketli platform, bölüm akışı, davranış testleri |
 
 ---
 
 ## Kurulum
 
-1. **Godot 4.7.x**'i indir: <https://godotengine.org/download> (kurulum gerektirmez,
-   tek dosya). Standart sürüm yeterli; C# yazmayacaksan .NET sürümüne gerek yok.
-2. Godot'yu aç → **Import** → bu klasördeki `project.godot` dosyasını seç.
-3. İlk açılışta içe aktarım yapar (`.godot/` klasörü oluşur; depoya girmez).
+1. **Godot 4.7.x** indir: <https://godotengine.org/download> (kurulum gerektirmez, tek dosya).
+2. Godot → **Import** → bu klasördeki `project.godot`.
+3. İlk açılışta içe aktarım yapar (`.godot/` oluşur, depoya girmez).
 4. **F5** ile çalıştır.
 
 ### Kontroller
@@ -23,73 +23,100 @@ ilk günden kurulmazsa, altıncı ayda oyununu paketleyemediğin gün öğrenirs
 |---|---|
 | `W A S D` / yön tuşları | Hareket (kamera yönüne göre) |
 | `Shift` | Koşma |
-| `Space` | Zıplama |
-| Fare | Kamerayı çevir |
+| `Space` | Zıplama — basılı tutmak yükseltir, erken bırakmak alçaltır |
+| Fare | Kamera |
+| `R` | Bölümü yeniden başlat |
 | `Esc` | Fare kilidini bırak / geri al (tarayıcıda geri almak için sahneye tıkla) |
 
-Sol üstteki bilgi kutusu FPS, kare süresini (**bütçe 16.6 ms**), draw call sayısını
-ve GPU adını gösterir. Bu üç sayıya bakma alışkanlığı Faz 6'daki optimizasyon
-işinin yarısıdır.
+Oyun kolu da tanımlı: sol çubuk hareket, sağ çubuk kamera, A zıplama, LB koşma.
+
+### Bölümün amacı
+
+8 çiçeği topla, dikenli alana düşmeden parkuru geç, sondaki altın platforma çık.
+Dikenli alan seni son kontrol noktasına yollar (bayrak direkleri). Süre ve ölüm
+sayısı üstte; bölüm bitince ikisi de yazılır. Yaklaşık 2–3 dakikalık bir tur.
 
 ---
 
-## Duman testi
+## Bölüm testleri
 
 ```bash
-godot --headless --path oyun3d --script res://testler/faz0_test.gd
+godot --headless --path oyun3d --script res://testler/bolum_testi.gd
 ```
 
-Pencere açmadan çalışır, ~2,5 saniyelik fizik simüle eder ve şunu kanıtlar:
-ana sahne yükleniyor, betikler derleniyor, girdi eylemleri kurulu, yerçekimi ve
-zemin çarpışması çalışıyor, karakter girdiye hareketle yanıt veriyor. Çıkışta
-konum ve kat edilen mesafeyi yazar; başarısızlıkta `1` döner, yani CI'da da
-kullanılabilir — `.github/workflows/oyun3d-web.yml` dışa aktarımdan önce bunu
-çalıştırıyor.
+Pencere açmadan çalışır, davranışları **sayıyla** ölçer:
 
-Ekran görüntüsü bir kanıt değildir; sayı kanıttır. Faz 1'de bu dosyanın yanına
-karakterin zıplama yüksekliğini ve rampa tırmanışını ölçen testler gelecek.
+| Test | Ne kanıtlar |
+|---|---|
+| zemin | Karakter zemine oturuyor, kapsül yüksekliği doğru |
+| zıplama | Gerçek zıplama yüksekliği ayarlanan `ziplama_yuksekligi` ile aynı |
+| hız | Koşma ve yürüme hızları ayarlarla aynı, Shift gerçekten hızlandırıyor |
+| rampa | Karakter eğimi tırmanıyor ve üstünde zemin algılıyor |
+| tuzak | Tuzak ölüm sayıyor ve doğum noktasına yolluyor |
+| toplanabilir | Çiçek sayacı artıyor; bölümde 8 çiçek var; başlangıçta 0 toplanmış |
+| hareketli platform | Karakter platformla birlikte taşınıyor (fark < 0.2 m) |
+
+Başarısızlıkta `1` döner; CI dışa aktarımdan önce bunu çalıştırıyor. Her fazın
+testleri bu dosyaya birikir — Faz 2'de Blender'dan gelen modelin ölçeği ve
+çarpışma kutusu için testler eklenecek.
+
+Ekran görüntüsü kanıt değildir, sayı kanıttır: "zıplama iyi hissettiriyor"
+tartışılır, "zıplama 1.68 m" tartışılmaz.
 
 ---
 
-## Dışa aktarım
+## Karakter ve animasyon
 
-Şablonlar bir kez indirilir: **Editör → Dışa Aktarım Şablonlarını Yönet → İndir**.
-
-Ardından hazır ön ayarları kopyala:
+Karakter kutulardan kurulu; `Yon/Model` altındaki uzuvlar birer `Node3D` pivot.
+Animasyonlar `araclar/animasyon_uret.gd` ile **kodla üretiliyor**:
 
 ```bash
-cp export_presets.cfg.ornek export_presets.cfg
+godot --headless --path oyun3d --script res://araclar/animasyon_uret.gd
 ```
 
-Gerçek `export_presets.cfg` bilerek `.gitignore`'dadır: Godot bu dosyaya Android
-imza anahtarının parolasını da yazar. Şablon sürüm kontrolünde, sırlar dışarıda.
+Üretilenler: `animasyon/oyuncu.tres` (bosta, yürüme, koşma, zıplama, düşme) ve
+`animasyon/oyuncu_agac.tres` (durum makinesi).
 
-| Hedef | Ön ayar | Not |
+Neden kodla: Faz 1'de rig'li bir model yok — Mixamo bir Adobe hesabı istiyor.
+Kutu karakterde animasyon, düğüm dönüşlerinin zamana bağlı değeri demek; sinüsle
+üretmek elle keyframe koymaktan hızlı ve tekrarlanabilir. **Faz 2'de** Blender'dan
+gerçek model gelince bu üretici silinecek, animasyonlar GLB ile birlikte gelecek —
+`AnimationTree` yapısı aynen kalabilir. Öğrenilmesi gereken şey zaten o yapı.
+
+**Durum makinesi:** `yer` (bosta ↔ yürüme ↔ koşma arasında bir `BlendSpace1D`,
+karışım konumunu yatay hız sürüyor), `zipla`, `dusme`. Geçişleri `oyuncu.gd`
+`travel()` ile tetikliyor.
+
+### Kontrolcüde ne var
+
+`betikler/oyuncu.gd` yalnızca "hareket ediyor" değil, iyi hissettiren küçük
+şeyleri de içeriyor — hiçbiri oyuncunun fark ettiği, hepsi yokluğu fark edilen
+şeyler:
+
+- **Coyote süresi** — platformdan düştükten sonra 0.12 sn zıplama hâlâ kabul edilir
+- **Zıplama tamponu** — havadayken basılan zıplama, yere değince 0.14 sn hatırlanır
+- **Değişken zıplama** — tuşu erken bırakınca dikey hız kesilir
+- **Artan düşme yerçekimi** — inişte yerçekimi 1.35× uygulanır, zıplama "canlı" olur
+- **Havada azaltılmış ivme** — havada yön değiştirmek yerdekinden zor
+- **Yumuşak dönüş** — model gittiği yöne `lerp_angle` ile döner, anında snap etmez
+
+---
+
+## Çarpışma katmanları
+
+Numara yerine isim kullanın; `project.godot` içinde tanımlı:
+
+| # | İsim | Kim |
 |---|---|---|
-| Windows | `Windows` | `cikti/windows/cactus3d.exe` |
-| Web | `Web` | `cikti/web/index.html` — yerelde `python3 -m http.server` ile aç, `file://` çalışmaz |
-| Android | `Android` | JDK 17 + Android SDK gerekir; Editör Ayarları → Export → Android'de yollar ve debug keystore tanımlanır |
+| 1 | zemin | Zemin, platformlar, rampa |
+| 2 | oyuncu | Karakter |
+| 3 | tuzak | Dikenli alan (Area3D) |
+| 4 | toplanabilir | Çiçekler (Area3D) |
+| 5 | kontrol | Kontrol noktaları ve bitiş (Area3D) |
+| 6 | platform | Hareketli platform (AnimatableBody3D) |
 
-Komut satırından:
-
-```bash
-godot --headless --export-release "Web" ../cikti/web/index.html
-```
-
-**Web notu:** tarayıcı hedefi `gl_compatibility` renderer ile çalışır
-(`project.godot` içinde ayarlı). Masaüstündeki `forward_plus` ile aynı gölge ve
-efektleri beklemeyin — bu bir hata değil, platform farkı. Aynı proje iki farklı
-render yolundan geçtiğinde neyin değiştiğini görmek, Faz 6'nın ön hazırlığı.
-
-**VRAM doku sıkıştırması:** Web ve Android ön ayarlarındaki
-`vram_texture_compression` seçenekleri, `project.godot` içindeki
-`textures/vram_compression/import_s3tc_bptc` ve `import_etc2_astc` ayarları
-açık değilse dışa aktarımı "configuration errors" diyerek durdurur. İkisi de
-açık geliyor; kapatmayın.
-
-**CI:** `.github/workflows/oyun3d-web.yml` aynı işi Ubuntu'da elle tetiklemeyle
-yapar (Actions → *3B Oyun — Web Derlemesi* → Run workflow). Derleme artifact
-olarak iner. Godot sürümünü iş akışı girdisinden değiştirebilirsin.
+Karakterin maskesi zemin + platform; Area3D'lerin maskesi yalnızca oyuncu.
+Böylece çiçekler birbirini, tuzak platformu tetiklemiyor.
 
 ---
 
@@ -97,76 +124,107 @@ olarak iner. Godot sürümünü iş akışı girdisinden değiştirebilirsin.
 
 ```
 oyun3d/
-├── project.godot            Proje ayarları, autoload, renderer seçimi
-├── icon.svg                 Uygulama ikonu
-├── export_presets.cfg.ornek Üç hedefin ön ayarı (kopyalanacak şablon)
+├── project.godot            Ayarlar, autoload, renderer, çarpışma katmanı isimleri
 ├── sahneler/
-│   ├── ana.tscn             Zemin, ışık, gökyüzü, basamaklar, HUD
-│   └── oyuncu.tscn          Küp gövde + çarpışma + kamera yayı
-└── betikler/
-    ├── girdi.gd             Autoload: girdi eylemlerini kurar
-    ├── oyuncu.gd            Yerçekimi, kamera yönüne göre hareket, zıplama
-    └── hud.gd               FPS / kare süresi / draw call
+│   ├── ana.tscn             Bölüm: parkur, tuzak, çiçekler, bitiş, HUD
+│   ├── oyuncu.tscn          Karakter + kamera kolu + AnimationTree
+│   ├── platform.tscn        Ölçüsü/rengi ayarlanabilir platform parçası
+│   ├── toplanabilir.tscn    Çiçek
+│   ├── kontrol_noktasi.tscn Bayrak
+│   └── hareketli_platform.tscn
+├── betikler/
+│   ├── girdi.gd             Autoload: klavye + oyun kolu eylemleri
+│   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
+│   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
+│   ├── oyun.gd              Bölüm akışı: sayaç, süre, ölüm, bitiş
+│   ├── platform.gd          @tool — ölçü/renk uygular
+│   ├── toplanabilir.gd · tuzak.gd · kontrol_noktasi.gd · bitis.gd
+│   ├── hareketli_platform.gd
+│   └── hud.gd               Durum + kare bütçesi
+├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
+├── araclar/animasyon_uret.gd
+└── testler/bolum_testi.gd
 ```
 
-`oyuncu.tscn` ayrı bir sahne ve `ana.tscn` içine örneklenmiş durumda. Bu Godot'nun
-temel çalışma biçimi: her şey bir sahne, sahneler iç içe geçer. Faz 1'de karakter
-bu dosyada büyüyecek, ana sahne hiç değişmeyecek.
+`platform.tscn` içindeki mesh, çarpışma şekli ve materyal
+`resource_local_to_scene` işaretli: her örnek kendi kopyasını alır. Bu olmadan
+bir platformun ölçüsünü değiştirmek hepsini birden değiştirir — Godot'da en sık
+düşülen kuyulardan biri.
 
-### Girdi eylemleri nerede?
+---
 
-`betikler/girdi.gd` içinde, kodda. Sebebi: proje dosyasının Godot sürümleri
-arasında elle taşınabilir kalması. **Faz 1'in ilk işi** bunları
-*Proje → Proje Ayarları → Girdi Haritası* paneline taşımak olsun — oyuncuya tuş
-atama ekranı yazacaksan zaten oraya ihtiyacın var.
+## Dışa aktarım
+
+Şablonlar bir kez indirilir: **Editör → Dışa Aktarım Şablonlarını Yönet → İndir**.
+Sonra ön ayarları kopyala:
+
+```bash
+cp export_presets.cfg.ornek export_presets.cfg
+```
+
+Gerçek `export_presets.cfg` bilerek `.gitignore`'da: Godot bu dosyaya Android imza
+anahtarının parolasını da yazar.
+
+| Hedef | Ön ayar | Not |
+|---|---|---|
+| Windows | `Windows` | `cikti/windows/cactus3d.exe` |
+| Web | `Web` | `cikti/web/index.html` — yerelde sunucudan aç, `file://` çalışmaz |
+| Android | `Android` | JDK 17+ ve Android SDK gerekir (Editör Ayarları → Export → Android) |
+
+```bash
+godot --headless --export-release "Web" ../cikti/web/index.html
+```
+
+**Web notu:** tarayıcı hedefi `gl_compatibility` renderer ile çalışır. Masaüstündeki
+`forward_plus` ile aynı gölge ve efektleri beklemeyin — hata değil, platform farkı.
+
+**Web + iş parçacığı:** ön ayarda `thread_support` açık; bu, sayfanın
+`Cross-Origin-Opener-Policy: same-origin` ve `Cross-Origin-Embedder-Policy:
+require-corp` başlıklarıyla sunulmasını şart koşar. Cloudflare Pages'te bunu
+`_headers` dosyasına eklemek gerekecek; basit `python3 -m http.server` bu
+başlıkları göndermez.
+
+**VRAM doku sıkıştırması:** ön ayarlardaki `vram_texture_compression` seçenekleri,
+`project.godot` içindeki `textures/vram_compression/import_s3tc_bptc` ve
+`import_etc2_astc` açık değilse dışa aktarımı "configuration errors" diyerek
+durdurur. İkisi de açık geliyor; kapatmayın.
+
+**CI:** `.github/workflows/oyun3d-web.yml` — Actions → *3B Oyun — Web Derlemesi*.
+Önce bölüm testlerini çalıştırır, sonra web derlemesini artifact olarak bırakır.
 
 ---
 
 ## Git LFS
 
 Depo kökündeki `.gitattributes`, LFS kurallarını **yalnızca `oyun3d/` altına**
-uygular; sitedeki mevcut fotoğraflar bilinçli olarak kapsam dışı. Klonlayan her
-makinede bir kez:
+uygular. Klonlayan her makinede bir kez:
 
 ```bash
 git lfs install
 ```
 
-İlk `.glb` veya `.png`'yi eklemeden önce bunu yapmayı unutma; sonradan geçmişi
-LFS'e taşımak çok daha zahmetli.
+Faz 2'de ilk `.glb` ve doku dosyaları gelmeden önce bunu yapmayı unutmayın.
 
 ---
 
-## Bu iskeletin doğrulanmış durumu
+## Doğrulanmış durum
 
-Godot **4.7.2** ile, bu depoda gerçekten çalıştırıldı:
+Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 
 | Adım | Durum |
 |---|---|
 | `--headless --import` | ✅ hatasız |
-| Duman testi | ✅ geçti — karakter 2,5 sn'de 11,56 m yol aldı, `y = 0.50` zeminde |
-| Web dışa aktarımı | ✅ `index.wasm` + `index.pck` üretildi |
-| Windows dışa aktarımı | ✅ `cactus3d.exe` üretildi |
-| Tarayıcıda açılış | ✅ Chromium'da WebGL2 ile sahne çizildi, HUD okundu |
-| Android dışa aktarımı | ⚠️ denenmedi — Android SDK (`platform-tools` + `build-tools`) gerekiyor, o ortamda indirilemedi |
-
-Android tarafı sizin makinenizde ilk kurulumda hallolacak: Godot → Editör
-Ayarları → Export → Android bölümüne SDK yolunu ve debug keystore'u tanıtın.
-Godot APK'yı imzalamak için SDK'nın `apksigner`'ını, cihaza atmak için
-`adb`'sini kullanıyor.
+| Bölüm testleri (7 test) | ✅ hepsi geçti |
+| Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
+| Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
+| Tarayıcıda açılış | ✅ Chromium'da WebGL2, parkur ve HUD çizildi |
+| Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
 
 ---
 
-## Faz 0 kontrol listesi
+## Faz 2'de sırada ne var
 
-- [ ] Godot 4.7.x kuruldu, proje açıldı, F5 ile küp koşuyor
-- [ ] Dışa aktarım şablonları indirildi
-- [ ] Windows derlemesi alındı ve çalıştırıldı
-- [ ] Web derlemesi alındı ve yerel sunucudan açıldı
-- [ ] Android APK alındı ve telefona kuruldu
-- [ ] `git lfs install` çalıştırıldı
-- [ ] CI iş akışı bir kez elle tetiklendi ve yeşil döndü
-
-Hepsi işaretlendiğinde Faz 0 bitti; [Faz 1](../3D-OYUN-YOLHARITASI.md)
-başlıyor: `CharacterBody3D` yerine gerçek karakter, Mixamo animasyonları,
-`AnimationTree` ile geçişler.
+- Blender: parkurun kutularının yerine gerçek modeller (kaya, kaktüs, tabela)
+- Karakterin yerine modellenmiş + rig'li bir kaktüs; `animasyon_uret.gd` emekli olur
+- Doku, UV, texel density — ve ilk `.glb`/LFS akışı
+- Ses: adım, zıplama, toplama, düşme (şu an tamamen sessiz)

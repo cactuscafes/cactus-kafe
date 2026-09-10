@@ -108,6 +108,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - Çarpışma katmanları, raycast ile zemin kontrolü, basit tuzak/platform.
 - Mixamo'dan animasyon indir, `AnimationTree` + blend space ile yürü/koş/zıpla geçişleri.
 - **Çıktı:** 3 dakikalık oynanabilir platform prototipi.
+- **Durum: bitti** → [`oyun3d/`](oyun3d/README.md). Üçüncü şahıs karakter (coyote
+  süresi, zıplama tamponu, değişken zıplama), `AnimationTree` + `BlendSpace1D` ile
+  bosta/yürüme/koşma/zıplama/düşme, SpringArm kamera; parkur bölümü: eğimli rampa,
+  hareketli platform, dikenli tuzak, kontrol noktaları, 8 toplanabilir, bitiş ve
+  süre/ölüm sayacı. 7 davranış testi CI'da koşuyor.
 
 ### Faz 2 — Matematik + Blender (Ay 2)
 - Freya Holmér'in vektör/quaternion videoları; her konuyu prototipte uygula

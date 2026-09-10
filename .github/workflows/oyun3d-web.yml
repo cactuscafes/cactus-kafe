@@ -41,9 +41,9 @@ jobs:
           # asıl doğrulama bir sonraki adımdaki dışa aktarım.
           godot --headless --import || true
 
-      - name: Duman testi (pencere açmadan)
+      - name: Bölüm testleri (pencere açmadan)
         working-directory: oyun3d
-        run: godot --headless --script res://testler/faz0_test.gd
+        run: godot --headless --script res://testler/bolum_testi.gd
 
       - name: Web olarak dışa aktar
         working-directory: oyun3d

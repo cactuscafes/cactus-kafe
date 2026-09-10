@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://betikler/kontrol_noktasi.gd" id="1_kn"]
+
+[sub_resource type="BoxShape3D" id="Sekil_kn"]
+size = Vector3(2.5, 2.5, 2.5)
+
+[sub_resource type="CylinderMesh" id="Mesh_direk"]
+top_radius = 0.06
+bottom_radius = 0.06
+height = 2.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_direk"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_bez"]
+size = Vector3(0.7, 0.42, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="Mat_bayrak"]
+albedo_color = Color(0.949, 0.706, 0.239, 1)
+roughness = 0.6
+
+[node name="KontrolNoktasi" type="Area3D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_kn")
+
+[node name="Carpisma" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("Sekil_kn")
+
+[node name="Direk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("Mesh_direk")
+material_override = SubResource("Mat_direk")
+
+[node name="Bayrak" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)
+
+[node name="Bez" type="MeshInstance3D" parent="Bayrak"]
+position = Vector3(0.35, 0, 0)
+mesh = SubResource("Mesh_bez")
+material_override = SubResource("Mat_bayrak")

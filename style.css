@@ -9,6 +9,8 @@
   --mist:#c8c2b8;
   --accent:#1a1a1a;
   --gold:#b8965a;
+  /* --gold dekoratif. Acik zeminde METIN/BUTON icin --gold-ink (beyazda 4.97:1). */
+  --gold-ink:#8a6b2f;
 }
 html{scroll-behavior:smooth;}
 body{

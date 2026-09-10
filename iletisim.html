@@ -47,7 +47,8 @@
 .sk-tur{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
 .sk-info{display:flex;flex-direction:column;gap:14px;}
 .sk-info-row{display:flex;align-items:flex-start;gap:12px;}
-.sk-info-ico{font-size:16px;flex-shrink:0;margin-top:1px;}
+.sk-info-ico{flex-shrink:0;margin-top:2px;line-height:0;color:var(--gold-ink);}
+.sk-info-ico svg{display:block;}
 .sk-info-txt{font-size:13px;font-weight:300;color:#666;line-height:1.6;}
 .sk-info-txt strong{display:block;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mist);margin-bottom:3px;}
 .sk-ig{
@@ -119,8 +120,8 @@
     <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
     <a href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Menü</a>
     <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎖 Sadakat Kartı</a>
-    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">🎮 Oyun</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">Sadakat Kartı</a>
+    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:400;">Oyun</a>
     <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
@@ -133,8 +134,8 @@
   <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
   <a href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Menü</a>
   <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎖 Sadakat Kartı</a>
-  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">🎮 Oyun</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#c8a86a;font-family:'Inter',sans-serif;">Oyun</a>
   <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#c8a86a;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
@@ -156,21 +157,21 @@
       <div style="margin:-14px 0 20px;"><span class="acik-rozet" data-branch="podyum"></span></div>
       <div class="sk-info">
         <div class="sk-info-row">
-          <span class="sk-info-ico">📍</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
           <div class="sk-info-txt"><strong>Adres</strong>Podyumpark AVM, Bursa</div>
         </div>
         <div class="sk-info-row">
-          <span class="sk-info-ico">🕐</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
           <div class="sk-info-txt"><strong>Çalışma Saatleri</strong><span data-ayar="saat-podyum">Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</span></div>
         </div>
         <div class="sk-info-row">
-          <span class="sk-info-ico">📞</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
           <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="sk-yol">🧭 Yol Tarifi</a>
-        <a href="https://instagram.com/cactuscafe.tr" target="_blank" class="sk-ig">📷 @cactuscafe.tr</a>
+        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="sk-yol"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Yol Tarifi</a>
+        <a href="https://instagram.com/cactuscafe.tr" target="_blank" class="sk-ig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @cactuscafe.tr</a>
       </div>
     </div>
 
@@ -181,21 +182,21 @@
       <div style="margin:-14px 0 20px;"><span class="acik-rozet" data-branch="podyum"></span></div>
       <div class="sk-info">
         <div class="sk-info-row">
-          <span class="sk-info-ico">📍</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
           <div class="sk-info-txt"><strong>Adres</strong>Podyumpark AVM, Bursa</div>
         </div>
         <div class="sk-info-row">
-          <span class="sk-info-ico">🕐</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
           <div class="sk-info-txt"><strong>Çalışma Saatleri</strong><span data-ayar="saat-podyum">Hafta içi 16:00 – 01:00 · Hafta sonu 14:00 – 02:00</span></div>
         </div>
         <div class="sk-info-row">
-          <span class="sk-info-ico">📞</span>
+          <span class="sk-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
           <div class="sk-info-txt"><strong>Telefon</strong><a href="tel:+905380146600" style="color:var(--gold);text-decoration:none;font-weight:500;" data-ayar="tel">0538 014 66 00</a></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="sk-yol">🧭 Yol Tarifi</a>
-        <a href="https://instagram.com/cactuscafe.waffle" target="_blank" class="sk-ig">📷 @cactuscafe.waffle</a>
+        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" class="sk-yol"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Yol Tarifi</a>
+        <a href="https://instagram.com/cactuscafe.waffle" target="_blank" class="sk-ig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @cactuscafe.waffle</a>
       </div>
     </div>
   </div>

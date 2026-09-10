@@ -33,6 +33,24 @@ işinin yarısıdır.
 
 ---
 
+## Duman testi
+
+```bash
+godot --headless --path oyun3d --script res://testler/faz0_test.gd
+```
+
+Pencere açmadan çalışır, ~2,5 saniyelik fizik simüle eder ve şunu kanıtlar:
+ana sahne yükleniyor, betikler derleniyor, girdi eylemleri kurulu, yerçekimi ve
+zemin çarpışması çalışıyor, karakter girdiye hareketle yanıt veriyor. Çıkışta
+konum ve kat edilen mesafeyi yazar; başarısızlıkta `1` döner, yani CI'da da
+kullanılabilir — `.github/workflows/oyun3d-web.yml` dışa aktarımdan önce bunu
+çalıştırıyor.
+
+Ekran görüntüsü bir kanıt değildir; sayı kanıttır. Faz 1'de bu dosyanın yanına
+karakterin zıplama yüksekliğini ve rampa tırmanışını ölçen testler gelecek.
+
+---
+
 ## Dışa aktarım
 
 Şablonlar bir kez indirilir: **Editör → Dışa Aktarım Şablonlarını Yönet → İndir**.
@@ -62,6 +80,12 @@ godot --headless --export-release "Web" ../cikti/web/index.html
 (`project.godot` içinde ayarlı). Masaüstündeki `forward_plus` ile aynı gölge ve
 efektleri beklemeyin — bu bir hata değil, platform farkı. Aynı proje iki farklı
 render yolundan geçtiğinde neyin değiştiğini görmek, Faz 6'nın ön hazırlığı.
+
+**VRAM doku sıkıştırması:** Web ve Android ön ayarlarındaki
+`vram_texture_compression` seçenekleri, `project.godot` içindeki
+`textures/vram_compression/import_s3tc_bptc` ve `import_etc2_astc` ayarları
+açık değilse dışa aktarımı "configuration errors" diyerek durdurur. İkisi de
+açık geliyor; kapatmayın.
 
 **CI:** `.github/workflows/oyun3d-web.yml` aynı işi Ubuntu'da elle tetiklemeyle
 yapar (Actions → *3B Oyun — Web Derlemesi* → Run workflow). Derleme artifact
@@ -110,6 +134,26 @@ git lfs install
 
 İlk `.glb` veya `.png`'yi eklemeden önce bunu yapmayı unutma; sonradan geçmişi
 LFS'e taşımak çok daha zahmetli.
+
+---
+
+## Bu iskeletin doğrulanmış durumu
+
+Godot **4.7.2** ile, bu depoda gerçekten çalıştırıldı:
+
+| Adım | Durum |
+|---|---|
+| `--headless --import` | ✅ hatasız |
+| Duman testi | ✅ geçti — karakter 2,5 sn'de 11,56 m yol aldı, `y = 0.50` zeminde |
+| Web dışa aktarımı | ✅ `index.wasm` + `index.pck` üretildi |
+| Windows dışa aktarımı | ✅ `cactus3d.exe` üretildi |
+| Tarayıcıda açılış | ✅ Chromium'da WebGL2 ile sahne çizildi, HUD okundu |
+| Android dışa aktarımı | ⚠️ denenmedi — Android SDK (`platform-tools` + `build-tools`) gerekiyor, o ortamda indirilemedi |
+
+Android tarafı sizin makinenizde ilk kurulumda hallolacak: Godot → Editör
+Ayarları → Export → Android bölümüne SDK yolunu ve debug keystore'u tanıtın.
+Godot APK'yı imzalamak için SDK'nın `apksigner`'ını, cihaza atmak için
+`adb`'sini kullanıyor.
 
 ---
 

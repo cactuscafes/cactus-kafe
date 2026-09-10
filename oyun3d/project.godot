@@ -28,3 +28,7 @@ renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="mobile"
 renderer/rendering_method.web="gl_compatibility"
 anti_aliasing/quality/msaa_3d=2
+; Web ve Android ön ayarlarındaki VRAM doku sıkıştırması bu iki ayarı şart koşar.
+; Kapalıyken dışa aktarım "configuration errors" diyerek durur.
+textures/vram_compression/import_s3tc_bptc=true
+textures/vram_compression/import_etc2_astc=true

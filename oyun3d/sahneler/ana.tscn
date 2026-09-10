@@ -14,14 +14,18 @@ sky_material = SubResource("Mat_gok")
 [sub_resource type="Environment" id="Ortam"]
 background_mode = 2
 sky = SubResource("Gok")
-tonemap_mode = 2
+tonemap_mode = 4
+tonemap_white = 6.0
+fog_enabled = true
+fog_light_color = Color(0.702, 0.741, 0.729, 1)
+fog_density = 0.004
 
 [sub_resource type="PlaneMesh" id="Mesh_zemin"]
 size = Vector2(60, 60)
 
 [sub_resource type="StandardMaterial3D" id="Mat_zemin"]
-albedo_color = Color(0.847, 0.859, 0.827, 1)
-roughness = 0.9
+albedo_color = Color(0.514, 0.545, 0.494, 1)
+roughness = 0.95
 
 [sub_resource type="BoxShape3D" id="Sekil_zemin"]
 size = Vector3(60, 1, 60)
@@ -30,8 +34,8 @@ size = Vector3(60, 1, 60)
 size = Vector3(4, 1, 4)
 
 [sub_resource type="StandardMaterial3D" id="Mat_basamak"]
-albedo_color = Color(0.76, 0.66, 0.47, 1)
-roughness = 0.8
+albedo_color = Color(0.502, 0.427, 0.298, 1)
+roughness = 0.85
 
 [sub_resource type="BoxShape3D" id="Sekil_basamak"]
 size = Vector3(4, 1, 4)
@@ -44,7 +48,7 @@ environment = SubResource("Ortam")
 [node name="Gunes" type="DirectionalLight3D" parent="."]
 position = Vector3(0, 8, 0)
 rotation_degrees = Vector3(-52, -38, 0)
-light_energy = 1.1
+light_energy = 0.85
 shadow_enabled = true
 
 [node name="Zemin" type="StaticBody3D" parent="."]

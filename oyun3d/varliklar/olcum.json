@@ -5,7 +5,10 @@
     "ucgen_ust_sinir": 500
   },
   "cicek": {
-    "atlas_px": 2048,
+    "atlas_px": [
+      2048,
+      3072
+    ],
     "bolge": "cicek",
     "bolge_px": [
       1536,
@@ -26,8 +29,36 @@
     "teksel_metre": 380.0,
     "ucgen": 120
   },
+  "dusman": {
+    "atlas_px": [
+      2048,
+      3072
+    ],
+    "bolge": "dusman",
+    "bolge_px": [
+      0,
+      2048,
+      1024,
+      1024
+    ],
+    "boyut_m": [
+      1.14,
+      1.084,
+      1.011
+    ],
+    "taban_renk": [
+      0.56,
+      0.24,
+      0.31
+    ],
+    "teksel_metre": 380.0,
+    "ucgen": 86
+  },
   "kaktus": {
-    "atlas_px": 2048,
+    "atlas_px": [
+      2048,
+      3072
+    ],
     "bolge": "kaktus",
     "bolge_px": [
       0,
@@ -49,7 +80,10 @@
     "ucgen": 148
   },
   "kaya": {
-    "atlas_px": 2048,
+    "atlas_px": [
+      2048,
+      3072
+    ],
     "bolge": "kaya",
     "bolge_px": [
       1024,
@@ -71,7 +105,10 @@
     "ucgen": 20
   },
   "sandik": {
-    "atlas_px": 2048,
+    "atlas_px": [
+      2048,
+      3072
+    ],
     "bolge": "sandik",
     "bolge_px": [
       0,
@@ -93,7 +130,10 @@
     "ucgen": 120
   },
   "tabela": {
-    "atlas_px": 2048,
+    "atlas_px": [
+      2048,
+      3072
+    ],
     "bolge": "ahsap",
     "bolge_px": [
       1024,

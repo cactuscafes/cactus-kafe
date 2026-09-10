@@ -91,11 +91,11 @@ func _varligi_dogrula(ad: String, beklenen: Dictionary, bant: Dictionary) -> voi
 	# yoğunluğu bu hatada bile doğru çıkıyor; sadece bölge sınaması yakalıyor.
 	if uvler.size() > 0 and beklenen.has("bolge_px"):
 		var b_px: Array = beklenen["bolge_px"]
-		var atlas_px := float(beklenen["atlas_px"])
+		var atlas_boyut: Array = beklenen["atlas_px"]
 		var disarida := 0
 		for uv: Vector2 in uvler:
-			var x := uv.x * atlas_px
-			var y := uv.y * atlas_px
+			var x := uv.x * float(atlas_boyut[0])
+			var y := uv.y * float(atlas_boyut[1])
 			if x < float(b_px[0]) - 1.0 or x > float(b_px[0] + b_px[2]) + 1.0 \
 					or y < float(b_px[1]) - 1.0 or y > float(b_px[1] + b_px[3]) + 1.0:
 				disarida += 1
@@ -135,7 +135,9 @@ func _varligi_dogrula(ad: String, beklenen: Dictionary, bant: Dictionary) -> voi
 
 	# 7) Doku yoğunluğu: UV'ler dışa aktarımda bozulmuşsa burada yakalanır.
 	if uvler.size() > 0 and mat != null and mat.albedo_texture != null:
-		var doku_px: float = float(mat.albedo_texture.get_size().x)
+		# Doku kare olmayabilir: iki ekseni ayrı ölçekle. Tek boyutla çarpmak,
+		# 2048x3072 atlasta yoğunluğu %18 düşük ölçtürüyordu.
+		var doku_px := Vector2(mat.albedo_texture.get_size())
 		var yogunluk := _teksel_yogunlugu(dizi[Mesh.ARRAY_VERTEX], uvler, indeksler, doku_px)
 		var beklenen_yogunluk := float(beklenen["teksel_metre"])
 		print("%-8s %4d üçgen  %5.2f×%5.2f×%5.2f m  %4.0f teksel/m (Blender: %.0f)" % [
@@ -150,7 +152,7 @@ func _varligi_dogrula(ad: String, beklenen: Dictionary, bant: Dictionary) -> voi
 
 ## Üçgen başına (teksel alanı / dünya alanı) oranının karekökü = teksel/metre.
 func _teksel_yogunlugu(noktalar: PackedVector3Array, uvler: PackedVector2Array,
-		indeksler: PackedInt32Array, doku_px: float) -> float:
+		indeksler: PackedInt32Array, doku_px: Vector2) -> float:
 	var toplam := 0.0
 	var sayi := 0
 	for i in range(0, indeksler.size(), 3):

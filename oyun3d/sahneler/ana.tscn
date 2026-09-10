@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" path="res://varliklar/sandik.gltf" id="13_sandik"]
 [ext_resource type="PackedScene" path="res://sahneler/duraklat.tscn" id="14_duraklat"]
 [ext_resource type="PackedScene" path="res://sahneler/bitis_ekrani.tscn" id="15_bitis"]
+[ext_resource type="PackedScene" path="res://sahneler/dusman.tscn" id="16_dusman"]
+[ext_resource type="NavigationMesh" path="res://navigasyon/bolum1.tres" id="17_nav"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -233,6 +235,23 @@ transform = Transform3D(0.68944, 0, 0.57851, 0, 0.90000, 0, -0.57851, 0, 0.68944
 [node name="Kaya10" parent="Susleme" instance=ExtResource("10_kaya")]
 transform = Transform3D(-0.14760, 0, -0.83709, 0, 0.85000, 0, 0.83709, 0, -0.14760, 6.6, 4.15, -46.8)
 
+[node name="Navigasyon" type="NavigationRegion3D" parent="."]
+navigation_mesh = ExtResource("17_nav")
+
+[node name="Dusmanlar" type="Node3D" parent="."]
+
+[node name="Dusman1" parent="Dusmanlar" instance=ExtResource("16_dusman")]
+transform = Transform3D(1.00000, 0, -0.00000, 0, 1, 0, 0.00000, 0, 1.00000, 2.0, 4.25, -28.0)
+devriye_ucu = Vector3(4.0, 0.0, 0.0)
+
+[node name="Dusman2" parent="Dusmanlar" instance=ExtResource("16_dusman")]
+transform = Transform3D(0.00000, 0, -1.00000, 0, 1, 0, 1.00000, 0, 0.00000, 6.0, 4.25, -45.0)
+devriye_ucu = Vector3(0.0, 0.0, -3.5)
+
+[node name="Dusman3" parent="Dusmanlar" instance=ExtResource("16_dusman")]
+transform = Transform3D(1.00000, 0, -0.00000, 0, 1, 0, 0.00000, 0, 1.00000, -4.0, 0.15, -18.0)
+devriye_ucu = Vector3(7.0, 0.0, 0.0)
+
 [node name="Oyuncu" parent="." instance=ExtResource("1_oyuncu")]
 position = Vector3(0, 1.5, 6)
 
@@ -254,6 +273,18 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 20
 text = "0 / 0"
+
+[node name="Can" type="Label" parent="HUD"]
+unique_name_in_owner = true
+offset_left = 18.0
+offset_top = 46.0
+offset_right = 320.0
+offset_bottom = 74.0
+theme_override_colors/font_color = Color(0.898, 0.365, 0.353, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "can 3 / 3"
 
 [node name="Mesaj" type="Label" parent="HUD"]
 anchor_right = 1.0

@@ -16,6 +16,7 @@ config/icon="res://icon.svg"
 Girdi="*res://betikler/girdi.gd"
 Ses="*res://betikler/ses.gd"
 Ayarlar="*res://betikler/ayarlar.gd"
+Efekt="*res://betikler/efekt.gd"
 
 [display]
 

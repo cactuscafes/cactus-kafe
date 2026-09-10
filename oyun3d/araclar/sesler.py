@@ -159,6 +159,30 @@ def bitis() -> list[float]:
     return karistir(*katman)
 
 
+def hasar() -> list[float]:
+    """Oyuncu hasar aldı: sert, kısa, alçak. Ödül seslerinin tersi yönde."""
+    ton = sinus(0.28, 260, 90, "kare")
+    g = alcak_gecir(gurultu(0.28, 31), 1100)
+    return karistir(uygula(ton, zarf(len(ton), 0.005, 0.75)),
+                    [v * 0.6 for v in uygula(g, zarf(len(g), 0.005, 0.85))])
+
+
+def dusman_farketti() -> list[float]:
+    """Düşman oyuncuyu gördü: yukarı çıkan iki nota, uyarı niteliğinde."""
+    a = uygula(sinus(0.12, 300, 300, "ucgen"), zarf(int(0.12 * ORNEK), 0.03, 0.6))
+    b = [0.0] * int(0.09 * ORNEK) + uygula(sinus(0.22, 460, 500, "ucgen"),
+                                           zarf(int(0.22 * ORNEK), 0.03, 0.7))
+    return karistir(a, b)
+
+
+def dusman_saldiri() -> list[float]:
+    """Savurma: hızla alçalan süzülmüş gürültü."""
+    g = alcak_gecir(gurultu(0.22, 44), 2600)
+    ton = sinus(0.22, 520, 180)
+    return karistir(uygula(g, zarf(len(g), 0.02, 0.8)),
+                    [v * 0.4 for v in uygula(ton, zarf(len(ton), 0.02, 0.8))])
+
+
 def tik() -> list[float]:
     ton = sinus(0.05, 1200, 900)
     return uygula(ton, zarf(len(ton), 0.05, 0.8))
@@ -214,6 +238,9 @@ def main() -> int:
     yaz("olum.wav", olum())
     yaz("kontrol.wav", kontrol())
     yaz("bitis.wav", bitis())
+    yaz("hasar.wav", hasar())
+    yaz("dusman_farketti.wav", dusman_farketti(), 0.6)
+    yaz("dusman_saldiri.wav", dusman_saldiri(), 0.6)
     yaz("tik.wav", tik(), 0.5)
     yaz("muzik.wav", muzik(), 0.55)
     toplam = sum(os.path.getsize(os.path.join(SES, f)) for f in os.listdir(SES)

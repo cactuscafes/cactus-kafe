@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 3** bitti: menüsü, sesi, ayarları ve kaydı olan, başından sonuna
-oynanan bir oyun.
+Şu an **Faz 4** bitti: parkurda düşman var, oyuncunun canı var ve vuruşlar
+hissediliyor.
 
 | Faz | Ne geldi |
 |---|---|
@@ -10,6 +10,7 @@ oynanan bir oyun.
 | **1** | Üçüncü şahıs karakter + animasyon durum makinesi, parkur bölümü, toplanabilir/tuzak/kontrol noktası/hareketli platform, bölüm akışı, davranış testleri |
 | **2** | Blender varlık hattı: 5 modellenmiş nesne, ortak doku atlası, UV paketleme, glTF dışa/içe aktarım, ölçek-eksen-yoğunluk testleri, Git LFS |
 | **3** | Ana menü, duraklatma, ayarlar, bitiş ekranı, ses (10 parça, sentezlenmiş), ayar/rekor kaydı, arayüz testleri, itch.io paketi |
+| **4** | Durum makineli düşman + NavigationAgent3D, can/hasar/dokunulmazlık, vuruş duraklaması, ekran sarsıntısı, parçacık, zemin eğimine yatma, yapay zekâ testleri |
 
 ---
 
@@ -52,7 +53,12 @@ sayısı üstte; bölüm bitince ikisi de yazılır. Yaklaşık 2–3 dakikalık
 godot --headless --path oyun3d res://testler/bolum_testi.tscn    # oynanış
 godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
 godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
+godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar
 ```
+
+> Testleri **`timeout` ile** koşun (CI öyle yapıyor). Bir test betiği
+> derlenmezse Godot hata verip durmuyor: boş sahneyle sonsuza kadar çalışıyor.
+> Asılı kalan bir test, çoğu zaman başarısız test değil, derlenmeyen testtir.
 
 Testler `--script` ile değil **sahne olarak** koşuyor. Sebebi: `--script`
 kipinde autoload'lar kurulmadan derleme yapılıyor, `Ses` ve `Ayarlar`
@@ -85,6 +91,19 @@ bozmamalı), Esc ağacı duraklatıyor mu, duraklatma menüsü `PROCESS_MODE_ALW
 mı (değilse menü de donar ve oyun bir daha açılmaz), çiçekler eksikken bölüm
 bitiyor mu, bitişte ekran açılıp rekor kaydediliyor mu.
 
+**`dusman_testi.gd`** elle test edilmesi en pahalı şeyi ölçüyor — yapay zekâyı
+görmek için oyunu açıp düşmanın yanına gitmek, beklemek, arkasından dolaşmak
+gerekiyor:
+
+| Test | Ne kanıtlar |
+|---|---|
+| navigasyon | Örgü taze: iki nokta arasında yol var ve devriye noktası örgünün üstünde |
+| devriye | Düşman devriyede hareket ediyor ve 40 m uzaktaki oyuncu yüzünden çıkmıyor |
+| farketme | 20 m uzağı fark etmiyor, 6 m öndekini fark ediyor |
+| saldırı | Menzile girince saldırıyor ve tam olarak `hasar` kadar can götürüyor |
+| dokunulmazlık | İkinci vuruş yutuluyor, süre bitince yeniden hasar alınıyor |
+| ölüm | Can bitince doğum noktasına dönülüyor, can doluyor, kısa dokunulmazlık veriliyor |
+
 **`varlik_testi.gd`** ise Blender ile Godot arasındaki sözleşmeyi denetler —
 içe aktarımda en sık sessizce kaybedilen şeyler:
 
@@ -98,6 +117,69 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Düşman ve dövüş (Faz 4)
+
+### Durum makinesi
+
+`betikler/dusman.gd` tek bir enum ve tek bir `match` ile duruyor:
+
+```
+DEVRIYE ──gördü──► FARKETTI ──0.45 sn──► KOVALA ──menzilde──► SALDIRI
+   ▲                                       │                     │
+   └────── 3 sn kaybetti / 24 m uzak ──────┘                     │
+                                    CEKIL ◄──vuruş──────────────┘
+```
+
+"if kovaliyor and not saldiriyor and gordu" gibi bayrak yığını yerine bunu
+tercih etmenin sebebi: her an **tek** bir durumda olunduğu koda bakınca
+görülüyor ve yeni durum eklemek eskilerini bozmuyor.
+
+**Algı üç koşulun birleşimi:** mesafe (14 m), görüş açısı (120°) ve engel
+kontrolü (RayCast3D). Üçü birden olduğu için oyuncu arkadan yaklaşabiliyor ve
+platformun arkasına saklanabiliyor. 360° gören düşman adil hissettirmez.
+
+**Hazırlık süresi (0.38 sn) tasarımın kendisi.** Saldırıdan önceki bekleme,
+oyuncuya kaçma penceresi verir; olmadığında saldırı "haksız" hissettirir.
+Model o sırada geriye çekilip yaylanıyor — okunabilir bir uyarı.
+
+### Yol bulma
+
+`araclar/navmesh_uret.tscn` bölümün navigasyon örgüsünü bir kez pişirip
+`navigasyon/bolum1.tres` olarak kaydeder:
+
+```bash
+godot --headless --path oyun3d res://araclar/navmesh_uret.tscn
+```
+
+> **Seviye değiştiyse bunu yeniden çalıştırın.** Bayat örgü sessizce bozulur:
+> düşman görünmez duvarlara çarpar ya da boşlukta yürür. `dusman_testi`
+> içindeki yol testi tam bunu yakalamak için var — iki nokta arasında yol
+> bulunamıyorsa test kalır.
+
+### Vuruş hissi
+
+Hasar anında dört şey aynı anda oluyor; hiçbiri tek başına yeterli değil:
+
+| Ne | Nerede | Neden |
+|---|---|---|
+| Vuruş duraklaması (0.08 sn, ×0.05 hız) | `Efekt.vurus_duraklamasi()` | Darbeye ağırlık verir. 0.12 sn'yi geçerse oyun takılıyor sanılır |
+| Ekran sarsıntısı (üstel sönümlü) | `Efekt.sarsint()` → `kamera.gd` | Doğrusal sönüm "sallantı", üstel sönüm "darbe" hissi verir |
+| Parçacık | `CPUParticles3D` | Nereden vurulduğu görünür |
+| Ses + geri tepme + yanıp sönme | `oyuncu.gd` | Dokunulmazlığın ne zaman bittiği okunur olmalı |
+
+`Efekt` autoload'u sarsıntıyı **isteyen** kodla (hasar) **uygulayan** koddan
+(kamera) ayırıyor: düşman, oyuncuya vururken kameranın nerede olduğunu bilmek
+zorunda kalmıyor.
+
+### Zemine yatma
+
+Karakter modeli rampada dik durmuyor, zeminin normaline yatıyor. Gerçek ayak
+IK'sı iskelet ister; bu, kutu karakterde aynı işi gören ucuz sürümü. Eğim
+`Yon` düğümüne uygulanıyor — animasyonlar `Yon/Model`in dönüşünü yazıyor,
+ikisi çakışmasın diye.
 
 ---
 
@@ -268,6 +350,8 @@ oyun3d/
 │   ├── girdi.gd             Autoload: klavye + oyun kolu eylemleri
 │   ├── ses.gd               Autoload: ses havuzu, müzik, bus seviyeleri
 │   ├── ayarlar.gd           Autoload: ayar + rekor kalıcılığı
+│   ├── efekt.gd             Autoload: sarsıntı ve vuruş duraklaması
+│   ├── dusman.gd            Durum makineli düşman
 │   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
 │   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
 │   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
@@ -277,6 +361,7 @@ oyun3d/
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
+├── navigasyon/bolum1.tres   Pişirilmiş navigasyon örgüsü
 ├── arayuz/tema.tres         Ortak buton/etiket teması
 ├── default_bus_layout.tres  Master / SFX / Müzik bus'ları
 ├── varliklar/               Modellenmiş nesneler (.gltf + .bin) ve atlas.png
@@ -285,11 +370,13 @@ oyun3d/
 ├── araclar/
 │   ├── animasyon_uret.gd    Animasyon üretici (Godot)
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
-│   └── sesler.py            Ses üretici
+│   ├── sesler.py            Ses üretici
+│   └── navmesh_uret.gd      Navigasyon örgüsü üretici
 └── testler/
     ├── bolum_testi.gd       Oynanış davranışları
     ├── varlik_testi.gd      Varlık hattı
-    └── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
+    ├── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
+    └── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -384,6 +471,7 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
+| Düşman testleri (6 grup) | ✅ hepsi geçti |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
 | Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
 
@@ -414,11 +502,10 @@ söyler.
 
 ---
 
-## Faz 4'te sırada ne var
+## Faz 5'te sırada ne var
 
-Yol haritasına göre Faz 4 **animasyon, yapay zekâ ve seviye tasarımı**: durum
-makineli düşman, NavigationAgent3D ile takip, root motion, ayak IK, hasar geri
-bildirimi (ekran sarsıntısı, hit-stop, parçacık). Açık kalan uçlar:
+Yol haritasına göre Faz 5 **dikey dilim**: 15 dakikalık, son kalitede tek
+bölüm; 60 saniyelik trailer; Steam sayfası. Açık kalan uçlar:
 
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
@@ -429,3 +516,8 @@ bildirimi (ekran sarsıntısı, hit-stop, parçacık). Açık kalan uçlar:
   atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).
 - **İkinci bölüm** — şu an tek bölüm var; `oyun.gd` bölüm yükleyicisine
   dönüşecek.
+- **Düşmana can ve geri bildirim** — düşman şu an ölümsüz; oyuncunun karşılık
+  verme yolu yok. Dikey dilimde ya bir saldırı mekaniği ya da kaçınma
+  odaklı tasarım netleşmeli.
+- **Kök hareketi (root motion) ve gerçek ayak IK'sı** — ikisi de iskeletli
+  model ister; rig'li karakterle birlikte gelir.

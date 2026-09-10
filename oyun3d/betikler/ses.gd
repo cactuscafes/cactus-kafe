@@ -16,6 +16,9 @@ const EFEKTLER := {
 	"olum": preload("res://ses/olum.wav"),
 	"kontrol": preload("res://ses/kontrol.wav"),
 	"bitis": preload("res://ses/bitis.wav"),
+	"hasar": preload("res://ses/hasar.wav"),
+	"dusman_farketti": preload("res://ses/dusman_farketti.wav"),
+	"dusman_saldiri": preload("res://ses/dusman_saldiri.wav"),
 	"tik": preload("res://ses/tik.wav"),
 }
 

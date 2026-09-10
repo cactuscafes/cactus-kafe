@@ -142,6 +142,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - Blend tree, root motion, IK (ayak yerleştirme), hasar/geri tepme geri bildirimi
   (ekran sarsıntısı, hit-stop, parçacık, ses) — "game feel" burada öğrenilir.
 - Seviye tasarımı: blockout → oyun testi → sanat. Asla ters sırada değil.
+- **Durum: bitti** → [`oyun3d/`](oyun3d/README.md). Devriye/fark et/kovala/
+  saldır/çekil durum makinesi, NavigationAgent3D ile yol bulma (pişirilmiş
+  örgü), mesafe+açı+engel üçlüsüyle algı, hazırlık süreli saldırı; oyuncuda can,
+  dokunulmazlık, geri tepme; vuruş duraklaması, ekran sarsıntısı, parçacık ve
+  zemin eğimine yatma. Yapay zekâ ve hasar için 6 test grubu.
 
 ### Faz 5 — **Proje 2: dikey dilim (vertical slice)** (Ay 6)
 - 15 dakikalık, son kalitede bir bölüm: nihai sanat, ses, UI, denge.

@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://betikler/dusman.gd" id="1_dusman"]
+[ext_resource type="PackedScene" path="res://varliklar/dusman.gltf" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="Sekil_dusman"]
+radius = 0.45
+height = 1.1
+
+[node name="Dusman" type="CharacterBody3D"]
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("1_dusman")
+
+[node name="Carpisma" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("Sekil_dusman")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Gorsel" parent="Model" instance=ExtResource("2_model")]
+
+[node name="Ajan" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.6
+target_desired_distance = 1.2
+path_max_distance = 6.0
+avoidance_enabled = false
+
+[node name="Gorus" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+target_position = Vector3(0, 0, -8)
+collision_mask = 33

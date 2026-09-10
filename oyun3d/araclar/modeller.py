@@ -15,7 +15,7 @@ Blender'ı kendi makinende açıp aynı nesneleri elle modellediğinde, hattın 
 kalanı olduğu gibi çalışacak; sadece bu dosyanın yerine `.blend` dosyaların
 geçecek.
 
-ATLAS MANTIĞI: 2048×2048 tek doku; her nesneye yüzey alanıyla orantılı bir
+ATLAS MANTIĞI: 2048×3072 tek doku; her nesneye yüzey alanıyla orantılı bir
 bölge ayrılır (kaktüs ve kaya 1024², tabela 512×1024, çiçek 512²).
 Yüzler baskın eksenlerine göre düzleme yansıtılır, hepsi **aynı ölçekte** raf
 paketleyiciyle hücreye dizilir; sığmazsa yoğunluk kademeli düşürülür. Böylece
@@ -38,7 +38,11 @@ BURASI = os.path.dirname(os.path.abspath(__file__))
 PROJE = os.path.dirname(BURASI)
 VARLIK = os.path.join(PROJE, "varliklar")
 
-ATLAS_PX = 2048
+# Atlas kare olmak zorunda değil. Düşman eklenince 2048² doldu ve düşmana
+# ancak 512²'lik bir bölge kalıyordu — 178 teksel/m, banttın altı. Dokuyu
+# 4096²'ye çıkarmak (dosya ~4 kat) yerine bir satır eklendi.
+ATLAS_GEN = 2048
+ATLAS_YUK = 3072
 
 # Atlas alanı yüzey alanına göre paylaştırılır: 2.2 m'lik kaktüs, 0.15 m'lik
 # çiçekle aynı kareyi alırsa ya kaktüs bulanık olur ya çiçekte doku israf edilir.
@@ -50,7 +54,9 @@ BOLGELER = {
     "sandik":  (0, 1024, 1024, 1024),
     "ahsap":   (1024, 1024, 512, 1024),
     "cicek":   (1536, 1024, 512, 512),
+    "dusman":  (0, 2048, 1024, 1024),
 }
+# Boş kalanlar (Faz 5 için): (1536,1536,512,512) ve (1024,2048,1024,1024)
 
 RENKLER = {
     "kaya":   (0.44, 0.43, 0.41),
@@ -58,6 +64,8 @@ RENKLER = {
     "ahsap":  (0.42, 0.29, 0.17),
     "cicek":  (0.85, 0.42, 0.55),
     "sandik": (0.50, 0.37, 0.22),
+    # Düşman bilerek yeşil DEĞİL: tehlike, süslemeden bir bakışta ayrılmalı.
+    "dusman": (0.56, 0.24, 0.31),
 }
 
 
@@ -92,7 +100,7 @@ def _deger_gurultusu(x: float, y: float, adim: int, tohum: int) -> float:
 
 def atlas_uret(yol: str) -> None:
     """Bölgeleri desenli doldurup atlası kaydeder."""
-    img = Image.new("RGB", (ATLAS_PX, ATLAS_PX), (26, 28, 26))
+    img = Image.new("RGB", (ATLAS_GEN, ATLAS_YUK), (26, 28, 26))
     px = img.load()
     for ad, (x0, y0, gen_px, yuk_px) in BOLGELER.items():
         renk = RENKLER[ad]
@@ -113,6 +121,11 @@ def atlas_uret(yol: str) -> None:
                     kaba = _deger_gurultusu(x, y, 96, tohum + 2)
                     ince = _deger_gurultusu(x, y, 24, tohum + 3)
                     k *= 0.80 + 0.28 * kaba + 0.12 * ince
+                elif ad == "dusman":
+                    kaba = _deger_gurultusu(x, y, 64, tohum + 4)
+                    k *= 0.78 + 0.34 * kaba
+                    if x % 40 < 4 and y % 40 < 4:
+                        k *= 1.7            # diken parlaklığı
                 elif ad == "cicek":
                     dx = (x - gen_px / 2) / (gen_px / 2)
                     dy = (y - yuk_px / 2) / (yuk_px / 2)
@@ -224,6 +237,45 @@ def sandik() -> bpy.types.Object:
     return _nesne("sandik", bm)
 
 
+def dusman() -> bpy.types.Object:
+    """Yuvarlak, dikenli düşman.
+
+    Silueti kasten farklı: oyuncudaki kaktüs ve süslemedeki saguaro uzun ve
+    dik; bu yuvarlak ve dikenli. Tehlikeyi renkten önce siluetten tanımak
+    gerekir — renk körü oyuncu için tek ipucu budur.
+    """
+    rast = random.Random(21)
+    bm = bmesh.new()
+    govde = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.42)["verts"]
+    for v in govde:
+        v.co.z *= 0.86
+    # dikenler: gövdenin dışına bakan küçük koniler
+    for i in range(10):
+        aci = i * math.tau / 10.0
+        yukseklik = 0.06 + rast.random() * 0.30
+        diken = bmesh.ops.create_cone(
+            bm, cap_ends=True, cap_tris=False, segments=4,
+            radius1=0.07, radius2=0.0, depth=0.26,
+        )["verts"]
+        bmesh.ops.rotate(
+            bm, verts=diken, cent=(0, 0, 0),
+            matrix=Matrix.Rotation(math.radians(90), 3, "Y"),
+        )
+        bmesh.ops.rotate(
+            bm, verts=diken, cent=(0, 0, 0),
+            matrix=Matrix.Rotation(aci, 3, "Z"),
+        )
+        bmesh.ops.translate(bm, verts=diken, vec=(
+            math.cos(aci) * 0.44, math.sin(aci) * 0.44, yukseklik))
+    tepe = bmesh.ops.create_cone(
+        bm, cap_ends=True, cap_tris=False, segments=4,
+        radius1=0.08, radius2=0.0, depth=0.3,
+    )["verts"]
+    bmesh.ops.translate(bm, verts=tepe, vec=(0, 0, 0.5))
+    bmesh.ops.translate(bm, verts=bm.verts, vec=(0, 0, 0.42))
+    return _nesne("dusman", bm)
+
+
 def cicek() -> bpy.types.Object:
     bm = bmesh.new()
     orta = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.10)["verts"]
@@ -329,8 +381,8 @@ def uv_ac(obj: bpy.types.Object, bolge: tuple[int, int, int, int],
             # aktarıcı v'yi çevirir (v_gltf = 1 - v_blender), Godot ise glTF
             # değerini olduğu gibi kullanır. Bölgeleri görüntü koordinatıyla
             # hesapladığımız için çevirmeyi burada telafi ediyoruz.
-            kat.data[li].uv = ((bx + u * bgen) / ATLAS_PX,
-                               1.0 - (by + v * byuk) / ATLAS_PX)
+            kat.data[li].uv = ((bx + u * bgen) / ATLAS_GEN,
+                               1.0 - (by + v * byuk) / ATLAS_YUK)
 
     return yogunluk
 
@@ -384,6 +436,7 @@ def main() -> int:
         "tabela": (tabela, "ahsap"),
         "sandik": (sandik, "sandik"),
         "cicek": (cicek, "cicek"),
+        "dusman": (dusman, "dusman"),
     }
 
     rapor: dict[str, dict] = {}
@@ -401,7 +454,7 @@ def main() -> int:
             "bolge": hucre_adi,
             "bolge_px": list(BOLGELER[hucre_adi]),
             "taban_renk": [round(c, 3) for c in RENKLER[hucre_adi]],
-            "atlas_px": ATLAS_PX,
+            "atlas_px": [ATLAS_GEN, ATLAS_YUK],
         }
         print("%-8s %4d üçgen  %5.2f×%5.2f×%5.2f m  %6.0f teksel/m" % (
             ad, rapor[ad]["ucgen"], boyut.x, boyut.y, boyut.z, yogunluk))

@@ -43,10 +43,13 @@ jobs:
 
       - name: Bölüm testleri (pencere açmadan)
         working-directory: oyun3d
+        # timeout şart: bir test betiği DERLENMEZSE Godot boş sahneyle
+        # sonsuza kadar çalışır ve iş akışı asılı kalır.
         run: |
-          godot --headless res://testler/varlik_testi.tscn
-          godot --headless res://testler/bolum_testi.tscn
-          godot --headless res://testler/arayuz_testi.tscn
+          for t in varlik bolum arayuz dusman; do
+            echo "--- $t ---"
+            timeout 300 godot --headless "res://testler/${t}_testi.tscn"
+          done
 
       - name: Web olarak dışa aktar
         working-directory: oyun3d

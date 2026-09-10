@@ -11,19 +11,32 @@ extends SpringArm3D
 @export var oyun_kolu_hizi := 2.6
 
 var _serbest := false
+var _sarsinti := 0.0
+var _sarsinti_ofset := Vector3.ZERO
 
 func _ready() -> void:
 	# Kol, karakterin dönüşünden etkilenmemeli: kamerayı oyuncu çevirir.
 	top_level = true
 	hassasiyet = Ayarlar.hassasiyet
 	Ayarlar.degisti.connect(func() -> void: hassasiyet = Ayarlar.hassasiyet)
+	Efekt.sarsildi.connect(func(guc: float) -> void: _sarsinti = maxf(_sarsinti, guc))
 	kilitle(true)
 
 func _process(delta: float) -> void:
 	# Kol karakteri takip eder ama onunla birlikte dönmez.
+	# Sarsıntı üstel sönümleniyor: sert başlayıp hızla dinmesi, doğrusal
+	# sönümden çok daha "vuruş" gibi hissettiriyor.
+	if _sarsinti > 0.0001:
+		_sarsinti = lerpf(_sarsinti, 0.0, minf(1.0, delta * 9.0))
+		_sarsinti_ofset = Vector3(
+			randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)
+		) * _sarsinti * 0.35
+	else:
+		_sarsinti_ofset = Vector3.ZERO
+
 	var sahip := get_parent() as Node3D
 	if sahip != null:
-		global_position = sahip.global_position + Vector3(0.0, 1.15, 0.0)
+		global_position = sahip.global_position + Vector3(0.0, 1.15, 0.0) + _sarsinti_ofset
 
 	var bak := Input.get_vector("bak_sol", "bak_sag", "bak_yukari", "bak_asagi")
 	if bak != Vector2.ZERO:

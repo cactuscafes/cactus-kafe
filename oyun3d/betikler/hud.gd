@@ -7,10 +7,12 @@ extends CanvasLayer
 const BUTCE_MS := 16.6
 
 @export var oyun_yolu: NodePath = ^"../Oyun"
+@export var oyuncu_yolu: NodePath = ^"../Oyuncu"
 
 @onready var _durum: Label = $Durum
 @onready var _mesaj: Label = $Mesaj
 @onready var _olcum: Label = $Olcum
+@onready var _can: Label = %Can
 
 var _oyun: Node
 var _sayac := 0.0
@@ -18,6 +20,9 @@ var _sayac := 0.0
 func _ready() -> void:
 	_oyun = get_node(oyun_yolu)
 	_oyun.durum_degisti.connect(_durumu_yaz)
+	var oyuncu := get_node(oyuncu_yolu)
+	oyuncu.can_degisti.connect(_cani_yaz)
+	_cani_yaz(oyuncu.can, oyuncu.can_max)
 	_durumu_yaz()
 	_olcumu_yaz()
 
@@ -29,6 +34,12 @@ func _process(delta: float) -> void:
 	if _sayac <= 0.0:
 		_sayac = 0.25
 		_olcumu_yaz()
+
+func _cani_yaz(can: int, en_fazla: int) -> void:
+	_can.text = "can %d / %d" % [can, en_fazla]
+	# Son can farklı renkte: sayıyı okumadan da durum anlaşılsın.
+	_can.add_theme_color_override("font_color",
+		Color(1.0, 0.35, 0.3) if can <= 1 else Color(0.898, 0.6, 0.35))
 
 func _durumu_yaz() -> void:
 	_mesaj.text = _oyun.mesaj

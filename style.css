@@ -7,6 +7,8 @@
   --paper:#f8f6f2;
   --stone:#e8e4dd;
   --mist:#c8c2b8;
+  /* --mist dekoratif/kenarlik. Etiket METNI icin okunabilir esi (5.2:1). */
+  --label-ink:#6b675f;
   --accent:#1a1a1a;
   --gold:#b8965a;
   /* --gold dekoratif. Acik zeminde METIN/BUTON icin --gold-ink (beyazda 4.97:1). */
@@ -102,14 +104,14 @@ body::before{
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 .footer-brand{font-family:'Fraunces',serif;font-size:28px;font-weight:300;color:var(--paper);letter-spacing:3px;margin-bottom:16px;}
-.footer-desc{font-size:13px;font-weight:300;color:rgba(248,246,242,.35);line-height:1.8;max-width:280px;}
+.footer-desc{font-size:13px;font-weight:300;color:rgba(248,246,242,.58);line-height:1.8;max-width:280px;}
 .footer-col-ttl{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
-.footer-col a{display:block;font-size:13px;color:rgba(248,246,242,.4);text-decoration:none;margin-bottom:10px;transition:color .2s;}
+.footer-col a{display:block;font-size:13px;color:rgba(248,246,242,.62);text-decoration:none;margin-bottom:10px;transition:color .2s;}
 .footer-col a:hover{color:var(--paper);}
 .footer-bottom{max-width:1100px;margin:0 auto;padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
-.footer-copy{font-size:11px;color:rgba(248,246,242,.2);letter-spacing:1px;}
+.footer-copy{font-size:11px;color:rgba(248,246,242,.5);letter-spacing:1px;}
 .footer-ig{display:flex;gap:16px;}
-.footer-ig a{font-size:11px;color:rgba(248,246,242,.3);text-decoration:none;letter-spacing:1px;transition:color .2s;}
+.footer-ig a{font-size:11px;color:rgba(248,246,242,.54);text-decoration:none;letter-spacing:1px;transition:color .2s;}
 .footer-ig a:hover{color:var(--gold);}
 
 /* ── TICKER ── */

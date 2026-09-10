@@ -26,6 +26,8 @@
   --amber:#c8a86a;
   --amber2:#b8965a;
   --amber3:#a07840;
+  --amber-ink:#8a6b2f;   /* beyaz uzerinde 4.97:1 — nav metni/CTA */
+  --amber-ink2:#6f5526;  /* hover: daha koyu, 6.99:1 */
   --espresso:#0b1a07;
   --coffee:#1a3310;
   --latte:#f0ece4;
@@ -38,16 +40,16 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 #mainNav a.logo{text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;}
 .nav-links{display:flex;gap:32px;align-items:center;}
 .nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;transition:color .2s;}
-.nav-links a:hover{color:var(--amber);}
-.nav-links a.aktif{color:var(--amber);}
-.nav-links a.nav-cta{background:var(--amber);color:#fff;padding:9px 18px;font-weight:600;}
-.nav-links a.nav-cta:hover{background:var(--amber2);color:#fff;}
+.nav-links a:hover{color:var(--amber-ink);}
+.nav-links a.aktif{color:var(--amber-ink);}
+.nav-links a.nav-cta{background:var(--amber-ink);color:#fff;padding:9px 18px;font-weight:600;}
+.nav-links a.nav-cta:hover{background:var(--amber-ink2);color:#fff;}
 #mainBurger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
 #mainBurger span{width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;}
 #mainMobMenu{display:none;position:fixed;inset:0;background:rgba(255,255,255,.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
 #mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;transition:color .2s;}
-#mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber);}
-#mainMobMenu a.nav-cta{background:var(--amber);color:#fff;padding:14px 36px;font-weight:700;}
+#mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber-ink);}
+#mainMobMenu a.nav-cta{background:var(--amber-ink);color:#fff;padding:14px 36px;font-weight:700;}
 @media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
 
 /* ── SAYFA ── */

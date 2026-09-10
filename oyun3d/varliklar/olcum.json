@@ -1,0 +1,117 @@
+{
+  "_bant": {
+    "teksel_metre_max": 420,
+    "teksel_metre_min": 250,
+    "ucgen_ust_sinir": 500
+  },
+  "cicek": {
+    "atlas_px": 2048,
+    "bolge": "cicek",
+    "bolge_px": [
+      1536,
+      1024,
+      512,
+      512
+    ],
+    "boyut_m": [
+      0.563,
+      0.585,
+      0.15
+    ],
+    "taban_renk": [
+      0.85,
+      0.42,
+      0.55
+    ],
+    "teksel_metre": 380.0,
+    "ucgen": 120
+  },
+  "kaktus": {
+    "atlas_px": 2048,
+    "bolge": "kaktus",
+    "bolge_px": [
+      0,
+      0,
+      1024,
+      1024
+    ],
+    "boyut_m": [
+      1.56,
+      0.48,
+      2.2
+    ],
+    "taban_renk": [
+      0.22,
+      0.44,
+      0.27
+    ],
+    "teksel_metre": 334.4,
+    "ucgen": 148
+  },
+  "kaya": {
+    "atlas_px": 2048,
+    "bolge": "kaya",
+    "bolge_px": [
+      1024,
+      0,
+      1024,
+      1024
+    ],
+    "boyut_m": [
+      1.131,
+      1.152,
+      0.928
+    ],
+    "taban_renk": [
+      0.44,
+      0.43,
+      0.41
+    ],
+    "teksel_metre": 380.0,
+    "ucgen": 20
+  },
+  "sandik": {
+    "atlas_px": 2048,
+    "bolge": "sandik",
+    "bolge_px": [
+      0,
+      1024,
+      1024,
+      1024
+    ],
+    "boyut_m": [
+      0.86,
+      0.86,
+      0.855
+    ],
+    "taban_renk": [
+      0.5,
+      0.37,
+      0.22
+    ],
+    "teksel_metre": 380.0,
+    "ucgen": 120
+  },
+  "tabela": {
+    "atlas_px": 2048,
+    "bolge": "ahsap",
+    "bolge_px": [
+      1024,
+      1024,
+      512,
+      1024
+    ],
+    "boyut_m": [
+      1.193,
+      0.09,
+      1.9
+    ],
+    "taban_renk": [
+      0.42,
+      0.29,
+      0.17
+    ],
+    "teksel_metre": 294.3,
+    "ucgen": 24
+  }
+}

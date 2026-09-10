@@ -1,12 +1,14 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 1** bitti: oynanabilir bir platform bölümü var.
+Şu an **Faz 2** bitti: oynanabilir bölüm artık kutulardan değil, modellenmiş
+varlıklardan oluşuyor.
 
 | Faz | Ne geldi |
 |---|---|
 | **0** | Godot projesi, "merhaba küp", üç platforma dışa aktarım zinciri, CI |
 | **1** | Üçüncü şahıs karakter + animasyon durum makinesi, parkur bölümü, toplanabilir/tuzak/kontrol noktası/hareketli platform, bölüm akışı, davranış testleri |
+| **2** | Blender varlık hattı: 5 modellenmiş nesne, ortak doku atlası, UV paketleme, glTF dışa/içe aktarım, ölçek-eksen-yoğunluk testleri, Git LFS |
 
 ---
 
@@ -38,10 +40,11 @@ sayısı üstte; bölüm bitince ikisi de yazılır. Yaklaşık 2–3 dakikalık
 
 ---
 
-## Bölüm testleri
+## Testler
 
 ```bash
-godot --headless --path oyun3d --script res://testler/bolum_testi.gd
+godot --headless --path oyun3d --script res://testler/bolum_testi.gd    # oynanış
+godot --headless --path oyun3d --script res://testler/varlik_testi.gd   # varlıklar
 ```
 
 Pencere açmadan çalışır, davranışları **sayıyla** ölçer:
@@ -62,6 +65,81 @@ testleri bu dosyaya birikir — Faz 2'de Blender'dan gelen modelin ölçeği ve
 
 Ekran görüntüsü kanıt değildir, sayı kanıttır: "zıplama iyi hissettiriyor"
 tartışılır, "zıplama 1.68 m" tartışılmaz.
+
+**`varlik_testi.gd`** ise Blender ile Godot arasındaki sözleşmeyi denetler —
+içe aktarımda en sık sessizce kaybedilen şeyler:
+
+| Test | Ne kanıtlar |
+|---|---|
+| ölçü | Godot'daki AABB, Blender'ın raporladığı ölçüyle aynı (santim/metre karışması yok) |
+| eksen | Blender Z-up → Godot Y-up dönüşümü doğru; kaktüs 2.2 m **yukarı** |
+| orijin | Nesnenin orijini tabanında: `y = zemin` yazınca oturuyor |
+| üçgen | Sayı raporla aynı ve bütçenin altında |
+| UV + doku | UV katmanı ve albedo dokusu içe aktarımdan sağ çıkmış |
+| bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
+| renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
+| yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Varlık hattı (Faz 2)
+
+```bash
+pip install bpy pillow
+python3 oyun3d/araclar/modeller.py
+```
+
+Blender'ın `bpy` modülüyle beş nesne üretilir — kaya, kaktüs, tabela, sandık,
+çiçek — UV'leri açılır, ortak atlasa paketlenir, `varliklar/` altına glTF olarak
+yazılır. Ölçüler `varliklar/olcum.json` dosyasına raporlanır; Godot tarafındaki
+test bu raporu sözleşme olarak kullanır.
+
+> **Betikle modellemek elle modellemenin yerine geçmez.** Bu ortamda Blender'ın
+> arayüzü yok, o yüzden nesneler kodla kuruldu. Fazın asıl kazancı hattın
+> kendisi: UV → atlas → malzeme → glTF → Godot → ölçek/eksen doğrulaması.
+> Blender'ı kendi makinende açıp aynı nesneleri elle modellediğinde hattın geri
+> kalanı olduğu gibi çalışır; sadece `modeller.py`'nin yerine `.blend`
+> dosyaların geçer.
+
+### Doku atlası ve teksel yoğunluğu
+
+Tek 2048×2048 doku; her nesneye **yüzey alanıyla orantılı** bir bölge ayrılır
+(kaktüs ve kaya 1024², tabela 512×1024, çiçek 512²). Yüzler baskın eksenlerine
+göre düzleme yansıtılır ve hepsi *aynı ölçekte* bir raf paketleyiciyle bölgeye
+dizilir; sığmazsa yoğunluk kademeli düşürülür.
+
+Neden aynı ölçek: ilk sürüm her yüzü bölgenin tamamına yayıyordu, küçük pah
+yüzleri 3000 teksel/m alırken büyük yüzler 200'de kalıyordu. Aynı nesnede
+yoğunluk farkı, dokunun bir yerde bulanık bir yerde israf olması demektir.
+Şu an hepsi 294–380 teksel/m bandında.
+
+Tek doku + tek malzeme = az draw call. Faz 6'nın optimizasyon işi buradan
+kolaylaşacak.
+
+### Neden `.gltf` + `.bin`, `.glb` değil
+
+`.glb` her şeyi tek ikili dosyaya gömer; dokuyu da gömdüğü için beş nesne
+atlasın beş kopyasını taşırdı. Ayrık glTF'te `.gltf` **metin** (JSON) — diff'i
+okunabilir, LFS dışında tutuldu — `.bin` ikili (LFS), doku ise ortak tek dosya.
+
+### Bu fazda düşülen iki kuyu
+
+1. **V ekseni.** Blender UV'nin başlangıcı sol *alt*, glTF'inki sol *üst*. Dışa
+   aktarıcı `v`'yi çevirir, Godot çevirmez. Telafi edilmeyince her nesne
+   atlasın dikey aynasındaki bölgeyi örnekler: kaktüs kahverengi, tabela gri
+   çıkar. **Sayısal testlerin hiçbiri bunu yakalamadı** — ölçü, üçgen sayısı ve
+   teksel yoğunluğu bu hatada bile doğru. Yakalayan şey, atlastan okunan rengi
+   ölçen test oldu (`varlik_testi.gd`, madde 6). Test yazarken sorulacak soru
+   "doğru mu?" değil, "yanlış olsa hangi sayı değişirdi?".
+2. **Bayat içe aktarma önbelleği.** Varlıklar dışarıdaki bir araçla yeniden
+   üretilince Godot'nun `.godot/imported/` önbelleği bazen güncellenmiyor;
+   `--import` sessizce eski veriyi bırakıyor. Yeniden üretimden sonra:
+
+   ```bash
+   rm -rf oyun3d/.godot/imported && godot --headless --path oyun3d --import
+   ```
+
+   Bunu bilmeden yarım saat "düzelttiğim şey neden değişmiyor" diye bakılıyor.
 
 ---
 
@@ -141,9 +219,15 @@ oyun3d/
 │   ├── toplanabilir.gd · tuzak.gd · kontrol_noktasi.gd · bitis.gd
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
+├── varliklar/               Modellenmiş nesneler (.gltf + .bin) ve atlas.png
+│   └── olcum.json           Blender'ın raporu = Godot testinin sözleşmesi
 ├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
-├── araclar/animasyon_uret.gd
-└── testler/bolum_testi.gd
+├── araclar/
+│   ├── animasyon_uret.gd    Animasyon üretici (Godot)
+│   └── modeller.py          Varlık üretici (Blender/bpy)
+└── testler/
+    ├── bolum_testi.gd       Oynanış davranışları
+    └── varlik_testi.gd      Varlık hattı
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -203,7 +287,25 @@ uygular. Klonlayan her makinede bir kez:
 git lfs install
 ```
 
-Faz 2'de ilk `.glb` ve doku dosyaları gelmeden önce bunu yapmayı unutmayın.
+Kurallar `.blend`, `.glb`, `.fbx`, `.exr`, `.hdr`, `.ktx2` ve ses dosyaları için
+duruyor — yani asıl büyüyecek dosya türleri. Faz 2'nin ürettikleri **bilerek
+LFS dışında**:
+
+| Dosya | Boyut | Neden |
+|---|---|---|
+| `*.gltf` | 1–2 KB | Metin (JSON); diff'i okunabilir kalsın |
+| `*.bin` | 2–12 KB | LFS işaretçisi 130 bayt — bu boyutta LFS sadece bağımlılık |
+| `atlas.png` | 1.4 MB | Depoda tutulacak kadar küçük |
+
+Atlas ilk hâlinde 6.75 MB'tı: her piksele ayrı gürültü koyuyordum. O gürültü bir
+metre öteden zaten görünmüyor ama PNG'yi sıkıştırılamaz yapıyor. Kaba kafes
+üstünde aradeğerlenmiş gürültüye geçince dosya 5 kat küçüldü ve doku daha iyi
+göründü. Doku büyürse ya da ikinci bir atlas gelirse `*.png` LFS'e taşınmalı.
+
+> **Not:** Bu proje LFS için kurulu ama LFS yolu bu depoda henüz *fiilen*
+> denenmedi — geliştirme oturumunun ağ politikası `lfs.github.com` adresini
+> kapatıyor. İlk `.blend` veya ses dosyasını eklerken `git lfs install` yapıp
+> push'un gerçekten çalıştığını doğrulayın.
 
 ---
 
@@ -222,9 +324,16 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 
 ---
 
-## Faz 2'de sırada ne var
+## Faz 3'te sırada ne var
 
-- Blender: parkurun kutularının yerine gerçek modeller (kaya, kaktüs, tabela)
-- Karakterin yerine modellenmiş + rig'li bir kaktüs; `animasyon_uret.gd` emekli olur
-- Doku, UV, texel density — ve ilk `.glb`/LFS akışı
-- Ses: adım, zıplama, toplama, düşme (şu an tamamen sessiz)
+Yol haritasına göre Faz 3 **bitmiş küçük oyun**: menü, ayarlar, ses, kayıt,
+kredi ekranı ve itch.io yayını. Bu fazın açık kalan uçları oraya taşınıyor:
+
+- **Ses** — proje hâlâ tamamen sessiz. Adım, zıplama, toplama, düşme.
+- **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
+  gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
+- **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
+  içe aktarıcısı, Blender'da adı `-col` ile biten mesh'ler için otomatik
+  `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.
+- **Malzeme paylaşımı** — beş nesnenin beş ayrı malzemesi var, hepsi aynı
+  atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).

@@ -1,19 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://betikler/toplanabilir.gd" id="1_top"]
+[ext_resource type="PackedScene" path="res://varliklar/cicek.gltf" id="2_cicek"]
 
 [sub_resource type="SphereShape3D" id="Sekil_top"]
 radius = 0.85
-
-[sub_resource type="StandardMaterial3D" id="Mat_top"]
-albedo_color = Color(0.925, 0.478, 0.596, 1)
-roughness = 0.35
-emission_enabled = true
-emission = Color(0.925, 0.478, 0.596, 1)
-emission_energy_multiplier = 0.45
-
-[sub_resource type="PrismMesh" id="Mesh_top"]
-size = Vector3(0.42, 0.55, 0.42)
 
 [node name="Toplanabilir" type="Area3D"]
 collision_layer = 8
@@ -25,11 +16,5 @@ shape = SubResource("Sekil_top")
 
 [node name="Gorsel" type="Node3D" parent="."]
 
-[node name="Ust" type="MeshInstance3D" parent="Gorsel"]
-mesh = SubResource("Mesh_top")
-material_override = SubResource("Mat_top")
-
-[node name="Alt" type="MeshInstance3D" parent="Gorsel"]
-transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, 1, 0, -0.02, 0)
-mesh = SubResource("Mesh_top")
-material_override = SubResource("Mat_top")
+[node name="Model" parent="Gorsel" instance=ExtResource("2_cicek")]
+transform = Transform3D(0.9, 0, 0, 0, 0.826, 0.357, 0, -0.357, 0.826, 0, -0.08, 0)

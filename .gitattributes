@@ -5,11 +5,9 @@
 # Kullanmadan önce bir kez:  git lfs install
 
 oyun3d/**/*.glb   filter=lfs diff=lfs merge=lfs -text
-oyun3d/**/*.gltf  filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.fbx   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.blend filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.obj   filter=lfs diff=lfs merge=lfs -text
-oyun3d/**/*.png   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.jpg   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.exr   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.hdr   filter=lfs diff=lfs merge=lfs -text
@@ -17,3 +15,10 @@ oyun3d/**/*.ktx2  filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.wav   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.ogg   filter=lfs diff=lfs merge=lfs -text
 oyun3d/**/*.mp3   filter=lfs diff=lfs merge=lfs -text
+
+# Bilerek LFS DIŞINDA tutulanlar:
+#   *.gltf  metin (JSON) — diff'i okunabilir kalsın
+#   *.bin   2-12 KB — LFS işaretçisi 130 bayt; bu boyutta LFS sadece bağımlılık
+#   *.png   üretilen atlas 1.4 MB — depoda tutulacak kadar küçük
+# Doku büyürse ya da ikinci bir atlas gelirse *.png buraya taşınmalı.
+oyun3d/**/*.gltf  text

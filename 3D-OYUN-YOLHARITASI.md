@@ -120,6 +120,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - Blender: donut eğitimi **değil** — doğrudan oyununa girecek 5 low-poly nesne modelle
   (kaktüs, masa, fincan, sandalye, tabela), UV aç, texture'la, GLB olarak Godot'ya al.
 - **Çıktı:** tamamı kendi ürettiğin varlıklardan oluşan bir sahne.
+- **Durum: bitti** → [`oyun3d/varliklar/`](oyun3d/README.md). Beş modellenmiş
+  nesne (kaya, kaktüs, tabela, sandık, çiçek), tek 2048² doku atlası, yüzey
+  alanına göre bölge dağıtımı ve eşit teksel yoğunluğu (294–380 teksel/m),
+  ayrık glTF (metin `.gltf` + LFS'te `.bin`), Godot tarafında ölçek/eksen/
+  orijin/UV/bölge/renk/yoğunluk testleri.
 
 ### Faz 3 — **Proje 1: bitmiş küçük oyun** (Ay 3)
 - Kapsam: 10 dakikada bitirilen, tek mekaniğe dayalı 3B oyun. Ana menü, ayarlar, ses,

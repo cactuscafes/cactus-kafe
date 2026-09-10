@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -9,6 +9,10 @@
 [ext_resource type="Script" path="res://betikler/oyun.gd" id="7_oyun"]
 [ext_resource type="Script" path="res://betikler/tuzak.gd" id="8_tuzak"]
 [ext_resource type="Script" path="res://betikler/bitis.gd" id="9_bitis"]
+[ext_resource type="PackedScene" path="res://varliklar/kaya.gltf" id="10_kaya"]
+[ext_resource type="PackedScene" path="res://varliklar/kaktus.gltf" id="11_kaktus"]
+[ext_resource type="PackedScene" path="res://varliklar/tabela.gltf" id="12_tabela"]
+[ext_resource type="PackedScene" path="res://varliklar/sandik.gltf" id="13_sandik"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -194,6 +198,38 @@ shape = SubResource("Sekil_bitis")
 position = Vector3(0, -1.13, 0)
 mesh = SubResource("Mesh_bitis")
 material_override = SubResource("Mat_bitis")
+
+[node name="Susleme" type="Node3D" parent="."]
+
+[node name="Tabela1" parent="Susleme" instance=ExtResource("12_tabela")]
+transform = Transform3D(0.95106, 0, -0.30902, 0, 1.00000, 0, 0.30902, 0, 0.95106, 2.4, 0, 8.6)
+
+[node name="Kaktus2" parent="Susleme" instance=ExtResource("11_kaktus")]
+transform = Transform3D(0.90631, 0, 0.42262, 0, 1.00000, 0, -0.42262, 0, 0.90631, -5.6, 0, 7.8)
+
+[node name="Kaktus3" parent="Susleme" instance=ExtResource("11_kaktus")]
+transform = Transform3D(-0.62816, 0, -0.52709, 0, 0.82000, 0, 0.52709, 0, -0.62816, 8.4, 0, 1.2)
+
+[node name="Kaya4" parent="Susleme" instance=ExtResource("10_kaya")]
+transform = Transform3D(0.76604, 0, -0.64279, 0, 1.00000, 0, 0.64279, 0, 0.76604, -4.2, 0, 3.6)
+
+[node name="Kaya5" parent="Susleme" instance=ExtResource("10_kaya")]
+transform = Transform3D(0.23941, 0, 0.65778, 0, 0.70000, 0, -0.65778, 0, 0.23941, 6.8, 0, 6.4)
+
+[node name="Kaktus6" parent="Susleme" instance=ExtResource("11_kaktus")]
+transform = Transform3D(0.57500, 0, -0.99593, 0, 1.15000, 0, 0.99593, 0, 0.57500, -4.5, 0, -19.5)
+
+[node name="Kaya7" parent="Susleme" instance=ExtResource("10_kaya")]
+transform = Transform3D(1.20741, 0, -0.32352, 0, 1.25000, 0, 0.32352, 0, 1.20741, 10.5, 0, -24.0)
+
+[node name="Sandik8" parent="Susleme" instance=ExtResource("13_sandik")]
+transform = Transform3D(0.92718, 0, -0.37461, 0, 1.00000, 0, 0.37461, 0, 0.92718, 1.4, 4.15, -25.4)
+
+[node name="Kaktus9" parent="Susleme" instance=ExtResource("11_kaktus")]
+transform = Transform3D(0.68944, 0, 0.57851, 0, 0.90000, 0, -0.57851, 0, 0.68944, 1.3, 4.15, -47.2)
+
+[node name="Kaya10" parent="Susleme" instance=ExtResource("10_kaya")]
+transform = Transform3D(-0.14760, 0, -0.83709, 0, 0.85000, 0, 0.83709, 0, -0.14760, 6.6, 4.15, -46.8)
 
 [node name="Oyuncu" parent="." instance=ExtResource("1_oyuncu")]
 position = Vector3(0, 1.5, 6)

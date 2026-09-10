@@ -43,7 +43,9 @@ jobs:
 
       - name: Bölüm testleri (pencere açmadan)
         working-directory: oyun3d
-        run: godot --headless --script res://testler/bolum_testi.gd
+        run: |
+          godot --headless --script res://testler/varlik_testi.gd
+          godot --headless --script res://testler/bolum_testi.gd
 
       - name: Web olarak dışa aktar
         working-directory: oyun3d

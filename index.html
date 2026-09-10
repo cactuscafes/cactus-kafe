@@ -65,7 +65,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
 .hero-btn{display:inline-block;padding:16px 36px;border:1px solid rgba(255,255,255,0.7);color:#fff;text-decoration:none;font-size:12px;letter-spacing:.24em;text-transform:uppercase;transition:all .3s;font-weight:400;white-space:nowrap;}
 .hero-btn:hover{background:rgba(255,255,255,0.15);}
-@media(max-width:600px){.hero-btns{flex-direction:column;gap:10px;width:100%;max-width:280px;margin:0 auto;}.hero-btn{padding:14px 24px;font-size:9.5px;letter-spacing:3px;}}
+@media(max-width:600px){.hero-btns{flex-direction:column;gap:10px;width:100%;max-width:280px;margin:0 auto;}.hero-btn{padding:14px 24px;font-size:12px;letter-spacing:.24em;}}
 .hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:var(--t-micro);letter-spacing:var(--ls-caps);text-transform:uppercase;}
 .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
 /* Mobil: hero tam dolsun (bant yok) — kadraj dolabı koruyacak şekilde sola yaslı */
@@ -161,9 +161,9 @@ nav{padding:18px 24px;}
 .menu-grid{gap:1px;}
 .menu-card{aspect-ratio:2/3;}
 .menu-card-title{font-size:14px;}
-.menu-card-label{font-size:10px;}
+.menu-card-label{font-size:var(--t-micro);}
 .menu-card-overlay{padding:12px 10px;}
-.menu-card-link{font-size:10px;margin-top:6px;}
+.menu-card-link{font-size:var(--t-micro);margin-top:6px;}
 .footer-inner{grid-template-columns:1fr;gap:40px;}
 }
 
@@ -442,7 +442,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
     <!-- Sol: Metin -->
     <div style="position:relative;z-index:1;">
-      <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;font-family:'Inter',sans-serif;">Üyelere Özel</p>
+      <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;font-family:'Inter',sans-serif;">Üyelere Özel</p>
       <h2 style="font-family:'Fraunces',serif;font-size:clamp(30px,3.5vw,52px);font-weight:300;color:#f7f2ea;line-height:1.1;margin-bottom:16px;">Her kahve seni<br><em style="font-style:italic;color:#e8c47a;">bedavaya</em> götürür</h2>
       <p style="font-size:13px;color:rgba(240,225,195,.65);line-height:1.9;font-weight:300;margin-bottom:28px;max-width:380px;">Dijital sadakat kartınla her alışverişte 1 yıldız kazan. 7 yıldız tamamlandığında bir içecek bizden. Uygulama yok, kart yok — sadece telefon numaran yeterli.</p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
@@ -459,7 +459,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
           <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">Bakiyeni istediğin zaman kartımı görüntüle sayfasından kontrol et</span>
         </div>
       </div>
-      <a href="kart.html" style="display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#c8a86a';this.style.transform='translateY(0)'">Kartımı Gör →</a>
+      <a href="kart.html" style="display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#c8a86a';this.style.transform='translateY(0)'">Kartımı Gör →</a>
 
     </div>
 
@@ -469,7 +469,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
           <div>
             <div style="font-family:'Fraunces',serif;font-size:17px;letter-spacing:5px;color:#f7f2ea;text-transform:uppercase;">CACTUS</div>
-            <div style="font-size:8px;letter-spacing:3px;color:#c8a86a;text-transform:uppercase;margin-top:2px;">Sadakat Kartı</div>
+            <div style="font-size:10px;letter-spacing:.28em;color:#c8a86a;text-transform:uppercase;margin-top:2px;">Sadakat Kartı</div>
           </div>
           <div style="font-size:20px;">⭐</div>
         </div>
@@ -478,11 +478,11 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
           <div>
             <div style="font-family:'Fraunces',serif;font-size:24px;color:#f7f2ea;font-weight:300;"><span id="kart-sayac">0</span>/7</div>
-            <div style="font-size:8px;color:rgba(200,168,106,.5);letter-spacing:2px;text-transform:uppercase;">yıldız</div>
+            <div style="font-size:10px;color:rgba(200,168,106,.5);letter-spacing:.2em;text-transform:uppercase;">yıldız</div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:11px;color:#c8a86a;" id="kart-hak">0 hak</div>
-            <div style="font-size:8px;color:rgba(200,168,106,.4);letter-spacing:1px;text-transform:uppercase;">bedava içecek</div>
+            <div style="font-size:10px;color:rgba(200,168,106,.4);letter-spacing:.1em;text-transform:uppercase;">bedava içecek</div>
           </div>
         </div>
       </div>
@@ -594,7 +594,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .app-cta{display:inline-flex;align-items:center;gap:12px;background:#f7f2ea;color:#0e1f08;text-decoration:none;padding:14px 22px 14px 16px;border-radius:14px;font-family:'Inter',sans-serif;transition:transform .2s,box-shadow .2s;}
 .app-cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35);}
 .app-cta svg{width:26px;height:26px;flex:none;}
-.app-cta small{display:block;font-size:10px;letter-spacing:.5px;color:#5c6650;line-height:1.1;}
+.app-cta small{display:block;font-size:var(--t-micro);letter-spacing:.04em;color:#5c6650;line-height:1.1;}
 .app-cta b{display:block;font-size:16px;font-weight:600;line-height:1.15;}
 .app-not{font-size:var(--t-small);color:rgba(240,230,210,.5);margin-top:14px;max-width:52ch;line-height:var(--lh-body);}
 .app-not b{color:rgba(240,230,210,.8);font-weight:600;}
@@ -760,7 +760,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <!-- === INSTAGRAM === -->
 <section class="ig-section">
   <div style="text-align:center;margin-bottom:60px;" class="fade-up">
-    <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#8a6b2f;margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
+    <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#8a6b2f;margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
     <h2 style="font-family:'Fraunces',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi <em style="font-style:italic;">Takip Edin</em></h2>
     <div style="width:60px;height:1px;background:#c8a86a;margin:20px auto 0;"></div>
   </div>
@@ -768,12 +768,12 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <a class="ig-card ig-center fade-up fade-up-d1" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Cactus Coffee</p>
-      <p style="font-size:10px;color:#6f6f6f;letter-spacing:2px;font-family:'Inter',sans-serif;">@cactuscafe.tr</p>
+      <p style="font-size:13px;color:#6f6f6f;letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.tr</p>
     </a>
     <a class="ig-card fade-up fade-up-d2" href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
       <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Waffle</p>
-      <p style="font-size:10px;color:#6f6f6f;letter-spacing:2px;font-family:'Inter',sans-serif;">@cactuscafe.waffle</p>
+      <p style="font-size:13px;color:#6f6f6f;letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.waffle</p>
     </a>
   </div>
 </section>
@@ -809,13 +809,13 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <!-- Marka -->
     <div>
       <div style="font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:7px;text-transform:uppercase;margin-bottom:10px;">CACTUS</div>
-      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c8a86a;margin-bottom:22px;font-family:'Inter',sans-serif;">COFFEE · SNACK · DESSERT</div>
+      <div style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8a86a;margin-bottom:22px;font-family:'Inter',sans-serif;">COFFEE · SNACK · DESSERT</div>
       <p style="font-size: 12px; line-height: 2; color: rgb(143, 143, 143); font-weight: 300; margin-bottom: 28px; position: relative;">Her yudumda bir hikaye.<br>Bursa'nın kalbinde, Podyumpark'ta.</p>
     </div>
 
     <!-- Podyumpark -->
     <div>
-      <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Podyumpark</h4>
+      <h4 style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Podyumpark</h4>
       <p style="font-size: 12px; color: rgb(143, 143, 143); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Podyumpark AVM<br>Nilüfer, Bursa</p>
       <p style="font-size: 12px; color: rgb(143, 143, 143); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;" data-ayar="saat-podyum">Hafta içi 16:00 – 01:00<br>Hafta sonu 14:00 – 02:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
@@ -828,7 +828,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
     <!-- Sayfalar & Sosyal -->
     <div>
-      <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Sayfalar</h4>
+      <h4 style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 22px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Sayfalar</h4>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:36px;">
         <a href="index.html" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s; position: relative;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">Ana Sayfa</a>
         <a href="menu-podyum.html" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s; position: relative;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">Menü</a>
@@ -836,7 +836,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         <a href="iletisim.html#basvuru" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s; position: relative;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">İş Başvurusu</a>
         <a href="iletisim.html#sikayet" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s; position: relative;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">Şikayet &amp; Öneri</a>
       </div>
-      <h4 style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 16px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Instagram</h4>
+      <h4 style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: rgb(184, 150, 90); margin-bottom: 16px; font-weight: 500; font-family: Inter, sans-serif; position: relative;">Instagram</h4>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">@cactuscafe.tr</a>
         <a href="https://instagram.com/cactuscafe.waffle" target="_blank" rel="noopener" style="font-size: 12px; color: rgb(143, 143, 143); text-decoration: none; font-weight: 300; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8f8f8f'">@cactuscafe.waffle</a>

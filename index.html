@@ -115,17 +115,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .branch-meta{background:#fff;border:1px solid #ece7dd;border-top:none;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
 .branch-meta-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .branch-saat{font-size:13px;color:#666;}
-.branch-saat b{font-weight:500;color:#1a1a1a;}
+.branch-saat b{font-weight:500;color:var(--c-ink);}
 .branch-actions{display:flex;gap:10px;}
 .bmini{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px 16px;font-size:var(--t-small);font-weight:500;letter-spacing:.02em;text-decoration:none;transition:all .2s;font-family:'Inter',sans-serif;}
-.bmini.ara{background:#fff;border:1.5px solid #d8d2c6;color:#1a1a1a;}
+.bmini.ara{background:#fff;border:1.5px solid #d8d2c6;color:var(--c-ink);}
 .bmini.ara:hover{border-color:var(--gold-ink);color:var(--gold-ink);}
 .bmini.yol{background:var(--gold-ink);border:1.5px solid var(--gold-ink);color:#fff;}
 .bmini.yol:hover{filter:brightness(1.07);}
 .acik-rozet{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.4px;padding:5px 13px;border-radius:20px;}
 .acik-rozet::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;}
-.acik-rozet.acik{background:rgba(39,150,80,.14);color:#14663a;}
-.acik-rozet.kapali{background:rgba(180,60,60,.12);color:#8f3434;}
+.acik-rozet.acik{background:rgba(39,150,80,.14);color:var(--c-acik);}
+.acik-rozet.kapali{background:rgba(180,60,60,.12);color:var(--c-kapali);}
 
 /* FOOTER */
 footer{background:var(--dark);color:#fff;padding:80px 60px 40px;}
@@ -263,9 +263,9 @@ nav{padding:18px 24px;}
    görsel sonucu blur olmadan veriyoruz. */
 #mainNav.scrolled{padding:12px 60px!important;background:rgba(255,255,255,.96)!important;box-shadow:0 4px 24px rgba(0,0,0,.06);}
 #mainNavLinks a{position:relative;transition:color .25s;}
-#mainNavLinks a:not([style*="background"])::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;background:#c8a86a;transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1);}
+#mainNavLinks a:not([style*="background"])::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;background:var(--c-altin);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1);}
 #mainNavLinks a:not([style*="background"]):hover::after{transform:scaleX(1);}
-#mainNavLinks a:not([style*="background"]):hover{color:#8a6b2f!important;}
+#mainNavLinks a:not([style*="background"]):hover{color:var(--c-altin-ink)!important;}
 
 /* 14. ABOUT/HERO BTN — letter-spacing on hover */
 .about-btn{transition:background .3s,color .3s,letter-spacing .3s,transform .3s;}
@@ -364,26 +364,26 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <nav id="mainNav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);border-bottom:1px solid rgba(0,0,0,0.08);">
   <a href="index.html" style="display:flex;align-items:center;text-decoration:none;" aria-label="Cactus Coffee — Ana Sayfa"><img src="logo-trans.png" alt="Cactus Coffee" width="491" height="126" style="height:38px;width:auto;display:block;"></a>
   <div id="mainNavLinks" style="display:flex;gap:36px;align-items:center;">
-    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
-    <a href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">Menü</a>
-    <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
-    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Sadakat Kartı</a>
-    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;font-weight:400;">Oyun</a>
-    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
+    <a href="index.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-altin-ink);font-family:'Inter',sans-serif;font-weight:400;">Ana Sayfa</a>
+    <a href="menu-podyum.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;font-weight:400;">Menü</a>
+    <a href="iletisim.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;font-weight:400;">İletişim</a>
+    <a href="kart.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-altin-ink);font-family:'Inter',sans-serif;font-weight:400;">Sadakat Kartı</a>
+    <a href="oyunlar.html" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-altin-ink);font-family:'Inter',sans-serif;font-weight:400;">Oyun</a>
+    <a href="iletisim.html#basvuru" style="text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:var(--c-altin-ink);padding:9px 18px;font-family:'Inter',sans-serif;font-weight:400;">İş Başvurusu</a>
   </div>
   <button id="mainBurger" onclick="toggleMainNav()" style="display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;">
-    <span id="bs1" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
-    <span id="bs2" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
-    <span id="bs3" style="width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;"></span>
+    <span id="bs1" style="width:24px;height:1.5px;background:var(--c-ink);display:block;transition:all .3s;"></span>
+    <span id="bs2" style="width:24px;height:1.5px;background:var(--c-ink);display:block;transition:all .3s;"></span>
+    <span id="bs3" style="width:24px;height:1.5px;background:var(--c-ink);display:block;transition:all .3s;"></span>
   </button>
 </nav>
 <div id="mainMobMenu" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;">
-  <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Ana Sayfa</a>
-  <a href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">Menü</a>
-  <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;">İletişim</a>
-  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">Sadakat Kartı</a>
-  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#8a6b2f;font-family:'Inter',sans-serif;">Oyun</a>
-  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#8a6b2f;padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
+  <a href="index.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;">Ana Sayfa</a>
+  <a href="menu-podyum.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;">Menü</a>
+  <a href="iletisim.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;">İletişim</a>
+  <a href="kart.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--c-altin-ink);font-family:'Inter',sans-serif;">Sadakat Kartı</a>
+  <a href="oyunlar.html" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--c-altin-ink);font-family:'Inter',sans-serif;">Oyun</a>
+  <a href="iletisim.html#basvuru" onclick="toggleMainNav()" style="text-decoration:none;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:var(--c-altin-ink);padding:14px 28px;font-family:'Inter',sans-serif;">İş Başvurusu</a>
 </div>
 <style>
 @media(max-width:768px){
@@ -424,30 +424,30 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 </section>
 
 <!-- SADAKAT KARTI TANITIM -->
-<section id="sadakat-section" style="background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 45%,#0e1f08 100%);padding:var(--sp-section) var(--sp-gutter);overflow:hidden;position:relative;">
+<section id="sadakat-section" style="background:linear-gradient(135deg,var(--c-mocha) 0%,var(--c-coffee) 45%,#0e1f08 100%);padding:var(--sp-section) var(--sp-gutter);overflow:hidden;position:relative;">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(200,168,106,.1) 0%,transparent 60%);pointer-events:none;"></div>
   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" id="sadakat-inner">
 
     <!-- Sol: Metin -->
     <div style="position:relative;z-index:1;">
-      <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;font-family:'Inter',sans-serif;">Üyelere Özel</p>
+      <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--c-altin);margin-bottom:14px;font-family:'Inter',sans-serif;">Üyelere Özel</p>
       <h2 style="font-family:'Fraunces',serif;font-size:clamp(30px,3.5vw,52px);font-weight:300;color:#f7f2ea;line-height:1.1;margin-bottom:16px;">Her kahve seni<br><em style="font-style:italic;color:#e8c47a;">bedavaya</em> götürür</h2>
       <p style="font-size:13px;color:rgba(240,225,195,.65);line-height:1.9;font-weight:300;margin-bottom:28px;max-width:380px;">Dijital sadakat kartınla her alışverişte 1 yıldız kazan. 7 yıldız tamamlandığında bir içecek bizden. Uygulama yok, kart yok — sadece telefon numaran yeterli.</p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">1</div>
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--c-altin);font-family:'Inter',sans-serif;font-weight:500;">1</div>
           <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">Kasiyere telefonunu söyle, yıldız otomatik eklenir</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">2</div>
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--c-altin);font-family:'Inter',sans-serif;font-weight:500;">2</div>
           <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">7 yıldız dolduğunda bedava içecek hakkı kazanırsın</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">3</div>
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--c-altin);font-family:'Inter',sans-serif;font-weight:500;">3</div>
           <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">Bakiyeni istediğin zaman kartımı görüntüle sayfasından kontrol et</span>
         </div>
       </div>
-      <a href="kart.html" style="display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#c8a86a';this.style.transform='translateY(0)'">Kartımı Gör →</a>
+      <a href="kart.html" style="display:inline-block;padding:13px 32px;background:var(--c-altin);color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='var(--c-altin)';this.style.transform='translateY(0)'">Kartımı Gör →</a>
 
     </div>
 
@@ -457,7 +457,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
           <div>
             <div style="font-family:'Fraunces',serif;font-size:17px;letter-spacing:5px;color:#f7f2ea;text-transform:uppercase;">CACTUS</div>
-            <div style="font-size:10px;letter-spacing:.28em;color:#c8a86a;text-transform:uppercase;margin-top:2px;">Sadakat Kartı</div>
+            <div style="font-size:10px;letter-spacing:.28em;color:var(--c-altin);text-transform:uppercase;margin-top:2px;">Sadakat Kartı</div>
           </div>
           <div style="font-size:20px;">⭐</div>
         </div>
@@ -469,7 +469,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
             <div style="font-size:10px;color:rgba(200,168,106,.5);letter-spacing:.2em;text-transform:uppercase;">yıldız</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:11px;color:#c8a86a;" id="kart-hak">0 hak</div>
+            <div style="font-size:11px;color:var(--c-altin);" id="kart-hak">0 hak</div>
             <div style="font-size:10px;color:rgba(200,168,106,.4);letter-spacing:.1em;text-transform:uppercase;">bedava içecek</div>
           </div>
         </div>
@@ -482,8 +482,8 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 /* Damga animasyonları */
 .kdm{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .25s cubic-bezier(.34,1.56,.64,1);position:relative;}
 .kdm.bos{border:1.5px solid rgba(200,168,106,.2);background:rgba(255,255,255,.03);}
-.kdm.aktif{border:1.5px dashed #c8a86a;animation:kp 1.5s ease-in-out infinite;}
-.kdm.dolu{background:linear-gradient(135deg,#c8a86a,#a8883a);box-shadow:0 2px 8px rgba(200,168,106,.3);animation:kdmPop .5s cubic-bezier(.34,1.56,.64,1);}
+.kdm.aktif{border:1.5px dashed var(--c-altin);animation:kp 1.5s ease-in-out infinite;}
+.kdm.dolu{background:linear-gradient(135deg,var(--c-altin),#a8883a);box-shadow:0 2px 8px rgba(200,168,106,.3);animation:kdmPop .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes kdmPop{0%{transform:scale(0.2) rotate(-90deg);opacity:0;}60%{transform:scale(1.25) rotate(15deg);opacity:1;}100%{transform:scale(1) rotate(0deg);opacity:1;}}
 @keyframes kdmSparkle{0%,100%{transform:scale(1);}50%{transform:scale(1.08);box-shadow:0 0 20px rgba(232,196,122,.7);}}
 .kdm.son{animation:kdmPop .5s cubic-bezier(.34,1.56,.64,1),kdmSparkle 1.2s ease-in-out infinite .5s;}
@@ -567,7 +567,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .app-sec{background:#0e1f08;padding:88px 60px;position:relative;overflow:hidden;color:#f7f2ea;}
 .app-sec::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(127,176,105,.14) 0%,transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(200,168,106,.12) 0%,transparent 55%);pointer-events:none;}
 .app-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center;position:relative;z-index:1;}
-.app-eyebrow{font-size:var(--t-micro);font-weight:700;letter-spacing:var(--ls-caps);text-transform:uppercase;color:#c8a86a;margin-bottom:14px;}
+.app-eyebrow{font-size:var(--t-micro);font-weight:700;letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--c-altin);margin-bottom:14px;}
 .app-title{font-family:'Fraunces',serif;font-size:clamp(32px,4vw,54px);font-weight:300;line-height:1.08;margin-bottom:16px;letter-spacing:-.5px;}
 .app-title em{font-style:italic;color:#e8c47a;}
 .app-sub{font-size:14px;line-height:1.85;color:rgba(240,230,210,.72);font-weight:300;max-width:52ch;margin-bottom:26px;}
@@ -577,7 +577,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .app-odul span{font-size:var(--t-small);color:rgba(240,230,210,.7);line-height:var(--lh-body);}
 .app-adim{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px;max-width:560px;}
 .app-adim>div{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;}
-.app-adim>div>.n{font-family:'Fraunces',serif;font-size:22px;color:#c8a86a;line-height:1;background:none;border:none;padding:0;margin:0;display:block;}
+.app-adim>div>.n{font-family:'Fraunces',serif;font-size:22px;color:var(--c-altin);line-height:1;background:none;border:none;padding:0;margin:0;display:block;}
 .app-adim p{font-size:var(--t-small);color:rgba(240,230,210,.75);line-height:var(--lh-body);margin:0;}
 .app-cta{display:inline-flex;align-items:center;gap:12px;background:#f7f2ea;color:#0e1f08;text-decoration:none;padding:14px 22px 14px 16px;border-radius:14px;font-family:'Inter',sans-serif;transition:transform .2s,box-shadow .2s;}
 .app-cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35);}
@@ -587,7 +587,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .app-not{font-size:var(--t-small);color:rgba(240,230,210,.5);margin-top:14px;max-width:52ch;line-height:var(--lh-body);}
 .app-not b{color:rgba(240,230,210,.8);font-weight:600;}
 .app-gorsel{display:flex;justify-content:center;}
-.app-tel{width:min(300px,100%);aspect-ratio:9/19;border-radius:38px;background:linear-gradient(160deg,#2c4a1e 0%,#1a3310 55%,#0b1a07 100%);border:6px solid #1c2416;box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.06);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.app-tel{width:min(300px,100%);aspect-ratio:9/19;border-radius:38px;background:linear-gradient(160deg,var(--c-mocha) 0%,var(--c-coffee) 55%,var(--c-espresso) 100%);border:6px solid #1c2416;box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.06);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
 .app-tel::before{content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);width:96px;height:26px;background:#1c2416;border-radius:16px;}
 .app-tel .kaktus{font-size:74px;line-height:1;filter:drop-shadow(0 10px 20px rgba(0,0,0,.4));animation:appZipla 2.4s ease-in-out infinite;}
 @keyframes appZipla{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
@@ -689,7 +689,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 .oncu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1100px;margin:0 auto;}
 .oncu-card{text-decoration:none;background:#fff;border:1px solid #eee;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s,border-color .3s;}
 .oncu-card:hover{transform:translateY(-8px);box-shadow:0 24px 48px -20px rgba(0,0,0,.25);border-color:var(--gold);}
-.oncu-img{aspect-ratio:1;overflow:hidden;background:#f0ece4;}
+.oncu-img{aspect-ratio:1;overflow:hidden;background:var(--c-latte);}
 .oncu-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1);}
 .oncu-card:hover .oncu-img img{transform:scale(1.07);}
 .oncu-body{padding:18px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
@@ -748,20 +748,20 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <!-- === INSTAGRAM === -->
 <section class="ig-section">
   <div style="text-align:center;margin-bottom:60px;" class="fade-up">
-    <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#8a6b2f;margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
+    <p style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--c-altin-ink);margin-bottom:16px;font-family:'Inter',sans-serif;">Instagram</p>
     <h2 style="font-family:'Fraunces',serif;font-size:clamp(36px,4vw,52px);font-weight:300;letter-spacing:2px;">Bizi <em style="font-style:italic;">Takip Edin</em></h2>
-    <div style="width:60px;height:1px;background:#c8a86a;margin:20px auto 0;"></div>
+    <div style="width:60px;height:1px;background:var(--c-altin);margin:20px auto 0;"></div>
   </div>
   <div class="ig-grid">
     <a class="ig-card ig-center fade-up fade-up-d1" href="https://www.instagram.com/cactuscafe.tr" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-      <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Cactus Coffee</p>
-      <p style="font-size:13px;color:#6f6f6f;letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.tr</p>
+      <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:var(--c-ink);margin-bottom:8px;letter-spacing:1px;">Cactus Coffee</p>
+      <p style="font-size:13px;color:var(--c-govde-ink);letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.tr</p>
     </a>
     <a class="ig-card fade-up fade-up-d2" href="https://www.instagram.com/cactuscafe.waffle" target="_blank" rel="noopener">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8a86a" stroke-width="1.3" style="margin-bottom:20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-      <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:1px;">Waffle</p>
-      <p style="font-size:13px;color:#6f6f6f;letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.waffle</p>
+      <p style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:var(--c-ink);margin-bottom:8px;letter-spacing:1px;">Waffle</p>
+      <p style="font-size:13px;color:var(--c-govde-ink);letter-spacing:.14em;font-family:'Inter',sans-serif;">@cactuscafe.waffle</p>
     </a>
   </div>
 </section>
@@ -773,7 +773,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <p class="about-eyebrow fade-up" style="color:#e8a87a;">Kariyer</p>
     <h2 class="about-title fade-up fade-up-d1" style="color:#f7f2ea;">Ekibimize <em>Katıl</em></h2>
     <p class="about-text fade-up fade-up-d2" style="color:rgba(240,225,195,.65);">Cactus Coffee olarak enerjik, güler yüzlü ve işine tutkuyla bağlı insanları arıyoruz. Barista, servis veya mutfak ekibimizde yer almak istiyorsan başvurunu bırak.</p>
-    <a href="iletisim.html#basvuru" class="about-btn fade-up fade-up-d3" style="background:#c8a86a;color:#2a0808;">Hemen Başvur</a>
+    <a href="iletisim.html#basvuru" class="about-btn fade-up fade-up-d3" style="background:var(--c-altin);color:#2a0808;">Hemen Başvur</a>
     <div class="kariyer-puan fade-up fade-up-d4">
       <a class="gpuan" href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener">
         <span class="gpuan-skor" data-ayar="puan-podyum">4.5</span>
@@ -797,7 +797,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <!-- Marka -->
     <div>
       <div style="font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:7px;text-transform:uppercase;margin-bottom:10px;">CACTUS</div>
-      <div style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8a86a;margin-bottom:22px;font-family:'Inter',sans-serif;">COFFEE · SNACK · DESSERT</div>
+      <div style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--c-altin);margin-bottom:22px;font-family:'Inter',sans-serif;">COFFEE · SNACK · DESSERT</div>
       <p style="font-size: 12px; line-height: 2; color: rgb(143, 143, 143); font-weight: 300; margin-bottom: 28px; position: relative;">Her yudumda bir hikaye.<br>Bursa'nın kalbinde, Podyumpark'ta.</p>
     </div>
 
@@ -807,10 +807,10 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
       <p style="font-size: 12px; color: rgb(143, 143, 143); line-height: 1.9; font-weight: 300; margin-bottom: 14px; position: relative;">Podyumpark AVM<br>Nilüfer, Bursa</p>
       <p style="font-size: 12px; color: rgb(143, 143, 143); line-height: 1.9; font-weight: 300; margin-bottom: 20px; position: relative;" data-ayar="saat-podyum">Hafta içi 16:00 – 01:00<br>Hafta sonu 14:00 – 02:00</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="tel:+905380146600" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#8f8f8f'" data-ayar="tel">0538 014 66 00</a>
-        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#8f8f8f'">Google Maps'te Gör</a>
-        <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#8f8f8f'">Yorum Yaz</a>
-        <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#c8a86a'" onmouseout="this.style.color='#8f8f8f'">@cactuscafe.tr</a>
+        <a href="tel:+905380146600" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='var(--c-altin)'" onmouseout="this.style.color='#8f8f8f'" data-ayar="tel">0538 014 66 00</a>
+        <a href="https://share.google/EkVqq0ZsMokrMi3UF" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='var(--c-altin)'" onmouseout="this.style.color='#8f8f8f'">Google Maps'te Gör</a>
+        <a href="https://g.page/r/Cco614k_cN7ZEAE/review" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='var(--c-altin)'" onmouseout="this.style.color='#8f8f8f'">Yorum Yaz</a>
+        <a href="https://instagram.com/cactuscafe.tr" target="_blank" rel="noopener" style="font-size: 11px; color: rgb(143, 143, 143); text-decoration: none; font-family: Inter, sans-serif; transition: color 0.2s;" onmouseover="this.style.color='var(--c-altin)'" onmouseout="this.style.color='#8f8f8f'">@cactuscafe.tr</a>
       </div>
     </div>
 
@@ -885,9 +885,9 @@ function toggleMainNav(){
 <!-- ── SAYFA GEÇİŞİ ── -->
 <div id="pt-veil"><span id="pt-word">CACTUS</span></div>
 <style>
-#pt-veil{position:fixed;inset:0;z-index:99999;background:#0b1a07;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .55s cubic-bezier(.4,0,.2,1);}
+#pt-veil{position:fixed;inset:0;z-index:99999;background:var(--c-espresso);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .55s cubic-bezier(.4,0,.2,1);}
 #pt-veil.pt-out{opacity:0;pointer-events:none;}
-#pt-word{font-family:'Fraunces',serif;font-size:30px;letter-spacing:14px;color:#c8a86a;text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
+#pt-word{font-family:'Fraunces',serif;font-size:30px;letter-spacing:14px;color:var(--c-altin);text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
 #pt-veil.pt-out #pt-word{opacity:0;transform:scale(.94);}
 </style>
 <script>
@@ -1042,7 +1042,7 @@ function toggleMainNav(){
 <!-- ════════ MOBİL ANİMASYONLAR ════════ -->
 <style>
 /* 1. SCROLL PROGRESS BAR */
-#scroll-prog{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,#c8a86a 0%,#f0d890 60%,#c8a86a 100%);z-index:99999;pointer-events:none;will-change:width;}
+#scroll-prog{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--c-altin) 0%,#f0d890 60%,var(--c-altin) 100%);z-index:99999;pointer-events:none;will-change:width;}
 
 /* 2. MOBİL NAV SLİDE ANİMASYON */
 @media(max-width:768px){

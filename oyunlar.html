@@ -39,24 +39,24 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 
 /* ── NAV (kart.html ile aynı) ── */
 #mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
-#mainNav a.logo{text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:#1a1a1a;text-transform:uppercase;}
+#mainNav a.logo{text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:var(--c-ink);text-transform:uppercase;}
 .nav-links{display:flex;gap:32px;align-items:center;}
-.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;font-weight:400;transition:color .2s;}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;font-weight:400;transition:color .2s;}
 .nav-links a:hover{color:var(--amber-ink);}
 .nav-links a.aktif{color:var(--amber-ink);}
 .nav-links a.nav-cta{background:var(--amber-ink);color:#fff;padding:9px 18px;font-weight:600;}
 .nav-links a.nav-cta:hover{background:var(--amber-ink2);color:#fff;}
 #mainBurger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
-#mainBurger span{width:24px;height:1.5px;background:#1a1a1a;display:block;transition:all .3s;}
+#mainBurger span{width:24px;height:1.5px;background:var(--c-ink);display:block;transition:all .3s;}
 #mainMobMenu{display:none;position:fixed;inset:0;background:rgba(255,255,255,.99);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
-#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#1a1a1a;font-family:'Inter',sans-serif;transition:color .2s;}
+#mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;transition:color .2s;}
 #mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber-ink);}
 #mainMobMenu a.nav-cta{background:var(--amber-ink);color:#fff;padding:14px 36px;font-weight:700;}
 @media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
 
 /* ── SAYFA ── */
 .sayfa-wrap{position:relative;min-height:100vh;padding:120px 24px 60px;overflow:hidden;}
-.sayfa-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,rgba(44,74,30,.6) 0%,transparent 55%),radial-gradient(ellipse at 15% 75%,rgba(26,51,16,.5) 0%,transparent 50%),linear-gradient(160deg,#2c4a1e 0%,#1a3310 45%,#0b1a07 100%);}
+.sayfa-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 30%,rgba(44,74,30,.6) 0%,transparent 55%),radial-gradient(ellipse at 15% 75%,rgba(26,51,16,.5) 0%,transparent 50%),linear-gradient(160deg,var(--c-mocha) 0%,var(--c-coffee) 45%,var(--c-espresso) 100%);}
 .sayfa-bg::before{content:'';position:absolute;top:10%;right:8%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.09),transparent 70%);pointer-events:none;}
 .sayfa-ic{position:relative;z-index:1;max-width:760px;margin:0 auto;}
 
@@ -107,7 +107,7 @@ h1 em{font-style:italic;color:var(--amber);}
 .as-serit:hover{background:rgba(255,255,255,.08);border-color:rgba(232,196,122,.85);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.32);}
 .as-ikon{
   width:62px;height:62px;flex:none;border-radius:15px;
-  background:linear-gradient(150deg,#3d6b2a,#1a3310);
+  background:linear-gradient(150deg,#3d6b2a,var(--c-coffee));
   border:1px solid rgba(232,160,48,.28);
   display:flex;align-items:center;justify-content:center;font-size:33px;
 }

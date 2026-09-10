@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CACTUS — RENK PALETİ
+
+   tipografi.css gibi: YALNIZCA :root token'ları, tek bir seçici yok.
+
+   Neden yeni isimler (--c-* öneki), sayfalardaki mevcut isimler değil:
+   aynı isim sayfadan sayfaya FARKLI şey demek. Denetimde çıkanlar —
+
+     --gold   → #c8a86a (index) · #b8965a (style.css, qr-menu) · #2d5a27 YEŞİL (menu-podyum)
+     --ink    → #0a0a0a (style.css) · #eef0f4 AÇIK (hoopcoach)
+     --accent → #1a1a1a (style.css) · #e8a03a (hoopcoach)
+     --dark, --mist, --paper, --stone, --border → her biri 2-4 farklı değer
+
+   Bu isimleri ortak katmana taşımak sayfaları sessizce bozardı. Onun
+   yerine burada değere göre adlandırılmış tek bir kaynak var; sayfalar
+   kendi yerel isimlerini buna BAĞLIYOR (--gold:var(--c-altin) gibi).
+   Kullanım yerleri değişmiyor, yalnızca hex tek yerde tanımlanıyor.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  /* ── Altın ailesi ──
+     --c-altin DEKORATİF: çizgi, kenarlık, koyu zeminde metin.
+     Açık zeminde metin/buton için --c-altin-ink kullan; #c8a86a beyaz
+     üzerinde 2.3:1 ile WCAG AA'yı geçemiyor. */
+  --c-altin:#c8a86a;
+  --c-altin-orta:#b8965a;
+  --c-altin-derin:#a07840;
+  --c-altin-ink:#8a6b2f;      /* beyaz üzerinde 4.97:1 — metin/buton */
+  --c-altin-ink2:#6f5526;     /* hover, 6.99:1 */
+
+  /* ── Yeşil ailesi (marka) ── */
+  --c-espresso:#0b1a07;
+  --c-coffee:#1a3310;
+  --c-mocha:#2c4a1e;
+  --c-yesil:#2d5a27;
+
+  /* ── Nötrler ── */
+  --c-ink:#1a1a1a;
+  --c-ink-derin:#0a0a0a;
+  --c-kagit:#f8f6f2;
+  --c-latte:#f0ece4;
+  --c-krem:#f7f4ef;
+  --c-etiket-ink:#6b675f;     /* açık zeminde etiket metni, 5.2:1 */
+  --c-govde-ink:#6f6f6f;      /* açık zeminde ikincil metin, 5.0:1 */
+
+  /* ── Durum ──
+     Rozetlerin AÇIK hali kapalıdan daha düşük kontrastlıydı; ikisi de
+     açık zeminde AA geçecek şekilde koyulaştırıldı. */
+  --c-acik:#14663a;
+  --c-kapali:#8f3434;
+}

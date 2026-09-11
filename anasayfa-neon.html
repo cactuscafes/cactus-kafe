@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cactus Coffee — Yeni Anasayfa (Önizleme)</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1408">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="foto-hero-podyum2.jpg" fetchpriority="high" media="(min-width:769px)">
+<link rel="preload" as="image" href="foto-hero-podyum-mobil2.jpg" fetchpriority="high" media="(max-width:768px)">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#c8a86a;          /* marka altını */
+  --gold-hi:#f0dcae;       /* neon içi parlak ton */
+  --ink:#0b1408;           /* en koyu yeşil-siyah */
+  --ink-2:#121d0d;         /* bölüm arkası */
+  --cream:#f7f2ea;
+  --muted:rgba(247,242,234,.62);
+  --line:rgba(200,168,106,.22);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+
+/* ══ Üst altın hairline (referanstaki ince turuncu çizgi) ══ */
+.topline{position:fixed;top:0;left:0;right:0;height:2px;z-index:1200;
+  background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold-hi) 50%,var(--gold) 80%,transparent);
+  box-shadow:0 0 12px rgba(200,168,106,.7);}
+
+/* ══ NAV ══ */
+nav{position:fixed;top:2px;left:0;right:0;z-index:1000;padding:18px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background .35s ease,padding .35s ease,border-color .35s ease,backdrop-filter .35s ease;}
+nav.scrolled{background:rgba(11,20,8,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line);padding:12px 48px;}
+.nav-logo img{height:34px;width:auto;}
+.nav-links{display:flex;gap:34px;align-items:center;}
+.nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--cream);font-weight:400;opacity:.85;transition:color .25s,opacity .25s;position:relative;}
+.nav-links a:hover{color:var(--gold);opacity:1;}
+.nav-cta{background:var(--gold);color:#12200c!important;padding:10px 20px;font-weight:600;opacity:1!important;
+  transition:box-shadow .3s,transform .3s;}
+.nav-cta:hover{box-shadow:0 0 24px rgba(200,168,106,.55);transform:translateY(-1px);}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.burger span{width:26px;height:1.5px;background:var(--cream);display:block;transition:all .3s;}
+#mobMenu{display:none;position:fixed;inset:0;z-index:999;background:rgba(11,20,8,.98);
+  flex-direction:column;align-items:center;justify-content:center;gap:30px;}
+#mobMenu a{text-decoration:none;font-size:14px;letter-spacing:5px;text-transform:uppercase;color:var(--cream);}
+
+/* ══ HERO ══ */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;text-align:center;padding:120px 20px 90px;}
+.hero-bg{position:absolute;inset:0;z-index:0;}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center 35%;
+  filter:saturate(.55) brightness(.42) contrast(1.12);transform:scale(1.06);}
+/* koyulaştırma + marka yeşili tonu */
+.hero-bg::after{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 50% 45%,rgba(11,20,8,.15) 0%,rgba(11,20,8,.72) 55%,rgba(11,20,8,.96) 100%),
+    linear-gradient(180deg,rgba(11,20,8,.85) 0%,rgba(11,20,8,.35) 35%,rgba(11,20,8,.92) 100%);}
+/* film grain */
+.grain{position:absolute;inset:-50%;z-index:1;opacity:.05;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  animation:grainmove 1.2s steps(3) infinite;}
+@keyframes grainmove{0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-3%)}100%{transform:translate(0,0)}}
+
+/* ışık çizgileri (referanstaki yazının içinden geçen streak'ler) */
+.streaks{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+.streak{position:absolute;left:-40%;width:180%;height:2px;transform:skewY(-8deg);
+  background:linear-gradient(90deg,transparent,rgba(200,168,106,0) 15%,var(--gold-hi) 50%,rgba(200,168,106,0) 85%,transparent);
+  box-shadow:0 0 18px rgba(200,168,106,.85);opacity:0;animation:sweep 7s ease-in-out infinite;}
+.streak.s1{top:38%;animation-delay:.4s;}
+.streak.s2{top:52%;height:1px;animation-delay:2.6s;animation-duration:8s;opacity:.7;}
+.streak.s3{top:61%;height:3px;animation-delay:4.8s;animation-duration:9s;transform:skewY(6deg);}
+@keyframes sweep{
+  0%{transform:translateX(-60%) skewY(-8deg);opacity:0;}
+  8%{opacity:1;}
+  40%{opacity:.9;}
+  60%{transform:translateX(60%) skewY(-8deg);opacity:0;}
+  100%{transform:translateX(60%) skewY(-8deg);opacity:0;}
+}
+
+.hero-inner{position:relative;z-index:3;max-width:1000px;}
+.hero-kicker{font-size:10px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);
+  margin-bottom:26px;font-weight:500;opacity:0;animation:rise .9s .2s ease forwards;}
+.hero-kicker span{display:inline-block;width:34px;height:1px;background:var(--gold);
+  vertical-align:middle;margin:0 14px;opacity:.6;}
+
+/* ── NEON BAŞLIK — metni değiştirmek için sadece bu iki satırı düzenle ── */
+.neon{font-family:'Fraunces',serif;font-weight:600;line-height:.92;letter-spacing:1px;
+  font-size:clamp(44px,10.5vw,138px);text-transform:uppercase;color:var(--gold-hi);
+  margin-bottom:10px;opacity:0;animation:rise 1s .35s ease forwards;}
+.neon .l2{display:block;font-style:italic;color:var(--cream);}
+.neon{
+  text-shadow:
+    0 0 3px rgba(255,244,220,.95),
+    0 0 10px rgba(240,220,174,.75),
+    0 0 26px rgba(200,168,106,.7),
+    0 0 58px rgba(200,168,106,.45),
+    0 0 110px rgba(160,120,50,.35);
+  animation:rise 1s .35s ease forwards, flicker 6s 1.6s infinite;
+}
+@keyframes flicker{
+  0%,100%{filter:brightness(1);}
+  48%{filter:brightness(1);}
+  49%{filter:brightness(.72);}
+  50%{filter:brightness(1.12);}
+  51%{filter:brightness(.8);}
+  52%{filter:brightness(1);}
+  86%{filter:brightness(1);}
+  87%{filter:brightness(.85);}
+  88%{filter:brightness(1);}
+}
+.hero-sub{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);
+  margin:26px 0 44px;font-weight:300;opacity:0;animation:rise .9s .6s ease forwards;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:rise .9s .8s ease forwards;}
+.btn{display:inline-block;padding:17px 38px;text-decoration:none;font-size:10.5px;letter-spacing:3.5px;
+  text-transform:uppercase;font-weight:600;transition:all .3s;white-space:nowrap;}
+.btn-fill{background:var(--gold);color:#12200c;box-shadow:0 0 0 rgba(200,168,106,0);}
+.btn-fill:hover{box-shadow:0 0 34px rgba(200,168,106,.6);transform:translateY(-2px);}
+.btn-ghost{border:1px solid rgba(247,242,234,.35);color:var(--cream);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,168,106,.08);}
+@keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+
+.scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(247,242,234,.45);}
+.scroll-cue i{width:1px;height:46px;background:linear-gradient(180deg,transparent,var(--gold));
+  animation:cue 2s ease-in-out infinite;}
+@keyframes cue{0%,100%{opacity:.3;transform:scaleY(.6);transform-origin:top;}50%{opacity:1;transform:scaleY(1);}}
+
+/* ══ ORTAK BÖLÜM ══ */
+section.blk{padding:110px 48px;position:relative;}
+.wrap{max-width:1160px;margin:0 auto;}
+.eyebrow{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;font-weight:500;}
+h2.tit{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(30px,4.4vw,52px);line-height:1.08;margin-bottom:18px;}
+h2.tit em{font-style:italic;color:var(--gold);}
+p.lead{color:var(--muted);font-size:15px;line-height:1.85;font-weight:300;max-width:560px;}
+
+/* scroll reveal */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .9s cubic-bezier(.2,.7,.3,1),transform .9s cubic-bezier(.2,.7,.3,1);}
+.rv.in{opacity:1;transform:none;}
+
+/* ── öne çıkanlar ── */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px;}
+.card{position:relative;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--line);background:var(--ink-2);}
+.card img{width:100%;height:100%;object-fit:cover;filter:brightness(.68) saturate(.85);
+  transition:transform .9s cubic-bezier(.2,.7,.3,1),filter .6s;}
+.card:hover img{transform:scale(1.07);filter:brightness(.85) saturate(1);}
+.card-txt{position:absolute;left:0;right:0;bottom:0;padding:28px;
+  background:linear-gradient(180deg,transparent,rgba(11,20,8,.92));}
+.card-txt h3{font-family:'Fraunces',serif;font-weight:500;font-size:22px;margin-bottom:6px;}
+.card-txt p{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);}
+
+/* ── sadakat ── */
+.loyal{background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.loyal-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;}
+.stamps{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin:32px 0 22px;max-width:340px;}
+.stamp{aspect-ratio:1;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:rgba(247,242,234,.25);transition:all .45s;}
+.stamp.on{border-color:var(--gold);color:var(--gold);background:rgba(200,168,106,.1);
+  box-shadow:0 0 18px rgba(200,168,106,.35);}
+.loyal-card{border:1px solid var(--line);padding:34px;background:
+  linear-gradient(135deg,rgba(200,168,106,.09),rgba(11,20,8,0));position:relative;overflow:hidden;}
+.loyal-card::after{content:'';position:absolute;top:-60%;left:-30%;width:60%;height:220%;transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:shine 5.5s ease-in-out infinite;}
+@keyframes shine{0%{left:-40%}55%{left:120%}100%{left:120%}}
+
+/* ── şubeler ── */
+.branches{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:52px;}
+.branch{border:1px solid var(--line);padding:34px;transition:border-color .4s,background .4s;}
+.branch:hover{border-color:var(--gold);background:rgba(200,168,106,.05);}
+.branch h3{font-family:'Fraunces',serif;font-size:26px;font-weight:500;margin-bottom:10px;}
+.branch .meta{font-size:13px;color:var(--muted);line-height:1.9;font-weight:300;}
+.branch .meta b{color:var(--cream);font-weight:500;}
+.branch a.go{display:inline-block;margin-top:18px;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:4px;}
+
+/* ── footer ── */
+footer{padding:64px 48px;border-top:1px solid var(--line);text-align:center;}
+footer img{height:40px;margin:0 auto 22px;opacity:.9;}
+footer p{font-size:11px;letter-spacing:1.5px;color:rgba(247,242,234,.4);}
+.f-links{display:flex;gap:26px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;}
+.f-links a{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+.f-links a:hover{color:var(--gold);}
+
+/* ══ MOBİL ══ */
+@media(max-width:900px){
+  .cards{grid-template-columns:1fr;}
+  .loyal-grid,.branches{grid-template-columns:1fr;gap:40px;}
+}
+@media(max-width:768px){
+  nav,nav.scrolled{padding:14px 20px;}
+  .nav-links{display:none;}
+  .burger{display:flex;}
+  section.blk{padding:80px 20px;}
+  footer{padding:50px 20px;}
+  .hero{padding:110px 18px 80px;}
+  .hero-btns{flex-direction:column;width:100%;max-width:290px;margin:0 auto;}
+  .btn{padding:15px 26px;}
+  .hero-kicker{letter-spacing:4px;font-size:9px;}
+  .hero-sub{letter-spacing:3.5px;font-size:10px;}
+}
+/* JS kapaliysa icerik gizli kalmasin */
+.nojs .rv{opacity:1!important;transform:none!important;}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+  .rv{opacity:1;transform:none;}
+  .hero-kicker,.neon,.hero-sub,.hero-btns{opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<div class="topline"></div>
+
+<nav id="nav">
+  <a class="nav-logo" href="index.html" aria-label="Cactus Coffee"><img src="logo-light.png" alt="Cactus Coffee"></a>
+  <div class="nav-links">
+    <a href="#lezzet">Lezzetler</a>
+    <a href="menu-podyum.html">Menü</a>
+    <a href="#sadakat">Sadakat</a>
+    <a href="#subeler">Şubeler</a>
+    <a href="oyunlar.html">Oyun</a>
+    <a class="nav-cta" href="menu-podyum.html">Menüyü Aç</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+</nav>
+<div id="mobMenu">
+  <a href="#lezzet">Lezzetler</a>
+  <a href="menu-podyum.html">Menü</a>
+  <a href="#sadakat">Sadakat</a>
+  <a href="#subeler">Şubeler</a>
+  <a href="oyunlar.html">Oyun</a>
+  <a href="kart.html" style="color:var(--gold)">🎖 Sadakat Kartı</a>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="hero-bg">
+    <picture>
+      <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
+      <img src="foto-hero-podyum2.jpg" alt="Cactus Coffee Podyumpark" fetchpriority="high">
+    </picture>
+  </div>
+  <div class="grain"></div>
+  <div class="streaks"><i class="streak s1"></i><i class="streak s2"></i><i class="streak s3"></i></div>
+
+  <div class="hero-inner">
+    <p class="hero-kicker">Podyumpark<span></span>Bursa</p>
+    <!-- BAŞLIK: iki satır. Değiştirmek istersen sadece aşağıdaki iki metni düzenle -->
+    <h1 class="neon">Gününü<span class="l2">Tazele</span></h1>
+    <p class="hero-sub">Coffee · Snack &amp; Dessert — Her yudumda bir hikâye</p>
+    <div class="hero-btns">
+      <a class="btn btn-fill" href="menu-podyum.html">Menüyü Gör</a>
+      <a class="btn btn-ghost" href="tel:+905380146600" data-ayar="tel">0538 014 66 00</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue"><i></i>Kaydır</div>
+</header>
+
+<!-- ══════════ ÖNE ÇIKANLAR ══════════ -->
+<section class="blk" id="lezzet">
+  <div class="wrap">
+    <div class="rv">
+      <p class="eyebrow">Öne Çıkanlar</p>
+      <h2 class="tit">Fırından, ocaktan, <em>taze</em>.</h2>
+      <p class="lead">Menünün en çok sevilenleri. Hepsi günlük hazırlanır, hiçbiri beklemez.</p>
+    </div>
+    <div class="cards">
+      <a class="card rv" href="menu-podyum.html">
+        <img src="foto-podyum-waffle.jpg" alt="Waffle">
+        <div class="card-txt"><h3>Podyum Waffle</h3><p>Tatlı</p></div>
+      </a>
+      <a class="card rv" href="menu-podyum.html">
+        <img src="foto-waffle-kase.jpg" alt="Waffle kâse">
+        <div class="card-txt"><h3>Kâse Waffle</h3><p>Meyveli</p></div>
+      </a>
+      <a class="card rv" href="menu-podyum.html">
+        <img src="foto-podyum-park-dikey.jpg" alt="Cactus Podyumpark">
+        <div class="card-txt"><h3>Bahçe Keyfi</h3><p>Podyumpark</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SADAKAT ══════════ -->
+<section class="blk loyal" id="sadakat">
+  <div class="wrap loyal-grid">
+    <div class="rv">
+      <p class="eyebrow">Dijital Sadakat Kartı</p>
+      <h2 class="tit">7 kahve içtin, <em>8.'si bizden</em>.</h2>
+      <p class="lead">Kart taşımak yok, uygulama indirmek yok. Kasada telefonundaki QR'ı okut, damgan anında düşsün.</p>
+      <div class="stamps" id="stamps"></div>
+      <a class="btn btn-fill" href="kart.html" style="margin-top:12px">Kartımı Aç</a>
+    </div>
+    <div class="loyal-card rv">
+      <p class="eyebrow" style="margin-bottom:10px">Cactus Coffee</p>
+      <h3 style="font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:3px;margin-bottom:8px;">SADAKAT KARTI</h3>
+      <p style="font-size:12px;color:var(--muted);line-height:1.8;">Her 7 içecekte 1 bedava.<br>Podyumpark &amp; FSM şubelerinde geçerli.</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:34px;">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:300;"><span id="sayac">0</span>/7</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--gold);">BEDAVA HAKKI: <span id="hak">0</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ŞUBELER ══════════ -->
+<section class="blk" id="subeler">
+  <div class="wrap">
+    <div class="rv">
+      <p class="eyebrow">Şubeler</p>
+      <h2 class="tit">Bursa'da <em>iki</em> nokta.</h2>
+    </div>
+    <div class="branches">
+      <div class="branch rv">
+        <h3>Podyumpark</h3>
+        <p class="meta">Nilüfer, Bursa<br><b data-ayar="saat-podyum">Her gün <b>11:00 – 00:00</b></b></p>
+        <a class="go" href="menu-podyum.html">Menüyü Gör →</a>
+      </div>
+      <div class="branch rv">
+        <h3>FSM</h3>
+        <p class="meta">Nilüfer, Bursa<br><b data-ayar="saat-fsm">Her gün <b>08:00 – 23:00</b></b></p>
+        <a class="go" href="menu.html">Menüyü Gör →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <img src="logo-light.png" alt="Cactus Coffee">
+  <div class="f-links">
+    <a href="menu-podyum.html">Menü</a>
+    <a href="iletisim.html">İletişim</a>
+    <a href="kart.html">Sadakat</a>
+    <a href="oyunlar.html">Oyunlar</a>
+    <a href="iletisim.html#basvuru">İş Başvurusu</a>
+    <a href="gizlilik.html">Gizlilik</a>
+  </div>
+  <p>© <span id="yil">2026</span> Cactus Coffee · Bursa, Türkiye</p>
+</footer>
+
+<noscript><style>.rv{opacity:1!important;transform:none!important;}</style></noscript>
+<script>
+/* nav scroll durumu */
+var nav=document.getElementById('nav');
+addEventListener('scroll',function(){nav.classList.toggle('scrolled',scrollY>40);},{passive:true});
+
+/* mobil menü */
+var mob=document.getElementById('mobMenu');
+document.getElementById('burger').onclick=function(){
+  var open=mob.style.display==='flex';
+  mob.style.display=open?'none':'flex';
+  document.body.style.overflow=open?'':'hidden';
+};
+mob.querySelectorAll('a').forEach(function(a){a.onclick=function(){mob.style.display='none';document.body.style.overflow='';};});
+
+/* scroll reveal */
+if(!('IntersectionObserver' in window)){document.documentElement.classList.add('nojs');}
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{threshold:.14,rootMargin:'0px 0px -60px'});
+document.querySelectorAll('.rv').forEach(function(el,i){el.style.transitionDelay=(i%3)*90+'ms';io.observe(el);});
+
+/* sadakat damgaları — görünür olunca tek tek dolsun */
+var grid=document.getElementById('stamps');
+for(var i=0;i<7;i++){var d=document.createElement('div');d.className='stamp';d.textContent='☕';grid.appendChild(d);}
+var doldu=false;
+new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting||doldu)return; doldu=true;
+    var n=0;
+    var t=setInterval(function(){
+      grid.children[n].classList.add('on');
+      document.getElementById('sayac').textContent=++n;
+      if(n>=7){clearInterval(t);document.getElementById('hak').textContent='1';}
+    },260);
+  });
+},{threshold:.5}).observe(grid);
+
+document.getElementById('yil').textContent=new Date().getFullYear();
+</script>
+<script src="site-ayarlar.js" defer></script>
+</body></html>

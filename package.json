@@ -6,12 +6,18 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "d1:yedek": "wrangler d1 export cactus-adisyon-events --remote --output d1-yedek-$(date -u +%Y-%m-%d).sql --skip-confirmation"
+    "d1:yedek": "wrangler d1 export cactus-adisyon-events --remote --output d1-yedek-$(date -u +%Y-%m-%d).sql --skip-confirmation",
+    "admin:onizle": "node test/admin-onizleme.js"
   },
-  "keywords": ["cafe", "menu", "ordering"],
+  "keywords": [
+    "cafe",
+    "menu",
+    "ordering"
+  ],
   "author": "Cactus Cafe",
   "license": "MIT",
   "devDependencies": {
-    "wrangler": "^4.107.0"
+    "wrangler": "^4.107.0",
+    "playwright": "^1.49.1"
   }
 }

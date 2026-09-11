@@ -194,6 +194,36 @@ yanlış hizalanmış bir diff'e güvenme.
 gösterdi. Sebep: `.page-hero` markup'ta **hiç kullanılmıyordu**. Gerçek boşluk
 inline stildeydi. Ölçüm olmasaydı ölü kuralı düzeltip geçecektim.
 
+### Kimlik kapısının arkasını görmek
+
+`admin.html` denetimi uzun süre "0 sorun" gösterdi — ama ölçülecek bir şey yoktu:
+panel kimlik doğrulamadan sonra JS ile kuruluyor ve verisini Worker API'sinden
+çekiyor. Giriş gizlendiğinde bile **görünür 1 öge, metin taşıyan 0** kalıyordu.
+"Temiz" değil, "görülemedi".
+
+`test/admin-onizleme.js` bunu çözer — **üretim koduna dokunmadan**:
+
+```bash
+npm i -D playwright
+python3 -m http.server 8788 &
+npm run admin:onizle -- --shot panel.png
+```
+
+Yöntem: `localStorage`'a sahte token konur (giriş katmanı hiç görünmez) ve API
+istekleri Playwright'ın `route` yakalamasıyla sahte JSON'a yönlendirilir. Parola
+ne bilinir ne gerekir; `admin.html`'e test bayrağı veya arka kapı **eklenmez**.
+
+Sonuç: 1 görünür öge → **90**, ölçülebilir metin 0 → **40**. Ve panel temiz
+değilmiş: 15 AA-altı öge çıktı.
+
+İki tuzak, ikisi de ilk koşuda görüldü:
+- **Bilinmeyen uç noktaya obje dönmek.** Liste bekleyen yerler
+  `(r[0]||[]).filter is not a function` ile render'ı yarıda kesiyordu. Varsayılan
+  yanıt boş **dizi** olmalı.
+- **`fullPage: true`.** Bu sayfada `position:fixed` kapsayıcılarla bomboş kare
+  üretti — 90 görünür öge varken. Viewport ekran görüntüsü doğru sonucu verdi.
+  Ekran görüntüsünü almak yetmez, **bakmak** gerekir.
+
 ### Bağlamı konumla belirle, tahminle değil
 
 Hex'in öncesindeki 90 karaktere regex uygulayan sınıflandırıcı 189 hex'in 147'sini

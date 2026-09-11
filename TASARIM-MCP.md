@@ -3,6 +3,10 @@
 Bu doküman `cactuscafes.com` sitesini üç MCP sunucusuyla adım adım güzelleştirmek için
 hazırlandı. Config dosyası repoda: **`.mcp.json`**. Anahtarlar: **`.env`** (git'e girmez).
 
+> Sitenin **tasarım sistemi** (token katmanları, erişilebilirlik kuralları, doğrulama
+> yöntemi) ayrı dosyada: [`TASARIM-SISTEMI.md`](TASARIM-SISTEMI.md). Üretilen tasarımı
+> koda çevirirken oradaki token'ları kullan.
+
 ---
 
 ## 1. Üç araç, üç ayrı iş
@@ -83,11 +87,14 @@ claude plugin marketplace add 21st-dev/magic-mcp
 Kurulumdan sonra insanların takıldığı yer burası:
 
 1. **Bu site vanilla HTML.** 25 kök HTML dosyası, CSS'in tamamı `<style>` içinde inline,
-   build adımı yok, React yok, Tailwind yok (`style.css` ortak stiller, `:root` içinde
-   `--ink / --paper / --stone / --gold` token'ları).
+   build adımı yok, React yok, Tailwind yok.
+   Ortak token katmanları: `tipografi.css`, `renkler.css`, `bosluk.css` — üçü de
+   yalnızca `:root` değişkeni içerir. Yeni kod bunları kullanmalı; ham hex veya
+   rastgele punto yazma. Ayrıntı: [`TASARIM-SISTEMI.md`](TASARIM-SISTEMI.md).
 2. **21st.dev React + Tailwind üretir.** Çıktısını olduğu gibi yapıştıramazsın.
    Doğru kullanım: 21st'i **referans** olarak al, kodu bu sitenin CSS diline çevir.
-   Bunu bana yaptır — "şu bileşeni al, `style.css` token'larıyla vanilla CSS'e çevir" de.
+   Bunu bana yaptır — "şu bileşeni al, `renkler.css`/`tipografi.css` token'larıyla
+   vanilla CSS'e çevir" de.
 3. **Stitch çıktısı da yabancı bir HTML/CSS'tir.** `build_site` ile aldığın kodu doğrudan
    `index.html` üzerine yazma; kompozisyon kararlarını (boşluk ritmi, tipografi ölçeği,
    grid) alıp mevcut markup'a uygula.
@@ -161,21 +168,31 @@ Değişikliği uygula, sonra kontrol et:
 
 ---
 
-## 5. Sayfa sayfa somut plan
+## 5. Sayfa sayfa durum
 
-Öncelik sırasıyla, en yüksek getiri üstte:
+Temel geçiş (erişilebilirlik, düzen hataları, token katmanları) **yapıldı**:
 
-| Sayfa | Şu anki durum | Ne yapılacak | Hangi araç |
-|---|---|---|---|
-| `index.html` | Hero + menü + hakkında + şubeler + IG şeridi | **1. tur yapıldı** — grid/kontrast/ritim düzeltildi. Sırada: hero görseli ve tipografi ölçeği | Stitch → Nano Banana |
-| `menu.html` / `menu-podyum.html` | 161 KB, ürün listesi | Kategori navigasyonu + ürün kartı; ürün görselleri eksik | 21st + Nano Banana |
-| `iletisim.html` | Basit iletişim | Harita/saat/şube kartı düzeni | 21st |
-| `kart.html` | Sadakat kartı | Damga grid'i görsel dil olarak zayıf | Stitch |
-| `oyunlar.html` + `oyun-*.html` | 4 mini oyun | Ortak bir oyun-hub kimliği yok | Stitch |
-| `og-image.html` → `og-image.jpg` | Sosyal paylaşım görseli | Yeniden üret, 1200×630 | Nano Banana |
+| Alan | Durum |
+|---|---|
+| Kontrast (WCAG AA) | Ölçülen tüm açık sayfalarda gerçek AA-altı **yok** |
+| Ölü grid sütunları | `index.html`'de üç yerde düzeltildi |
+| Hero ağırlığı | 474 KB → **148 KB** (AVIF), mobil 278 → 89 KB |
+| Navigasyon emojisi | Krom emojiler temizlendi (oyun/illüstrasyon/veri korundu) |
+| Tipografi ölçeği | 9 sayfada uygulandı; taban 11px, izleme em |
+| Renk paleti | `renkler.css`; 178 ham hex token'a çevrildi |
+| Boşluk ölçeği | `bosluk.css`; nav altı boşluk ölçülen nav yüksekliğine bağlandı |
 
-Hero fotoğrafları (`foto-hero-podyum2.jpg` 486 KB, mobil sürümü 284 KB) ayrıca
-**boyut olarak da** ağır — Nano Banana ile yeniden üretirken 2K yeter, sonra sıkıştır.
+**Tasarım turları bundan sonra başlıyor** — yukarıdakiler hijyen, asıl kompozisyon
+işi değil. MCP araçlarıyla yapılacaklar:
+
+| Sayfa | Ne | Hangi araç |
+|---|---|---|
+| `menu-podyum.html` | Kategori navigasyonu + ürün kartı; ürün görselleri eksik | 21st + Nano Banana |
+| `kart.html` | Damga grid'i görsel dil olarak zayıf | Stitch |
+| `oyunlar.html` + `oyun-*.html` | Ortak bir oyun-hub kimliği yok | Stitch |
+| `iletisim.html` | Harita/saat/şube kartı düzeni | 21st |
+| `og-image.html` → `og-image.jpg` | Yeniden üret, 1200×630 | Nano Banana |
+
 
 ---
 
@@ -215,11 +232,15 @@ Marka tutarlılığı için: Nano Banana'ya `images` parametresiyle mevcut
 Her turdan sonra bunları geçmeden yayına alma:
 
 - [ ] 360px genişlikte yatay kaydırma yok
-- [ ] Hero LCP < 2.5s (preload link'leri yerinde)
-- [ ] Metin/zemin kontrastı ≥ 4.5:1 (altın `#b8965a` beyaz üstünde **yetersiz** — sadece dekoratif kullan)
+- [ ] Hero LCP < 2.5s (preload link'leri `type="image/avif"` ile yerinde)
+- [ ] Kontrast **tarayıcıda ölçüldü** — kaynağa bakarak değil; yarı saydam zeminler
+      alfa kompozitlendi (bkz. TASARIM-SISTEMI.md §6)
+- [ ] Açık zeminde altın metin/buton `--c-altin-ink`, dekoratif olan `--c-altin`
+- [ ] Ham hex veya rastgele punto yazılmadı — token kullanıldı
+- [ ] 11px altı metin yok (maket/baskı istisnaları hariç, bkz. §4)
 - [ ] Fraunces + Inter dışında font yüklenmiyor
 - [ ] `sw.js` `VERSION` sabiti artırıldı
-- [ ] Üretilen görseller sıkıştırıldı (hero < 250 KB hedef)
+- [ ] Üretilen görseller sıkıştırıldı (hero < 250 KB hedef; AVIF tercih)
 - [ ] Menü/fiyat verisi `menu-data.json`'dan geliyor, HTML'e gömülmedi
 
 ---

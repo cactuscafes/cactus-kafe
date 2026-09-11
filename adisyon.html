@@ -109,6 +109,9 @@
   --k1:#0c3d29;--k2:#1a6244;--k3:#2f9163;
   --kr:#f5f3ec;--kr2:#ece7da;--kr3:#d4cab4;
   --al:#d2a544;--al2:#f2cf7c;
+  /* --kr3/--al dekoratif. Metin icin kardesleri: */
+  --kr3-ink:#6f6657;   /* acik zeminde (#f5f3ec) 5.0:1 */
+  --al-acik:#dfb862;   /* koyu yesil zeminde (#284d2e) 5.1:1 */
   --wh:#fcfbf7;
   --bl:#1A3F6F;--bl2:#2A60A8;
   --gr:#1F5C38;--gr2:#2E8A52;
@@ -171,7 +174,7 @@ input,select{font-family:'Inter',sans-serif;}
 }
 .masa-pnl-hdr{padding:10px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,.2);flex-shrink:0;gap:6px;}
 .masa-pnl-hdr span{font-family:'Fraunces',serif;font-size:11px;color:var(--al);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;}
-.masa-pnl-hdr .aktar-btn{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--al);font-weight:700;white-space:nowrap;}
+.masa-pnl-hdr .aktar-btn{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--al-acik);font-weight:700;white-space:nowrap;}
 .toggle-masa-btn{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:4px 7px;font-size:13px;color:var(--al);flex-shrink:0;transition:background .15s;}
 .toggle-masa-btn:hover{background:rgba(201,168,76,.3);}
 .masa-grid{flex:1;overflow-y:auto;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:start;}
@@ -285,7 +288,7 @@ input,select{font-family:'Inter',sans-serif;}
 .adis-act-btn{flex:1;padding:9px 6px;min-height:38px;border-radius:7px;border:1px solid rgba(247,237,216,.3);background:rgba(247,237,216,.1);color:var(--kr);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s;}
 .adis-act-btn:hover{background:rgba(247,237,216,.2);}
 .adis-items{flex:1;overflow-y:auto;padding:10px;}
-.adis-bos{text-align:center;color:var(--kr3);padding:30px 16px;}
+.adis-bos{text-align:center;color:var(--kr3-ink);padding:30px 16px;}
 .adis-bos .bi{font-size:34px;opacity:.4;margin-bottom:8px;}
 .adis-bos p{font-size:12px;line-height:1.6;}
 .aitem{background:#fff;border:1px solid var(--kr2);border-radius:9px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;animation:sld .2s ease;}

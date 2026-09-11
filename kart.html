@@ -24,6 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="renkler.css">
+<link rel="stylesheet" href="bosluk.css">
 <link rel="stylesheet" href="tipografi.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -42,7 +43,7 @@
 body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte);min-height:100vh;overflow-x:hidden;}
 
 /* ── NAV ── */
-#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
+#mainNav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px var(--sp-gutter);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.08);}
 #mainNav a.logo{text-decoration:none;font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:6px;color:var(--c-ink);text-transform:uppercase;}
 .nav-links{display:flex;gap:32px;align-items:center;}
 .nav-links a{text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;font-weight:400;transition:color .2s;}
@@ -56,7 +57,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 #mainMobMenu a{text-decoration:none;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:var(--c-ink);font-family:'Inter',sans-serif;transition:color .2s;}
 #mainMobMenu a:hover,#mainMobMenu a.aktif{color:var(--amber-ink);}
 #mainMobMenu a.nav-cta{background:var(--amber-ink);color:#fff;padding:14px 36px;font-weight:700;}
-@media(max-width:768px){#mainNav{padding:16px 20px!important;}.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
+@media(max-width:768px){.nav-links{display:none!important;}#mainBurger{display:flex!important;}}
 
 /* ── GİRİŞ HERO ── */
 .hero-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:88px 24px 40px;position:relative;overflow:hidden;}
@@ -109,7 +110,7 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .kart-toast.on{transform:translateX(-50%) translateY(0);}
 
 /* ── KART SAYFASI ── */
-.kart-bg{min-height:100vh;background:linear-gradient(160deg,var(--c-mocha) 0%,var(--c-coffee) 45%,var(--c-espresso) 100%);padding:90px 20px 60px;position:relative;overflow:hidden;}
+.kart-bg{min-height:100vh;background:linear-gradient(160deg,var(--c-mocha) 0%,var(--c-coffee) 45%,var(--c-espresso) 100%);padding:var(--sp-nav) 20px 60px;position:relative;overflow:hidden;}
 .kart-bg::before{content:'';position:absolute;top:0;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,106,.07),transparent 65%);pointer-events:none;}
 .kart-wrap{max-width:440px;margin:0 auto;position:relative;z-index:1;}
 

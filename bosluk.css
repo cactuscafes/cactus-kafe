@@ -1,0 +1,36 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CACTUS — BOŞLUK ÖLÇEĞİ
+
+   tipografi.css / renkler.css gibi: yalnızca :root token'ları.
+
+   Tek bir "boşluk" yok; ÜÇ AYRI KAYGI var ve kodda hepsi aynı
+   padding'in içinde karışmıştı:
+
+     1. Bölüm ritmi      → tasarım tercihi
+     2. Sayfa kenar boşluğu → ekran genişliğine bağlı
+     3. Sabit nav'ın altını boşaltma → NAV YÜKSEKLİĞİNE bağlı
+
+   3'ü 1'e katmak cazipti (ikisi de büyük dikey padding) ama yanlış
+   olurdu: nav'a bir satır eklendiğinde bütün bölüm ritmi kayardı.
+   Ayrı token, ayrı sebep.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  /* ── 1. Bölüm ritmi ──
+     İki basamak var çünkü kodda iki ayrı ritim YAŞIYOR: vitrin sayfaları
+     geniş (100-120px), yoğun sayfalar dar (56-72px). Hepsini tek değere
+     zorlamak menüyü gereksiz seyreltirdi. */
+  --sp-section:clamp(72px,9vw,120px);
+  --sp-section-dar:clamp(48px,6vw,72px);
+
+  /* ── 2. Sayfa kenar boşluğu ──
+     Masaüstünde 60px: nav'ın mevcut değeri. Nav ile içerik aynı token'ı
+     kullanınca her genişlikte hizalı kalır. */
+  --sp-gutter:clamp(20px,5vw,60px);
+
+  /* ── 3. Sabit nav altı boşluk ──
+     --sp-nav-yuk ölçülen değer: nav 1440px'te 71-75px, 390px'te 67-71px.
+     Sayfalar bunu 120/130/160px gibi elle yazıyordu; hiçbiri nav
+     yüksekliğini takip etmiyordu ve mobilde de 120px harcıyordu. */
+  --sp-nav-yuk:76px;
+  --sp-nav:calc(var(--sp-nav-yuk) + clamp(32px,4vw,60px));
+}

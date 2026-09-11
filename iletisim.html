@@ -25,14 +25,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="renkler.css">
+<link rel="stylesheet" href="bosluk.css">
 <link rel="stylesheet" href="tipografi.css">
 <style>
-.page-hero{background:var(--ink);padding:160px 32px 80px;text-align:center;position:relative;overflow:hidden;}
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,#1e1a14,var(--c-ink-derin));}
-.page-hero-content{position:relative;z-index:1;}
-.page-eyebrow{font-size:var(--t-micro);font-weight:500;letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--gold-ink);margin-bottom:20px;display:block;}
-.page-title{font-family:'Fraunces',serif;font-size:clamp(48px,8vw,90px);font-weight:300;color:var(--c-kagit);line-height:.95;letter-spacing:-2px;}
-.page-title em{font-style:italic;color:var(--gold-ink);}
 
 /* İletişim içerik */
 .iletisim-wrap{max-width:1100px;margin:0 auto;padding:80px 32px;}
@@ -104,7 +99,6 @@
   .form-sec{grid-template-columns:1fr;gap:48px;}
 }
 @media(max-width:768px){
-  .page-hero{padding:130px 20px 60px;}
   .iletisim-wrap{padding:50px 20px;}
   .sube-kart{padding:32px 24px;}
   .sk-no{font-size:40px;}
@@ -148,7 +142,7 @@
 }
 </style>
 
-<div class="iletisim-wrap" style="padding-top:120px;">
+<div class="iletisim-wrap" style="padding-top:var(--sp-nav);">
 
   <!-- Şube Kartları -->
   <div class="iletisim-grid reveal">

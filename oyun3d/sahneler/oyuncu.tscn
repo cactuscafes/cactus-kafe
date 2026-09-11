@@ -40,7 +40,7 @@ size = Vector3(0.2, 0.55, 0.2)
 
 [node name="Oyuncu" type="CharacterBody3D"]
 collision_layer = 2
-collision_mask = 33
+collision_mask = 97
 floor_max_angle = 0.959931
 floor_snap_length = 0.4
 script = ExtResource("1_oyuncu")

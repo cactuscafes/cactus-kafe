@@ -1,9 +1,8 @@
 extends Control
 ## Ana menü.
 
-const BOLUM := "res://sahneler/ana.tscn"
-
 @onready var _rekor: Label = %Rekor
+@onready var _bolum_kutusu: VBoxContainer = %BolumKutusu
 @onready var _ayarlar: Control = %AyarlarPaneli
 @onready var _krediler: Control = %KredilerPaneli
 
@@ -11,10 +10,7 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().paused = false
 	Ses.muzik_baslat()
-	_rekor.text = "En iyi süre: %s   ·   %d kez oynandı" % [
-		Ayarlar.sure_metni(Ayarlar.en_iyi_sure), Ayarlar.oynanma,
-	]
-	%Basla.pressed.connect(func() -> void: get_tree().change_scene_to_file(BOLUM))
+	_bolumleri_kur()
 	%Ayarlar.pressed.connect(func() -> void: _panel(_ayarlar, true))
 	%Krediler.pressed.connect(func() -> void: _panel(_krediler, true))
 	%Cik.pressed.connect(func() -> void: get_tree().quit())
@@ -23,6 +19,30 @@ func _ready() -> void:
 	_ayarlar.kapandi.connect(func() -> void: _panel(_ayarlar, false))
 	MenuYardimci.butonlari_seslendir(self)
 	MenuYardimci.ilk_butona_odaklan(%Kutu)
+
+## Bölüm düğmeleri kütükten üretiliyor: yeni bölüm eklemek için menüye
+## dokunmak gerekmiyor, `bolumler.gd`'ye bir satır yetiyor.
+func _bolumleri_kur() -> void:
+	var toplam := 0
+	for i in Bolumler.LISTE.size():
+		var bilgi: Dictionary = Bolumler.LISTE[i]
+		var kimlik: String = bilgi["kimlik"]
+		var kayit := Ayarlar.kayit(kimlik)
+		toplam += int(kayit["oynanma"])
+
+		var buton := Button.new()
+		buton.custom_minimum_size = Vector2(340, 0)
+		var sure: float = kayit["sure"]
+		buton.text = "%d. %s%s" % [
+			i + 1, bilgi["ad"],
+			"" if sure <= 0.0 else "   ·   %s" % Ayarlar.sure_metni(sure),
+		]
+		buton.pressed.connect(
+			func() -> void: get_tree().change_scene_to_file(bilgi["sahne"]))
+		_bolum_kutusu.add_child(buton)
+
+	_rekor.text = ("Henüz oynanmadı" if toplam == 0
+		else "%d bölüm   ·   toplam %d kez oynandı" % [Bolumler.sayi(), toplam])
 
 func _panel(panel: Control, ac: bool) -> void:
 	panel.visible = ac

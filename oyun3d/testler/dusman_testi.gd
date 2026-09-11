@@ -25,13 +25,14 @@ func _bekle(kare: int) -> void:
 		await get_tree().physics_frame
 
 func _calis() -> void:
-	_bolum = (load("res://sahneler/ana.tscn") as PackedScene).instantiate()
+	_bolum = (load("res://sahneler/bolum1.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(_bolum)
 	await _bekle(30)
 	_oyuncu = _bolum.get_node("Oyuncu")
 	_dusman = _bolum.get_node("Dusmanlar/Dusman3")
 
 	_navigasyon_testi()
+	await _ezme_testi()
 	await _devriye_testi()
 	await _farketme_testi()
 	await _saldiri_testi()
@@ -67,16 +68,58 @@ func _uzunluk(yol: PackedVector3Array) -> float:
 		t += yol[i].distance_to(yol[i - 1])
 	return t
 
+## Ezme: düşmanın üstüne düşünce hasar verip sıçramalı; yandan çarpınca
+## ezme sayılmamalı. İkisini ayırmak "yandan değdim ama ezdim sayıldı"
+## hatasını yakalıyor.
+func _ezme_testi() -> void:
+	var kurban: CharacterBody3D = _bolum.get_node("Dusmanlar/Dusman1")
+	var can_once: int = kurban.can
+
+	# Yandan çarp: ezme olmamalı.
+	_oyuncu.global_position = kurban.global_position + Vector3(1.0, 0.0, 0.0)
+	_oyuncu.velocity = Vector3(-4.0, 0.0, 0.0)
+	await _bekle(10)
+	_dogrula(kurban.can == can_once,
+		"Yandan çarpma ezme sayıldı (can %d -> %d)" % [can_once, kurban.can])
+
+	# Üstüne düş: ezme olmalı ve sıçramalı.
+	_oyuncu.global_position = kurban.global_position + Vector3(0.0, 2.6, 0.0)
+	_oyuncu.velocity = Vector3(0.0, -6.0, 0.0)
+	var kare := 0
+	while kurban.can == can_once and kare < 120:
+		await get_tree().physics_frame
+		kare += 1
+	print("ezme: %d karede can %d -> %d, sıçrama hızı %.2f" % [
+		kare, can_once, kurban.can, _oyuncu.velocity.y])
+	_dogrula(kurban.can == can_once - 1, "Üstüne düşmek düşmana hasar vermedi")
+	_dogrula(_oyuncu.velocity.y > 1.0, "Ezmeden sonra sıçrama olmadı (%.2f)" % _oyuncu.velocity.y)
+
+	# Kalan canı bitir: yenilmeli ve sahneden kalkmalı.
+	while is_instance_valid(kurban) and kurban.can > 0 and kare < 400:
+		_oyuncu.global_position = kurban.global_position + Vector3(0.0, 2.6, 0.0)
+		_oyuncu.velocity = Vector3(0.0, -6.0, 0.0)
+		await _bekle(12)
+		kare += 12
+	await _bekle(50)
+	print("yenilme: düşman sahnede mi? %s" % is_instance_valid(kurban))
+	_dogrula(not is_instance_valid(kurban), "Canı biten düşman sahneden kalkmadı")
+
 func _devriye_testi() -> void:
 	# Oyuncuyu uzağa al ki düşman devriyede kalsın.
 	_oyuncu.global_position = Vector3(0, 1.0, 40)
 	await _bekle(20)
 	_dusman.durum = _dusman.Durum.DEVRIYE
-	var basla := _dusman.global_position
-	await _bekle(120)
-	var mesafe := basla.distance_to(_dusman.global_position)
-	print("devriye: %.2f m yol aldı, durum=%d" % [mesafe, _dusman.durum])
-	_dogrula(mesafe > 1.0, "Düşman devriyede hareket etmiyor (%.2f m)" % mesafe)
+	# YER DEĞİŞTİRME değil KAT EDİLEN YOL ölçülüyor: devriye ileri geri gidiyor,
+	# tur ortasında başladığı yere dönebiliyor ve "hiç kımıldamadı" gibi
+	# görünüyor. Ölçtüğün şey, ölçmek istediğin şey olmayabilir.
+	var onceki := _dusman.global_position
+	var yol := 0.0
+	for i in 120:
+		await get_tree().physics_frame
+		yol += onceki.distance_to(_dusman.global_position)
+		onceki = _dusman.global_position
+	print("devriye: %.2f m yol aldı, durum=%d" % [yol, _dusman.durum])
+	_dogrula(yol > 2.0, "Düşman devriyede hareket etmiyor (%.2f m)" % yol)
 	_dogrula(_dusman.durum == _dusman.Durum.DEVRIYE,
 		"Oyuncu 40 m uzaktayken düşman devriyeden çıktı")
 

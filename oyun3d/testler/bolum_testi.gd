@@ -20,12 +20,13 @@ func _ready() -> void:
 	_baslat()
 
 func _baslat() -> void:
-	_sahne = load("res://sahneler/ana.tscn").instantiate()
+	_sahne = load("res://sahneler/bolum1.tscn").instantiate()
 	get_tree().root.add_child(_sahne)
 	_oyuncu = _sahne.get_node("Oyuncu")
 	_oyun = _sahne.get_node("Oyun")
 	await _bekle(30)
 
+	await _bolum_yapisi_testi()
 	await _zemin_testi()
 	await _ziplama_testi()
 	await _kosma_testi()
@@ -57,6 +58,47 @@ func _dogrula(kosul: bool, mesaj: String) -> void:
 		_hatalar.append(mesaj)
 
 # --- testler ---------------------------------------------------------------
+
+## Her bölüm oynanabilir iskelete sahip mi? Yeni bölüm eklerken unutulan şey
+## hep aynı: bitiş alanı, duraklatma katmanı ya da navigasyon örgüsü. Bunlar
+## eksikken bölüm açılıyor ve hata vermiyor — sadece bitirilemiyor.
+func _bolum_yapisi_testi() -> void:
+	for bilgi: Dictionary in Bolumler.LISTE:
+		var kimlik: String = bilgi["kimlik"]
+		var sahne: Node3D = (load(bilgi["sahne"]) as PackedScene).instantiate()
+		get_tree().root.add_child(sahne)
+		await _bekle(5)
+
+		for ad in ["Oyuncu", "Oyun", "Bitis", "Duraklat", "BitisEkrani", "Navigasyon"]:
+			_dogrula(sahne.get_node_or_null(ad) != null, "%s: %s düğümü yok" % [kimlik, ad])
+
+		var oyun := sahne.get_node("Oyun")
+		_dogrula(oyun.bolum_kimligi == kimlik,
+			"%s: Oyun düğümünde bölüm kimliği '%s'" % [kimlik, oyun.bolum_kimligi])
+		_dogrula(oyun.hedef_toplanabilir >= 8,
+			"%s: %d çiçek var, en az 8 olmalı" % [kimlik, oyun.hedef_toplanabilir])
+
+		var bolge: NavigationRegion3D = sahne.get_node("Navigasyon")
+		_dogrula(bolge.navigation_mesh != null
+			and bolge.navigation_mesh.get_polygon_count() > 0,
+			"%s: navigasyon örgüsü boş — navmesh_uret çalıştırılmalı" % kimlik)
+
+		# Oyuncu boşlukta doğmamalı: altında 6 m içinde zemin olmalı.
+		var oyuncu: CharacterBody3D = sahne.get_node("Oyuncu")
+		var uzay := oyuncu.get_world_3d().direct_space_state
+		var sorgu := PhysicsRayQueryParameters3D.create(
+			oyuncu.global_position, oyuncu.global_position + Vector3(0, -6, 0), 1)
+		var vurus := uzay.intersect_ray(sorgu)
+		_dogrula(not vurus.is_empty(), "%s: oyuncu boşlukta doğuyor" % kimlik)
+
+		var dusman_sayisi := 0
+		for d in sahne.get_node("Dusmanlar").get_children():
+			dusman_sayisi += 1
+		print("%-7s %d çiçek, %d düşman, %d navmesh poligonu" % [
+			kimlik, oyun.hedef_toplanabilir, dusman_sayisi,
+			bolge.navigation_mesh.get_polygon_count()])
+		sahne.queue_free()
+		await _bekle(3)
 
 func _zemin_testi() -> void:
 	await _isinla(Vector3(0, 2.5, 6))

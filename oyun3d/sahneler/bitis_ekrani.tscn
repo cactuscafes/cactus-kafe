@@ -58,6 +58,11 @@ text = "En iyi"
 [node name="Bosluk2" type="Control" parent="Merkez/Kutu"]
 custom_minimum_size = Vector2(0, 16)
 
+[node name="Sonraki" type="Button" parent="Merkez/Kutu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+text = "Sonraki bölüm"
+
 [node name="Tekrar" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)

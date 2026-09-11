@@ -18,6 +18,11 @@ signal can_degisti(can: int, en_fazla: int)
 @export var yer_surtunmesi := 55.0
 @export var donus_hizi := 12.0
 
+@export_group("Ezme")
+## Düşmanın üstüne inince kazanılan sıçrama. Zıplamadan biraz düşük:
+## zincirleme ezme ödül olmalı ama sonsuz yükselme aracı olmamalı.
+@export var ezme_sicramasi := 0.85
+
 @export_group("Can")
 @export var can_max := 3
 ## Hasardan sonra dokunulmazlık: iki düşmanın arasında kalınca canın bir
@@ -73,6 +78,7 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	_ezme_kontrolu()
 	if is_on_floor() and not yerde:
 		yere_indi.emit(absf(_onceki_dikey))
 		# Hafif inişte ses çıkarmak gürültü olur; eşik koyuyoruz.
@@ -146,6 +152,25 @@ func _animasyon(yerde: bool) -> void:
 			_durum.travel("yer")
 	elif velocity.y < -0.5 and _durum.get_current_node() != "dusme":
 		_durum.travel("dusme")
+
+## Düşmanın üstüne düşüldü mü? move_and_slide'ın kaydettiği çarpışmalara
+## bakıyoruz: normali yukarı bakıyorsa ve düşüyorsak, üstüne binmişiz demektir.
+## Ayrı bir Area3D yerine bunu kullanmak, "yandan değdim ama ezdim sayıldı"
+## hatasını kökten engelliyor.
+func _ezme_kontrolu() -> void:
+	if velocity.y > 1.0:
+		return
+	for i in get_slide_collision_count():
+		var carpisma := get_slide_collision(i)
+		var hedef := carpisma.get_collider()
+		if hedef == null or not hedef.is_in_group("dusman"):
+			continue
+		if carpisma.get_normal().y < 0.55:
+			continue   # yandan çarptık, üstüne binmedik
+		if hedef.has_method("ezildi"):
+			hedef.ezildi()
+		velocity.y = _ziplama_hizi * ezme_sicramasi
+		return
 
 ## Modeli zeminin eğimine yatırır — rampada dik durmak yerine yokuşa uyar.
 ## Gerçek ayak IK'sı iskelet ister; bu, kutu karakterde aynı işi gören ucuz

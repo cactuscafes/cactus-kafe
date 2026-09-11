@@ -44,10 +44,9 @@ text = "En iyi süre: —"
 [node name="Bosluk" type="Control" parent="Merkez/Kutu"]
 custom_minimum_size = Vector2(0, 18)
 
-[node name="Basla" type="Button" parent="Merkez/Kutu"]
+[node name="BolumKutusu" type="VBoxContainer" parent="Merkez/Kutu"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-text = "Başla"
+theme_override_constants/separation = 8
 
 [node name="Ayarlar" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true

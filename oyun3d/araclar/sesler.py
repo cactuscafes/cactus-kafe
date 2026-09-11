@@ -183,6 +183,26 @@ def dusman_saldiri() -> list[float]:
                     [v * 0.4 for v in uygula(ton, zarf(len(ton), 0.02, 0.8))])
 
 
+def ezme() -> list[float]:
+    """Düşmanın üstüne binme: kısa, tok, tatmin edici."""
+    ton = sinus(0.16, 620, 150, "ucgen")
+    g = alcak_gecir(gurultu(0.16, 77), 1800)
+    return karistir(uygula(ton, zarf(len(ton), 0.005, 0.7)),
+                    [v * 0.5 for v in uygula(g, zarf(len(g), 0.005, 0.8))])
+
+
+def dusman_oldu() -> list[float]:
+    """Düşman yenildi: aşağı inen üç nota, 'sönme' hissi."""
+    katman = []
+    for i, frek in enumerate((520.0, 400.0, 280.0)):
+        n = uygula(sinus(0.3, frek, frek * 0.85, "ucgen"),
+                   zarf(int(0.3 * ORNEK), 0.02, 0.75))
+        katman.append([0.0] * int(i * 0.09 * ORNEK) + n)
+    g = alcak_gecir(gurultu(0.4, 88), 900)
+    katman.append([v * 0.3 for v in uygula(g, zarf(len(g), 0.02, 0.9))])
+    return karistir(*katman)
+
+
 def tik() -> list[float]:
     ton = sinus(0.05, 1200, 900)
     return uygula(ton, zarf(len(ton), 0.05, 0.8))
@@ -239,6 +259,8 @@ def main() -> int:
     yaz("kontrol.wav", kontrol())
     yaz("bitis.wav", bitis())
     yaz("hasar.wav", hasar())
+    yaz("ezme.wav", ezme())
+    yaz("dusman_oldu.wav", dusman_oldu(), 0.6)
     yaz("dusman_farketti.wav", dusman_farketti(), 0.6)
     yaz("dusman_saldiri.wav", dusman_saldiri(), 0.6)
     yaz("tik.wav", tik(), 0.5)

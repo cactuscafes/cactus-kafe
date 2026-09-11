@@ -152,6 +152,11 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - 15 dakikalık, son kalitede bir bölüm: nihai sanat, ses, UI, denge.
 - 60 saniyelik trailer çek. **Steam sayfası aç** (Steam Direct: ürün başına $100, iade edilebilir).
 - **Çıktı:** portföyünün merkez parçası + wishlist toplamaya başlayan bir mağaza sayfası.
+- **Durum: oyun tarafı bitti, sayfa açmak sende** → [`oyun3d/MAGAZA.md`](oyun3d/MAGAZA.md).
+  Ezme mekaniğiyle dövüş döngüsü kapandı, ikinci bölüm (dikey kule) eklendi,
+  bölüm kütüğü ve bölüm başına rekor geldi; trailer betikle çekiliyor
+  (`araclar/tanitim.gd` + Godot Movie Maker, 31 sn). Mağaza metni, kapsül
+  ölçüleri ve Steam Direct sırası yazılı — kalan iş hesabı açıp $100'ı yatırmak.
 
 ### Faz 6 — Derinleşme (Ay 7–8)
 - Shader yaz (Godot shading language): su, taramalı çizgi, dissolve, outline, toon.

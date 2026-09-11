@@ -6,9 +6,10 @@ extends CharacterBody3D
 ## sebebi: her an TEK bir durumda olunduğu koda bakınca görülüyor, ve yeni
 ## durum eklemek eskileri bozmuyor.
 
-enum Durum { DEVRIYE, FARKETTI, KOVALA, SALDIRI, CEKIL }
+enum Durum { DEVRIYE, FARKETTI, KOVALA, SALDIRI, CEKIL, YENILDI }
 
 signal durum_degisti(yeni: Durum)
+signal yenildi
 
 @export_group("Devriye")
 ## Başlangıç noktasına göre ikinci devriye ucu.
@@ -21,6 +22,9 @@ signal durum_degisti(yeni: Durum)
 @export var gorus_acisi := 120.0
 @export var unutma_mesafesi := 24.0
 @export var unutma_suresi := 3.0
+
+@export_group("Can")
+@export var can := 2
 
 @export_group("Saldırı")
 @export var kovalama_hizi := 4.3
@@ -38,11 +42,13 @@ var _baslangic := Vector3.ZERO
 var _devriye_hedefi := Vector3.ZERO
 var _oyuncu: Node3D
 var _kayip := 0.0
+var _yenilme_zamani := 0.0
 var _yercekimi: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
 @onready var _ajan: NavigationAgent3D = $Ajan
 @onready var _gorus: RayCast3D = $Gorus
 @onready var _model: Node3D = $Model
+@onready var _parcacik: CPUParticles3D = $Parcacik
 
 func _ready() -> void:
 	add_to_group("dusman")
@@ -61,12 +67,18 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	_zaman -= delta
 
+	if durum == Durum.YENILDI:
+		_yenilme(delta)
+		move_and_slide()
+		return
+
 	match durum:
 		Durum.DEVRIYE: _devriye(delta)
 		Durum.FARKETTI: _farketti()
 		Durum.KOVALA: _kovala(delta)
 		Durum.SALDIRI: _saldiri()
 		Durum.CEKIL: _cekil()
+		Durum.YENILDI: pass
 
 	move_and_slide()
 
@@ -144,6 +156,34 @@ func _cekil() -> void:
 	if _zaman <= 0.0:
 		_gec(Durum.KOVALA)
 
+## Oyuncu üstüne bindiğinde çağrılır. Yenildiyse true döner.
+func ezildi() -> bool:
+	if durum == Durum.YENILDI:
+		return false
+	can -= 1
+	Ses.cal("ezme", 1.5)
+	Efekt.sarsint(0.3)
+	Efekt.vurus_duraklamasi(0.07, 0.06)
+	_parcacik.restart()
+	if can > 0:
+		# Hayatta kaldı: ezilip yayılıyor ve saldırıya geçiyor.
+		_model.scale = Vector3(1.4, 0.5, 1.4)
+		_gec(Durum.KOVALA)
+		return false
+	_gec(Durum.YENILDI)
+	return true
+
+## Yenilme: büzülerek kayboluyor. Anında silmek yerine yarım saniye
+## göstermek, oyuncunun "ben yaptım" bağlantısını kurması için gerekli.
+func _yenilme(delta: float) -> void:
+	_yenilme_zamani += delta
+	velocity.x = move_toward(velocity.x, 0.0, 30.0 * delta)
+	velocity.z = move_toward(velocity.z, 0.0, 30.0 * delta)
+	_model.scale = _model.scale.lerp(Vector3(0.05, 0.05, 0.05), minf(1.0, delta * 6.0))
+	_model.rotation.y += delta * 9.0
+	if _yenilme_zamani > 0.55:
+		queue_free()
+
 # --- yardımcılar -----------------------------------------------------------
 
 func _gec(yeni: Durum) -> void:
@@ -151,6 +191,13 @@ func _gec(yeni: Durum) -> void:
 		return
 	durum = yeni
 	match yeni:
+		Durum.YENILDI:
+			_zaman = 0.0
+			Ses.cal("dusman_oldu")
+			# Çarpışmayı kapat: yenilen düşmanın üstünde durulmasın.
+			$Carpisma.set_deferred("disabled", true)
+			set_collision_layer_value(7, false)
+			yenildi.emit()
 		Durum.FARKETTI:
 			_zaman = 0.45
 			Ses.cal("dusman_farketti", 1.0)

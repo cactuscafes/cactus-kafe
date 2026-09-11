@@ -17,10 +17,8 @@ var muzik := 0.55
 var hassasiyet := 0.0022
 var tam_ekran := false
 
-# kayıt
-var en_iyi_sure := 0.0
-var en_iyi_olum := 0
-var oynanma := 0
+# kayıt — bölüm kimliğine göre: {"bolum1": {"sure": 42.0, "olum": 1, "oynanma": 3}}
+var kayitlar := {}
 
 func _ready() -> void:
 	yukle()
@@ -35,10 +33,14 @@ func yukle() -> void:
 		hassasiyet = c.get_value("kontrol", "hassasiyet", hassasiyet)
 		tam_ekran = c.get_value("ekran", "tam_ekran", tam_ekran)
 	var k := ConfigFile.new()
+	kayitlar = {}
 	if k.load(KAYIT_YOLU) == OK:
-		en_iyi_sure = k.get_value("bolum1", "en_iyi_sure", 0.0)
-		en_iyi_olum = k.get_value("bolum1", "en_iyi_olum", 0)
-		oynanma = k.get_value("bolum1", "oynanma", 0)
+		for bolum in k.get_sections():
+			kayitlar[bolum] = {
+				"sure": k.get_value(bolum, "en_iyi_sure", 0.0),
+				"olum": k.get_value(bolum, "en_iyi_olum", 0),
+				"oynanma": k.get_value(bolum, "oynanma", 0),
+			}
 
 func kaydet() -> void:
 	var c := ConfigFile.new()
@@ -61,17 +63,31 @@ func uygula() -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	degisti.emit()
 
+## Bölümün kaydını döndürür; hiç oynanmadıysa sıfırlı sözlük.
+func kayit(bolum: String) -> Dictionary:
+	return kayitlar.get(bolum, {"sure": 0.0, "olum": 0, "oynanma": 0})
+
+func en_iyi_sure(bolum: String) -> float:
+	return kayit(bolum)["sure"]
+
+func oynanma(bolum: String) -> int:
+	return kayit(bolum)["oynanma"]
+
 ## Bölüm bitince çağrılır. Yeni rekor kırıldıysa true döner.
-func sonuc_kaydet(sure: float, olum: int) -> bool:
-	oynanma += 1
-	var rekor := en_iyi_sure <= 0.0 or sure < en_iyi_sure
+func sonuc_kaydet(bolum: String, sure: float, olum: int) -> bool:
+	var mevcut: Dictionary = kayit(bolum).duplicate()
+	mevcut["oynanma"] = int(mevcut["oynanma"]) + 1
+	var rekor: bool = float(mevcut["sure"]) <= 0.0 or sure < float(mevcut["sure"])
 	if rekor:
-		en_iyi_sure = sure
-		en_iyi_olum = olum
+		mevcut["sure"] = sure
+		mevcut["olum"] = olum
+	kayitlar[bolum] = mevcut
+
 	var k := ConfigFile.new()
-	k.set_value("bolum1", "en_iyi_sure", en_iyi_sure)
-	k.set_value("bolum1", "en_iyi_olum", en_iyi_olum)
-	k.set_value("bolum1", "oynanma", oynanma)
+	for kimlik: String in kayitlar:
+		k.set_value(kimlik, "en_iyi_sure", kayitlar[kimlik]["sure"])
+		k.set_value(kimlik, "en_iyi_olum", kayitlar[kimlik]["olum"])
+		k.set_value(kimlik, "oynanma", kayitlar[kimlik]["oynanma"])
 	k.save(KAYIT_YOLU)
 	return rekor
 

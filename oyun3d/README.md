@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 4** bitti: parkurda düşman var, oyuncunun canı var ve vuruşlar
-hissediliyor.
+Şu an **Faz 5** bitti: iki bölüm, dövüş döngüsü, bölüm kütüğü ve betikle
+çekilen tanıtım videosu. Kalan tek adım yayın — [MAGAZA.md](MAGAZA.md).
 
 | Faz | Ne geldi |
 |---|---|
@@ -11,6 +11,7 @@ hissediliyor.
 | **2** | Blender varlık hattı: 5 modellenmiş nesne, ortak doku atlası, UV paketleme, glTF dışa/içe aktarım, ölçek-eksen-yoğunluk testleri, Git LFS |
 | **3** | Ana menü, duraklatma, ayarlar, bitiş ekranı, ses (10 parça, sentezlenmiş), ayar/rekor kaydı, arayüz testleri, itch.io paketi |
 | **4** | Durum makineli düşman + NavigationAgent3D, can/hasar/dokunulmazlık, vuruş duraklaması, ekran sarsıntısı, parçacık, zemin eğimine yatma, yapay zekâ testleri |
+| **5** | Ezme mekaniği ve düşman canı, ikinci bölüm (dikey kule), bölüm kütüğü + bölüm başına rekor, betikle çekilen trailer, mağaza metni |
 
 ---
 
@@ -39,6 +40,17 @@ Oyun kolu da tanımlı: sol çubuk hareket, sağ çubuk kamera, A zıplama, LB k
 Ana menü → bölüm → (Esc ile duraklatma) → bitiş ekranı → tekrar ya da menü.
 Ayarlar hem menüden hem duraklatmadan açılıyor; aynı panel, tek yerde.
 
+### Bölümler
+
+| # | Bölüm | Ritim |
+|---|---|---|
+| 1 | Kaktüs Parkuru | Yatay: dikenli tarla üstünde basamak taşları, rampa, hareketli platform, kule |
+| 2 | Dikenli Kule | Dikey: spiral tırmanış, iki asansör platformu, tepede çıkış |
+
+Bölümler `betikler/bolumler.gd` kütüğünde. Yeni bölüm eklemek = kütüğe bir
+satır: menüdeki düğme, "sonraki bölüm" akışı ve rekor kaydı kendiliğinden
+gelir. Rekorlar bölüm başına tutuluyor.
+
 ### Bölümün amacı
 
 8 çiçeği topla, dikenli alana düşmeden parkuru geç, sondaki altın platforma çık.
@@ -53,7 +65,7 @@ sayısı üstte; bölüm bitince ikisi de yazılır. Yaklaşık 2–3 dakikalık
 godot --headless --path oyun3d res://testler/bolum_testi.tscn    # oynanış
 godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
 godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
-godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar
+godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar, ezme
 ```
 
 > Testleri **`timeout` ile** koşun (CI öyle yapıyor). Bir test betiği
@@ -97,6 +109,7 @@ gerekiyor:
 
 | Test | Ne kanıtlar |
 |---|---|
+| ezme | Üstüne düşmek hasar verip sıçratıyor; **yandan çarpmak ezme sayılmıyor**; canı biten düşman sahneden kalkıyor |
 | navigasyon | Örgü taze: iki nokta arasında yol var ve devriye noktası örgünün üstünde |
 | devriye | Düşman devriyede hareket ediyor ve 40 m uzaktaki oyuncu yüzünden çıkmıyor |
 | farketme | 20 m uzağı fark etmiyor, 6 m öndekini fark ediyor |
@@ -117,6 +130,40 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Dövüş döngüsü (Faz 5)
+
+Faz 4'te düşman vardı ama oyuncunun karşılık verme yolu yoktu — oyun yarımdı.
+Kapatan mekanik **üstüne zıplama**: düşmanın üstüne düşünce hasar veriyor ve
+oyuncuyu sektiriyor.
+
+Çarpışma tespiti ayrı bir `Area3D` ile değil, `move_and_slide`'ın kaydettiği
+çarpışmalardan yapılıyor: normal yukarı bakıyorsa ve düşüyorsak üstüne
+binmişiz demektir. Bu, "yandan değdim ama ezdim sayıldı" hatasını kökten
+engelliyor — ve testte ikisi ayrı ayrı doğrulanıyor.
+
+Sıçrama yüksekliği zıplamanın %85'i: zincirleme ezme ödül olmalı ama sonsuz
+yükselme aracı olmamalı. Düşman iki vuruşta yeniliyor; ilk vuruşta eziliyor
+(yassılıp yaylanıyor) ve saldırıya geçiyor. Yenilince yarım saniye büzülerek
+kayboluyor — anında silmek, oyuncunun "ben yaptım" bağlantısını kurmasına
+izin vermiyor.
+
+## Tanıtım videosu
+
+```bash
+godot --path oyun3d --rendering-driver opengl3 --audio-driver Dummy \
+  --write-movie cikti/tanitim.avi --fixed-fps 24 res://araclar/tanitim.tscn
+ffmpeg -i cikti/tanitim.avi -c:v libx264 -crf 20 -pix_fmt yuv420p cikti/tanitim.mp4
+```
+
+Oyun kendi kendini oynuyor: `araclar/tanitim.gd` içindeki çekim listesi
+oyuncuyu sahneye yerleştiriyor, tuşları basılı tutuyor, belirlenen anlarda
+zıplatıyor. Godot'nun Movie Maker kipi sabit adımla çalıştığı için yavaş
+makinede bile akıcı çıktı veriyor.
+
+Ayrıntı ve Steam kuralları: [MAGAZA.md](MAGAZA.md).
 
 ---
 
@@ -340,7 +387,8 @@ Böylece çiçekler birbirini, tuzak platformu tetiklemiyor.
 oyun3d/
 ├── project.godot            Ayarlar, autoload, renderer, çarpışma katmanı isimleri
 ├── sahneler/
-│   ├── ana.tscn             Bölüm: parkur, tuzak, çiçekler, bitiş, HUD
+│   ├── bolum1.tscn          Kaktüs Parkuru (yatay)
+│   ├── bolum2.tscn          Dikenli Kule (dikey)
 │   ├── oyuncu.tscn          Karakter + kamera kolu + AnimationTree
 │   ├── platform.tscn        Ölçüsü/rengi ayarlanabilir platform parçası
 │   ├── toplanabilir.tscn    Çiçek
@@ -352,6 +400,7 @@ oyun3d/
 │   ├── ayarlar.gd           Autoload: ayar + rekor kalıcılığı
 │   ├── efekt.gd             Autoload: sarsıntı ve vuruş duraklaması
 │   ├── dusman.gd            Durum makineli düşman
+│   ├── bolumler.gd          Autoload: bölüm kütüğü
 │   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
 │   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
 │   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
@@ -361,7 +410,8 @@ oyun3d/
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
-├── navigasyon/bolum1.tres   Pişirilmiş navigasyon örgüsü
+├── navigasyon/              Pişirilmiş navigasyon örgüleri (bölüm başına)
+├── MAGAZA.md                Mağaza metni, trailer ve Steam sırası
 ├── arayuz/tema.tres         Ortak buton/etiket teması
 ├── default_bus_layout.tres  Master / SFX / Müzik bus'ları
 ├── varliklar/               Modellenmiş nesneler (.gltf + .bin) ve atlas.png
@@ -371,7 +421,8 @@ oyun3d/
 │   ├── animasyon_uret.gd    Animasyon üretici (Godot)
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
 │   ├── sesler.py            Ses üretici
-│   └── navmesh_uret.gd      Navigasyon örgüsü üretici
+│   ├── navmesh_uret.gd      Navigasyon örgüsü üretici (her bölüm için)
+│   └── tanitim.gd           Trailer çekimi (oyun kendini oynar)
 └── testler/
     ├── bolum_testi.gd       Oynanış davranışları
     ├── varlik_testi.gd      Varlık hattı
@@ -471,7 +522,8 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
-| Düşman testleri (6 grup) | ✅ hepsi geçti |
+| Düşman testleri (7 grup) | ✅ hepsi geçti |
+| Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
 | Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
 
@@ -502,10 +554,11 @@ söyler.
 
 ---
 
-## Faz 5'te sırada ne var
+## Faz 6'da sırada ne var
 
-Yol haritasına göre Faz 5 **dikey dilim**: 15 dakikalık, son kalitede tek
-bölüm; 60 saniyelik trailer; Steam sayfası. Açık kalan uçlar:
+Yol haritasına göre Faz 6 **derinleşme**: shader yazımı, profil alıp draw call
+düşürme, LOD ve occlusion, mobil + PC'de 60 FPS, lokalizasyon ve erişilebilirlik.
+Açık kalan uçlar:
 
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
@@ -516,8 +569,9 @@ bölüm; 60 saniyelik trailer; Steam sayfası. Açık kalan uçlar:
   atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).
 - **İkinci bölüm** — şu an tek bölüm var; `oyun.gd` bölüm yükleyicisine
   dönüşecek.
-- **Düşmana can ve geri bildirim** — düşman şu an ölümsüz; oyuncunun karşılık
-  verme yolu yok. Dikey dilimde ya bir saldırı mekaniği ya da kaçınma
-  odaklı tasarım netleşmeli.
 - **Kök hareketi (root motion) ve gerçek ayak IK'sı** — ikisi de iskeletli
   model ister; rig'li karakterle birlikte gelir.
+- **Trailer'da ses yok** — Movie Maker ses de yazabiliyor (`.wav` yan dosyası);
+  kurgu aşamasında eklenecek.
+- **Bölüm 2 dengelenmedi** — yapı testten geçiyor ama baştan sona oynanıp
+  süresi ölçülmedi. Yol haritasının dediği gibi: 20 kişiye oynat, izle.

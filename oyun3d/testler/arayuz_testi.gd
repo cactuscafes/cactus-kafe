@@ -83,34 +83,51 @@ func _ayar_kaliciligi_testi() -> void:
 func _kayit_testi() -> void:
 	# Temiz başlangıç: kayıt dosyasını sil.
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Ayarlar.KAYIT_YOLU))
-	Ayarlar.en_iyi_sure = 0.0
-	Ayarlar.en_iyi_olum = 0
-	Ayarlar.oynanma = 0
+	Ayarlar.kayitlar = {}
 
-	_dogrula(Ayarlar.sonuc_kaydet(90.0, 3), "İlk sonuç rekor sayılmadı")
-	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure, 90.0), "İlk rekor kaydedilmedi")
-	_dogrula(not Ayarlar.sonuc_kaydet(120.0, 0), "Daha kötü süre rekor sayıldı")
-	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure, 90.0), "Kötü süre rekoru bozdu")
-	_dogrula(Ayarlar.sonuc_kaydet(75.5, 1), "Daha iyi süre rekor sayılmadı")
-	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure, 75.5), "Yeni rekor kaydedilmedi")
-	_dogrula(Ayarlar.oynanma == 3, "Oynanma sayacı %d, 3 olmalı" % Ayarlar.oynanma)
+	_dogrula(Ayarlar.sonuc_kaydet("bolum1", 90.0, 3), "İlk sonuç rekor sayılmadı")
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum1"), 90.0), "İlk rekor kaydedilmedi")
+	_dogrula(not Ayarlar.sonuc_kaydet("bolum1", 120.0, 0), "Daha kötü süre rekor sayıldı")
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum1"), 90.0), "Kötü süre rekoru bozdu")
+	_dogrula(Ayarlar.sonuc_kaydet("bolum1", 75.5, 1), "Daha iyi süre rekor sayılmadı")
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum1"), 75.5), "Yeni rekor kaydedilmedi")
+	_dogrula(Ayarlar.oynanma("bolum1") == 3,
+		"Oynanma sayacı %d, 3 olmalı" % Ayarlar.oynanma("bolum1"))
+
+	# Bölümler birbirinin kaydını ezmemeli — tek sayı tutulsa fark edilmezdi.
+	_dogrula(Ayarlar.sonuc_kaydet("bolum2", 200.0, 5), "İkinci bölümün ilk sonucu rekor sayılmadı")
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum1"), 75.5),
+		"Bölüm 2'nin sonucu bölüm 1'in rekorunu bozdu")
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum2"), 200.0), "Bölüm 2 rekoru tutulmadı")
 
 	var k := ConfigFile.new()
 	_dogrula(k.load(Ayarlar.KAYIT_YOLU) == OK, "Kayıt dosyası yazılmamış")
 	_dogrula(is_equal_approx(k.get_value("bolum1", "en_iyi_sure", -1.0), 75.5),
 		"Rekor diske yazılmamış")
+	_dogrula(is_equal_approx(k.get_value("bolum2", "en_iyi_sure", -1.0), 200.0),
+		"Bölüm 2 rekoru diske yazılmamış")
 	_dogrula(Ayarlar.sure_metni(75.5) == "1:15.50",
 		"Süre biçimi yanlış: %s" % Ayarlar.sure_metni(75.5))
-	print("kayıt: rekor 75.5 sn, %d oynanma, biçim %s" % [
-		Ayarlar.oynanma, Ayarlar.sure_metni(75.5)])
+	print("kayıt: bölüm1 %s / bölüm2 %s, biçim %s" % [
+		Ayarlar.sure_metni(Ayarlar.en_iyi_sure("bolum1")),
+		Ayarlar.sure_metni(Ayarlar.en_iyi_sure("bolum2")),
+		Ayarlar.sure_metni(75.5)])
 
 func _menu_testi() -> void:
 	var menu: Control = (load("res://sahneler/ana_menu.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(menu)
 	await _bekle(3)
-	for ad in ["Basla", "Ayarlar", "Krediler", "Rekor"]:
+	for ad in ["BolumKutusu", "Ayarlar", "Krediler", "Rekor"]:
 		_dogrula(menu.get_node_or_null("%%%s" % ad) != null, "Ana menüde %s yok" % ad)
-	_dogrula(ResourceLoader.exists(menu.BOLUM), "Menüdeki bölüm yolu geçersiz: %s" % menu.BOLUM)
+	# Her bölüm için bir düğme ve her düğme için geçerli bir sahne.
+	var kutu: VBoxContainer = menu.get_node("%BolumKutusu")
+	_dogrula(kutu.get_child_count() == Bolumler.sayi(),
+		"Menüde %d bölüm düğmesi var, %d olmalı" % [kutu.get_child_count(), Bolumler.sayi()])
+	for bilgi: Dictionary in Bolumler.LISTE:
+		_dogrula(ResourceLoader.exists(bilgi["sahne"]),
+			"Bölüm sahnesi yok: %s" % bilgi["sahne"])
+		_dogrula(ResourceLoader.exists("res://navigasyon/%s.tres" % bilgi["kimlik"]),
+			"Bölümün navigasyon örgüsü yok: %s" % bilgi["kimlik"])
 	# Ayarlar paneli açılıp kapanıyor mu?
 	var panel: Control = menu.get_node("%AyarlarPaneli")
 	_dogrula(not panel.visible, "Ayarlar paneli açılışta görünür olmamalı")
@@ -125,7 +142,7 @@ func _menu_testi() -> void:
 	await _bekle(2)
 
 func _duraklatma_testi() -> void:
-	var bolum: Node3D = (load("res://sahneler/ana.tscn") as PackedScene).instantiate()
+	var bolum: Node3D = (load("res://sahneler/bolum1.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(bolum)
 	await _bekle(5)
 	var duraklat: CanvasLayer = bolum.get_node("Duraklat")
@@ -147,7 +164,7 @@ func _duraklatma_testi() -> void:
 	await _bekle(2)
 
 func _bitis_testi() -> void:
-	var bolum: Node3D = (load("res://sahneler/ana.tscn") as PackedScene).instantiate()
+	var bolum: Node3D = (load("res://sahneler/bolum1.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(bolum)
 	await _bekle(5)
 	var oyun := bolum.get_node("Oyun")
@@ -168,8 +185,8 @@ func _bitis_testi() -> void:
 	_dogrula(oyun.bitti, "Bölüm bitmedi")
 	_dogrula(bitis.visible, "Bitiş ekranı açılmadı")
 	_dogrula(get_tree().paused, "Bitişte ağaç duraklatılmadı")
-	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure, 42.0),
-		"Bitişte rekor kaydedilmedi (%.1f)" % Ayarlar.en_iyi_sure)
+	_dogrula(is_equal_approx(Ayarlar.en_iyi_sure("bolum1"), 42.0),
+		"Bitişte rekor kaydedilmedi (%.1f)" % Ayarlar.en_iyi_sure("bolum1"))
 	print("bitiş: ekran açıldı, rekor %s olarak kaydedildi" % Ayarlar.sure_metni(42.0))
 	get_tree().paused = false
 	bolum.queue_free()

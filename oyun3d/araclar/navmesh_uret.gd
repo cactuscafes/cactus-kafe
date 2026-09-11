@@ -11,11 +11,17 @@ extends Node
 ## düşman görünmez duvarlara çarpar ya da boşlukta yürür. dusman_testi
 ## içindeki yol testi bunu yakalamak için var.
 
-const CIKTI := "res://navigasyon/bolum1.tres"
-
 func _ready() -> void:
 	await get_tree().process_frame
-	var bolum: Node3D = (load("res://sahneler/ana.tscn") as PackedScene).instantiate()
+	var hatali := 0
+	for bilgi: Dictionary in Bolumler.LISTE:
+		if not await _pisir(bilgi["kimlik"], bilgi["sahne"]):
+			hatali += 1
+	get_tree().quit(1 if hatali > 0 else 0)
+
+func _pisir(kimlik: String, sahne_yolu: String) -> bool:
+	var cikti := "res://navigasyon/%s.tres" % kimlik
+	var bolum: Node3D = (load(sahne_yolu) as PackedScene).instantiate()
 	get_tree().root.add_child(bolum)
 	await get_tree().process_frame
 
@@ -31,22 +37,22 @@ func _ready() -> void:
 	orgu.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
 	orgu.geometry_collision_mask = 1   # yalnızca "zemin" katmanı
 	# Zemin 140x140; parkurun dışını pişirmenin anlamı yok.
-	orgu.filter_baking_aabb = AABB(Vector3(-26.0, -4.0, -60.0), Vector3(52.0, 24.0, 82.0))
+	# Kutu bütün bölümü kapsamalı: bölüm 1 yatay ve uzun, bölüm 2 dikey.
+	orgu.filter_baking_aabb = AABB(Vector3(-30.0, -4.0, -60.0), Vector3(60.0, 40.0, 84.0))
 
 	var kaynak := NavigationMeshSourceGeometryData3D.new()
 	NavigationServer3D.parse_source_geometry_data(orgu, kaynak, bolum)
 	NavigationServer3D.bake_from_source_geometry_data(orgu, kaynak)
 
 	var poligon := orgu.get_polygon_count()
-	print("navigasyon örgüsü: %d poligon, %d köşe" % [poligon, orgu.get_vertices().size()])
+	print("%-8s %3d poligon, %3d köşe -> %s" % [
+		kimlik, poligon, orgu.get_vertices().size(), cikti])
+	bolum.queue_free()
 	if poligon == 0:
-		printerr("  ! Örgü boş — çarpışma katmanı ya da AABB yanlış olabilir")
-		get_tree().quit(1)
-		return
-	var hata := ResourceSaver.save(orgu, CIKTI)
+		printerr("  ! %s: örgü boş — çarpışma katmanı ya da AABB yanlış olabilir" % kimlik)
+		return false
+	var hata := ResourceSaver.save(orgu, cikti)
 	if hata != OK:
-		printerr("  ! Kaydedilemedi: %d" % hata)
-		get_tree().quit(1)
-		return
-	print("kaydedildi -> %s" % CIKTI)
-	get_tree().quit(0)
+		printerr("  ! %s kaydedilemedi: %d" % [kimlik, hata])
+		return false
+	return true

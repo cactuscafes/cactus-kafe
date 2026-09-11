@@ -26,6 +26,11 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://arayuz/ceviriler.tr.translation", "res://arayuz/ceviriler.en.translation")
+locale/fallback="tr"
+
 [layer_names]
 
 3d_physics/layer_1="zemin"
@@ -41,6 +46,10 @@ renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="mobile"
 renderer/rendering_method.web="gl_compatibility"
 anti_aliasing/quality/msaa_3d=2
+; Gölge atlası doku belleğinin en büyük kalemi. 4096 bu stilde görülmüyor;
+; 2048 masaüstünde, 1024 mobilde yeter.
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/size.mobile=1024
 ; Web ve Android ön ayarlarındaki VRAM doku sıkıştırması bu iki ayarı şart koşar.
 ; Kapalıyken dışa aktarım "configuration errors" diyerek durur.
 textures/vram_compression/import_s3tc_bptc=true

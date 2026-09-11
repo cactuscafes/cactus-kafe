@@ -21,12 +21,12 @@ func _goster(rekor: bool, oyun: Node) -> void:
 	var sonraki := Bolumler.sonraki(oyun.bolum_kimligi)
 	%Sonraki.visible = sonraki != ""
 	if sonraki != "":
-		%Sonraki.text = "Sonraki: %s" % Bolumler.ad(sonraki)
+		%Sonraki.text = tr("BITIS_SONRAKI") % Bolumler.ad(sonraki)
 		if not %Sonraki.pressed.is_connected(_sonrakine_gec):
 			%Sonraki.pressed.connect(_sonrakine_gec.bind(sonraki))
-	%Sure.text = "Süre   %s" % Ayarlar.sure_metni(oyun.sure)
-	%Olum.text = "Ölüm   %d     Yenilen düşman   %d" % [oyun.olum, oyun.yenilen]
-	%EnIyi.text = "En iyi   %s" % Ayarlar.sure_metni(Ayarlar.en_iyi_sure(oyun.bolum_kimligi))
+	%Sure.text = tr("BITIS_SURE") % Ayarlar.sure_metni(oyun.sure)
+	%Olum.text = tr("BITIS_OLUM") % [oyun.olum, oyun.yenilen]
+	%EnIyi.text = tr("BITIS_EN_IYI") % Ayarlar.sure_metni(Ayarlar.en_iyi_sure(oyun.bolum_kimligi))
 	%Rekor.visible = rekor
 	visible = true
 	get_tree().paused = true

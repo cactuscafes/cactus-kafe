@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://golgeler/tuzak.gdshader" id="1"]
+
+[resource]
+resource_name = "tuzak_malzeme"
+shader = ExtResource("1")
+shader_parameter/taban_renk = Color(0.353, 0.196, 0.212, 1)
+shader_parameter/serit_renk = Color(0.722, 0.243, 0.243, 1)
+shader_parameter/serit_araligi = 1.6
+shader_parameter/akis_hizi = 0.55
+shader_parameter/nabiz_hizi = 1.8

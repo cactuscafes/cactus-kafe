@@ -16,6 +16,11 @@ var sfx := 0.9
 var muzik := 0.55
 var hassasiyet := 0.0022
 var tam_ekran := false
+var dil := "tr"
+## Erişilebilirlik: ekran sarsıntısı hareket hassasiyeti olanlarda rahatsızlık
+## yapabiliyor. Kapatmak oynanışı değiştirmiyor, yalnızca kamerayı sabit
+## tutuyor.
+var sarsinti := true
 
 # kayıt — bölüm kimliğine göre: {"bolum1": {"sure": 42.0, "olum": 1, "oynanma": 3}}
 var kayitlar := {}
@@ -32,6 +37,8 @@ func yukle() -> void:
 		muzik = c.get_value("ses", "muzik", muzik)
 		hassasiyet = c.get_value("kontrol", "hassasiyet", hassasiyet)
 		tam_ekran = c.get_value("ekran", "tam_ekran", tam_ekran)
+		dil = c.get_value("genel", "dil", dil)
+		sarsinti = c.get_value("erisim", "sarsinti", sarsinti)
 	var k := ConfigFile.new()
 	kayitlar = {}
 	if k.load(KAYIT_YOLU) == OK:
@@ -49,9 +56,12 @@ func kaydet() -> void:
 	c.set_value("ses", "muzik", muzik)
 	c.set_value("kontrol", "hassasiyet", hassasiyet)
 	c.set_value("ekran", "tam_ekran", tam_ekran)
+	c.set_value("genel", "dil", dil)
+	c.set_value("erisim", "sarsinti", sarsinti)
 	c.save(AYAR_YOLU)
 
 func uygula() -> void:
+	TranslationServer.set_locale(dil)
 	Ses.seviye_ayarla(&"Master", master)
 	Ses.seviye_ayarla(&"SFX", sfx)
 	Ses.seviye_ayarla(&"Muzik", muzik)

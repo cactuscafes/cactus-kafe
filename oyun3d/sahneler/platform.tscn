@@ -1,9 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://betikler/platform.gd" id="1_platform"]
-
-[sub_resource type="BoxMesh" id="Mesh_kutu"]
-resource_local_to_scene = true
+[ext_resource type="BoxMesh" path="res://varliklar/birim_kutu.tres" id="2_kutu"]
 
 [sub_resource type="BoxShape3D" id="Sekil_kutu"]
 resource_local_to_scene = true
@@ -18,7 +16,7 @@ collision_mask = 0
 script = ExtResource("1_platform")
 
 [node name="Gorsel" type="MeshInstance3D" parent="."]
-mesh = SubResource("Mesh_kutu")
+mesh = ExtResource("2_kutu")
 material_override = SubResource("Mat_kutu")
 
 [node name="Carpisma" type="CollisionShape3D" parent="."]

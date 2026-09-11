@@ -163,6 +163,12 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
 - Optimizasyon: profil al, draw call düşür, LOD ve occlusion, doku atlası, KTX2.
 - Çok platform: aynı oyun PC + mobilde 60 FPS. Girdi ve UI ölçeklenmesi.
 - Lokalizasyon (TR/EN), erişilebilirlik (renk körlüğü, tuş atama, altyazı).
+- **Durum: büyük kısmı bitti** → [`oyun3d/README.md`](oyun3d/README.md).
+  Ölçüm hattı ve bütçe denetimi kuruldu (CI'da koşuyor); MultiMesh birleştirme
+  ve gölge ayarlarıyla draw call 137→82 ve 175→105; atlas VRAM sıkıştırmalı;
+  iki shader (tuzak şeritleri — renk körlüğü için desenli uyarı, ve erime);
+  TR/EN çeviri + çeviri bütünlüğü testi; ekran sarsıntısı kapatma seçeneği.
+  Yapılmayanlar: tuş atama ekranı, mobil dokunmatik kontrol, LOD/occlusion.
 
 ### Faz 7 — Uzmanlık (Ay 9–10)
 Bir yön seç ve derinleş:

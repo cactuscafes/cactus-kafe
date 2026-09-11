@@ -6,8 +6,8 @@ extends Node
 ## bölüm eklemek = buraya bir satır eklemek.
 
 const LISTE: Array[Dictionary] = [
-	{"kimlik": "bolum1", "ad": "Kaktüs Parkuru", "sahne": "res://sahneler/bolum1.tscn"},
-	{"kimlik": "bolum2", "ad": "Dikenli Kule", "sahne": "res://sahneler/bolum2.tscn"},
+	{"kimlik": "bolum1", "ad": "BOLUM1_AD", "sahne": "res://sahneler/bolum1.tscn"},
+	{"kimlik": "bolum2", "ad": "BOLUM2_AD", "sahne": "res://sahneler/bolum2.tscn"},
 ]
 
 func sayi() -> int:
@@ -23,9 +23,10 @@ func sahne(kimlik: String) -> String:
 	var b := bilgi(kimlik)
 	return b.get("sahne", "")
 
+## Bölüm adı çeviri anahtarı olarak tutuluyor; burada çevrilmiş hâli döner.
 func ad(kimlik: String) -> String:
 	var b := bilgi(kimlik)
-	return b.get("ad", kimlik)
+	return tr(b.get("ad", kimlik))
 
 ## Sıradaki bölümün kimliği; sonuncudaysa boş metin.
 func sonraki(kimlik: String) -> String:

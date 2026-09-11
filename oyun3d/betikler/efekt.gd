@@ -23,6 +23,8 @@ func _process(delta: float) -> void:
 
 ## Kameraya sarsıntı yollar. guc ~ 0.1 hafif, 0.5 sert.
 func sarsint(guc: float) -> void:
+	if not Ayarlar.sarsinti:
+		return
 	sarsildi.emit(guc)
 
 ## Vuruş anında zamanı kısa süre neredeyse durdurur (hit-stop). Darbeye

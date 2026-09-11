@@ -15,9 +15,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -260.0
-offset_top = -175.0
+offset_top = -215.0
 offset_right = 260.0
-offset_bottom = 175.0
+offset_bottom = 215.0
 
 [node name="Kutu" type="VBoxContainer" parent="Panel"]
 anchor_right = 1.0
@@ -30,14 +30,14 @@ theme_override_constants/separation = 12
 
 [node name="Baslik" type="Label" parent="Panel/Kutu"]
 theme_override_font_sizes/font_size = 24
-text = "Ayarlar"
+text = "AYAR_BASLIK"
 
 [node name="MasterSatir" type="HBoxContainer" parent="Panel/Kutu"]
 theme_override_constants/separation = 14
 
 [node name="Etiket" type="Label" parent="Panel/Kutu/MasterSatir"]
 custom_minimum_size = Vector2(170, 0)
-text = "Ana ses"
+text = "AYAR_ANA_SES"
 
 [node name="Master" type="HSlider" parent="Panel/Kutu/MasterSatir"]
 unique_name_in_owner = true
@@ -53,7 +53,7 @@ theme_override_constants/separation = 14
 
 [node name="Etiket" type="Label" parent="Panel/Kutu/SFXSatir"]
 custom_minimum_size = Vector2(170, 0)
-text = "Efektler"
+text = "AYAR_EFEKT"
 
 [node name="SFX" type="HSlider" parent="Panel/Kutu/SFXSatir"]
 unique_name_in_owner = true
@@ -69,7 +69,7 @@ theme_override_constants/separation = 14
 
 [node name="Etiket" type="Label" parent="Panel/Kutu/MuzikSatir"]
 custom_minimum_size = Vector2(170, 0)
-text = "Müzik"
+text = "AYAR_MUZIK"
 
 [node name="Muzik" type="HSlider" parent="Panel/Kutu/MuzikSatir"]
 unique_name_in_owner = true
@@ -85,7 +85,7 @@ theme_override_constants/separation = 14
 
 [node name="Etiket" type="Label" parent="Panel/Kutu/HassasiyetSatir"]
 custom_minimum_size = Vector2(170, 0)
-text = "Fare hassasiyeti"
+text = "AYAR_HASSASIYET"
 
 [node name="Hassasiyet" type="HSlider" parent="Panel/Kutu/HassasiyetSatir"]
 unique_name_in_owner = true
@@ -96,13 +96,28 @@ min_value = 1.0
 max_value = 12.0
 step = 0.2
 
+[node name="Sarsinti" type="CheckButton" parent="Panel/Kutu"]
+unique_name_in_owner = true
+text = "AYAR_SARSINTI"
+
+[node name="DilSatir" type="HBoxContainer" parent="Panel/Kutu"]
+theme_override_constants/separation = 14
+
+[node name="Etiket" type="Label" parent="Panel/Kutu/DilSatir"]
+custom_minimum_size = Vector2(170, 0)
+text = "AYAR_DIL"
+
+[node name="Dil" type="OptionButton" parent="Panel/Kutu/DilSatir"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+
 [node name="TamEkran" type="CheckButton" parent="Panel/Kutu"]
 unique_name_in_owner = true
-text = "Tam ekran"
+text = "AYAR_TAM_EKRAN"
 
 [node name="Bosluk" type="Control" parent="Panel/Kutu"]
 custom_minimum_size = Vector2(0, 8)
 
 [node name="Kapat" type="Button" parent="Panel/Kutu"]
 unique_name_in_owner = true
-text = "Geri"
+text = "AYAR_GERI"

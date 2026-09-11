@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" path="res://sahneler/bitis_ekrani.tscn" id="15_bitis"]
 [ext_resource type="PackedScene" path="res://sahneler/dusman.tscn" id="16_dusman"]
 [ext_resource type="NavigationMesh" path="res://navigasyon/bolum1.tres" id="17_nav"]
+[ext_resource type="Script" path="res://betikler/birlestirici.gd" id="20_birlestirici"]
+[ext_resource type="ShaderMaterial" path="res://golgeler/tuzak_malzeme.tres" id="21_tuzak_mat"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -101,7 +103,8 @@ script = ExtResource("8_tuzak")
 
 [node name="Gorsel" type="MeshInstance3D" parent="Tuzak"]
 mesh = SubResource("Mesh_tuzak")
-material_override = SubResource("Mat_tuzak")
+material_override = ExtResource("21_tuzak_mat")
+cast_shadow = 0
 
 [node name="Carpisma" type="CollisionShape3D" parent="Tuzak"]
 shape = SubResource("Sekil_tuzak")
@@ -251,6 +254,10 @@ devriye_ucu = Vector3(0.0, 0.0, -3.5)
 [node name="Dusman3" parent="Dusmanlar" instance=ExtResource("16_dusman")]
 transform = Transform3D(1.00000, 0, -0.00000, 0, 1, 0, 0.00000, 0, 1.00000, -4.0, 0.15, -18.0)
 devriye_ucu = Vector3(7.0, 0.0, 0.0)
+
+[node name="Birlestirici" type="Node3D" parent="."]
+script = ExtResource("20_birlestirici")
+hedefler = [NodePath("../Parkur"), NodePath("../Susleme")]
 
 [node name="Oyuncu" parent="." instance=ExtResource("1_oyuncu")]
 position = Vector3(0, 1.5, 6)

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://crbqma1r38eay"
+
+[deps]
+
+files=["res://arayuz/ceviriler.tr.translation", "res://arayuz/ceviriler.en.translation"]
+
+source_file="res://arayuz/ceviriler.csv"
+dest_files=["res://arayuz/ceviriler.tr.translation", "res://arayuz/ceviriler.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

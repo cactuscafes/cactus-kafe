@@ -27,7 +27,7 @@ func _ready() -> void:
 	_olcumu_yaz()
 
 func _process(delta: float) -> void:
-	_durum.text = "çiçek %d/%d     süre %.1f sn     ölüm %d" % [
+	_durum.text = tr("HUD_DURUM") % [
 		_oyun.toplanan, _oyun.hedef_toplanabilir, _oyun.sure, _oyun.olum,
 	]
 	_sayac -= delta
@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 		_olcumu_yaz()
 
 func _cani_yaz(can: int, en_fazla: int) -> void:
-	_can.text = "can %d / %d" % [can, en_fazla]
+	_can.text = tr("HUD_CAN") % [can, en_fazla]
 	# Son can farklı renkte: sayıyı okumadan da durum anlaşılsın.
 	_can.add_theme_color_override("font_color",
 		Color(1.0, 0.35, 0.3) if can <= 1 else Color(0.898, 0.6, 0.35))
@@ -50,6 +50,6 @@ func _olcumu_yaz() -> void:
 	var cizim := RenderingServer.get_rendering_info(
 		RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME
 	)
-	_olcum.text = "%d FPS · %.1f ms (bütçe %.1f) · %d draw call · %s\nWASD hareket · Shift koş · Space zıpla · R yeniden · Esc duraklat" % [
-		fps, ms, BUTCE_MS, cizim, OS.get_name(),
+	_olcum.text = "%d FPS · %.1f ms (bütçe %.1f) · %d draw call · %s\n%s" % [
+		fps, ms, BUTCE_MS, cizim, OS.get_name(), tr("HUD_TUSLAR"),
 	]

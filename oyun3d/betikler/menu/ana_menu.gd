@@ -34,15 +34,15 @@ func _bolumleri_kur() -> void:
 		buton.custom_minimum_size = Vector2(340, 0)
 		var sure: float = kayit["sure"]
 		buton.text = "%d. %s%s" % [
-			i + 1, bilgi["ad"],
+			i + 1, tr(bilgi["ad"]),
 			"" if sure <= 0.0 else "   ·   %s" % Ayarlar.sure_metni(sure),
 		]
 		buton.pressed.connect(
 			func() -> void: get_tree().change_scene_to_file(bilgi["sahne"]))
 		_bolum_kutusu.add_child(buton)
 
-	_rekor.text = ("Henüz oynanmadı" if toplam == 0
-		else "%d bölüm   ·   toplam %d kez oynandı" % [Bolumler.sayi(), toplam])
+	_rekor.text = (tr("MENU_REKOR_YOK") if toplam == 0
+		else tr("MENU_OZET") % [Bolumler.sayi(), toplam])
 
 func _panel(panel: Control, ac: bool) -> void:
 	panel.visible = ac

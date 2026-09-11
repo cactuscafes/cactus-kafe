@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 5** bitti: iki bölüm, dövüş döngüsü, bölüm kütüğü ve betikle
-çekilen tanıtım videosu. Kalan tek adım yayın — [MAGAZA.md](MAGAZA.md).
+Şu an **Faz 6** bitti: ölçülen ve düşürülen draw call, kendi shader'ları, iki
+dil ve erişilebilirlik seçenekleri. Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md).
 
 | Faz | Ne geldi |
 |---|---|
@@ -12,6 +12,7 @@
 | **3** | Ana menü, duraklatma, ayarlar, bitiş ekranı, ses (10 parça, sentezlenmiş), ayar/rekor kaydı, arayüz testleri, itch.io paketi |
 | **4** | Durum makineli düşman + NavigationAgent3D, can/hasar/dokunulmazlık, vuruş duraklaması, ekran sarsıntısı, parçacık, zemin eğimine yatma, yapay zekâ testleri |
 | **5** | Ezme mekaniği ve düşman canı, ikinci bölüm (dikey kule), bölüm kütüğü + bölüm başına rekor, betikle çekilen trailer, mağaza metni |
+| **6** | Performans ölçüm hattı ve bütçe, MultiMesh birleştirme (−%40 draw call), VRAM doku sıkıştırma, iki shader, TR/EN lokalizasyon, erişilebilirlik seçenekleri, görsel çekme aracı |
 
 ---
 
@@ -66,6 +67,7 @@ godot --headless --path oyun3d res://testler/bolum_testi.tscn    # oynanış
 godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
 godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
 godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar, ezme
+godot --headless --path oyun3d res://testler/ceviri_testi.tscn   # çeviri bütünlüğü
 ```
 
 > Testleri **`timeout` ile** koşun (CI öyle yapıyor). Bir test betiği
@@ -130,6 +132,90 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Ölçüm ve optimizasyon (Faz 6)
+
+```bash
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
+  --audio-driver Dummy res://araclar/olcum.tscn
+```
+
+Her bölümü yükleyip 90 kare örnekliyor ve `performans_butce.json`'daki bütçeyle
+karşılaştırıyor; aşılırsa çıkış kodu 1 (CI kırmızı).
+
+**FPS ölçmüyoruz.** Bu makinenin GPU'su yok (yazılımsal llvmpipe); ölçülen kare
+süresi kimsenin donanımını temsil etmez. Ölçülenler donanımdan bağımsız: draw
+call, üçgen sayısı, doku belleği. Bunlar düşerse her donanımda düşer.
+
+### Ne yapıldı, ne kazanıldı
+
+| Değişiklik | bolum1 | bolum2 |
+|---|---|---|
+| Başlangıç | 137 draw call | 175 |
+| Çiçeklerin gölgesi kapatıldı + MultiMesh birleştirme | 85 | 109 |
+| Tuzak shader'ı (gölge yok) | **82** | **105** |
+
+**MultiMesh birleştirme** (`betikler/birlestirici.gd`): editörde her platformu
+ve süslemeyi ayrı düğüm olarak yerleştirmek doğru — taşıyorsun, ölçüsünü
+değiştiriyorsun, görüyorsun. Ama her düğüm en az bir draw call, gölge açıksa
+iki. Oyun çalışırken bunlar mesh'e göre gruplanıp tek `MultiMeshInstance3D`'ye
+iniyor. Renk farkı, örnek renkleri (`use_colors`) ve malzemede
+`vertex_color_use_as_albedo` ile korunuyor.
+
+Bunun için `platform.tscn` ortak bir `birim_kutu.tres` kullanıyor ve ölçü
+mesh'in boyutuna değil düğümün ölçeğine yazılıyor: her platformun kendi mesh'i
+olsaydı gruplanamazlardı.
+
+**Doku:** atlas VRAM sıkıştırmalı (S3TC + ETC2) ve mipmap'li; diskte 4.1 MB.
+Ölçümde 40 MB görünmesinin sebebi yazılımsal Mesa'nın S3TC desteklememesi ve
+dokuyu açması — **gerçek donanımda 4 MB**. Bu yüzden `doku_mb` bütçeye dahil
+değil. Gölge atlası 4096'dan 2048'e (mobilde 1024) indirildi.
+
+## Shader'lar
+
+`golgeler/` altında iki shader, ikisi de `gl_compatibility` (tarayıcı) ile
+uyumlu:
+
+**`tuzak.gdshader`** — dikenli alanda kayan uyarı şeritleri ve nabız.
+Erişilebilirlik gerekçesi: tehlike yalnızca kırmızıyla anlatılırsa kırmızı-yeşil
+renk körü oyuncu (erkeklerin ~%8'i) zemini tehlikeden ayıramaz. Şerit deseni
+renkten bağımsız ikinci bir işaret. Desen dünya koordinatına göre çiziliyor;
+UV'ye göre olsaydı 90 m'lik alanda şeritler metrelerce genişlerdi.
+
+**`erime.gdshader`** — yenilen düşman eriyerek kayboluyor. Gürültü dokudan
+değil üç satırlık bir karma fonksiyonundan geliyor: ek doku belleği ve içe
+aktarım derdi yok. Her düşman malzemenin kendi kopyasını alıyor, yoksa biri
+diğerinin erimesini sürüklerdi.
+
+## Lokalizasyon ve erişilebilirlik
+
+Çeviriler `arayuz/ceviriler.csv` (35 anahtar, TR + EN). Godot Control
+düğümlerinin metnini kendiliğinden çeviriyor, o yüzden sahnelerde düz metin
+yerine anahtar yazılı (`text = "DURAKLAT_DEVAM"`). Kodda üretilen metinler
+`tr("HUD_DURUM") % [...]` biçiminde.
+
+Ayarlar ekranından değiştirilenler: dil, ana ses / efekt / müzik, fare
+hassasiyeti, tam ekran ve **ekran sarsıntısı** (hareket hassasiyeti olanlar
+için; kapatmak oynanışı değiştirmiyor).
+
+`ceviri_testi` eksik çeviriyi yakalıyor — lokalizasyon hatası çökme olarak
+gelmiyor, ekranda ham anahtar (`AYAR_GERI`) olarak görünüyor ve çoğu zaman
+kimse fark etmiyor. Test, anahtarları **koddan ve sahnelerden tarayıp** tabloyla
+karşılaştırıyor.
+
+## Görsel çekme
+
+```bash
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
+  --audio-driver Dummy res://araclar/gorsel_cek.tscn
+```
+
+Mağaza ve belge görselleri için altı kadraj; `user://gorseller/` altına PNG.
+Elle ekran görüntüsü almaktan farkı tekrarlanabilir olması: bölüm değişince
+aynı komut aynı kadrajları yeniden üretiyor. 1920×1080 için `--resolution`
+ekleyin.
 
 ---
 
@@ -401,6 +487,7 @@ oyun3d/
 │   ├── efekt.gd             Autoload: sarsıntı ve vuruş duraklaması
 │   ├── dusman.gd            Durum makineli düşman
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
+│   ├── birlestirici.gd      Statik görselleri MultiMesh'e indirir
 │   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
 │   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
 │   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
@@ -410,6 +497,8 @@ oyun3d/
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
+├── golgeler/                Shader'lar (tuzak şeritleri, erime)
+├── performans_butce.json    Draw call / üçgen bütçeleri
 ├── navigasyon/              Pişirilmiş navigasyon örgüleri (bölüm başına)
 ├── MAGAZA.md                Mağaza metni, trailer ve Steam sırası
 ├── arayuz/tema.tres         Ortak buton/etiket teması
@@ -422,12 +511,15 @@ oyun3d/
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
 │   ├── sesler.py            Ses üretici
 │   ├── navmesh_uret.gd      Navigasyon örgüsü üretici (her bölüm için)
-│   └── tanitim.gd           Trailer çekimi (oyun kendini oynar)
+│   ├── tanitim.gd           Trailer çekimi (oyun kendini oynar)
+│   ├── olcum.gd             Performans ölçümü ve bütçe denetimi
+│   └── gorsel_cek.gd        Mağaza görselleri
 └── testler/
     ├── bolum_testi.gd       Oynanış davranışları
     ├── varlik_testi.gd      Varlık hattı
     ├── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
-    └── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
+    ├── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
+    └── ceviri_testi.gd      Çeviri bütünlüğü
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -523,6 +615,8 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (7 grup) | ✅ hepsi geçti |
+| Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
+| Performans bütçesi | ✅ bolum1 82, bolum2 105 draw call |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
 | Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
@@ -554,11 +648,11 @@ söyler.
 
 ---
 
-## Faz 6'da sırada ne var
+## Faz 7'de sırada ne var
 
-Yol haritasına göre Faz 6 **derinleşme**: shader yazımı, profil alıp draw call
-düşürme, LOD ve occlusion, mobil + PC'de 60 FPS, lokalizasyon ve erişilebilirlik.
-Açık kalan uçlar:
+Yol haritasına göre Faz 7 **uzmanlık**: ağ/çok oyunculu, sistem tasarımı
+(envanter, ekonomi, prosedürel üretim) ya da grafik (özel render pass, GPU
+parçacık, compute shader) — birini seçip derinleşmek. Açık kalan uçlar:
 
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
@@ -575,3 +669,7 @@ Açık kalan uçlar:
   kurgu aşamasında eklenecek.
 - **Bölüm 2 dengelenmedi** — yapı testten geçiyor ama baştan sona oynanıp
   süresi ölçülmedi. Yol haritasının dediği gibi: 20 kişiye oynat, izle.
+- **Tuş atama ekranı yok** — erişilebilirliğin en çok istenen maddesi.
+  `girdi.gd` eylemleri hâlâ kodda; Girdi Haritası paneline taşınıp kaydedilmeli.
+- **Mobil dokunmatik kontrol yok** — Android'e dışa aktarılıyor ama ekranda
+  tuş yok. LOD ve occlusion da yapılmadı; şu anki sahne boyutunda gerekmedi.

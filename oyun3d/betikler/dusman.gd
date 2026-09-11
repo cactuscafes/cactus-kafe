@@ -43,6 +43,7 @@ var _devriye_hedefi := Vector3.ZERO
 var _oyuncu: Node3D
 var _kayip := 0.0
 var _yenilme_zamani := 0.0
+var _erime_malzemeleri: Array[ShaderMaterial] = []
 var _yercekimi: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
 @onready var _ajan: NavigationAgent3D = $Ajan
@@ -173,16 +174,34 @@ func ezildi() -> bool:
 	_gec(Durum.YENILDI)
 	return true
 
-## Yenilme: büzülerek kayboluyor. Anında silmek yerine yarım saniye
-## göstermek, oyuncunun "ben yaptım" bağlantısını kurması için gerekli.
+## Yenilme: eriyerek kayboluyor (golgeler/erime.gdshader). Anında silmek
+## yerine yarım saniye göstermek, oyuncunun "ben yaptım" bağlantısını kurması
+## için gerekli.
+const ERIME_SURESI := 0.62
+
 func _yenilme(delta: float) -> void:
 	_yenilme_zamani += delta
 	velocity.x = move_toward(velocity.x, 0.0, 30.0 * delta)
 	velocity.z = move_toward(velocity.z, 0.0, 30.0 * delta)
-	_model.scale = _model.scale.lerp(Vector3(0.05, 0.05, 0.05), minf(1.0, delta * 6.0))
-	_model.rotation.y += delta * 9.0
-	if _yenilme_zamani > 0.55:
+	_model.rotation.y += delta * 5.0
+	_model.position.y += delta * 0.5
+	var oran := clampf(_yenilme_zamani / ERIME_SURESI, 0.0, 1.0)
+	for mat in _erime_malzemeleri:
+		mat.set_shader_parameter("esik", oran)
+	if _yenilme_zamani > ERIME_SURESI:
 		queue_free()
+
+## Modelin malzemesini erime shader'ıyla değiştirir. Her örnek kendi
+## kopyasını alıyor: iki düşman aynı anda yenilirse biri diğerinin erimesini
+## sürüklemesin.
+func _erimeyi_baslat() -> void:
+	var sablon: ShaderMaterial = preload("res://golgeler/erime_malzeme.tres")
+	for dugum in _model.find_children("*", "MeshInstance3D", true, false):
+		var mi := dugum as MeshInstance3D
+		var mat := sablon.duplicate() as ShaderMaterial
+		mi.material_override = mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_erime_malzemeleri.append(mat)
 
 # --- yardımcılar -----------------------------------------------------------
 
@@ -197,6 +216,7 @@ func _gec(yeni: Durum) -> void:
 			# Çarpışmayı kapat: yenilen düşmanın üstünde durulmasın.
 			$Carpisma.set_deferred("disabled", true)
 			set_collision_layer_value(7, false)
+			_erimeyi_baslat()
 			yenildi.emit()
 		Durum.FARKETTI:
 			_zaman = 0.45

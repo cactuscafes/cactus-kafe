@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://golgeler/erime.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://varliklar/atlas.png" id="2"]
+
+[resource]
+resource_name = "erime_malzeme"
+shader = ExtResource("1")
+shader_parameter/albedo_dokusu = ExtResource("2")
+shader_parameter/esik = 0.0
+shader_parameter/kenar_renk = Color(1, 0.549, 0.353, 1)
+shader_parameter/kenar_kalinligi = 0.12
+shader_parameter/gurultu_olcegi = 14.0

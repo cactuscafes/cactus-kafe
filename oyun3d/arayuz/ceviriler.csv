@@ -1,0 +1,36 @@
+keys,tr,en
+MENU_ALTBASLIK,Çölde zıpla — çiçekleri topla,Hop the desert — collect the blooms
+MENU_AYARLAR,Ayarlar,Settings
+MENU_KREDILER,Krediler,Credits
+MENU_CIK,Çık,Quit
+MENU_REKOR_YOK,Henüz oynanmadı,Not played yet
+MENU_OZET,%d bölüm   ·   toplam %d kez oynandı,%d levels   ·   played %d times
+AYAR_BASLIK,Ayarlar,Settings
+AYAR_ANA_SES,Ana ses,Master volume
+AYAR_EFEKT,Efektler,Sound effects
+AYAR_MUZIK,Müzik,Music
+AYAR_HASSASIYET,Fare hassasiyeti,Mouse sensitivity
+AYAR_TAM_EKRAN,Tam ekran,Fullscreen
+AYAR_SARSINTI,Ekran sarsıntısı,Screen shake
+AYAR_DIL,Dil / Language,Dil / Language
+AYAR_GERI,Geri,Back
+DURAKLAT_BASLIK,Duraklatıldı,Paused
+DURAKLAT_DEVAM,Devam et,Resume
+DURAKLAT_YENIDEN,Bölümü yeniden başlat,Restart level
+DURAKLAT_ANA_MENU,Ana menü,Main menu
+BITIS_BASLIK,Bölüm tamam,Level complete
+BITIS_REKOR,Yeni rekor!,New record!
+BITIS_SURE,Süre   %s,Time   %s
+BITIS_OLUM,Ölüm   %d     Yenilen düşman   %d,Deaths   %d     Enemies defeated   %d
+BITIS_EN_IYI,En iyi   %s,Best   %s
+BITIS_TEKRAR,Tekrar oyna,Play again
+BITIS_SONRAKI,Sonraki: %s,Next: %s
+HUD_DURUM,çiçek %d/%d     süre %.1f sn     ölüm %d,blooms %d/%d     time %.1f s     deaths %d
+HUD_CAN,can %d / %d,health %d / %d
+HUD_TUSLAR,WASD hareket · Shift koş · Space zıpla · R yeniden · Esc duraklat,WASD move · Shift run · Space jump · R restart · Esc pause
+OYUN_KONTROL,Kontrol noktası,Checkpoint
+OYUN_OLDUN,Kontrol noktasına döndün,Back to checkpoint
+OYUN_EKSIK_CICEK,Önce %d çiçeğin hepsini topla (%d kaldı),Collect all %d blooms first (%d left)
+BOLUM1_AD,Kaktüs Parkuru,Cactus Run
+BOLUM2_AD,Dikenli Kule,Thorn Tower
+KREDILER_BASLIK,Krediler,Credits

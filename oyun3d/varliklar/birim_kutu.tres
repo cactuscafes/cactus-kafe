@@ -1,0 +1,5 @@
+[gd_resource type="BoxMesh" format=3]
+
+[resource]
+resource_name = "birim_kutu"
+size = Vector3(1, 1, 1)

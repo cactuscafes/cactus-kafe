@@ -24,14 +24,14 @@ theme_override_constants/separation = 8
 theme_override_font_sizes/font_size = 40
 theme_override_colors/font_color = Color(0.404, 0.702, 0.529, 1)
 horizontal_alignment = 1
-text = "Bölüm tamam"
+text = "BITIS_BASLIK"
 
 [node name="Rekor" type="Label" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.949, 0.808, 0.404, 1)
 horizontal_alignment = 1
-text = "Yeni rekor!"
+text = "BITIS_REKOR"
 
 [node name="Bosluk" type="Control" parent="Merkez/Kutu"]
 custom_minimum_size = Vector2(0, 10)
@@ -61,14 +61,14 @@ custom_minimum_size = Vector2(0, 16)
 [node name="Sonraki" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Sonraki bölüm"
+text = "BITIS_SONRAKI"
 
 [node name="Tekrar" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Tekrar oyna"
+text = "BITIS_TEKRAR"
 
 [node name="AnaMenu" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Ana menü"
+text = "DURAKLAT_ANA_MENU"

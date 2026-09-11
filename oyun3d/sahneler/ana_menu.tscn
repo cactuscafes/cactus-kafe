@@ -32,14 +32,14 @@ text = "CACTUS 3B"
 [node name="AltBaslik" type="Label" parent="Merkez/Kutu"]
 theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
-text = "Kaktüs Parkuru — Bölüm 1"
+text = "MENU_ALTBASLIK"
 
 [node name="Rekor" type="Label" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.6, 0.639, 0.596, 1)
 horizontal_alignment = 1
-text = "En iyi süre: —"
+text = "MENU_REKOR_YOK"
 
 [node name="Bosluk" type="Control" parent="Merkez/Kutu"]
 custom_minimum_size = Vector2(0, 18)
@@ -51,17 +51,17 @@ theme_override_constants/separation = 8
 [node name="Ayarlar" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Ayarlar"
+text = "MENU_AYARLAR"
 
 [node name="Krediler" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Krediler"
+text = "MENU_KREDILER"
 
 [node name="Cik" type="Button" parent="Merkez/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Çık"
+text = "MENU_CIK"
 
 [node name="AyarlarPaneli" parent="." instance=ExtResource("ayarlar")]
 unique_name_in_owner = true
@@ -94,7 +94,7 @@ theme_override_constants/separation = 10
 
 [node name="Baslik" type="Label" parent="KredilerPaneli/Panel/Kutu"]
 theme_override_font_sizes/font_size = 24
-text = "Krediler"
+text = "MENU_KREDILER"
 
 [node name="Metin" type="RichTextLabel" parent="KredilerPaneli/Panel/Kutu"]
 size_flags_vertical = 3
@@ -105,4 +105,4 @@ text = "[b]Cactus 3B[/b] — Cactus Cafe\n\nMotor: [b]Godot Engine 4.7[/b] (MIT)
 [node name="KredilerKapat" type="Button" parent="KredilerPaneli/Panel/Kutu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
-text = "Geri"
+text = "AYAR_GERI"

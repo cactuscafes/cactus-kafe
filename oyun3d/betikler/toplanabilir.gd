@@ -17,6 +17,9 @@ func _ready() -> void:
 	# Aynı anda doğan nesneler aynı fazda salınmasın diye rastgele kaydırma.
 	_t = randf() * TAU
 	body_entered.connect(_giren)
+	# Küçük nesnelerin gölgesi hem görsel gürültü hem fazladan çizim.
+	for dugum in find_children("*", "MeshInstance3D", true, false):
+		(dugum as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func _process(delta: float) -> void:
 	_t += delta

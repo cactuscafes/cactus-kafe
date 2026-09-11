@@ -62,7 +62,7 @@ func _dusman_yenilince() -> void:
 
 func _olunce() -> void:
 	olum += 1
-	mesaj = "Kontrol noktasına döndün"
+	mesaj = tr("OYUN_OLDUN")
 	durum_degisti.emit()
 
 ## Bitiş alanı çağırır. Hepsi toplanmadan bölüm bitmez.
@@ -70,7 +70,7 @@ func bitirmeyi_dene() -> void:
 	if bitti:
 		return
 	if toplanan < hedef_toplanabilir:
-		mesaj = "Önce %d çiçeğin hepsini topla (%d kaldı)" % [
+		mesaj = tr("OYUN_EKSIK_CICEK") % [
 			hedef_toplanabilir, hedef_toplanabilir - toplanan,
 		]
 	else:
@@ -83,5 +83,5 @@ func bitirmeyi_dene() -> void:
 
 func kontrol_noktasi(nokta: Vector3) -> void:
 	_oyuncu.dogum_noktasi_ayarla(nokta)
-	mesaj = "Kontrol noktası"
+	mesaj = tr("OYUN_KONTROL")
 	durum_degisti.emit()

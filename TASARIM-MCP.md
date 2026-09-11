@@ -45,22 +45,43 @@ Claude Code'u anahtarlar ortamda olacak şekilde başlat:
 set -a && source .env && set +a && claude
 ```
 
-### 2.2 Stitch (tek seferlik OAuth)
+### 2.2 Stitch — iki auth yolu
+
+Proxy anahtarsız çalışmaz. Ölçülen hata:
+
+```
+✖ Proxy server error: StitchProxy requires an API key (STITCH_API_KEY)
+  or access token (STITCH_ACCESS_TOKEN)
+```
+
+**Yol A — API anahtarı (basit).** `.env`'de `STITCH_API_KEY` doldur, bitti.
+Paylaşılan/commit'lenmiş config için bu yol daha öngörülebilir.
+
+**Yol B — OAuth (gcloud).**
 
 ```bash
-npx @_davideast/stitch-mcp init      # gcloud + OAuth sihirbazı
-npx @_davideast/stitch-mcp doctor    # sağlık kontrolü
+npx @_davideast/stitch-mcp init      # gcloud kurulumu + OAuth + client config
+npx @_davideast/stitch-mcp doctor    # kontrol listesi
 ```
 
-`init` gcloud kurulumunu, OAuth'u ve MCP client config'ini kendi halleder.
-Google Cloud projende **faturalandırma açık** ve `stitch.googleapis.com` etkin olmalı;
-"Permission Denied" alırsan sebep neredeyse her zaman budur → `doctor --verbose`.
+`doctor` şunları sırayla denetler — hepsi ✓ olmalı:
 
-Zaten gcloud kuruluysa `.mcp.json`'daki `stitch` bloğuna şunu ekle:
-
-```json
-"env": { "STITCH_USE_SYSTEM_GCLOUD": "1" }
 ```
+- Google Cloud CLI          - kullanıcı kimlik doğrulaması
+- application credentials   - ADC quota project
+- aktif proje
+```
+
+Sistemde zaten gcloud varsa `.env`'de `STITCH_USE_SYSTEM_GCLOUD=1` yap; ayrı bir
+gcloud kurulumu indirmesin.
+
+> **Dikkat:** `init`'in `-c/--client` seçeneği **kendi MCP config'ini yazar**.
+> Bu repoda zaten commit'li bir `.mcp.json` var. İkisi birden olursa iki ayrı
+> `stitch` sunucusu tanımlanmış olur. `init`'i çalıştırırken client yapılandırmasını
+> atla, ya da `.mcp.json`'daki `stitch` girdisini sil — ikisinden biri.
+
+Google Cloud projende **faturalandırma açık** ve `stitch.googleapis.com` etkin
+olmalı; "Permission Denied" alırsan sebep neredeyse her zaman budur.
 
 ### 2.3 Doğrulama
 
@@ -68,7 +89,18 @@ Zaten gcloud kuruluysa `.mcp.json`'daki `stitch` bloğuna şunu ekle:
 claude mcp list
 ```
 
-Üçü de `connected` görünmeli. Projedeki `.mcp.json`'ı Claude Code ilk açılışta
+Üçü de `connected` görünmeli.
+
+**Anahtar boşsa sunucu hiç başlamaz** — "bağlanır ama işlev vermez" değil. Ölçülen
+hatalar:
+
+| Sunucu | Anahtar boşken |
+|---|---|
+| `nano-banana` | `GEMINI_API_KEY environment variable is required` |
+| `stitch` | `StitchProxy requires an API key … or access token` |
+| `21st` | yetkilendirme ister (OAuth / API key) |
+
+Yani `claude mcp list`'te `failed` görüyorsan ilk bakılacak yer `.env`. Projedeki `.mcp.json`'ı Claude Code ilk açılışta
 onaylamanı ister — kabul et.
 
 ### 2.4 Alternatif: 21st'i plugin olarak kurmak
@@ -196,36 +228,88 @@ işi değil. MCP araçlarıyla yapılacaklar:
 
 ---
 
-## 6. Hazır prompt şablonları
+## 6. Tasarım brief'i ve prompt'lar
 
-**Stitch — tam sayfa:**
+### 6.1 Marka brief'i — Stitch'e her seferinde bunu ver
+
+Bu blok sitenin gerçek token değerlerinden yazıldı. Olduğu gibi yapıştır; çıktı
+zaten `renkler.css` / `tipografi.css` diline yakın gelir, çeviri mekanik kalır.
+
 ```
-Bursa'da bir specialty kahve dükkanı için ana sayfa. Marka: sıcak toprak tonları,
-krem zemin (#f8f6f2), altın vurgu (#b8965a), koyu mürekkep (#0a0a0a).
-Başlıklar Fraunces serif, gövde Inter. Editoryal ve sakin — bol beyaz alan,
-büyük tipografi, az sayıda öge. Bölümler: tam ekran hero, menü önizleme,
-hikâye, iki şube, Instagram şeridi, footer. Mobil öncelikli.
+MARKA: Cactus Coffee — Bursa Nilüfer, Podyumpark. Kahve, snack & tatlı.
+TON: Editoryal ve sakin. Bol beyaz alan, büyük tipografi, az sayıda öge.
+     Kalabalık değil; her bölüm tek bir şey söylesin.
+
+RENK (bunlar sabit, değiştirme):
+  Altın #c8a86a   — DEKORATİF: çizgi, kenarlık, koyu zeminde metin
+  Altın #8a6b2f   — açık zeminde METİN ve BUTON (beyazda 4.97:1)
+  Mürekkep #1a1a1a · Kâğıt #f8f6f2 · Latte #f0ece4
+  Yeşil ailesi: espresso #0b1a07 · coffee #1a3310 · mocha #2c4a1e
+
+  KURAL: açık zeminde altın metin/buton İÇİN #8a6b2f kullan.
+  #c8a86a beyazda 2.3:1 — WCAG AA'yı geçmez, sadece dekoratif.
+
+TİPOGRAFİ (sabit):
+  Başlık: Fraunces (serif), weight 300, italik vurgu için <em>
+  Gövde:  Inter, weight 300-400
+  Ölçek:  11 / 13 / 15 / 17 / 21px, başlık clamp(32px,4vw,52px), hero clamp(56px,8vw,110px)
+  TABAN 11px — bunun altında metin YOK, buton metni en az 12px.
+  Büyük harf etiketlerde izleme em cinsinden, en fazla 0.28em.
+  Gövde satır yüksekliği 1.75.
+
+BOŞLUK:
+  Bölüm dolgusu clamp(72px,9vw,120px), kenar boşluğu clamp(20px,5vw,60px)
+  Sabit nav var; ilk içerik nav yüksekliği (76px) + nefes kadar aşağıdan başlar.
+
+TEKNİK KISIT:
+  Çıktı vanilla HTML/CSS'e çevrilecek. React yok, Tailwind yok, build yok.
+  Grid'lerde sabit sütun sayısı verme; auto-fit kullan (kart sayısı değişiyor).
+  Mobil öncelikli; 360px'te yatay kaydırma olmayacak.
 ```
 
-**21st — bileşen:**
+### 6.2 Stitch — tam sayfa
+
+Yukarıdaki brief'i yapıştır, sonra:
+
 ```
-21st search: "editorial product card with image, title, price, minimal border"
-3 sonuç göster, sonra seçtiğimi vanilla HTML/CSS'e çevir —
-Tailwind class'ı olmasın, style.css'teki --gold/--paper/--ink token'larını kullan.
+Bu markanın <sayfa adı> sayfasını tasarla.
+Bölümler: <...>
+Her bölüm için kompozisyon kararını gerekçesiyle söyle (neden bu hiyerarşi,
+neden bu boşluk). Kodu sonra isteyeceğim.
 ```
 
-**Nano Banana — görsel:**
+Sonra koda geçerken:
+
+```
+stitch build_site ile <projectId> içindeki ekranları çek.
+Kodu bana ver ama UYGULAMA — önce mevcut sayfayla farkını anlat.
+```
+
+### 6.3 21st — bileşen
+
+```
+21st search: "<bileşen tarifi>"
+3 alternatif göster. Seçtiğimi vanilla HTML/CSS'e çevir:
+Tailwind class'ı olmasın, renkler var(--c-altin-ink) gibi token olsun,
+puntolar var(--t-body) gibi token olsun.
+```
+
+### 6.4 Nano Banana — görsel
+
 ```
 generate_image, aspectRatio 16:9, imageSize 2K:
-"Doğal gün ışığı alan modern bir kahve dükkanı iç mekânı, açık ahşap tezgah,
-espresso makinesi, sıcak nötr palet, sığ alan derinliği, sinematik, insan yok,
-stok fotoğraf hissi olmayan otantik kadraj"
+"Bursa'da bir specialty kahve dükkanı, doğal gün ışığı, açık ahşap tezgah,
+sıcak nötr palet, sığ alan derinliği, sinematik, insan yok, otantik kadraj —
+stok fotoğraf hissi olmasın"
 ```
 
-Marka tutarlılığı için: Nano Banana'ya `images` parametresiyle mevcut
-`foto-hero-podyum2.jpg`'yi referans ver — palet ve mekân hissi korunur.
+Marka tutarlılığı için `images` parametresiyle mevcut `foto-hero-podyum2.jpg`'yi
+referans ver. Önce `gemini-2.5-flash-preview-05-20` ile taslak çıkar, beğendiğini
+`gemini-3-pro-image-preview` ile yeniden üret — Pro görsel başına ~$0.13.
 
----
+**Fotoğraf üstüne metin gelecekse:** hero'da öğrenildi — global karartma yerine
+metin bloğunun arkasına odaklı bir perde koy, fotoğrafın kenarları aydınlık kalsın.
+
 
 ## 7. Kalite kapıları
 

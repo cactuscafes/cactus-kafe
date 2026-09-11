@@ -2,7 +2,11 @@
   "mcpServers": {
     "stitch": {
       "command": "npx",
-      "args": ["-y", "@_davideast/stitch-mcp", "proxy"]
+      "args": ["-y", "@_davideast/stitch-mcp", "proxy"],
+      "env": {
+        "STITCH_API_KEY": "${STITCH_API_KEY:-}",
+        "STITCH_USE_SYSTEM_GCLOUD": "${STITCH_USE_SYSTEM_GCLOUD:-}"
+      }
     },
     "nano-banana": {
       "command": "npx",

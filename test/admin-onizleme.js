@@ -151,7 +151,17 @@ const DENETIM = `(() => {
   p.on('console', m => { if (m.type() === 'error') hatalar.push('konsol: ' + m.text().slice(0, 90)); });
 
   await p.goto(`${TABAN}/${SAYFA}`, { waitUntil: 'load', timeout: 30000 });
-  await p.waitForTimeout(3000);
+  // Panel iskeletle açılıp veriyle doluyor. Sabit bir bekleme yetmiyor —
+  // yarı yüklü sayfada ölçüm yanıltıcı olur (ilk koşuda görüldü: iskelet
+  // haldeyken de "40 öge" sayıldı). Metin öge sayısı DURULANA kadar bekle.
+  let onceki = -1, sabit = 0;
+  for (let i = 0; i < 40 && sabit < 3; i++) {
+    await p.waitForTimeout(400);
+    const say = await p.evaluate(() => [...document.querySelectorAll('body *')]
+      .filter(el => !el.children.length && (el.textContent || '').trim()).length);
+    sabit = (say === onceki) ? sabit + 1 : 0;
+    onceki = say;
+  }
 
   const durum = await p.evaluate(() => {
     const giris = document.getElementById('cactusGiris');

@@ -56,7 +56,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--ink:#14271d;--gold:#b8965a;--paper:#f5f3ec;--stone:#e6e1d6;--mist:#9a9488;--rd:#e74c3c;}
+:root{--ink:#14271d;--gold:#b8965a;--paper:#f5f3ec;--stone:#e6e1d6;--mist:#6b675f;--rd:#e74c3c;}
 body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
 .giris{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);}
 .giris-kart{background:#fff;padding:48px;width:min(420px,95vw);}
@@ -134,7 +134,7 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
 .rap-tabs{display:flex;border-bottom:2px solid var(--stone);margin-bottom:20px;}
 .rap-tab{flex:1;padding:10px 0;text-align:center;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist);}
 .rap-tab.on-p{color:#2d7a4f;border-color:#2d7a4f;}
-.rap-tab.on-f{color:#c67000;border-color:#c67000;}
+.rap-tab.on-f{color:#a35c00;border-color:#a35c00;}
 .rap-sek{display:none;}.rap-sek.on{display:block;}
 .rap-sek-ttl{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin:0 0 10px;color:var(--mist);}
 .rap-nakit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
@@ -249,7 +249,7 @@ td{padding:8px;border-bottom:1px solid var(--paper);}
   --surface:#fffdfa;      /* kart/yüzey: kırık beyaz (saf beyaz değil) */
   --stone:#e3dccd;
   --line:#e6ddcd;
-  --mist:#9a958a;
+  --mist:#6b675f;
   --rad:14px;
   --rad-sm:9px;
   --shadow:0 1px 2px rgba(60,48,30,.04),0 14px 30px -20px rgba(60,48,30,.16);
@@ -850,7 +850,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <input id="waAlici" class="yi" type="tel" inputmode="numeric" placeholder="905XXXXXXXXX" style="width:100%;">
           </div>
           <button onclick="waTest()" id="waTestBtn" style="padding:9px 18px;background:#25d366;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">💬 WhatsApp Test Gönder</button>
-          <button onclick="waTestFsm()" id="waTestFsmBtn" style="padding:9px 18px;background:#c67000;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;margin-left:8px;">🟠 FSM Raporu Gönder</button>
+          <button onclick="waTestFsm()" id="waTestFsmBtn" style="padding:9px 18px;background:#a35c00;color:#fff;border:none;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;margin-left:8px;">🟠 FSM Raporu Gönder</button>
           <div id="waSonuc" style="font-size:12px;padding:8px 0;min-height:20px;"></div>
         </div>
         <div class="pttl">📊 Raporlar</div>
@@ -2242,7 +2242,7 @@ function rapHizliFiltre(tip) {
 function rapSubeRender(k, ozet, detay) {
   var fmt = function(v){ return Number(v||0).toLocaleString('tr-TR'); };
   var subeAd = k==='p' ? 'podyum' : 'fsm';
-  var renkVal = k==='p' ? '#2d7a4f' : '#c67000';
+  var renkVal = k==='p' ? '#2d7a4f' : '#a35c00';
 
   var toplamCiro = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.ciro||0); }, 0);
   var toplamAdet = (ozet.gunler||[]).reduce(function(a,g){ return a+(g.adet||0); }, 0);
@@ -2626,7 +2626,7 @@ async function bugunYukle(){
         '<div style="font-size:11px;margin-top:6px;">'+_bgDelta(_ozetCiro(o),_ozetCiro(yo)).replace(/#7bd88f/g,'#2d7a4f').replace(/#f3a3a3/g,'#c0392b')+'</div>';
     };
     document.getElementById('bg-sube-p').innerHTML=subeKart('🟢 Podyumpark','#2d7a4f',oP,yP);
-    document.getElementById('bg-sube-f').innerHTML=subeKart('🟠 FSM','#c67000',oF,yF);
+    document.getElementById('bg-sube-f').innerHTML=subeKart('🟠 FSM','#a35c00',oF,yF);
 
     // Nakit / Kredi — şube bazında (Podyum | FSM | Toplam)
     function _nkOde(o){ var n=0,k=0; ((o&&o.odeme)||[]).forEach(function(x){ var t=(x.odeme_tipi||'').toLowerCase(); if(t==='nakit') n+=x.ciro||0; else if(t==='kredi') k+=x.ciro||0; }); return {n:n,k:k}; }
@@ -2637,7 +2637,7 @@ async function bugunYukle(){
     var _bt='border-top:1px solid #f0ede8;';
     document.getElementById('bg-nakit').innerHTML=
       '<table style="grid-column:1/-1;width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1.5px solid var(--stone);border-radius:10px;overflow:hidden;">'+
-      '<thead><tr><th style="'+_th+'text-align:left;color:var(--mist);"></th><th style="'+_th+'text-align:right;color:#2d7a4f;">🟢 Podyum</th><th style="'+_th+'text-align:right;color:#c67000;">🟠 FSM</th><th style="'+_th+'text-align:right;color:var(--ink);">Toplam</th></tr></thead><tbody>'+
+      '<thead><tr><th style="'+_th+'text-align:left;color:var(--mist);"></th><th style="'+_th+'text-align:right;color:#2d7a4f;">🟢 Podyum</th><th style="'+_th+'text-align:right;color:#a35c00;">🟠 FSM</th><th style="'+_th+'text-align:right;color:var(--ink);">Toplam</th></tr></thead><tbody>'+
       '<tr><td style="padding:9px 8px;font-weight:600;">💵 Nakit</td><td style="'+_td+'">'+_bgFmt(nkP.n)+'</td><td style="'+_td+'">'+_bgFmt(nkF.n)+'</td><td style="'+_td+'font-weight:700;color:#1a6b3c;">'+_bgFmt(nakitT)+'</td></tr>'+
       '<tr><td style="padding:9px 8px;font-weight:600;'+_bt+'">💳 Kredi Kartı</td><td style="'+_td+_bt+'">'+_bgFmt(nkP.k)+'</td><td style="'+_td+_bt+'">'+_bgFmt(nkF.k)+'</td><td style="'+_td+_bt+'font-weight:700;color:#1a4b8c;">'+_bgFmt(krediT)+'</td></tr>'+
       '</tbody></table>';
@@ -2824,7 +2824,7 @@ async function canliMasaYukle(){
   try{
     var res=await Promise.all([D('podyum'),D('fsm')]);
     var aP=subeBlok('cm-podyum','🟢 Podyumpark','#2d7a4f',res[0]);
-    var aF=subeBlok('cm-fsm','🟠 FSM','#c67000',res[1]);
+    var aF=subeBlok('cm-fsm','🟠 FSM','#a35c00',res[1]);
     var toplamMasa=aP.length+aF.length;
     var toplamHesap=aP.concat(aF).reduce(function(a,t){return a+t.tutar;},0);
     document.getElementById('cm-ozet').innerHTML=[
@@ -4173,7 +4173,7 @@ async function ziyaretYukle(){
     }
     ozet.innerHTML=
       kart('Bugün',d.bugun,(d.bugunTekil||0)+' tekil ziyaretçi','#2d7a4f')+
-      kart('Son 7 Gün',d.hafta,(d.haftaTekil||0)+' tekil','#c67000')+
+      kart('Son 7 Gün',d.hafta,(d.haftaTekil||0)+' tekil','#a35c00')+
       kart('Son 30 Gün',d.ay,(d.ayTekil||0)+' tekil','#1a4b8c')+
       kart('Tüm Zamanlar',d.toplam,(d.tekilToplam||0)+' tekil','#5a2d8c');
     // Günlük tablo
@@ -4971,7 +4971,7 @@ if('serviceWorker' in navigator){
       })
       .catch(function(){ if(dEl) dEl.textContent='⚠️ bağlantı yok'; });
   };
-  function renkVer(adet,esik){ return adet<=0?'#c0392b':(adet<=esik?'#c67000':'#2d7a3a'); }
+  function renkVer(adet,esik){ return adet<=0?'#c0392b':(adet<=esik?'#a35c00':'#2d7a3a'); }
   function sayi(x){ return Math.round(Number(x)*100)/100; }
 
   // ── Hammadde ──

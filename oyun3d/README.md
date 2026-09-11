@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 6** bitti: ölçülen ve düşürülen draw call, kendi shader'ları, iki
-dil ve erişilebilirlik seçenekleri. Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md).
+Şu an **Faz 6** bitti ve üstüne **telefon kontrolleri** eklendi. Yayın hâlâ
+sizde — [MAGAZA.md](MAGAZA.md).
 
 | Faz | Ne geldi |
 |---|---|
@@ -68,6 +68,10 @@ godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
 godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
 godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar, ezme
 godot --headless --path oyun3d res://testler/ceviri_testi.tscn   # çeviri bütünlüğü
+
+# Bu ikisi gerçek pencere ister (bkz. Telefonda oynamak):
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 --audio-driver Dummy \
+  res://testler/dokunmatik_testi.tscn
 ```
 
 > Testleri **`timeout` ile** koşun (CI öyle yapıyor). Bir test betiği
@@ -132,6 +136,58 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Telefonda oynamak
+
+Oyun ekrandaki kontrollerle telefonda oynanır. Aynı derleme masaüstünde de
+çalışır: kontroller **ilk dokunuşta** görünür, klavyeye veya oyun koluna
+dönülünce kaybolur. Oyuncuya "mobil sürüm" diye ayrı bir şey sunulmuyor.
+
+| Bölge | Ne yapar |
+|---|---|
+| Sol yarı | Parmağın indiği yer çubuğun merkezi olur; ittiğin yöne yürür |
+| Sağ yarı | Sürükleyerek kamera |
+| Sağ alt | **ZIPLA** (basılı tutmak yükseltir) ve **KOŞ** (aç/kapa) |
+| Sağ üst | Duraklat (telefonda Esc yok) |
+
+**Girdi kodu hiç değişmedi.** Çubuk ve düğmeler aynı eylemleri basıyor
+(`Input.action_press`), kamera sürüklemesi `Girdi.bakis_kaydi` sinyalinden
+geçiyor. `oyuncu.gd`'ye tek satır dokunulmadan telefon desteği eklendi —
+Faz 1'de girdiyi soyutlamanın karşılığı buydu.
+
+Çubuk **analog**: yarım itersen yarım hızda yürürsün. Bunun için `oyuncu.gd`
+artık girdinin yalnızca yönünü değil boyunu da kullanıyor (klavyede boy zaten
+1, orada bir şey değişmiyor).
+
+İki ayar gerekliydi:
+- `pointing/emulate_mouse_from_touch=false` — açık kalırsa çubuğu sürüklemek
+  aynı anda fare hareketi üretiyor ve kamerayı da döndürüyor.
+- Telefonda fare kilidi istenmiyor (`DisplayServer.is_touchscreen_available()`);
+  tarayıcıda yakalamaya çalışmak hata veriyor.
+
+```bash
+# Dokunmatik testi GERÇEK PENCERE ister, --headless ile çalışmaz
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
+  --audio-driver Dummy res://testler/dokunmatik_testi.tscn
+```
+
+Başsız kipte pencere boyutu (0,0) ve `canvas_items` esneme dönüşümü dokunuş
+koordinatlarını 20 katına çıkarıyor: (200,500) ekrana (4000,10000) olarak
+geliyor. Bu testi yazarken yarım saat "çubuk neden çalışmıyor" diye aradım;
+cevap oyunda değil, test ortamındaydı.
+
+### Sizde kalan: gerçek cihaz
+
+APK bu ortamda alınamıyor (Android SDK indirilemiyor). Sizin makinenizde:
+Godot → Editör Ayarları → Export → Android'e SDK yolunu ve debug keystore'u
+tanıtın, sonra `Android` ön ayarıyla dışa aktarın. Telefonda bakılacaklar:
+
+- Düğme boyutları parmağa uyuyor mu (küçük telefonda ZIPLA'ya rahat basılıyor mu)
+- Kare hızı — 105 draw call sorun çıkarmamalı ama termal kısıtlamayı ancak
+  gerçek cihaz gösterir
+- Çentik/kavisli ekranlarda düğmeler kenara sıkışıyor mu
 
 ---
 
@@ -488,6 +544,8 @@ oyun3d/
 │   ├── dusman.gd            Durum makineli düşman
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
 │   ├── birlestirici.gd      Statik görselleri MultiMesh'e indirir
+│   ├── dokunmatik.gd        Ekran kontrolleri (çubuk, düğmeler)
+│   ├── cubuk_cizimi.gd      Sanal çubuğun çizimi
 │   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
 │   ├── oyuncu.gd            Hareket, zıplama, animasyon sürücüsü
 │   ├── kamera.gd            SpringArm3D üçüncü şahıs kamera
@@ -519,7 +577,8 @@ oyun3d/
     ├── varlik_testi.gd      Varlık hattı
     ├── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
     ├── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
-    └── ceviri_testi.gd      Çeviri bütünlüğü
+    ├── ceviri_testi.gd      Çeviri bütünlüğü
+    └── dokunmatik_testi.gd  Ekran kontrolleri (gerçek pencere ister)
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -617,6 +676,8 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Düşman testleri (7 grup) | ✅ hepsi geçti |
 | Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
 | Performans bütçesi | ✅ bolum1 82, bolum2 105 draw call |
+| Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
+| Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
 | Android dışa aktarımı | ⚠️ denenmedi — Android SDK gerekiyor, o ortamda indirilemedi |
@@ -671,5 +732,6 @@ parçacık, compute shader) — birini seçip derinleşmek. Açık kalan uçlar:
   süresi ölçülmedi. Yol haritasının dediği gibi: 20 kişiye oynat, izle.
 - **Tuş atama ekranı yok** — erişilebilirliğin en çok istenen maddesi.
   `girdi.gd` eylemleri hâlâ kodda; Girdi Haritası paneline taşınıp kaydedilmeli.
-- **Mobil dokunmatik kontrol yok** — Android'e dışa aktarılıyor ama ekranda
-  tuş yok. LOD ve occlusion da yapılmadı; şu anki sahne boyutunda gerekmedi.
+- **LOD ve occlusion yapılmadı** — şu anki sahne boyutunda gerekmedi; bütçe
+  aşılırsa ilk başvurulacak yer orası.
+- **APK gerçek cihazda denenmedi** — SDK bu ortamda yok (yukarıdaki liste).

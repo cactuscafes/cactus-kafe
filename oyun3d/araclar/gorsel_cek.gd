@@ -21,7 +21,28 @@ const KADRAJLAR := [
 	["04_dusman", "res://sahneler/bolum1.tscn", Vector3(2, 4.6, -24), 0.0, 60],
 	["05_kule", "res://sahneler/bolum2.tscn", Vector3(0, 2.2, 9), 0.0, 40],
 	["06_tirmanis", "res://sahneler/bolum2.tscn", Vector3(4.6, 6.5, -9.5), 120.0, 60],
+	# Son kare mobil kontrolleri gösteriyor: mağaza sayfasında "telefonda da
+	# oynanır" iddiasının kanıtı ekran görüntüsüdür, cümle değil.
+	["07_mobil", "res://sahneler/bolum1.tscn", Vector3(0, 1.2, 4), 0.0, 40, true],
 ]
+
+## Ekran kontrolleri ancak dokunma olduktan sonra görünüyor; görsel için
+## parmağı taklit ediyoruz.
+func _dokunmatigi_goster(bolum: Node3D) -> void:
+	var basla := Vector2(250, 520)
+	var dokunus := InputEventScreenTouch.new()
+	dokunus.index = 0
+	dokunus.position = basla
+	dokunus.pressed = true
+	Input.parse_input_event(dokunus)
+	await get_tree().process_frame
+	var surukle := InputEventScreenDrag.new()
+	surukle.index = 0
+	surukle.position = basla + Vector2(62, -78)
+	surukle.relative = Vector2(62, -78)
+	Input.parse_input_event(surukle)
+	for i in 20:
+		await get_tree().process_frame
 
 func _ready() -> void:
 	await get_tree().process_frame
@@ -51,6 +72,9 @@ func _ready() -> void:
 		kol.rotation.x = deg_to_rad(-14.0)
 		for i in int(kadraj[4]):
 			await get_tree().process_frame
+
+		if kadraj.size() > 5 and bool(kadraj[5]):
+			await _dokunmatigi_goster(bolum)
 
 		var goruntu := get_viewport().get_texture().get_image()
 		var yol := "%s/%s.png" % [KLASOR, kadraj[0]]

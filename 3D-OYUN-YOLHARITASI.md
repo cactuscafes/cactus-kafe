@@ -168,7 +168,10 @@ Varsayım: **haftada 10–15 saat**. Daha az zaman ayırırsan fazları uzat, s�
   ve gölge ayarlarıyla draw call 137→82 ve 175→105; atlas VRAM sıkıştırmalı;
   iki shader (tuzak şeritleri — renk körlüğü için desenli uyarı, ve erime);
   TR/EN çeviri + çeviri bütünlüğü testi; ekran sarsıntısı kapatma seçeneği.
-  Yapılmayanlar: tuş atama ekranı, mobil dokunmatik kontrol, LOD/occlusion.
+  Ayrıca **telefon kontrolleri**: ekranda analog çubuk, zıpla/koş/duraklat
+  düğmeleri, parmakla kamera; ilk dokunuşta görünüp klavyeye dönünce
+  kayboluyor. Girdi soyutlaması sayesinde `oyuncu.gd`'ye dokunulmadı.
+  Yapılmayanlar: tuş atama ekranı, LOD/occlusion, gerçek cihazda APK denemesi.
 
 ### Faz 7 — Uzmanlık (Ay 9–10)
 Bir yön seç ve derinleş:

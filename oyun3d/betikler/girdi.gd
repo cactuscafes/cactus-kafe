@@ -6,6 +6,11 @@ extends Node
 ##
 ## Faz 2'de bunlar Proje Ayarları > Girdi Haritası paneline taşınacak; oyuncuya
 ## tuş atama ekranı yazılacağı gün zaten oraya ihtiyaç olacak.
+##
+## DOKUNMATİK: ekrandaki çubuk ve düğmeler de aynı eylemleri basıyor
+## (`Input.action_press`), yani oyuncu ve kamera kodu girdinin nereden geldiğini
+## bilmiyor. Girdiyi soyutlamanın bütün karşılığı bu: telefon desteği eklemek
+## `oyuncu.gd`'ye tek satır dokunmadan yapılabildi.
 
 const OLU_BOLGE := 0.2
 
@@ -36,6 +41,19 @@ const EKSENLER := {
 	"bak_asagi": [JOY_AXIS_RIGHT_Y, 1.0],
 }
 
+## Dokunmatik sürükleme kameraya buradan geçiyor: ekrandaki katman kamerayı
+## tanımıyor, kamera da ekranı tanımıyor.
+signal bakis_kaydi(delta: Vector2)
+## Oyuncu son olarak hangi girdiyi kullandı? Ekran kontrolleri buna göre
+## görünüyor/gizleniyor — aynı derleme hem telefonda hem masaüstünde doğru.
+signal dokunmatik_degisti(aktif: bool)
+
+var dokunmatik := false:
+	set(deger):
+		if dokunmatik != deger:
+			dokunmatik = deger
+			dokunmatik_degisti.emit(deger)
+
 const DUGMELER := {
 	"ziplama": JOY_BUTTON_A,
 	"kosma": JOY_BUTTON_LEFT_SHOULDER,
@@ -62,6 +80,13 @@ func _ready() -> void:
 		var dugme := InputEventJoypadButton.new()
 		dugme.button_index = DUGMELER[eylem]
 		_ekle(eylem, dugme)
+
+func _input(olay: InputEvent) -> void:
+	if olay is InputEventScreenTouch or olay is InputEventScreenDrag:
+		dokunmatik = true
+	elif olay is InputEventKey or olay is InputEventMouseMotion \
+			or olay is InputEventJoypadButton:
+		dokunmatik = false
 
 func _ekle(eylem: String, olay: InputEvent) -> void:
 	if not InputMap.action_has_event(eylem, olay):

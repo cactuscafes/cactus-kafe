@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -18,6 +18,7 @@
 [ext_resource type="NavigationMesh" path="res://navigasyon/bolum2.tres" id="16_nav"]
 [ext_resource type="Script" path="res://betikler/birlestirici.gd" id="20_birlestirici"]
 [ext_resource type="ShaderMaterial" path="res://golgeler/tuzak_malzeme.tres" id="21_tuzak_mat"]
+[ext_resource type="PackedScene" path="res://sahneler/dokunmatik.tscn" id="22_dokunmatik"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_top_color = Color(0.298, 0.310, 0.404, 1)
@@ -331,3 +332,4 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 14
 text = "ölçüm"
 
+[node name="Dokunmatik" parent="." instance=ExtResource("22_dokunmatik")]

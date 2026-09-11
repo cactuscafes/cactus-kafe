@@ -51,12 +51,20 @@ jobs:
             timeout 300 godot --headless "res://testler/${t}_testi.tscn"
           done
 
+      # Dokunmatik testi başsız kipte çalışmaz: pencere boyutu (0,0) olunca
+      # esneme dönüşümü dokunuş koordinatlarını bozuyor.
+      - name: Dokunmatik kontroller
+        working-directory: oyun3d
+        run: |
+          sudo apt-get install -y --no-install-recommends xvfb >/dev/null
+          timeout 400 xvfb-run -a godot --rendering-driver opengl3 \
+            --audio-driver Dummy res://testler/dokunmatik_testi.tscn
+
       # Performans yazılımsal GPU ile ölçülüyor: FPS değil, donanımdan bağımsız
       # sayılar (draw call, üçgen). Bütçe performans_butce.json içinde.
       - name: Performans bütçesi
         working-directory: oyun3d
         run: |
-          sudo apt-get install -y --no-install-recommends xvfb >/dev/null
           timeout 600 xvfb-run -a godot --rendering-driver opengl3 \
             --audio-driver Dummy res://araclar/olcum.tscn
 

@@ -1,0 +1,58 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://betikler/dokunmatik.gd" id="1_dokunmatik"]
+[ext_resource type="Script" path="res://betikler/cubuk_cizimi.gd" id="2_cubuk"]
+[ext_resource type="Theme" path="res://arayuz/tema.tres" id="3_tema"]
+
+[node name="Dokunmatik" type="CanvasLayer"]
+layer = 8
+script = ExtResource("1_dokunmatik")
+
+[node name="Cubuk" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+script = ExtResource("2_cubuk")
+
+[node name="Dugmeler" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("3_tema")
+
+[node name="Zipla" type="Button" parent="Dugmeler"]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -170.0
+offset_right = -40.0
+offset_bottom = -40.0
+theme_override_font_sizes/font_size = 22
+text = "DOKUNMA_ZIPLA"
+
+[node name="Kos" type="Button" parent="Dugmeler"]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -330.0
+offset_top = -140.0
+offset_right = -190.0
+offset_bottom = -40.0
+toggle_mode = true
+theme_override_font_sizes/font_size = 20
+text = "DOKUNMA_KOS"
+
+[node name="Duraklat" type="Button" parent="Dugmeler"]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -130.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 20
+text = "DOKUNMA_DURAKLAT"

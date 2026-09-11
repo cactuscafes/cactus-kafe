@@ -51,5 +51,6 @@ func _olcumu_yaz() -> void:
 		RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME
 	)
 	_olcum.text = "%d FPS · %.1f ms (bütçe %.1f) · %d draw call · %s\n%s" % [
-		fps, ms, BUTCE_MS, cizim, OS.get_name(), tr("HUD_TUSLAR"),
+		fps, ms, BUTCE_MS, cizim, OS.get_name(),
+		tr("HUD_TUSLAR_DOKUNMA") if Girdi.dokunmatik else tr("HUD_TUSLAR"),
 	]

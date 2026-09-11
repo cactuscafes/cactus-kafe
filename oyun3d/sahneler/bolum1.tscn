@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=34 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -19,6 +19,7 @@
 [ext_resource type="NavigationMesh" path="res://navigasyon/bolum1.tres" id="17_nav"]
 [ext_resource type="Script" path="res://betikler/birlestirici.gd" id="20_birlestirici"]
 [ext_resource type="ShaderMaterial" path="res://golgeler/tuzak_malzeme.tres" id="21_tuzak_mat"]
+[ext_resource type="PackedScene" path="res://sahneler/dokunmatik.tscn" id="22_dokunmatik"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_horizon_color = Color(0.72, 0.75, 0.71, 1)
@@ -319,3 +320,5 @@ text = "ölçüm"
 [node name="Duraklat" parent="." instance=ExtResource("14_duraklat")]
 
 [node name="BitisEkrani" parent="." instance=ExtResource("15_bitis")]
+
+[node name="Dokunmatik" parent="." instance=ExtResource("22_dokunmatik")]

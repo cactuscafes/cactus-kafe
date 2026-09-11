@@ -20,7 +20,10 @@ func _ready() -> void:
 	hassasiyet = Ayarlar.hassasiyet
 	Ayarlar.degisti.connect(func() -> void: hassasiyet = Ayarlar.hassasiyet)
 	Efekt.sarsildi.connect(func(guc: float) -> void: _sarsinti = maxf(_sarsinti, guc))
-	kilitle(true)
+	Girdi.bakis_kaydi.connect(func(delta: Vector2) -> void: _cevir(delta * hassasiyet * 1.4))
+	# Telefonda fare kilidi diye bir şey yok; yakalamaya çalışmak tarayıcıda
+	# hata veriyor. Dokunmatikte kamera parmakla sürükleniyor.
+	kilitle(not DisplayServer.is_touchscreen_available())
 
 func _process(delta: float) -> void:
 	# Kol karakteri takip eder ama onunla birlikte dönmez.
@@ -48,7 +51,7 @@ func _unhandled_input(olay: InputEvent) -> void:
 	elif olay is InputEventMouseButton:
 		# Tarayıcı ve mobilde fare kilidi ancak kullanıcı tıklamasıyla açılır.
 		var dugme := olay as InputEventMouseButton
-		if dugme.pressed and _serbest and not get_tree().paused:
+		if dugme.pressed and _serbest and not get_tree().paused and not Girdi.dokunmatik:
 			kilitle(true)
 
 func _cevir(miktar: Vector2) -> void:

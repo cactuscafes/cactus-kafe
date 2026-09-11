@@ -26,6 +26,13 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[input_devices]
+
+; Dokunuşlar fare olayına ÇEVRİLMESİN: açık kaldığında hareket çubuğunu
+; sürüklemek aynı anda fare hareketi üretiyor ve kamerayı da döndürüyor.
+; Godot Control'leri dokunuşu zaten doğrudan işliyor, menüler etkilenmiyor.
+pointing/emulate_mouse_from_touch=false
+
 [internationalization]
 
 locale/translations=PackedStringArray("res://arayuz/ceviriler.tr.translation", "res://arayuz/ceviriler.en.translation")

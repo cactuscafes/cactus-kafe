@@ -122,6 +122,10 @@ func _dikey(delta: float, yerde: bool) -> void:
 
 func _yatay(delta: float, yerde: bool) -> void:
 	var girdi := Input.get_vector("sol", "sag", "ileri", "geri")
+	# Girdinin BOYU da anlamlı: ekrandaki çubuk yarım itilirse yarım hız.
+	# Klavyede boy zaten 1 olduğu için bir şey değişmiyor. Yönü normalize edip
+	# gücü ayrı tutmak şart — normalize etmeden çapraz basmak 1.41 kat hız verir.
+	var guc := minf(girdi.length(), 1.0)
 	var taban := _kol.global_transform.basis
 	var yon := taban.x * girdi.x + taban.z * girdi.y
 	yon.y = 0.0
@@ -129,7 +133,7 @@ func _yatay(delta: float, yerde: bool) -> void:
 		yon = yon.normalized()
 
 	var hiz := kosma_hizi if Input.is_action_pressed("kosma") else yurume_hizi
-	var hedef := yon * hiz
+	var hedef := yon * hiz * guc
 	var degisim := (yer_ivmesi if yerde else hava_ivmesi) * delta
 	if yon == Vector3.ZERO and yerde:
 		degisim = yer_surtunmesi * delta

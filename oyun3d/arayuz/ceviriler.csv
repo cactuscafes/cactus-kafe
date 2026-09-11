@@ -34,3 +34,7 @@ OYUN_EKSIK_CICEK,Önce %d çiçeğin hepsini topla (%d kaldı),Collect all %d bl
 BOLUM1_AD,Kaktüs Parkuru,Cactus Run
 BOLUM2_AD,Dikenli Kule,Thorn Tower
 KREDILER_BASLIK,Krediler,Credits
+DOKUNMA_ZIPLA,ZIPLA,JUMP
+DOKUNMA_KOS,KOŞ,RUN
+DOKUNMA_DURAKLAT,II,II
+HUD_TUSLAR_DOKUNMA,Sol: hareket · Sağ: kamera · ZIPLA · KOŞ,Left: move · Right: camera · JUMP · RUN

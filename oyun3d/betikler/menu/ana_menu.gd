@@ -5,6 +5,7 @@ extends Control
 @onready var _bolum_kutusu: VBoxContainer = %BolumKutusu
 @onready var _ayarlar: Control = %AyarlarPaneli
 @onready var _krediler: Control = %KredilerPaneli
+@onready var _ag: Control = %AgPaneli
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -13,6 +14,8 @@ func _ready() -> void:
 	_bolumleri_kur()
 	%Ayarlar.pressed.connect(func() -> void: _panel(_ayarlar, true))
 	%Krediler.pressed.connect(func() -> void: _panel(_krediler, true))
+	%Yaris.pressed.connect(func() -> void: _panel(_ag, true))
+	_ag.kapandi.connect(func() -> void: _panel(_ag, false))
 	%Cik.pressed.connect(func() -> void: get_tree().quit())
 	%Cik.visible = not OS.has_feature("web")  # tarayıcıda sekmeyi oyun kapatmaz
 	%KredilerKapat.pressed.connect(func() -> void: _panel(_krediler, false))

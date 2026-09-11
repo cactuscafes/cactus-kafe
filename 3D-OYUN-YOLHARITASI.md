@@ -179,6 +179,12 @@ Bir yön seç ve derinleş:
 - **Sistem tasarımı:** envanter, ekonomi, ilerleme eğrisi, prosedürel üretim.
 - **Grafik:** özel render pass, GPU parçacık, compute shader.
 İş piyasasında seni ayıran şey bu uzmanlıktır.
+- **Durum: ağ seçildi ve yapıldı** → [`oyun3d/README.md`](oyun3d/README.md).
+  Hayalet yarış (20 Hz kayıt, aradeğerleme, "bulunduğun yerde hayaletin saati
+  kaçtı" farkı, yalnızca daha hızlı tur kaydedilir) ve gerçek zamanlı yarış
+  (istemci otoritesi + sunucu doğrulaması, meşru ışınlanma bildirimi, 120 ms
+  aradeğerleme tamponu, lobi). İki süreçli ağ testi CI'da koşuyor. Sınırlar
+  yazılı: NAT geçişi ve sunucu simülasyonu yok.
 
 ### Faz 8 — **Proje 3: ticari sürüm** (Ay 11–12)
 - Steam demo, Next Fest katılımı, wishlist kampanyası (hedef: çıkıştan önce **7.000+**).

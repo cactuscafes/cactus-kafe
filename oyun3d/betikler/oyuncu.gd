@@ -224,6 +224,10 @@ func dogum_noktasi_ayarla(nokta: Vector3) -> void:
 	_dogum = nokta
 
 func oldur() -> void:
+	# Ağdaysak sunucuya haber ver: doğum noktasına dönmek meşru bir ışınlanma,
+	# hile değil. Bildirmezsek paketlerimiz düşer ve rakiplerin ekranında
+	# donmuş görünürüz.
+	Ag.yerel_isinlanma()
 	Ses.cal("olum")
 	Efekt.sarsint(0.35)
 	olduruldu.emit()

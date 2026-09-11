@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://betikler/ag/hayalet.gd" id="1_hayalet"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_hayalet"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.435, 0.902, 0.761, 0.32)
+cull_mode = 2
+
+[sub_resource type="BoxMesh" id="Mesh_govde"]
+size = Vector3(0.55, 0.7, 0.35)
+
+[sub_resource type="BoxMesh" id="Mesh_kafa"]
+size = Vector3(0.42, 0.42, 0.42)
+
+[sub_resource type="BoxMesh" id="Mesh_bacak"]
+size = Vector3(0.5, 0.6, 0.2)
+
+[node name="Hayalet" type="Node3D"]
+script = ExtResource("1_hayalet")
+
+[node name="Yon" type="Node3D" parent="."]
+
+[node name="Govde" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, 0.1, 0)
+mesh = SubResource("Mesh_govde")
+material_override = SubResource("Mat_hayalet")
+cast_shadow = 0
+
+[node name="Kafa" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, 0.68, 0)
+mesh = SubResource("Mesh_kafa")
+material_override = SubResource("Mat_hayalet")
+cast_shadow = 0
+
+[node name="Bacaklar" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, -0.55, 0)
+mesh = SubResource("Mesh_bacak")
+material_override = SubResource("Mat_hayalet")
+cast_shadow = 0

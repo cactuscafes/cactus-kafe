@@ -38,3 +38,14 @@ DOKUNMA_ZIPLA,ZIPLA,JUMP
 DOKUNMA_KOS,KOŞ,RUN
 DOKUNMA_DURAKLAT,II,II
 HUD_TUSLAR_DOKUNMA,Sol: hareket · Sağ: kamera · ZIPLA · KOŞ,Left: move · Right: camera · JUMP · RUN
+HUD_HAYALET,hayalet,ghost
+MENU_YARIS,Yarış (ağ),Race (network)
+AG_BASLIK,Yarış lobisi,Race lobby
+AG_AD,Oyuncu adı,Player name
+AG_BARINDIR,Barındır,Host
+AG_ADRES,Sunucu adresi,Server address
+AG_KATIL,Katıl,Join
+AG_BASLAT,Yarışı başlat,Start race
+AG_AYRIL,Bağlantıyı kes,Disconnect
+AG_BAGLI_DEGIL,Bağlı değilsiniz,Not connected
+AG_HAZIR,Hazır,Ready

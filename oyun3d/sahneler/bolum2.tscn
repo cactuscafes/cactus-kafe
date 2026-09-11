@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -19,6 +19,8 @@
 [ext_resource type="Script" path="res://betikler/birlestirici.gd" id="20_birlestirici"]
 [ext_resource type="ShaderMaterial" path="res://golgeler/tuzak_malzeme.tres" id="21_tuzak_mat"]
 [ext_resource type="PackedScene" path="res://sahneler/dokunmatik.tscn" id="22_dokunmatik"]
+[ext_resource type="Script" path="res://betikler/ag/hayalet_kaydedici.gd" id="23_hayalet"]
+[ext_resource type="Script" path="res://betikler/ag/uzak_oyuncular.gd" id="24_uzak"]
 
 [sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
 sky_top_color = Color(0.298, 0.310, 0.404, 1)
@@ -309,6 +311,19 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 20
 text = "can 3 / 3"
 
+[node name="Hayalet" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -180.0
+offset_top = 52.0
+offset_right = 180.0
+offset_bottom = 84.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
 [node name="Mesaj" type="Label" parent="HUD"]
 anchor_right = 1.0
 offset_top = 96.0
@@ -333,3 +348,9 @@ theme_override_font_sizes/font_size = 14
 text = "ölçüm"
 
 [node name="Dokunmatik" parent="." instance=ExtResource("22_dokunmatik")]
+
+[node name="HayaletKaydedici" type="Node" parent="."]
+script = ExtResource("23_hayalet")
+
+[node name="UzakOyuncular" type="Node3D" parent="."]
+script = ExtResource("24_uzak")

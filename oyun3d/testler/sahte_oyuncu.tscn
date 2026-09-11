@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="SphereShape3D" id="Sekil"]
+radius = 0.4
+
+[node name="SahteOyuncu" type="CharacterBody3D"]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Carpisma" type="CollisionShape3D" parent="."]
+shape = SubResource("Sekil")
+
+[node name="Yon" type="Node3D" parent="."]

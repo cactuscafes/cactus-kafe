@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 6** bitti ve üstüne **telefon kontrolleri** eklendi. Yayın hâlâ
-sizde — [MAGAZA.md](MAGAZA.md).
+Şu an **Faz 7** bitti: uzmanlık yönü **ağ** seçildi — hayalet yarış ve
+gerçek zamanlı iki kişilik yarış. Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md).
 
 | Faz | Ne geldi |
 |---|---|
@@ -13,6 +13,8 @@ sizde — [MAGAZA.md](MAGAZA.md).
 | **4** | Durum makineli düşman + NavigationAgent3D, can/hasar/dokunulmazlık, vuruş duraklaması, ekran sarsıntısı, parçacık, zemin eğimine yatma, yapay zekâ testleri |
 | **5** | Ezme mekaniği ve düşman canı, ikinci bölüm (dikey kule), bölüm kütüğü + bölüm başına rekor, betikle çekilen trailer, mağaza metni |
 | **6** | Performans ölçüm hattı ve bütçe, MultiMesh birleştirme (−%40 draw call), VRAM doku sıkıştırma, iki shader, TR/EN lokalizasyon, erişilebilirlik seçenekleri, görsel çekme aracı |
+| **6+** | Telefon kontrolleri: analog çubuk, zıpla/koş/duraklat, parmakla kamera |
+| **7** | **Ağ uzmanlığı**: hayalet yarış (kayıt/oynatma/fark), gerçek zamanlı yarış (otorite, doğrulama, aradeğerleme tamponu), lobi, iki süreçli ağ testi |
 
 ---
 
@@ -68,6 +70,8 @@ godot --headless --path oyun3d res://testler/varlik_testi.tscn   # varlıklar
 godot --headless --path oyun3d res://testler/arayuz_testi.tscn   # menü, ayar, kayıt
 godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, hasar, ezme
 godot --headless --path oyun3d res://testler/ceviri_testi.tscn   # çeviri bütünlüğü
+godot --headless --path oyun3d res://testler/hayalet_testi.tscn  # hayalet kaydı
+testler/ag_testi.sh /yol/godot                                   # ağ (iki süreç)
 
 # Bu ikisi gerçek pencere ister (bkz. Telefonda oynamak):
 xvfb-run -a godot --path oyun3d --rendering-driver opengl3 --audio-driver Dummy \
@@ -136,6 +140,100 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Hayalet yarış (Faz 7)
+
+En iyi turunuz kaydediliyor ve bir dahaki sefere onunla yarışıyorsunuz.
+Ekranın üstünde fark yazıyor: **eksi = hayaletin önündesiniz**.
+
+**Kayıt biçimi** (`betikler/ag/hayalet_kayit.gd`): 20 Hz'de konum, yön ve hız.
+60 saniyelik tur ≈ 24 KB. Her kareyi kaydetmek üç kat büyütür ve hiçbir şey
+kazandırmaz — aradaki değerler doğrusal aradeğerlemeyle geri geliyor. Ağ
+üzerinden taşınacak veride "ne kadar sık" her zaman ilk sorudur; bu yüzden
+hayalet, gerçek zamanlı yarışın da provası.
+
+**Fark nasıl hesaplanıyor:** oyuncunun BULUNDUĞU yerde hayaletin saati kaçtı?
+Kayıttaki en yakın örneğin zamanı ile şimdiki süre arasındaki fark. Arama
+baştan değil, bir önceki eşleşmenin çevresinden başlıyor — oyuncu parkurda
+ilerlediği için önceki eşleşme iyi bir tahmin.
+
+Kayıt yalnızca **daha hızlı** turda değişiyor: hayalet "geçilmesi gereken en
+iyi tur" olmalı, "en son tur" değil.
+
+## Gerçek zamanlı yarış
+
+Ana menü → **Yarış (ağ)** → *Barındır* ya da adresi yazıp *Katıl*. Barındıran
+*Yarışı başlat*'a basınca herkes bölüme geçiyor; rakipler turuncu renkte ve
+adları üstlerinde görünüyor.
+
+### Otorite modeli — ve sınırı
+
+Her oyuncu **kendi** karakterini simüle ediyor (istemci otoritesi). Sunucu
+gelen konumu doğruluyor: iki paket arasında fiziğin izin verdiğinden hızlı
+gidilmişse paket **reddediliyor**.
+
+Bu tam bir hile koruması **değil** ve öyleymiş gibi yazmıyorum: gerçek koruma,
+sunucunun kendi simülasyonunu koşturup istemciyi düzeltmesidir
+(server-authoritative + reconciliation). Buradaki model ışınlanmanın ve kaba
+hız hilesinin önünü kesiyor, yarış oyununda kabul edilebilir bir denge.
+
+**Meşru ışınlanma:** ölünce kontrol noktasına dönmek de "iki paket arasında
+30 metre" demek. Sunucuya bildirilmezse oyuncunun her ölümü hile sayılıyor ve
+paketleri düşüyor — rakiplerin ekranında donuyor. `Ag.yerel_isinlanma()` bunu
+bildiriyor; kötüye kullanılmasın diye 1.5 saniyede birden sık bildirimler yok
+sayılıyor.
+
+### Gecikme
+
+Uzak oyuncular **120 ms geriden** oynatılıyor. Tampon olmadan her kayıp
+pakette karakter zıplıyor; tamponla elde hep aradeğerlenecek iki örnek
+kalıyor. Gördüğünüz şey rakibin gerçekten bulunduğu yer — 120 ms öncesi.
+
+Uzak karakteri yerel olarak simüle etmek (dead reckoning) daha akıcı görünürdü
+ama iki taraf ayrışınca karakter "kayarak" düzelir. Yarışta dürüstlük akıcılıktan
+önemli.
+
+### Neden `MultiplayerSynchronizer` değil
+
+Durum paketleri elle gönderiliyor. Sebep öğrenme değil denetim: kimin neye
+yetkili olduğu, paketin hangi sıklıkta gittiği ve geç gelen paketin ne olacağı
+`ag.gd`'de okunabiliyor. Synchronizer bunları gizler; gizlenen şeyi hata
+ayıklayamazsınız.
+
+### Ağ testi — iki süreç
+
+```bash
+testler/ag_testi.sh /yol/godot
+```
+
+Bir Godot sunucu, bir Godot istemci, 127.0.0.1. Ağ kodu tek süreçte test
+edilemez: asıl sorular (paket geç gelirse, kaybolursa, **sahte** gelirse ne
+olur) ancak iki süreç arasında sorulabiliyor. Bu yüzden diğerleri gibi sahne
+değil, kabuk betiği.
+
+Sunucu bilinen bir yol izliyor (5 m yarıçaplı çember); istemci aldığı
+konumların çember üstünde olup olmadığına bakıyor — iki sürecin saatlerini
+eşitlemeye gerek kalmadan. Ölçülenler: paketler geliyor mu, yarıçap hatası
+(< 0.5 m), ardışık kareler arası en büyük adım (< 1 m, ışınlanma yok),
+ve sunucunun gönderdiğim **hile paketini** reddedip masum paketleri
+reddetmediği.
+
+> Bu son ölçüt bir hata yakaladı: doğrulama, geçen süreyi paketin VARIŞ
+> zamanından hesaplıyordu. Ağ dalgalanmasıyla iki paket aynı karede gelince
+> "0.001 saniyede 0.25 metre" çıkıp masum paketler reddediliyordu. Yanlış
+> pozitif veren doğrulamayı kimse açık bırakmaz, kapatır — o yüzden tabanı
+> gönderim aralığının yarısına çekmek güvenliğin kendisi.
+
+### Açık kalan uçlar
+
+- **NAT geçişi yok.** Aynı ağdaki iki cihaz ya da port yönlendirme gerekiyor.
+  İnternet üzerinden oynatmak için aracı sunucu (relay) ya da eşleştirme
+  servisi lazım — Cloudflare Worker'ınız bu iş için doğal aday.
+- **Sunucu simülasyonu yok** (yukarıdaki otorite sınırı).
+- **Skor tablosu çevrimdışı.** Hayaletler yalnızca `user://` altında; sunucuya
+  yükleyip başkasının hayaletiyle yarışmak bir sonraki adım.
 
 ---
 
@@ -544,6 +642,8 @@ oyun3d/
 │   ├── dusman.gd            Durum makineli düşman
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
 │   ├── birlestirici.gd      Statik görselleri MultiMesh'e indirir
+│   ├── ag/                  Ağ: ag.gd, hayalet_kayit.gd, hayalet_kaydedici.gd,
+│   │                        hayalet.gd, uzak_oyuncu.gd, uzak_oyuncular.gd
 │   ├── dokunmatik.gd        Ekran kontrolleri (çubuk, düğmeler)
 │   ├── cubuk_cizimi.gd      Sanal çubuğun çizimi
 │   ├── menu/                Ana menü, ayarlar paneli, duraklatma, bitiş
@@ -578,7 +678,9 @@ oyun3d/
     ├── arayuz_testi.gd      Menü, ayar, kayıt, duraklatma
     ├── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
     ├── ceviri_testi.gd      Çeviri bütünlüğü
-    └── dokunmatik_testi.gd  Ekran kontrolleri (gerçek pencere ister)
+    ├── dokunmatik_testi.gd  Ekran kontrolleri (gerçek pencere ister)
+    ├── hayalet_testi.gd     Hayalet kaydı, aradeğerleme, HUD
+    └── ag_testi.sh          İki süreçli ağ testi (+ ag_sunucu / ag_istemci)
 ```
 
 `platform.tscn` içindeki mesh, çarpışma şekli ve materyal
@@ -677,6 +779,8 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
 | Performans bütçesi | ✅ bolum1 82, bolum2 105 draw call |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
+| Hayalet testleri (6 grup) | ✅ hepsi geçti |
+| Ağ testi (iki süreç) | ✅ 359 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
 | Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
@@ -709,11 +813,10 @@ söyler.
 
 ---
 
-## Faz 7'de sırada ne var
+## Faz 8'de sırada ne var
 
-Yol haritasına göre Faz 7 **uzmanlık**: ağ/çok oyunculu, sistem tasarımı
-(envanter, ekonomi, prosedürel üretim) ya da grafik (özel render pass, GPU
-parçacık, compute shader) — birini seçip derinleşmek. Açık kalan uçlar:
+Yol haritasına göre Faz 8 **ticari sürüm**: Steam demo, Next Fest, wishlist
+kampanyası, basın kiti, çıkış takvimi. Açık kalan uçlar:
 
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.

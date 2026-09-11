@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://betikler/ag/uzak_oyuncu.gd" id="1_uzak"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_uzak"]
+albedo_color = Color(0.898, 0.616, 0.267, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="Mesh_govde"]
+size = Vector3(0.55, 0.7, 0.35)
+
+[sub_resource type="BoxMesh" id="Mesh_kafa"]
+size = Vector3(0.42, 0.42, 0.42)
+
+[sub_resource type="BoxMesh" id="Mesh_bacak"]
+size = Vector3(0.5, 0.6, 0.2)
+
+[node name="UzakOyuncu" type="Node3D"]
+script = ExtResource("1_uzak")
+
+[node name="Yon" type="Node3D" parent="."]
+
+[node name="Govde" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, 0.1, 0)
+mesh = SubResource("Mesh_govde")
+material_override = SubResource("Mat_uzak")
+
+[node name="Kafa" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, 0.68, 0)
+mesh = SubResource("Mesh_kafa")
+material_override = SubResource("Mat_uzak")
+
+[node name="Bacaklar" type="MeshInstance3D" parent="Yon"]
+position = Vector3(0, -0.55, 0)
+mesh = SubResource("Mesh_bacak")
+material_override = SubResource("Mat_uzak")
+
+[node name="Ad" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+pixel_size = 0.0028
+outline_size = 14
+text = "Oyuncu"

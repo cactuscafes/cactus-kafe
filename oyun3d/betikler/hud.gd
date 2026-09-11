@@ -8,18 +8,23 @@ const BUTCE_MS := 16.6
 
 @export var oyun_yolu: NodePath = ^"../Oyun"
 @export var oyuncu_yolu: NodePath = ^"../Oyuncu"
+@export var hayalet_yolu: NodePath = ^"../HayaletKaydedici"
 
 @onready var _durum: Label = $Durum
 @onready var _mesaj: Label = $Mesaj
 @onready var _olcum: Label = $Olcum
 @onready var _can: Label = %Can
+@onready var _hayalet_etiketi: Label = %Hayalet
 
 var _oyun: Node
+var _hayalet: Node
 var _sayac := 0.0
 
 func _ready() -> void:
 	_oyun = get_node(oyun_yolu)
 	_oyun.durum_degisti.connect(_durumu_yaz)
+	_hayalet = get_node_or_null(hayalet_yolu)
+	_hayalet_etiketi.visible = false
 	var oyuncu := get_node(oyuncu_yolu)
 	oyuncu.can_degisti.connect(_cani_yaz)
 	_cani_yaz(oyuncu.can, oyuncu.can_max)
@@ -30,6 +35,18 @@ func _process(delta: float) -> void:
 	_durum.text = tr("HUD_DURUM") % [
 		_oyun.toplanan, _oyun.hedef_toplanabilir, _oyun.sure, _oyun.olum,
 	]
+	# Görünürlüğe HER KARE karar veriyoruz. _ready'de bir kez bakmak işe
+	# yaramıyor: HUD sahnede kaydediciden önce geldiği için onun _ready'si
+	# henüz çalışmamış oluyor ve hayalet_var daima false görünüyor.
+	_hayalet_etiketi.visible = (_hayalet != null and _hayalet.hayalet_var
+		and not _oyun.bitti)
+	if _hayalet_etiketi.visible:
+		# Eksi = hayaletin önündesin. Renk, sayıyı okumadan önce bilgi versin.
+		var f: float = _hayalet.fark
+		_hayalet_etiketi.text = "%s %+.2f" % [tr("HUD_HAYALET"), f]
+		_hayalet_etiketi.add_theme_color_override("font_color",
+			Color(0.42, 0.9, 0.55) if f <= 0.0 else Color(1.0, 0.55, 0.45))
+
 	_sayac -= delta
 	if _sayac <= 0.0:
 		_sayac = 0.25

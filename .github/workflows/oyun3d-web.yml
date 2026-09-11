@@ -46,10 +46,15 @@ jobs:
         # timeout şart: bir test betiği DERLENMEZSE Godot boş sahneyle
         # sonsuza kadar çalışır ve iş akışı asılı kalır.
         run: |
-          for t in varlik bolum arayuz dusman ceviri; do
+          for t in varlik bolum arayuz dusman ceviri hayalet; do
             echo "--- $t ---"
             timeout 300 godot --headless "res://testler/${t}_testi.tscn"
           done
+
+      # Ağ testi iki Godot süreci açıyor: tek süreçte ağ kodu test edilemez.
+      - name: Ağ (iki süreç)
+        working-directory: oyun3d
+        run: timeout 200 ./testler/ag_testi.sh godot
 
       # Dokunmatik testi başsız kipte çalışmaz: pencere boyutu (0,0) olunca
       # esneme dönüşümü dokunuş koordinatlarını bozuyor.

@@ -18,6 +18,7 @@ Ses="*res://betikler/ses.gd"
 Ayarlar="*res://betikler/ayarlar.gd"
 Efekt="*res://betikler/efekt.gd"
 Bolumler="*res://betikler/bolumler.gd"
+Ag="*res://betikler/ag/ag.gd"
 
 [display]
 

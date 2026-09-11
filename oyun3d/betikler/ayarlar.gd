@@ -21,6 +21,7 @@ var dil := "tr"
 ## yapabiliyor. Kapatmak oynanışı değiştirmiyor, yalnızca kamerayı sabit
 ## tutuyor.
 var sarsinti := true
+var oyuncu_adi := "Oyuncu"
 
 # kayıt — bölüm kimliğine göre: {"bolum1": {"sure": 42.0, "olum": 1, "oynanma": 3}}
 var kayitlar := {}
@@ -39,6 +40,7 @@ func yukle() -> void:
 		tam_ekran = c.get_value("ekran", "tam_ekran", tam_ekran)
 		dil = c.get_value("genel", "dil", dil)
 		sarsinti = c.get_value("erisim", "sarsinti", sarsinti)
+		oyuncu_adi = c.get_value("genel", "oyuncu_adi", oyuncu_adi)
 	var k := ConfigFile.new()
 	kayitlar = {}
 	if k.load(KAYIT_YOLU) == OK:
@@ -58,10 +60,12 @@ func kaydet() -> void:
 	c.set_value("ekran", "tam_ekran", tam_ekran)
 	c.set_value("genel", "dil", dil)
 	c.set_value("erisim", "sarsinti", sarsinti)
+	c.set_value("genel", "oyuncu_adi", oyuncu_adi)
 	c.save(AYAR_YOLU)
 
 func uygula() -> void:
 	TranslationServer.set_locale(dil)
+	Ag.kendi_adim = oyuncu_adi
 	Ses.seviye_ayarla(&"Master", master)
 	Ses.seviye_ayarla(&"SFX", sfx)
 	Ses.seviye_ayarla(&"Muzik", muzik)

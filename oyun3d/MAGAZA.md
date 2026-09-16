@@ -85,6 +85,9 @@ Trailer sayfanın en üstünde otomatik oynar — ilk kare bir ekran görüntüs
 
 ---
 
+> **Takvim:** aşağıdaki sıranın ne zaman yapılacağı
+> [`CIKIS-PLANI.md`](CIKIS-PLANI.md) içinde geri sayım olarak yazılı.
+
 ## Steam sayfası açma sırası
 
 1. **Steamworks hesabı** — partner.steamgames.com, şirket/şahıs bilgileri, vergi
@@ -112,8 +115,8 @@ Trailer sayfanın en üstünde otomatik oynar — ilk kare bir ekran görüntüs
 - [ ] Demo yayında (Steam Next Fest başvurusu için şart)
 - [ ] Trailer 60–90 sn, ilk 5 saniyede oynanış
 - [ ] 5+ ekran görüntüsü, her biri farklı bir şey gösteriyor
-- [ ] Basın kiti: presskit() ya da düz bir sayfa — logo, ekran görüntüleri,
-      trailer bağlantısı, bir paragraf açıklama, iletişim
+- [x] Basın kiti hazır: [`basin/index.html`](basin/index.html) — künye, TR/EN
+      açıklama, yedi 1920×1080 ekran görüntüsü, kullanım izni, iletişim
 - [ ] 20 kişiye oynatıldı ve geri bildirim işlendi (Faz 3'ten devreden görev)
 
 > **Uyarı:** Sayfa açmadan önce oyunun bitmesini bekleme. Wishlist zaman ister;

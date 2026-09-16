@@ -5,8 +5,9 @@ config_version=5
 
 [application]
 
-config/name="Cactus 3B — Faz 0"
-config/description="Merhaba küp: kamera, ışık, zemin ve hareket eden bir karakter."
+config/name="Cactus 3B"
+config/description="Çölde zıpla, çiçekleri topla, dikenli düşmanların üstüne bin."
+config/version="0.8.0"
 run/main_scene="res://sahneler/ana_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
@@ -19,6 +20,8 @@ Ayarlar="*res://betikler/ayarlar.gd"
 Efekt="*res://betikler/efekt.gd"
 Bolumler="*res://betikler/bolumler.gd"
 Ag="*res://betikler/ag/ag.gd"
+Urun="*res://betikler/urun.gd"
+Telemetri="*res://betikler/telemetri.gd"
 
 [display]
 

@@ -1,0 +1,4 @@
+Bu klasör Godot projesinin İÇİNDE ama oyunun parçası DEĞİL: basın kiti, site
+tarafından servis edilen düz bir HTML sayfası. `.gdignore` olmadan Godot yedi
+ekran görüntüsünü içe aktarıp .pck'ye koyuyor — web paketi 8,9 MB yerine
+12,2 MB çıkıyordu. (Dosyanın içeriği Godot için önemsiz; var olması yetiyor.)

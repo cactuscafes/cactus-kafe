@@ -16,6 +16,44 @@ func _ready() -> void:
 	await get_tree().process_frame
 	_calis()
 
+## Demo sürümü: yalnızca ilk bölüm açık ve son bölümün ardından "sonraki
+## bölüm" yerine mağaza çağrısı çıkıyor. Demo yanlışlıkla tam içerikle
+## yayınlanırsa geri alınamaz — bu yüzden testi var.
+func _demo_testi() -> void:
+	var onceki: bool = Urun.demo
+	Urun.demo = true
+	_dogrula(Bolumler.sayi() == 1, "Demoda %d bölüm açık, 1 olmalı" % Bolumler.sayi())
+	_dogrula(Bolumler.sonraki("bolum1") == "",
+		"Demoda ilk bölümden sonra başka bölüme geçiliyor")
+
+	var menu: Control = (load("res://sahneler/ana_menu.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(menu)
+	await _bekle(3)
+	var kutu: VBoxContainer = menu.get_node("%BolumKutusu")
+	_dogrula(kutu.get_child_count() == 1,
+		"Demo menüsünde %d bölüm düğmesi var" % kutu.get_child_count())
+	menu.queue_free()
+	await _bekle(2)
+
+	var bolum: Node3D = (load("res://sahneler/bolum1.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(bolum)
+	await _bekle(5)
+	var oyun := bolum.get_node("Oyun")
+	var bitis: CanvasLayer = bolum.get_node("BitisEkrani")
+	oyun.toplanan = oyun.hedef_toplanabilir
+	oyun.bitirmeyi_dene()
+	await _bekle(3)
+	_dogrula(not bitis.get_node("%Sonraki").visible,
+		"Demoda 'sonraki bölüm' düğmesi görünüyor")
+	_dogrula(bitis.get_node("%DemoNotu").visible, "Demo bitiş notu görünmüyor")
+	print("demo: %d bölüm, sonraki yok, demo notu açık" % Bolumler.sayi())
+	get_tree().paused = false
+	bolum.queue_free()
+	await _bekle(2)
+
+	Urun.demo = onceki
+	_dogrula(Bolumler.sayi() == 2, "Demo kapatılınca bölüm sayısı eski hâline dönmedi")
+
 func _dogrula(kosul: bool, mesaj: String) -> void:
 	if not kosul:
 		_hatalar.append(mesaj)
@@ -32,6 +70,7 @@ func _calis() -> void:
 	await _menu_testi()
 	await _duraklatma_testi()
 	await _bitis_testi()
+	await _demo_testi()
 
 	if _hatalar.is_empty():
 		print("ARAYUZ TESTI: GECTI")

@@ -33,6 +33,19 @@ func _bekle(kare: int) -> void:
 	for i in kare:
 		await get_tree().physics_frame
 
+## Koşul sağlanana kadar bekler (en fazla `azami` fizik karesi).
+##
+## NEDEN SABİT SAYIDA KARE BEKLEMEK YETMİYOR: girdi olayları fizik karesinde
+## değil, idle karesinde işleniyor. Yazılımsal GPU'da (CI, Xvfb) tek bir idle
+## karesi birkaç fizik karesi sürebiliyor; "3 kare bekle" hızlı makinede
+## çalışıp yavaş makinede kalıyor. Sabit bekleme, testi makinenin hızına bağlar.
+func _bekle_kosul(kosul: Callable, azami := 40) -> bool:
+	for i in azami:
+		if kosul.call():
+			return true
+		await get_tree().physics_frame
+	return kosul.call()
+
 ## Ekranın sol/sağ yarısında bir parmak.
 func _dokun(konum: Vector2, basili: bool, indeks := 0) -> void:
 	var olay := InputEventScreenTouch.new()
@@ -80,7 +93,8 @@ func _gorunurluk_testi() -> void:
 	await _bekle(3)
 	_dogrula(not _katman.visible, "Dokunulmadan ekran kontrolleri görünüyor")
 	await _dokun(Vector2(200, 500), true)
-	_dogrula(_katman.visible, "İlk dokunuşta ekran kontrolleri açılmadı")
+	var acildi := await _bekle_kosul(func() -> bool: return _katman.visible)
+	_dogrula(acildi, "İlk dokunuşta ekran kontrolleri açılmadı")
 	await _dokun(Vector2(200, 500), false)
 
 func _cubuk_testi() -> void:
@@ -155,8 +169,8 @@ func _klavyeye_donus_testi() -> void:
 	tus.physical_keycode = KEY_W
 	tus.pressed = true
 	Input.parse_input_event(tus)
-	await _bekle(3)
-	_dogrula(not Girdi.dokunmatik, "Klavyeye basınca dokunmatik kipi kapanmadı")
+	var kapandi := await _bekle_kosul(func() -> bool: return not Girdi.dokunmatik)
+	_dogrula(kapandi, "Klavyeye basınca dokunmatik kipi kapanmadı")
 	_dogrula(not _katman.visible, "Klavyeye basınca ekran kontrolleri gizlenmedi")
 	tus.pressed = false
 	Input.parse_input_event(tus)

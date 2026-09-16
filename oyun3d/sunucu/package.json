@@ -1,0 +1,12 @@
+{
+  "name": "cactus-3b-telemetri",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "description": "Cactus 3B anonim telemetri toplayıcısı (Cloudflare Worker + D1)",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "sema": "wrangler d1 execute cactus-3b-telemetri --remote --file=sema.sql"
+  }
+}

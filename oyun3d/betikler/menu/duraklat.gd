@@ -17,10 +17,24 @@ func _ready() -> void:
 		get_tree().paused = false
 		get_tree().reload_current_scene())
 	%AnaMenu.pressed.connect(func() -> void:
+		_birakmayi_bildir()
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://sahneler/ana_menu.tscn"))
 	_ayarlar.kapandi.connect(func() -> void: _panel(false))
 	MenuYardimci.butonlari_seslendir(self)
+
+## Bölümü yarıda bırakmak en değerli veri: demo nerede kopuyor?
+func _birakmayi_bildir() -> void:
+	var oyun := get_parent().get_node_or_null("Oyun")
+	var oyuncu := get_parent().get_node_or_null("Oyuncu")
+	if oyun == null or oyuncu == null or oyun.bitti:
+		return
+	var k: Vector3 = oyuncu.global_position
+	Telemetri.olay("bolum_birakildi", {
+		"bolum": oyun.bolum_kimligi, "sure": snappedf(oyun.sure, 0.1),
+		"toplanan": oyun.toplanan, "olum": oyun.olum,
+		"x": snappedf(k.x, 0.5), "y": snappedf(k.y, 0.5), "z": snappedf(k.z, 0.5)})
+	Telemetri.gonder()
 
 func _unhandled_input(olay: InputEvent) -> void:
 	if olay.is_action_pressed("duraklat"):

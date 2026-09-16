@@ -22,6 +22,8 @@ var dil := "tr"
 ## tutuyor.
 var sarsinti := true
 var oyuncu_adi := "Oyuncu"
+## Anonim oynanış verisi. VARSAYILAN KAPALI: açık rıza olmadan veri gitmez.
+var telemetri := false
 
 # kayıt — bölüm kimliğine göre: {"bolum1": {"sure": 42.0, "olum": 1, "oynanma": 3}}
 var kayitlar := {}
@@ -41,6 +43,7 @@ func yukle() -> void:
 		dil = c.get_value("genel", "dil", dil)
 		sarsinti = c.get_value("erisim", "sarsinti", sarsinti)
 		oyuncu_adi = c.get_value("genel", "oyuncu_adi", oyuncu_adi)
+		telemetri = c.get_value("genel", "telemetri", telemetri)
 	var k := ConfigFile.new()
 	kayitlar = {}
 	if k.load(KAYIT_YOLU) == OK:
@@ -61,6 +64,7 @@ func kaydet() -> void:
 	c.set_value("genel", "dil", dil)
 	c.set_value("erisim", "sarsinti", sarsinti)
 	c.set_value("genel", "oyuncu_adi", oyuncu_adi)
+	c.set_value("genel", "telemetri", telemetri)
 	c.save(AYAR_YOLU)
 
 func uygula() -> void:

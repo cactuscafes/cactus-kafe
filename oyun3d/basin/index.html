@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cactus 3B — Basın Kiti</title>
+<meta name="description" content="Cactus 3B basın kiti: künye, açıklama, ekran görüntüleri, iletişim.">
+<link rel="icon" href="../icon.svg">
+<style>
+:root{--kagit:#fdfaf3;--murekkep:#2a2a2a;--koyu:#1a3010;--yesil:#2d5a27;--tas:#f2ede1;}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:var(--kagit);color:var(--murekkep);margin:0;line-height:1.7;}
+.sayfa{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
+header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+header img{width:72px;height:72px;}
+h1{font-size:30px;color:var(--koyu);margin:0;}
+.alt{font-size:15px;color:#777;margin:2px 0 0;}
+h2{font-size:20px;color:var(--koyu);margin-top:44px;border-bottom:2px solid var(--tas);padding-bottom:6px;}
+h3{font-size:16px;color:var(--koyu);margin-bottom:4px;}
+p,li,td,th{font-size:15px;}
+a{color:var(--yesil);}
+.kunye{width:100%;border-collapse:collapse;margin-top:12px;}
+.kunye td{border-bottom:1px solid var(--tas);padding:8px 4px;vertical-align:top;}
+.kunye td:first-child{width:190px;color:#777;}
+.kutu{background:var(--tas);border-left:4px solid var(--yesil);padding:14px 18px;margin:20px 0;border-radius:0 8px 8px 0;}
+.kutu p{margin:0;}
+.gorseller{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:16px;}
+.gorseller a{display:block;line-height:0;}
+.gorseller img{width:100%;height:auto;border-radius:6px;border:1px solid var(--tas);}
+.dil{margin-left:auto;display:flex;gap:6px;}
+.dil button{font:inherit;font-size:14px;padding:5px 14px;border:1px solid var(--yesil);background:transparent;color:var(--yesil);border-radius:20px;cursor:pointer;}
+.dil button[aria-pressed="true"]{background:var(--yesil);color:#fff;}
+code{background:var(--tas);padding:1px 5px;border-radius:4px;font-size:13px;}
+pre{background:#1f2a1c;color:#e6efe2;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5;}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--tas);font-size:13px;color:#999;}
+[hidden]{display:none;}
+</style>
+</head>
+<body>
+<div class="sayfa">
+
+<header>
+  <img src="../icon.svg" alt="Cactus 3B simgesi">
+  <div>
+    <h1>Cactus 3B</h1>
+    <p class="alt">Kısa, hızlı, rekor kırmaya dayalı bir 3B platform oyunu</p>
+  </div>
+  <div class="dil">
+    <button id="dugme-tr" aria-pressed="true" onclick="dil('tr')">Türkçe</button>
+    <button id="dugme-en" aria-pressed="false" onclick="dil('en')">English</button>
+  </div>
+</header>
+
+<!-- ======================= TÜRKÇE ======================= -->
+<section id="tr">
+
+<div class="kutu">
+  <p><b>Kısaca:</b> Çölün dikenleri arasında zıpla, sekiz kaktüs çiçeğini topla,
+  dikenli düşmanların üstüne bin. İki bölüm, tek oturuş. Bölümü bitirmek kolay;
+  temiz bitirmek değil. Tarayıcıda, Windows'ta ve telefonda oynanıyor.</p>
+</div>
+
+<h2>Künye</h2>
+<table class="kunye">
+  <tr><td>Geliştirici</td><td>Cactus Cafe (Türkiye)</td></tr>
+  <tr><td>Yayıncı</td><td>Bağımsız (kendi yayını)</td></tr>
+  <tr><td>Çıkış tarihi</td><td>Duyurulacak</td></tr>
+  <tr><td>Platformlar</td><td>Tarayıcı (WebGL), Windows, Android</td></tr>
+  <tr><td>Fiyat</td><td>Duyurulacak · demo ücretsiz</td></tr>
+  <tr><td>Diller</td><td>Türkçe, İngilizce</td></tr>
+  <tr><td>Motor</td><td>Godot 4</td></tr>
+  <tr><td>Oyuncu</td><td>Tek kişilik · yerel ağda iki kişilik deneysel kip</td></tr>
+  <tr><td>Süre</td><td>Yaklaşık 20 dakika · rekor kovalamak sınırsız</td></tr>
+  <tr><td>Site</td><td><a href="https://cactuscafes.com">cactuscafes.com</a></td></tr>
+  <tr><td>İletişim</td><td><a href="mailto:batuhanbulut@cactuscafes.com">batuhanbulut@cactuscafes.com</a></td></tr>
+</table>
+
+<h2>Açıklama</h2>
+<p><b>Çöl seni beklemiyor.</b> Cactus 3B, tek oturuşta bitirilen bir 3B platform
+oyunu. Dikenli tarlaların üstünden basamak taşlarına atlıyor, hareketli
+platformlara yetişiyor, kule tepesindeki çıkışa tırmanıyorsun. Yolda sekiz
+kaktüs çiçeği ve seni fark edince peşine düşen dikenli düşmanlar var.</p>
+
+<p><b>Zıplama hissi önce gelir.</b> Kenardan düştükten sonra hâlâ zıplayabilirsin
+(coyote süresi), havadayken bastığın zıplama yere değince hatırlanır, tuşu erken
+bırakırsan alçak zıplarsın. Fark edilmeyen, ama olmayınca hissedilen şeyler.</p>
+
+<p><b>Düşmanlar adil.</b> Seni 120 derecelik bir koni içinde ve engel yoksa
+görürler — arkadan yaklaşabilir, platformun arkasına saklanabilirsin. Saldırıdan
+önce hazırlanırlar; kaçmak için bir anın vardır.</p>
+
+<p><b>Rekor senin rakibin.</b> Her bölüm süreni ve ölümünü kaydeder.</p>
+
+<h2>Özellikler</h2>
+<ul>
+  <li>İki el yapımı bölüm: yatay parkur ve dikey kule tırmanışı</li>
+  <li>Üstüne zıplayarak yenilen, devriye gezen ve seni kovalayan düşmanlar</li>
+  <li>Coyote süresi, zıplama tamponu, değişken zıplama yüksekliği</li>
+  <li>Bölüm başına süre ve ölüm rekoru, en iyi turun hayaleti</li>
+  <li>Telefonda ekran kontrolleriyle oynanır — ayrı bir sürüm değil, aynı oyun</li>
+  <li>Tarayıcıda oynanır: indirme yok</li>
+</ul>
+
+<h2>Ekran görüntüleri</h2>
+<p>1920×1080 · PNG (kayıpsız). Haber, inceleme ve video içeriklerinde serbestçe
+kullanılabilir. Başka ölçü veya kadraj gerekirse yazın.</p>
+<div class="gorseller">
+  <a href="gorseller/01_baslangic.png"><img loading="lazy" src="gorseller/01_baslangic.png" alt="Bölüm 1'in başlangıcı"></a>
+  <a href="gorseller/02_tuzak.png"><img loading="lazy" src="gorseller/02_tuzak.png" alt="Dikenli tarla ve basamak taşları"></a>
+  <a href="gorseller/03_rampa.png"><img loading="lazy" src="gorseller/03_rampa.png" alt="Rampa ve hareketli platform"></a>
+  <a href="gorseller/04_dusman.png"><img loading="lazy" src="gorseller/04_dusman.png" alt="Kontrol noktası ve düşman bölgesi"></a>
+  <a href="gorseller/05_kule.png"><img loading="lazy" src="gorseller/05_kule.png" alt="Bölüm 2: kule"></a>
+  <a href="gorseller/06_tirmanis.png"><img loading="lazy" src="gorseller/06_tirmanis.png" alt="Kule tırmanışı"></a>
+  <a href="gorseller/07_mobil.png"><img loading="lazy" src="gorseller/07_mobil.png" alt="Telefonda ekran kontrolleri"></a>
+</div>
+
+<h2>Video</h2>
+<p>Tanıtım videosu: <i>duyurulacak</i>. Bu depodan kendiniz de üretebilirsiniz:
+<code>araclar/tanitim.gd</code>, oyunu betikle oynatıp sabit kare hızında kaydediyor.</p>
+
+<h2>Logo ve simge</h2>
+<p><a href="../icon.svg">icon.svg</a> — vektör, her ölçüde kullanılabilir.</p>
+
+<h2>Kullanım izni</h2>
+<div class="kutu">
+  <p>Cactus 3B'nin ekran görüntülerini, videolarını ve logosunu haberlerde,
+  incelemelerde, yayınlarda ve videolarda <b>serbestçe</b> kullanabilirsiniz —
+  izin istemenize gerek yok. <b>Para kazandığınız içerikler de dâhil</b>
+  (YouTube, Twitch, Kick). Telif hakkı talebi göndermiyoruz.</p>
+</div>
+
+<h2>Ödüller ve alıntılar</h2>
+<p>Henüz yok. Oyun çıkmadı; bu bölüm boş olduğu için burada duruyor, doldurmak
+için uydurma alıntı yazmıyoruz.</p>
+
+<h2>Gizlilik</h2>
+<p>Oyun varsayılan olarak hiçbir veri göndermez. Ayarlardan <i>açıkça</i>
+açarsanız hangi bölümde ne kadar oynadığınız ve nerede öldüğünüz anonim olarak
+iletilir; oturum numarası her açılışta yenilenir ve diske yazılmaz, yani iki
+oturum birbirine bağlanamaz. Ad, e-posta, IP, cihaz kimliği ve konum
+toplanmıyor. Ayrıntısı: <code>oyun3d/sunucu/README.md</code>.</p>
+
+<h2>Nasıl yapıldı</h2>
+<p>Oyun, sıfırdan açık bir yol haritası izlenerek yapıldı: araç kurulumundan
+(Godot, Blender) başlayıp karakter kontrolüne, bölüm tasarımına, sese, arayüze,
+performans bütçesine, mobil kontrollere ve ağa kadar. Her aşamanın kararları ve
+tuzakları depodaki <code>oyun3d/README.md</code> ve
+<code>3D-OYUN-YOLHARITASI.md</code> dosyalarında yazılı. Modeller, dokular,
+animasyonlar, ses efektleri ve navigasyon ağı elle değil <b>betikle</b>
+üretiliyor: <code>oyun3d/araclar/</code> altındaki komutlar aynı varlıkları
+her seferinde yeniden üretiyor.</p>
+
+</section>
+
+<!-- ======================= ENGLISH ======================= -->
+<section id="en" hidden>
+
+<div class="kutu">
+  <p><b>In short:</b> Hop across a thorny desert, collect eight cactus blooms,
+  bounce off spiny foes. Two levels, one sitting. Finishing is easy; finishing
+  clean is not. Plays in the browser, on Windows, and on phones.</p>
+</div>
+
+<h2>Fact sheet</h2>
+<table class="kunye">
+  <tr><td>Developer</td><td>Cactus Cafe (Türkiye)</td></tr>
+  <tr><td>Publisher</td><td>Self-published</td></tr>
+  <tr><td>Release date</td><td>To be announced</td></tr>
+  <tr><td>Platforms</td><td>Browser (WebGL), Windows, Android</td></tr>
+  <tr><td>Price</td><td>TBA · demo free</td></tr>
+  <tr><td>Languages</td><td>Turkish, English</td></tr>
+  <tr><td>Engine</td><td>Godot 4</td></tr>
+  <tr><td>Players</td><td>Single player · experimental two-player LAN mode</td></tr>
+  <tr><td>Length</td><td>About 20 minutes · chasing records, unlimited</td></tr>
+  <tr><td>Website</td><td><a href="https://cactuscafes.com">cactuscafes.com</a></td></tr>
+  <tr><td>Contact</td><td><a href="mailto:batuhanbulut@cactuscafes.com">batuhanbulut@cactuscafes.com</a></td></tr>
+</table>
+
+<h2>Description</h2>
+<p><b>The desert will not wait for you.</b> Cactus 3D is a 3D platformer you
+finish in one sitting. You leap from stepping stone to stepping stone over
+thorn fields, catch moving platforms, and climb to the exit atop a tower. Along
+the way: eight cactus blooms and spiny foes that chase you once they spot you.</p>
+
+<p><b>Jump feel comes first.</b> You can still jump shortly after walking off a
+ledge (coyote time), a jump pressed mid-air is remembered on landing, and
+releasing early gives you a shorter hop. Things nobody notices — until they are
+missing.</p>
+
+<p><b>The enemies play fair.</b> They see you inside a 120-degree cone with
+clear line of sight, so you can approach from behind or break line of sight.
+They wind up before striking, which gives you a moment to escape.</p>
+
+<p><b>Your rival is your own record.</b> Every level stores your time and death
+count.</p>
+
+<h2>Features</h2>
+<ul>
+  <li>Two handcrafted levels: a horizontal run and a vertical tower climb</li>
+  <li>Patrolling, chasing enemies you defeat by bouncing on them</li>
+  <li>Coyote time, jump buffering, variable jump height</li>
+  <li>Per-level time and death records, plus a ghost of your best run</li>
+  <li>Touch controls on phones — the same game, not a separate version</li>
+  <li>Plays in the browser: no download</li>
+</ul>
+
+<h2>Screenshots</h2>
+<p>1920×1080 PNG, in the <a href="#tr" onclick="dil('tr')">Turkish section</a>
+above or straight from <code>gorseller/</code>. Free to use in articles,
+reviews and videos; write to us if you need a different crop or size.</p>
+
+<h2>Permission to use</h2>
+<div class="kutu">
+  <p>You may use Cactus 3D's screenshots, video and logo <b>freely</b> in news,
+  reviews, streams and videos — no permission needed, <b>including monetized
+  content</b>. We do not issue copyright claims.</p>
+</div>
+
+<h2>Privacy</h2>
+<p>The game sends nothing by default. If you explicitly opt in, it reports
+anonymously which level you played, for how long, and where you died. The
+session id is regenerated on every launch and never written to disk, so two
+sessions cannot be linked. No name, e-mail, IP, device id or location is
+collected.</p>
+
+</section>
+
+<footer>
+  Cactus 3B · sürüm 0.8.0 · Cactus Cafe ·
+  <a href="https://cactuscafes.com">cactuscafes.com</a>
+</footer>
+
+</div>
+<script>
+// Dil seçimi: iki bölüm, tek düğme çifti. Çerçeve yok — basın kiti sayfası
+// 20 yıl sonra da açılmalı.
+function dil(secim){
+  document.getElementById('tr').hidden = secim !== 'tr';
+  document.getElementById('en').hidden = secim !== 'en';
+  document.getElementById('dugme-tr').setAttribute('aria-pressed', secim === 'tr');
+  document.getElementById('dugme-en').setAttribute('aria-pressed', secim === 'en');
+  document.documentElement.lang = secim;
+}
+// Tarayıcı dili Türkçe değilse İngilizce ile aç.
+if (!(navigator.language || '').toLowerCase().startsWith('tr')) dil('en');
+</script>
+</body>
+</html>

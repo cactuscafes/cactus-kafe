@@ -1,0 +1,2 @@
+Telemetri sunucusu (Cloudflare Worker) — oyunun parçası değil, ayrı dağıtılıyor.
+Godot'nun burayı taramasına gerek yok; bkz. basin/.gdignore.

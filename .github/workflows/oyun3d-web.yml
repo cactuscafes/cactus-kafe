@@ -56,6 +56,13 @@ jobs:
         working-directory: oyun3d
         run: timeout 200 ./testler/ag_testi.sh godot
 
+      # Telemetri: gizlilik kuralları (Godot) + istemci–sunucu gövde sözleşmesi
+      # (Node, Worker'ın kendi doğrulayıcısı). Sözleşme iki ayrı dilde olduğu
+      # için tek taraflı test yeterli değil.
+      - name: Telemetri ve sunucu sözleşmesi
+        working-directory: oyun3d
+        run: timeout 200 ./testler/telemetri_testi.sh godot
+
       # Dokunmatik testi başsız kipte çalışmaz: pencere boyutu (0,0) olunca
       # esneme dönüşümü dokunuş koordinatlarını bozuyor.
       - name: Dokunmatik kontroller

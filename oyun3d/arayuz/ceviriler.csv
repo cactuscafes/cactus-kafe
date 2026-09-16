@@ -49,3 +49,8 @@ AG_BASLAT,Yarışı başlat,Start race
 AG_AYRIL,Bağlantıyı kes,Disconnect
 AG_BAGLI_DEGIL,Bağlı değilsiniz,Not connected
 AG_HAZIR,Hazır,Ready
+MENU_DEMO,Demo sürümü — ilk bölüm,Demo version — first level
+DEMO_BITTI,Demo burada bitiyor. Tam sürümde ikinci bölüm ve ağ yarışı var.,The demo ends here. The full game adds a second level and network racing.
+DEMO_MAGAZA,Dilek listesine ekle,Add to wishlist
+AYAR_TELEMETRI,Anonim oynanış verisi gönder,Send anonymous gameplay data
+AYAR_TELEMETRI_IPUCU,Bölüm süresi ve nerede takıldığın gönderilir. Ad ve kimlik gönderilmez; oturum numarası her açılışta değişir.,Level times and where you got stuck are sent. No name or identity; the session id changes every launch.

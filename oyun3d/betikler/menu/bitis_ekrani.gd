@@ -9,6 +9,10 @@ func _ready() -> void:
 	var oyun := get_node(oyun_yolu)
 	oyun.bolum_bitti.connect(_goster.bind(oyun))
 	%Sonraki.visible = false
+	%Magaza.visible = false
+	%Magaza.pressed.connect(func() -> void:
+		if not Urun.MAGAZA_URL.is_empty():
+			OS.shell_open(Urun.MAGAZA_URL))
 	%Tekrar.pressed.connect(func() -> void:
 		get_tree().paused = false
 		get_tree().reload_current_scene())
@@ -20,6 +24,11 @@ func _ready() -> void:
 func _goster(rekor: bool, oyun: Node) -> void:
 	var sonraki := Bolumler.sonraki(oyun.bolum_kimligi)
 	%Sonraki.visible = sonraki != ""
+	# Demoda son bölüm bitti: dilek listesi çağrısı burada yapılır, çünkü
+	# oyuncunun oyunu en çok sevdiği an tam olarak burası.
+	%Magaza.visible = (Urun.demo and sonraki == ""
+		and not Urun.MAGAZA_URL.is_empty())
+	%DemoNotu.visible = Urun.demo and sonraki == ""
 	if sonraki != "":
 		%Sonraki.text = tr("BITIS_SONRAKI") % Bolumler.ad(sonraki)
 		if not %Sonraki.pressed.is_connected(_sonrakine_gec):

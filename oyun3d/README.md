@@ -72,6 +72,7 @@ godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, 
 godot --headless --path oyun3d res://testler/ceviri_testi.tscn   # çeviri bütünlüğü
 godot --headless --path oyun3d res://testler/hayalet_testi.tscn  # hayalet kaydı
 testler/ag_testi.sh /yol/godot                                   # ağ (iki süreç)
+testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
 # Bu ikisi gerçek pencere ister (bkz. Telefonda oynamak):
 xvfb-run -a godot --path oyun3d --rendering-driver opengl3 --audio-driver Dummy \
@@ -140,6 +141,97 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Ticari sürüm hazırlığı (Faz 8)
+
+Faz 8'in işi kod kadar **karar**: neyi ölçeceğin, neyi paylaşacağın, ne zaman
+yayınlayacağın. Üçü de depoda yazılı — `CIKIS-PLANI.md` (geri sayım takvimi),
+`SURUM-NOTLARI.md` (sürüm geçmişi), `MAGAZA.md` (mağaza metni), `basin/`
+(basın kiti).
+
+### Demo sürümü
+
+Demo ayrı bir kod dalı **değil**: aynı yapının `demo` özellik etiketiyle dışa
+aktarılmış hâli (`export_presets.cfg.ornek` içindeki 3 ve 4 numaralı ön
+ayarlar). `Urun.demo` açıkken:
+
+- `Bolumler.liste()` yalnızca ilk bölümü döndürüyor — bölüm sayacı, "sonraki
+  bölüm" düğmesi ve bitiş ekranı bu listeden besleniyor, dolayısıyla tek yerden
+  kısıtlamak yetiyor;
+- ana menüde "demo" alt başlığı, bitişte tam sürüm notu çıkıyor;
+- `Urun.MAGAZA_URL` doluysa dilek listesi düğmesi görünüyor, boşsa gizleniyor.
+
+> **Neden ayrı dal değil:** ayrı demo dalı tutmak, demoyu güncellemeyi
+> unutmanın en kısa yolu. Aynı yapıdan dışa aktarınca oyun düzelince demo da
+> düzeliyor. Karşılığında bir risk var: demo yapısı tam sürümün içeriğini de
+> taşır. Bu yüzden kısıtlama **içerik listesinde**, bölüm dosyalarında değil —
+> ileride ücretli bölümler eklenirse demo ön ayarına `exclude_filter` de
+> gerekecek.
+
+`arayuz_testi.gd` demo kipini açıp bölüm sayısını, "sonraki bölüm" davranışını
+ve demo notunu ölçüyor. Test olmasaydı demoyu ancak dışa aktarıp oynayarak
+görebilirdin.
+
+### Anonim telemetri (varsayılan kapalı)
+
+Faz 8'in asıl sorusu: **demo nerede kopuyor?** Yirmi kişiyi omzundan izlemek en
+iyi yöntemdir ama ölçeklenmez; ölüm haritası ölçeklenir.
+
+Gizlilik üç kuralla korunuyor ve üçü de kodda:
+
+1. `Ayarlar.telemetri` varsayılan `false` — açık rıza gerekiyor.
+2. `Urun.TELEMETRI_URL` depoda boş; boşken `Telemetri.etkin_mi()` false, hiçbir
+   olay kuyruğa bile girmiyor.
+3. Oturum numarası her açılışta yeniden üretiliyor ve **diske yazılmıyor**:
+   iki oturum birbirine bağlanamıyor. Ad, e-posta, IP, cihaz kimliği, konum yok.
+
+Rıza yokken olayın kuyruğa **hiç girmemesi** bilinçli: sonradan rıza verilince
+geçmişin gönderilmesi, rızanın anlamını ortadan kaldırırdı.
+
+Sunucu tarafı `sunucu/` altında (Cloudflare Worker + D1). Şema sabit sütunlu,
+çünkü **şema gizlilik sözleşmesinin kendisi**: IP veya cihaz kimliği için sütun
+yoksa oraya yazılamaz. Olay adları beyaz listede; listede olmayan bir ad gelirse
+parti tümden reddediliyor.
+
+> **Tuzak — sessiz sözleşme kayması.** İstemci ile sunucu iki ayrı dilde. Bir
+> alan adını oyunda değiştirip sunucuda değiştirmezsen parti sessizce düşer ve
+> bunu haftalar sonra "hiç veri gelmiyor" diye fark edersin. Bu yüzden
+> `testler/telemetri_testi.sh`, oyunun ürettiği **gerçek gövdeyi** alıp
+> Worker'ın **kendi doğrulayıcısından** geçiriyor ve koddaki `Telemetri.olay`
+> çağrılarının adlarını sunucunun beyaz listesiyle karşılaştırıyor. Beyaz
+> listeden bir adı bilerek bozunca test kalıyor — denendi.
+
+### Basın kiti
+
+`basin/index.html` — tek dosya, çerçevesiz, TR/EN. Künye, açıklama, yedi
+1920×1080 ekran görüntüsü, kullanım izni. İzin metni kritik: içerik
+üreticileri **para kazandıkları** videoda kullanıp kullanamayacaklarını bilmek
+ister; "serbestçe kullanabilirsiniz, telif talebi göndermiyoruz" cümlesi
+olmayan bir basın kiti işe yaramaz.
+
+Görseller `araclar/gorsel_cek.gd` ile üretiliyor; elle ekran görüntüsü almakla
+farkı, bölüm değişince aynı komutun aynı kadrajları yeniden üretmesi:
+
+```bash
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 --audio-driver Dummy \
+  --resolution 1920x1080 res://araclar/gorsel_cek.tscn
+cp "$HOME/.local/share/godot/app_userdata/Cactus 3B/gorseller/"*.png oyun3d/basin/gorseller/
+```
+
+> **Tuzak — basın kiti oyunun içine giriyordu.** `basin/` klasörü Godot
+> projesinin içinde; Godot yedi ekran görüntüsünü doku olarak içe aktarıp
+> `.pck`'ye koyuyordu. Web paketi 12,2 MB'tan **8,9 MB**'a indi: klasöre
+> `.gdignore` konunca Godot orayı hiç görmüyor. Oyunun yanında duran her klasör
+> oyunun parçası değildir — ama Godot'ya söylemezsen öyle sanır.
+
+> **Neden JPEG değil PNG:** `.gitattributes` `oyun3d/**/*.jpg` dosyalarını Git
+> LFS'e yolluyor; basın kiti görselleri LFS'e girerse GitHub Pages'te işaretçi
+> dosyası servis edilir ve sayfa kırık görsellerle açılır. PNG bilerek LFS
+> dışında (üretilen doku atlası da öyle). Yedi kare toplam 2,3 MB; kayıpsız ve
+> renkler doğru — 256 renge indirip küçültmeyi denedim, bayraklar sarıdan
+> turuncuya kaydı.
 
 ---
 
@@ -275,6 +367,15 @@ Başsız kipte pencere boyutu (0,0) ve `canvas_items` esneme dönüşümü dokun
 koordinatlarını 20 katına çıkarıyor: (200,500) ekrana (4000,10000) olarak
 geliyor. Bu testi yazarken yarım saat "çubuk neden çalışmıyor" diye aradım;
 cevap oyunda değil, test ortamındaydı.
+
+> **Tuzak — sabit sayıda kare beklemek.** Testin "klavyeye dönünce kontroller
+> gizleniyor mu" adımı bir süre sonra kalmaya başladı; oyunda değişen bir şey
+> yoktu. Sebep: girdi olayları **idle** karesinde işleniyor, test ise **fizik**
+> karesi sayıyor. Yazılımsal GPU'da tek idle karesi 4–5 fizik karesi sürüyor,
+> "3 kare bekle" yetmiyor. Sabit bekleme testi makinenin hızına bağlar; bunun
+> yerine `_bekle_kosul()` koşul sağlanana kadar (en fazla 40 kare) bekliyor.
+> Yavaş makinede kalan bir test, çoğu zaman yavaş makineyi bulmuş demektir —
+> ama burada bulduğu şey oyunun değil, testin kusuruydu.
 
 ### Sizde kalan: gerçek cihaz
 
@@ -777,10 +878,14 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (7 grup) | ✅ hepsi geçti |
 | Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
-| Performans bütçesi | ✅ bolum1 82, bolum2 105 draw call |
+| Performans bütçesi | ✅ bolum1 84, bolum2 105 draw call |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ağ testi (iki süreç) | ✅ 359 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
+| Telemetri testi (7 grup) | ✅ gizlilik kuralları geçti |
+| İstemci–sunucu sözleşmesi | ✅ 3 satır, 4 olay adı, 7 ret kuralı (Node ile) |
+| Basın kiti sayfası | ✅ Chromium'da açıldı, 7 görsel yüklendi, konsol hatası yok |
+| Demo dışa aktarımı | ✅ Windows + Web; tarayıcıda menü "Demo sürümü — ilk bölüm" ve tek bölüm gösterdi |
 | Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
 | Tarayıcıda açılış | ✅ Chromium'da menü → Enter → oyun → Esc → duraklatma akışı çalıştı |
@@ -813,10 +918,10 @@ söyler.
 
 ---
 
-## Faz 8'de sırada ne var
+## Açık uçlar
 
-Yol haritasına göre Faz 8 **ticari sürüm**: Steam demo, Next Fest, wishlist
-kampanyası, basın kiti, çıkış takvimi. Açık kalan uçlar:
+Faz 8 bitti; `1.0.0` için kalanlar `SURUM-NOTLARI.md` sonunda listeli. Kodda
+açık kalan uçlar:
 
 - **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
   gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
@@ -825,8 +930,6 @@ kampanyası, basın kiti, çıkış takvimi. Açık kalan uçlar:
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.
 - **Malzeme paylaşımı** — beş nesnenin beş ayrı malzemesi var, hepsi aynı
   atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).
-- **İkinci bölüm** — şu an tek bölüm var; `oyun.gd` bölüm yükleyicisine
-  dönüşecek.
 - **Kök hareketi (root motion) ve gerçek ayak IK'sı** — ikisi de iskeletli
   model ister; rig'li karakterle birlikte gelir.
 - **Trailer'da ses yok** — Movie Maker ses de yazabiliyor (`.wav` yan dosyası);

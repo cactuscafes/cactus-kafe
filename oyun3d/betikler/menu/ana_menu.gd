@@ -27,8 +27,9 @@ func _ready() -> void:
 ## dokunmak gerekmiyor, `bolumler.gd`'ye bir satır yetiyor.
 func _bolumleri_kur() -> void:
 	var toplam := 0
-	for i in Bolumler.LISTE.size():
-		var bilgi: Dictionary = Bolumler.LISTE[i]
+	var bolumler := Bolumler.liste()
+	for i in bolumler.size():
+		var bilgi: Dictionary = bolumler[i]
 		var kimlik: String = bilgi["kimlik"]
 		var kayit := Ayarlar.kayit(kimlik)
 		toplam += int(kayit["oynanma"])
@@ -46,6 +47,7 @@ func _bolumleri_kur() -> void:
 
 	_rekor.text = (tr("MENU_REKOR_YOK") if toplam == 0
 		else tr("MENU_OZET") % [Bolumler.sayi(), toplam])
+	%AltBaslik.text = tr("MENU_DEMO") if Urun.demo else tr("MENU_ALTBASLIK")
 
 func _panel(panel: Control, ac: bool) -> void:
 	panel.visible = ac

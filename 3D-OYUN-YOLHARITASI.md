@@ -190,6 +190,13 @@ Bir yön seç ve derinleş:
 - Steam demo, Next Fest katılımı, wishlist kampanyası (hedef: çıkıştan önce **7.000+**).
 - Basın/içerik üreticisi listesi, basın kiti, çıkış takvimi.
 - **Çıktı:** satılan bir oyun. Bu noktadan sonra "profesyonel" lafı senin için doğru.
+- **Durum: kod ve içerik tarafı bitti** → demo sürümü (aynı yapının `demo`
+  etiketli dışa aktarımı, tek bölüm + tam sürüm çağrısı), varsayılan kapalı
+  anonim telemetri ve [`oyun3d/sunucu/`](oyun3d/sunucu/) altındaki toplayıcı,
+  [basın kiti](oyun3d/basin/index.html), [çıkış planı](oyun3d/CIKIS-PLANI.md)
+  ve [sürüm notları](oyun3d/SURUM-NOTLARI.md). İstemci–sunucu gövde sözleşmesi
+  testte. **Sende kalan:** Steamworks hesabı, 100 USD Steam Direct ücreti,
+  sayfanın açılması ve Next Fest başvurusu — bunlar hesap ve ödeme işi.
 
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.

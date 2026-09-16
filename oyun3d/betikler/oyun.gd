@@ -34,6 +34,7 @@ func _ready() -> void:
 	for dugum in _bolumdekiler("dusman"):
 		dugum.yenildi.connect(_dusman_yenilince)
 	hedef_toplanabilir = cicekler.size()
+	Telemetri.olay("bolum_basladi", {"bolum": bolum_kimligi})
 	durum_degisti.emit()
 
 ## Verilen gruptaki düğümlerden yalnızca bu bölümün ağacında olanlar.
@@ -62,6 +63,10 @@ func _dusman_yenilince() -> void:
 
 func _olunce() -> void:
 	olum += 1
+	# Ölüm konumu: hangi zıplamada takılındığı ancak böyle görülüyor.
+	var k: Vector3 = _oyuncu.global_position
+	Telemetri.olay("olum", {"bolum": bolum_kimligi, "sure": snappedf(sure, 0.1),
+		"x": snappedf(k.x, 0.5), "y": snappedf(k.y, 0.5), "z": snappedf(k.z, 0.5)})
 	mesaj = tr("OYUN_OLDUN")
 	durum_degisti.emit()
 
@@ -76,6 +81,9 @@ func bitirmeyi_dene() -> void:
 	else:
 		bitti = true
 		mesaj = ""
+		Telemetri.olay("bolum_bitti", {"bolum": bolum_kimligi,
+			"sure": snappedf(sure, 0.1), "olum": olum, "yenilen": yenilen})
+		Telemetri.gonder()
 		Ses.cal("bitis")
 		var rekor := Ayarlar.sonuc_kaydet(bolum_kimligi, sure, olum)
 		bolum_bitti.emit(rekor)

@@ -1,0 +1,27 @@
+# Cactus 3B telemetri worker'ı — kafe worker'ından AYRI dağıtılıyor.
+#
+# ÖNEMLİ: bu dosya yalnızca bu dizinden çalıştırıldığında geçerli. Komutları
+# `oyun3d/sunucu` içinden verin; depo kökünden verirseniz kökteki wrangler.toml
+# (cactus-kafe API worker'ı) devreye girer ve yanlış worker'ı yayınlarsınız.
+#
+#   cd oyun3d/sunucu
+#   npx wrangler d1 create cactus-3b-telemetri     # database_id'yi aşağı yaz
+#   npx wrangler d1 execute cactus-3b-telemetri --remote --file=sema.sql
+#   npx wrangler secret put OZET_ANAHTARI          # /ozet ucunun anahtarı
+#   npx wrangler deploy
+name = "cactus-3b-telemetri"
+compatibility_date = "2026-04-26"
+main = "src/index.js"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cactus-3b-telemetri"
+# `wrangler d1 create` çıktısındaki kimlik buraya. Boşken deploy hata verir —
+# yanlış veritabanına yazmaktansa hata vermesi iyi.
+database_id = ""
+
+# Gözlemlenebilirlik: worker günlükleri. Konsola YALNIZCA hata mesajı yazıyoruz,
+# istek gövdesi veya IP yazmıyoruz; yine de günlüklerin saklama süresini kısa
+# tutun (Cloudflare panelinden).
+[observability]
+enabled = true

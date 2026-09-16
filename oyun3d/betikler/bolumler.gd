@@ -10,8 +10,16 @@ const LISTE: Array[Dictionary] = [
 	{"kimlik": "bolum2", "ad": "BOLUM2_AD", "sahne": "res://sahneler/bolum2.tscn"},
 ]
 
+## Demoda yalnızca ilk bölüm açık. Bölüm listesini süzmek, menüden bitiş
+## ekranına kadar her yeri kendiliğinden doğru yapıyor — "demoda bu düğmeyi
+## gizle" diye yer yer kontrol eklemek yerine.
+func liste() -> Array[Dictionary]:
+	if Urun.demo:
+		return [LISTE[0]] as Array[Dictionary]
+	return LISTE
+
 func sayi() -> int:
-	return LISTE.size()
+	return liste().size()
 
 func bilgi(kimlik: String) -> Dictionary:
 	for b in LISTE:
@@ -30,7 +38,8 @@ func ad(kimlik: String) -> String:
 
 ## Sıradaki bölümün kimliği; sonuncudaysa boş metin.
 func sonraki(kimlik: String) -> String:
-	for i in LISTE.size():
-		if LISTE[i]["kimlik"] == kimlik:
-			return LISTE[i + 1]["kimlik"] if i + 1 < LISTE.size() else ""
+	var l := liste()
+	for i in l.size():
+		if l[i]["kimlik"] == kimlik:
+			return l[i + 1]["kimlik"] if i + 1 < l.size() else ""
 	return ""

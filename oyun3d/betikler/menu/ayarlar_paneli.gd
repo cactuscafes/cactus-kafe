@@ -9,6 +9,7 @@ signal kapandi
 @onready var _hassasiyet: HSlider = %Hassasiyet
 @onready var _tam_ekran: CheckButton = %TamEkran
 @onready var _sarsinti: CheckButton = %Sarsinti
+@onready var _telemetri: CheckButton = %Telemetri
 @onready var _dil: OptionButton = %Dil
 
 const DILLER := [["tr", "Türkçe"], ["en", "English"]]
@@ -21,6 +22,10 @@ func _ready() -> void:
 	_hassasiyet.value = Ayarlar.hassasiyet * 2000.0
 	_tam_ekran.button_pressed = Ayarlar.tam_ekran
 	_sarsinti.button_pressed = Ayarlar.sarsinti
+	_telemetri.button_pressed = Ayarlar.telemetri
+	# Sunucu kurulmadıysa seçeneği hiç gösterme: çalışmayan ayar, olmayan
+	# ayardan kötüdür.
+	_telemetri.visible = not Urun.TELEMETRI_URL.is_empty()
 	for i in DILLER.size():
 		_dil.add_item(DILLER[i][1], i)
 		if DILLER[i][0] == Ayarlar.dil:
@@ -33,6 +38,7 @@ func _ready() -> void:
 	_hassasiyet.value_changed.connect(func(d: float) -> void: _degisti("hassasiyet", d))
 	_tam_ekran.toggled.connect(func(a: bool) -> void: _degisti("tam_ekran", 1.0 if a else 0.0))
 	_sarsinti.toggled.connect(func(a: bool) -> void: _degisti("sarsinti", 1.0 if a else 0.0))
+	_telemetri.toggled.connect(func(a: bool) -> void: _degisti("telemetri", 1.0 if a else 0.0))
 	_dil.item_selected.connect(func(i: int) -> void:
 		Ayarlar.dil = DILLER[i][0]
 		Ayarlar.uygula()
@@ -50,5 +56,6 @@ func _degisti(alan: String, deger: float) -> void:
 		"hassasiyet": Ayarlar.hassasiyet = deger / 2000.0
 		"tam_ekran": Ayarlar.tam_ekran = deger > 0.5
 		"sarsinti": Ayarlar.sarsinti = deger > 0.5
+		"telemetri": Ayarlar.telemetri = deger > 0.5
 	Ayarlar.uygula()
 	Ayarlar.kaydet()

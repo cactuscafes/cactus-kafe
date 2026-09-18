@@ -1,6 +1,11 @@
-// Cactus Coffee — 3 sekmeli iOS uygulaması.
-// Menü sekmesi canlı menüyü gösterir; Sadakat Kartı ve İletişim tamamen native'dir
+// Cactus Coffee — 4 sekmeli iOS uygulaması.
+// Anasayfa ve Menü canlı siteyi gösterir; Sadakat Kartı ve İletişim tamamen native'dir
 // (App Review 4.2 "minimum functionality" gerekçesine cevaben).
+//
+// İçerik mağaza güncellemesi olmadan değişir: web sekmeleri canlı siteden gelir ve uygulama
+// öne gelince bayatsa yenilenir; kart bakiyesi ile iletişimdeki telefon/saatler sunucudan
+// çekilir. Native ekranın kendisini (yeni düğme, sekme, tasarım) değiştirmek ise her zaman
+// App Store onayı ister — Apple, kodu mağaza dışından değiştirmeyi yasaklar (Guideline 2.5.2).
 //
 // Renkler bilinçli olarak sabittir ve uygulama açık temaya kilitlidir: marka rengi
 // krem/yeşil, koyu temada beyaz kart üzerine beyaz yazı sorunu böylece oluşmaz.
@@ -207,7 +212,31 @@ struct SiteView: UIViewRepresentable {
     class Coordinator: NSObject, WKNavigationDelegate {
         let parent: SiteView
         weak var webView: WKWebView?
-        init(_ parent: SiteView) { self.parent = parent }
+        /// Sayfanın son başarıyla yüklendiği an — öne gelince bayat mı diye bakılır.
+        private var sonYukleme = Date()
+
+        init(_ parent: SiteView) {
+            self.parent = parent
+            super.init()
+            NotificationCenter.default.addObserver(self, selector: #selector(oneGeldi),
+                                                   name: UIApplication.didBecomeActiveNotification,
+                                                   object: nil)
+        }
+
+        deinit { NotificationCenter.default.removeObserver(self) }
+
+        /// Uygulama arka plandan dönünce sayfa bayatsa sessizce yeniler: menüde yapılan
+        /// değişiklik müşteri çekip yenilemeden görünür. Eşik, kısa geçişlerde (WhatsApp'a
+        /// bakıp dönmek gibi) kaydırma yerinin sıfırlanmasını önler.
+        @objc private func oneGeldi() {
+            guard let wv = webView, !wv.isLoading,
+                  Date().timeIntervalSince(sonYukleme) > 120 else { return }
+            wv.reload()
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            sonYukleme = Date()
+        }
 
         @objc func yenile(_ rc: UIRefreshControl) {
             webView?.reload()
@@ -332,6 +361,7 @@ struct KartTab: View {
     @State private var gecmis: [String] = []
     @State private var yukleniyor = false
     @State private var hata: String = ""
+    @Environment(\.scenePhase) private var faz
 
     var body: some View {
         ZStack {
@@ -352,6 +382,10 @@ struct KartTab: View {
             }
         }
         .onAppear { if kayitliTel.count >= 10 { Task { await tazele(elle: false) } } }
+        // Kasada yıldız işlendikten sonra uygulamaya dönen müşteri yeni bakiyeyi hemen görsün.
+        .onChange(of: faz) { yeni in
+            if yeni == .active && kayitliTel.count >= 10 { Task { await tazele(elle: false) } }
+        }
     }
 
     private func kartaGec(_ tel: String, _ bilgi: KartBilgi) {
@@ -716,9 +750,105 @@ struct Kutucuk: View {
     }
 }
 
+// ═══════════════════ İLETİŞİM — SUNUCU AYARLARI ═══════════════════
+
+/// Telefon ve çalışma saatleri sitenin yönetim panelindeki ayarlardan gelir
+/// (`/ayar/cek` — sitenin kendisi de aynı ucu kullanıyor). Panelden değiştirildiğinde
+/// uygulama güncellemesi gerekmez. Son geçerli yanıt cihazda saklanır; çevrimdışıyken
+/// o, hiç yoksa aşağıdaki varsayılanlar gösterilir.
+struct Saatler: Equatable {
+    var hiAc: String, hiKap: String, hsAc: String, hsKap: String
+
+    private static func dk(_ s: String) -> Int {   // "16:00" → 960
+        let p = s.split(separator: ":")
+        return (Int(p.first ?? "") ?? 0) * 60 + (p.count > 1 ? Int(p[1]) ?? 0 : 0)
+    }
+
+    /// gun: 0 = Pazar … 6 = Cumartesi. Gece yarısını aşan kapanış +1440 dk.
+    private func aralik(_ gun: Int) -> (Int, Int) {
+        let haftaSonu = gun == 0 || gun == 6
+        let a = Saatler.dk(haftaSonu ? hsAc : hiAc)
+        var k = Saatler.dk(haftaSonu ? hsKap : hiKap)
+        if k <= a { k += 1440 }
+        return (a, k)
+    }
+
+    /// Sitedeki `acikMi` ile birebir aynı kural (site-ayarlar.js) — ikisi farklı
+    /// söylerse müşteri kafaya hangisine inanacağını bilemez. Saat her zaman Türkiye saati.
+    func acikMi(_ an: Date = Date()) -> Bool {
+        var tk = Calendar(identifier: .gregorian)
+        tk.timeZone = TimeZone(identifier: "Europe/Istanbul") ?? .current
+        let c = tk.dateComponents([.weekday, .hour, .minute], from: an)
+        let gun = (c.weekday ?? 1) - 1
+        let simdi = (c.hour ?? 0) * 60 + (c.minute ?? 0)
+        let bugun = aralik(gun)
+        if simdi >= bugun.0 && simdi < bugun.1 { return true }
+        let dun = aralik((gun + 6) % 7)   // dünün gece yarısını aşan kısmı
+        return dun.1 > 1440 && simdi < dun.1 - 1440
+    }
+
+    var metin: String {
+        let hi = "\(hiAc) – \(hiKap)", hs = "\(hsAc) – \(hsKap)"
+        return hi == hs ? "Her gün \(hi)" : "Hafta içi \(hi)\nHafta sonu \(hs)"
+    }
+}
+
+struct IletisimAyar: Equatable {
+    var telefon = "0538 014 66 00"
+    var saatler: Saatler? = nil
+
+    /// Numaranın ülke kodu ve baştaki 0 olmadan 10 hanesi ("5380146600").
+    private var rakam: String {
+        var d = telefon.filter { $0.isNumber }
+        if d.hasPrefix("90") && d.count == 12 { d = String(d.dropFirst(2)) }
+        if d.hasPrefix("0") { d = String(d.dropFirst()) }
+        return d
+    }
+    var telLink: String { "tel:+90" + rakam }
+    /// WhatsApp hattı bugün telefonla aynı numara. Ayrı bir hat açılırsa
+    /// buraya kendi ayarı eklenmeli.
+    var waLink: String { "https://wa.me/90" + rakam }
+
+    /// Podyum şubesinin ayarlarını çözer. Bozuk ya da eksik alan varsayılanı bozmaz.
+    static func coz(_ veri: Data) -> IletisimAyar? {
+        guard !veri.isEmpty,
+              let j = try? JSONSerialization.jsonObject(with: veri) as? [String: Any] else { return nil }
+        var a = IletisimAyar()
+        if let t = j["telefon"] as? String {
+            var aday = a; aday.telefon = t.trimmingCharacters(in: .whitespaces)
+            if aday.rakam.count == 10 && aday.rakam.hasPrefix("5") { a = aday }
+        }
+        if let s = (j["saatler"] as? [String: Any])?["podyum"] as? [String: Any],
+           let hiAc = s["hi_ac"] as? String, let hiKap = s["hi_kap"] as? String,
+           let hsAc = s["hs_ac"] as? String, let hsKap = s["hs_kap"] as? String {
+            a.saatler = Saatler(hiAc: hiAc, hiKap: hiKap, hsAc: hsAc, hsKap: hsKap)
+        }
+        return a
+    }
+}
+
+enum AyarAPI {
+    /// Yalnız çözülebilen yanıtı döner — hatalı yanıt cihazdaki iyi kopyanın üstüne yazılmasın.
+    static func cek() async -> Data? {
+        guard let url = URL(string: API + "/ayar/cek") else { return nil }
+        var req = URLRequest(url: url)
+        req.timeoutInterval = 8
+        req.cachePolicy = .reloadIgnoringLocalCacheData
+        guard let (veri, yanit) = try? await URLSession.shared.data(for: req),
+              (yanit as? HTTPURLResponse)?.statusCode == 200,
+              IletisimAyar.coz(veri) != nil else { return nil }
+        return veri
+    }
+}
+
 // ═══════════════════ İLETİŞİM SEKMESİ ═══════════════════
 
 struct IletisimTab: View {
+    @AppStorage("iletisimAyar") private var onbellek = Data()
+    @Environment(\.scenePhase) private var faz
+
+    private var ayar: IletisimAyar { IletisimAyar.coz(onbellek) ?? IletisimAyar() }
+
     var body: some View {
         ZStack {
             KREM.ignoresSafeArea()
@@ -729,10 +859,12 @@ struct IletisimTab: View {
                         .font(.subheadline).foregroundColor(SOLGUN)
                         .padding(.bottom, 6)
 
+                    if let s = ayar.saatler { SaatKarti(saatler: s) }
+
                     IletisimSatiri(ikon: "phone.fill", baslik: "Bizi Ara",
-                                   alt: "0538 014 66 00", link: "tel:+905380146600")
+                                   alt: ayar.telefon, link: ayar.telLink)
                     IletisimSatiri(ikon: "message.fill", baslik: "WhatsApp",
-                                   alt: "Mesaj yaz", link: "https://wa.me/905380146600")
+                                   alt: "Mesaj yaz", link: ayar.waLink)
                     IletisimSatiri(ikon: "map.fill", baslik: "Yol Tarifi",
                                    alt: "Podyumpark AVM, Bursa",
                                    link: "https://maps.apple.com/?q=Cactus%20Coffee%20Podyumpark%20AVM%20Bursa")
@@ -752,6 +884,47 @@ struct IletisimTab: View {
                 }
                 .padding(20)
             }
+        }
+        .task { await tazele() }
+        .onChange(of: faz) { yeni in
+            if yeni == .active { Task { await tazele() } }
+        }
+    }
+
+    @MainActor private func tazele() async {
+        if let veri = await AyarAPI.cek() { onbellek = veri }
+    }
+}
+
+struct SaatKarti: View {
+    let saatler: Saatler
+
+    var body: some View {
+        // Dakikada bir yeniden çizilir: açık/kapalı rozeti ekran açıkken de doğru kalsın.
+        TimelineView(.everyMinute) { baglam in
+            let acik = saatler.acikMi(baglam.date)
+            HStack(spacing: 14) {
+                Image(systemName: "clock.fill")
+                    .frame(width: 40, height: 40)
+                    .background(YESIL.opacity(0.1))
+                    .foregroundColor(YESIL)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Çalışma Saatleri").font(.subheadline.bold()).foregroundColor(KOYU)
+                    Text(saatler.metin).font(.caption).foregroundColor(SOLGUN)
+                }
+                Spacer(minLength: 0)
+                Text(acik ? "Şu an açık" : "Şu an kapalı")
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 9).padding(.vertical, 5)
+                    .background(acik ? YESIL.opacity(0.14) : Color.gray.opacity(0.15))
+                    .foregroundColor(acik ? YESIL : SOLGUN)
+                    .clipShape(Capsule())
+            }
+            .padding(12)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .accessibilityElement(children: .combine)
         }
     }
 }

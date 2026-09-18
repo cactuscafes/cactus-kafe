@@ -7,9 +7,10 @@ Mac'te Xcode açmana gerek yok — tarayıcıdan bir düğmeye basman yeterli.
 
 | Sekme | İçerik |
 |---|---|
-| ☕ **Menü** | cactuscafes.com/menu-podyum canlı menüsü (sitede değişen her şey anında görünür) |
+| 🏠 **Anasayfa** | cactuscafes.com canlı (uygulamaya dönünce 2 dk'dan eskiyse kendiliğinden yenilenir) |
+| ☕ **Menü** | cactuscafes.com/menu-podyum canlı menüsü (sitede değişen her şey anında görünür; uygulamaya dönünce 2 dk'dan eskiyse kendiliğinden yenilenir) |
 | ⭐ **Sadakat Kartı** | **Tamamen native:** kart oluşturma/görüntüleme, yıldız ızgarası, bedava içecek hakkı, kasada gösterilecek numara + QR, son işlemler, çekerek yenileme, çevrimdışı görünüm, paylaşma |
-| 📞 **İletişim** | **Native:** arama, WhatsApp, Apple Haritalar yol tarifi, Instagram, paylaşma |
+| 📞 **İletişim** | **Native:** çalışma saatleri + şu an açık/kapalı, arama, WhatsApp, Apple Haritalar yol tarifi, Instagram, paylaşma. **Telefon ve saatler yönetim panelindeki site ayarlarından** (`/ayar/cek`) gelir — panelden değiştir, uygulama güncellemesi gerekmez |
 
 ---
 

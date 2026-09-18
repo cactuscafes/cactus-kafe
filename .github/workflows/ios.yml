@@ -13,11 +13,11 @@ on:
       build_numarasi:
         description: "Build numarası — her yüklemede artmalı (Apple aynısını 2. kez kabul etmez)"
         required: true
-        default: "8"
+        default: "9"
       surum:
         description: "Sürüm (MARKETING_VERSION) — yayındaki sürümün üstüne çıkmalı, örn. 1.1"
         required: true
-        default: "1.1"
+        default: "1.2"
       incelemeye_gonder:
         description: "Yükleme sonrası sürümü App Review'a gönder"
         type: boolean

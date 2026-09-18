@@ -33,6 +33,10 @@ OYUN_OLDUN,Kontrol noktasına döndün,Back to checkpoint
 OYUN_EKSIK_CICEK,Önce %d çiçeğin hepsini topla (%d kaldı),Collect all %d blooms first (%d left)
 BOLUM1_AD,Kaktüs Parkuru,Cactus Run
 BOLUM2_AD,Dikenli Kule,Thorn Tower
+BOLUM3_AD,Diken Köprüsü,Thorn Bridge
+BOLUM4_AD,Rüzgâr Terası,Wind Terrace
+BOLUM5_AD,Kaya Bahçesi,Rock Garden
+BOLUM6_AD,Son Tırmanış,Last Climb
 KREDILER_BASLIK,Krediler,Credits
 DOKUNMA_ZIPLA,ZIPLA,JUMP
 DOKUNMA_KOS,KOŞ,RUN
@@ -54,3 +58,18 @@ DEMO_BITTI,Demo burada bitiyor. Tam sürümde ikinci bölüm ve ağ yarışı va
 DEMO_MAGAZA,Dilek listesine ekle,Add to wishlist
 AYAR_TELEMETRI,Anonim oynanış verisi gönder,Send anonymous gameplay data
 AYAR_TELEMETRI_IPUCU,Bölüm süresi ve nerede takıldığın gönderilir. Ad ve kimlik gönderilmez; oturum numarası her açılışta değişir.,Level times and where you got stuck are sent. No name or identity; the session id changes every launch.
+AYAR_TUSLAR,Tuş atama,Key bindings
+TUS_BASLIK,Tuş atama,Key bindings
+TUS_ACIKLAMA,Bir satıra tıkla ve yeni tuşa bas. Ok tuşları ile oyun kolu her zaman çalışır; Esc vazgeçer.,Click a row then press the new key. Arrow keys and gamepad always work; Esc cancels.
+TUS_BEKLENIYOR,… tuşa bas,… press a key
+TUS_IPUCU,Yeni tuşa bas — Esc vazgeçer.,Press the new key — Esc cancels.
+TUS_CAKISMA,%s zaten "%s" eyleminde kullanılıyor.,%s is already used by "%s".
+TUS_VARSAYILAN,Varsayılana dön,Reset to defaults
+EYLEM_ILERI,İleri,Forward
+EYLEM_GERI,Geri,Back
+EYLEM_SOL,Sola,Left
+EYLEM_SAG,Sağa,Right
+EYLEM_ZIPLAMA,Zıpla,Jump
+EYLEM_KOSMA,Koş,Run
+EYLEM_DURAKLAT,Duraklat,Pause
+EYLEM_YENIDEN,Baştan başla,Restart

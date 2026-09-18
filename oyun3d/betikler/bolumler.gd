@@ -8,6 +8,10 @@ extends Node
 const LISTE: Array[Dictionary] = [
 	{"kimlik": "bolum1", "ad": "BOLUM1_AD", "sahne": "res://sahneler/bolum1.tscn"},
 	{"kimlik": "bolum2", "ad": "BOLUM2_AD", "sahne": "res://sahneler/bolum2.tscn"},
+	{"kimlik": "bolum3", "ad": "BOLUM3_AD", "sahne": "res://sahneler/bolum3.tscn"},
+	{"kimlik": "bolum4", "ad": "BOLUM4_AD", "sahne": "res://sahneler/bolum4.tscn"},
+	{"kimlik": "bolum5", "ad": "BOLUM5_AD", "sahne": "res://sahneler/bolum5.tscn"},
+	{"kimlik": "bolum6", "ad": "BOLUM6_AD", "sahne": "res://sahneler/bolum6.tscn"},
 ]
 
 ## Demoda yalnızca ilk bölüm açık. Bölüm listesini süzmek, menüden bitiş

@@ -198,6 +198,19 @@ Bir yön seç ve derinleş:
   testte. **Sende kalan:** Steamworks hesabı, 100 USD Steam Direct ücreti,
   sayfanın açılması ve Next Fest başvurusu — bunlar hesap ve ödeme işi.
 
+### Faz 9 — **1.0 yolu: içerik ölçeği** (Faz 8 sonrası)
+Yol haritası Faz 8'de bitiyordu; "satılan oyun" hedefine giden son teknik iş
+içerik ölçeği. İki bölüm bir demo, altı bölüm bir oyun.
+- **Durum: bitti** → dört yeni bölüm (Diken Köprüsü, Rüzgâr Terası, Kaya
+  Bahçesi, Son Tırmanış), veriden bölüm üreten hat
+  ([`oyun3d/bolum_tasarimi/`](oyun3d/bolum_tasarimi/) →
+  [`araclar/bolum_uret.gd`](oyun3d/araclar/bolum_uret.gd)) ve bitirilebilirlik
+  doğrulayıcısı. Doğrulayıcı ilk çalıştığında **bölüm 2'nin bitirilemez**
+  olduğunu buldu (başlangıç platformundan hiçbir yere zıplanamıyordu); onarıldı.
+  Ayrıca tuş atama ekranı — erişilebilirliğin en çok istenen maddesi.
+- **Kalan:** bölümleri oynatarak dengelemek. "Geçilebilir" ile "iyi" aynı şey
+  değil ve bunu hesaplayan bir test yok: 20 kişiye oynat, izle.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

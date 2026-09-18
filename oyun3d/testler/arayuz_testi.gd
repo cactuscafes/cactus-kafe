@@ -52,7 +52,10 @@ func _demo_testi() -> void:
 	await _bekle(2)
 
 	Urun.demo = onceki
-	_dogrula(Bolumler.sayi() == 2, "Demo kapatılınca bölüm sayısı eski hâline dönmedi")
+	# Sabit sayı yazmak, bölüm eklendiğinde alakasız bir testi düşürüyor.
+	_dogrula(Bolumler.sayi() == Bolumler.LISTE.size(),
+		"Demo kapatılınca bölüm sayısı eski hâline dönmedi (%d / %d)" % [
+			Bolumler.sayi(), Bolumler.LISTE.size()])
 
 func _dogrula(kosul: bool, mesaj: String) -> void:
 	if not kosul:

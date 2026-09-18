@@ -4,8 +4,11 @@ extends Node
 ## Klavye + oyun kolu birlikte tanımlı: aynı eylem iki girdiden de gelir, oyun
 ## kodu hangisinin bastığını bilmez. Girdiyi soyutlamanın bütün amacı bu.
 ##
-## Faz 2'de bunlar Proje Ayarları > Girdi Haritası paneline taşınacak; oyuncuya
-## tuş atama ekranı yazılacağı gün zaten oraya ihtiyaç olacak.
+## TUŞ ATAMA (Faz 9): oyuncu birincil tuşları değiştirebiliyor. İkincil tuşlar
+## (ok tuşları) ve oyun kolu bağlamaları DEĞİŞMİYOR — böylece kimse kendini
+## oyundan kilitleyemiyor. Özel atamalar `Ayarlar.tuslar` içinde saklanıyor ve
+## `Ayarlar.uygula()` tarafından buraya veriliyor; Girdi otomatik yüklemeden
+## okumuyor, çünkü autoload sırasında Girdi, Ayarlar'dan ÖNCE hazırlanıyor.
 ##
 ## DOKUNMATİK: ekrandaki çubuk ve düğmeler de aynı eylemleri basıyor
 ## (`Input.action_press`), yani oyuncu ve kamera kodu girdinin nereden geldiğini
@@ -61,14 +64,16 @@ const DUGMELER := {
 	"duraklat": JOY_BUTTON_START,
 }
 
+## Oyuncuya gösterilen ve değiştirilebilen eylemler; sıra ekranda da bu.
+## Bakış eylemleri listede yok: onlar fare/çubuk işi.
+const ATANABILIR := ["ileri", "geri", "sol", "sag", "ziplama", "kosma",
+	"duraklat", "yeniden"]
+
+## eylem -> özel birincil tuş (physical keycode). Ayarlar veriyor.
+var _ozel := {}
+
 func _ready() -> void:
-	for eylem: String in TUSLAR:
-		if not InputMap.has_action(eylem):
-			InputMap.add_action(eylem, OLU_BOLGE)
-		for kod: int in TUSLAR[eylem]:
-			var tus := InputEventKey.new()
-			tus.physical_keycode = kod
-			_ekle(eylem, tus)
+	tuslari_uygula({})
 
 	for eylem: String in EKSENLER:
 		var eksen := InputEventJoypadMotion.new()
@@ -91,3 +96,69 @@ func _input(olay: InputEvent) -> void:
 func _ekle(eylem: String, olay: InputEvent) -> void:
 	if not InputMap.action_has_event(eylem, olay):
 		InputMap.action_add_event(eylem, olay)
+
+# ------------------------------------------------------------------ tuş atama
+
+## Klavye bağlamalarını yeniden kurar. Yalnızca klavye olayları siliniyor:
+## oyun kolu bağlamaları elle temizlenirse, kumandayla oynayan oyuncu tuş
+## atama ekranını açtığı an kumandasını kaybederdi.
+func tuslari_uygula(ozel: Dictionary) -> void:
+	_ozel = ozel.duplicate()
+	for eylem: String in TUSLAR:
+		if not InputMap.has_action(eylem):
+			InputMap.add_action(eylem, OLU_BOLGE)
+		for olay: InputEvent in InputMap.action_get_events(eylem):
+			if olay is InputEventKey:
+				InputMap.action_erase_event(eylem, olay)
+		for kod: int in kodlar(eylem):
+			var tus := InputEventKey.new()
+			tus.physical_keycode = kod
+			_ekle(eylem, tus)
+
+## Eylemin şu anki klavye kodları. Özel atama BİRİNCİL tuşun yerine geçiyor,
+## ikincil (ok tuşları) yerinde kalıyor.
+func kodlar(eylem: String) -> Array:
+	var varsayilan: Array = TUSLAR.get(eylem, [])
+	if not _ozel.has(eylem):
+		return varsayilan
+	var liste := varsayilan.duplicate()
+	if liste.is_empty():
+		return [int(_ozel[eylem])]
+	liste[0] = int(_ozel[eylem])
+	return liste
+
+func tus_kodu(eylem: String) -> int:
+	var liste := kodlar(eylem)
+	return int(liste[0]) if not liste.is_empty() else 0
+
+func tus_adi(eylem: String) -> String:
+	var kod := tus_kodu(eylem)
+	return OS.get_keycode_string(kod) if kod != 0 else "—"
+
+## Bu tuş başka bir eylemde kullanılıyor mu? Kullanılıyorsa o eylemin adı.
+## Çakışmayı sessizce çözmek (diğerini boşaltmak) yerine reddediyoruz: oyuncu
+## hangi tuşu kaybettiğini fark etmeden kaybetmemeli.
+func cakisma(eylem: String, kod: int) -> String:
+	for diger: String in TUSLAR:
+		if diger == eylem:
+			continue
+		if kodlar(diger).has(kod):
+			return diger
+	return ""
+
+## Yeni birincil tuş. Çakışma varsa atama YAPILMIYOR, çakışan eylem dönüyor.
+func tus_ata(eylem: String, kod: int) -> String:
+	var engel := cakisma(eylem, kod)
+	if not engel.is_empty():
+		return engel
+	var yeni := _ozel.duplicate()
+	yeni[eylem] = kod
+	tuslari_uygula(yeni)
+	Ayarlar.tuslar = yeni
+	Ayarlar.kaydet()
+	return ""
+
+func varsayilana_don() -> void:
+	tuslari_uygula({})
+	Ayarlar.tuslar = {}
+	Ayarlar.kaydet()

@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 7** bitti: uzmanlık yönü **ağ** seçildi — hayalet yarış ve
-gerçek zamanlı iki kişilik yarış. Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md).
+Şu an **Faz 9** bitti: altı bölüm, bölüm üretim hattı ve tuş atama ekranı.
+Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
 |---|---|
@@ -15,6 +15,8 @@ gerçek zamanlı iki kişilik yarış. Yayın hâlâ sizde — [MAGAZA.md](MAGAZ
 | **6** | Performans ölçüm hattı ve bütçe, MultiMesh birleştirme (−%40 draw call), VRAM doku sıkıştırma, iki shader, TR/EN lokalizasyon, erişilebilirlik seçenekleri, görsel çekme aracı |
 | **6+** | Telefon kontrolleri: analog çubuk, zıpla/koş/duraklat, parmakla kamera |
 | **7** | **Ağ uzmanlığı**: hayalet yarış (kayıt/oynatma/fark), gerçek zamanlı yarış (otorite, doğrulama, aradeğerleme tamponu), lobi, iki süreçli ağ testi |
+| **8** | Ticari sürüm hazırlığı: demo yapısı, varsayılan kapalı anonim telemetri + Worker, basın kiti, çıkış planı, sürüm notları |
+| **9** | İçerik ölçeği: **dört yeni bölüm**, veriden bölüm üreten hat, bitirilebilirlik doğrulayıcısı (bölüm 2'nin bitirilemez olduğunu buldu), tuş atama ekranı |
 
 ---
 
@@ -38,6 +40,10 @@ gerçek zamanlı iki kişilik yarış. Yayın hâlâ sizde — [MAGAZA.md](MAGAZ
 
 Oyun kolu da tanımlı: sol çubuk hareket, sağ çubuk kamera, A zıplama, LB koşma.
 
+Tuşlar değiştirilebilir: **Ayarlar > Tuş atama**. Ok tuşları ve oyun kolu
+bağlamaları her zaman duruyor, çakışan atama reddediliyor — oyuncunun kendini
+oyundan kilitlemesi mümkün değil.
+
 ### Oyunun akışı
 
 Ana menü → bölüm → (Esc ile duraklatma) → bitiş ekranı → tekrar ya da menü.
@@ -49,10 +55,15 @@ Ayarlar hem menüden hem duraklatmadan açılıyor; aynı panel, tek yerde.
 |---|---|---|
 | 1 | Kaktüs Parkuru | Yatay: dikenli tarla üstünde basamak taşları, rampa, hareketli platform, kule |
 | 2 | Dikenli Kule | Dikey: spiral tırmanış, iki asansör platformu, tepede çıkış |
+| 3 | Diken Köprüsü | Dar: zeminin tamamı dikenli, ilerlemenin tek yolu taştan taşa |
+| 4 | Rüzgâr Terası | Ritim: dört hareketli platform (ileri, yanal, dikey, çapraz) — beklemeyi öğretiyor |
+| 5 | Kaya Bahçesi | Dövüş: zemin güvenli, baskı düşmandan; beş düşman, geniş alanlar |
+| 6 | Son Tırmanış | Final: yeni mekanik yok, dördünün hepsi arka arkaya |
 
 Bölümler `betikler/bolumler.gd` kütüğünde. Yeni bölüm eklemek = kütüğe bir
 satır: menüdeki düğme, "sonraki bölüm" akışı ve rekor kaydı kendiliğinden
-gelir. Rekorlar bölüm başına tutuluyor.
+gelir. Rekorlar bölüm başına tutuluyor. Bölüm 1 ve 2 elle yazılmış `.tscn`;
+3-6 veriden üretiliyor (bkz. [Bölüm hattı](#bölüm-hattı-faz-9)).
 
 ### Bölümün amacı
 
@@ -72,6 +83,8 @@ godot --headless --path oyun3d res://testler/dusman_testi.tscn   # yapay zekâ, 
 godot --headless --path oyun3d res://testler/ceviri_testi.tscn   # çeviri bütünlüğü
 godot --headless --path oyun3d res://testler/hayalet_testi.tscn  # hayalet kaydı
 testler/ag_testi.sh /yol/godot                                   # ağ (iki süreç)
+godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm bitirilebilir mi
+godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
 testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
 # Bu ikisi gerçek pencere ister (bkz. Telefonda oynamak):
@@ -141,6 +154,92 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Bölüm hattı (Faz 9)
+
+"İki bölüm bir demo, altı bölüm bir oyun." Faz 9'un işi içerik ölçeği — ama
+dört bölümü elle yazmak, her birinin 350 satırlık `.tscn`'ini kopyalamak
+demekti. O 350 satırın ~250'si her bölümde AYNI: HUD, duraklatma, bitiş ekranı,
+hayalet kaydedici, birleştirici, ortam, zemin. HUD'a bir etiket eklemek altı
+dosyayı elle düzeltmek olurdu.
+
+Bu yüzden tekrar eden kısım **kod**, bölüme özgü kısım **veri** oldu:
+
+```
+bolum_tasarimi/bolum3.gd   (koordinatlar + tasarım gerekçesi)
+        │
+        ▼  godot --headless --path oyun3d res://araclar/bolum_uret.tscn
+sahneler/bolum3.tscn       (üretilmiş sahne — elle düzenlenmez)
+        │
+        ▼  res://araclar/navmesh_uret.tscn      (navigasyon örgüsü)
+        ▼  res://testler/bolum_hatti_testi.tscn (bitirilebilir mi?)
+        ▼  res://araclar/olcum.tscn             (performans bütçesi)
+```
+
+Veri dosyası düz bir sözlük: platformlar, hareketli platformlar, çiçekler,
+kontrol noktaları, düşmanlar, süsleme, gökyüzü renkleri. JSON değil GDScript,
+çünkü **yorum satırı** yazılabiliyor: "bu boşluk 4,5 m, koşarak geçilir" bilgisi
+koordinatın yanında durmazsa altı ay sonra kimse hatırlamıyor.
+
+> **Bölüm 1 ve 2 bilerek elle kaldı.** Yayınlanmış, testleri olan ve elle
+> ayarlanmış iki bölümü yeniden üretmenin kazancı yok, riski var. Hattın işi
+> yeni bölümler.
+>
+> **Üretilen sahneler elle düzenlenmez** — bir dahaki çalıştırmada üzerine
+> yazılır. Kök düğümde `uretildi` üst verisi bunu söylüyor. Bir bölümü elden
+> geçirmek isterseniz veri dosyasını silin; `.tscn` artık sizindir.
+
+### Bitirilebilirlik doğrulayıcısı
+
+Hattın asıl değeri üretim değil, **doğrulama**. Bir bölümü elle oynayıp
+"geçilebiliyor" demek, o bölümü her değiştirdiğinde baştan oynamak demek;
+dördüncü bölümden sonra kimse yapmıyor.
+
+`testler/bolum_hatti_testi.gd` bitirilebilirliği oynayarak değil hesaplayarak
+doğruluyor:
+
+1. **Duraklar** çıkarılıyor: platformların çarpışma kutuları, zemin ve
+   hareketli platformların iki duruşu.
+2. **Kenarlar** kuruluyor: "buradan şuraya zıplanabilir mi?" Menzil, oyuncunun
+   kendi dışa aktarım değerlerinden hesaplanıyor (zıplama yüksekliği 1,65 m,
+   koşu hızı 7,4 m/sn, düşme çarpanı 1,35, projenin yerçekimi). Sabit yazsaydım
+   zıplama ayarı değiştiğinde test yalan söylemeye başlardı.
+3. **Genişlik-öncelikli arama** doğuş noktasından bitişe yol arıyor; çiçekler ve
+   kontrol noktaları da erişilebilir bir durağın üstünde olmalı — çiçeklerin
+   hepsi toplanmadan bitiş açılmıyor, yani ulaşılamayan tek çiçek bölümü
+   bitirilemez yapıyor.
+
+**İlk çalıştırmada bölüm 2'nin BİTİRİLEMEZ olduğunu buldu.** Başlangıç
+platformundan en yakın basamak 15 m ötede, diğerleri 5 m yukarıdaydı; zeminin
+tamamı dikenli olduğu için inmek de ölüm. Oyun yayına hazırlanıyordu ve ikinci
+bölümü kimse baştan sona oynamamıştı (README'de "bölüm 2 dengelenmedi" diye
+yazıyordu — dengesizlikten fazlasıymış). Kule tabanına dört giriş taşı eklendi.
+
+Doğrulayıcı üç kez de KENDİ hatasını gösterdi, bunlar modelin sınırları:
+
+- **Dikey paya yer yok.** Yatayda pay bırakmak doğru (hava ivmesi sınırlı), ama
+  dikeyde zıplama yüksekliği deterministik. 15 cm pay bırakınca bölüm 1'in
+  ilk basamağı (1,55 m) "zıplanamaz" çıkıyordu; oyun yayında ve o basamak
+  geçiliyor. Testin gerçeğe uyması gerekiyor, tersi değil.
+- **Hareketli platform tek durak değil.** Süpürdüğü alanı tek kutu saymak
+  "asansöre zıplanamıyor" diyordu: asansöre ALT ucunda binilir, ÜST ucunda
+  inilir. İki duruş ayrı durak, aralarında bedava kenar (binmek = beklemek).
+- **Ölçüm anı.** `baslangic_fazi` sıfırdan farklı platformlar daha ilk fizik
+  karesinde turun ortasına kayıyor; oradan süpürmek yanlış alan veriyordu.
+  Turun başlangıç konumuna geri çekiliyor.
+
+### Bölüm tasarımı: ölçüler
+
+Veri yazarken kullanılan sayılar (hepsi `oyuncu.gd`'den):
+
+| Ölçü | Değer | Sonuç |
+|---|---|---|
+| Zıplama yüksekliği | 1,65 m | Basamak yükselmesi **1,4 m**'yi geçmiyor |
+| Koşu hızı | 7,4 m/sn | Düz boşluk teorik 6,4 m; veride **4,5 m**'yi geçmiyor |
+| Yürüme hızı | 4,2 m/sn | Isınma bölümlerinde boşluk **2,5 m** civarı |
+| Düşme çarpanı | 1,35 | Yukarı zıplayışta menzil kısalıyor (dy 1,4 m'de 4,6 m) |
 
 ---
 
@@ -452,8 +551,32 @@ yerine anahtar yazılı (`text = "DURAKLAT_DEVAM"`). Kodda üretilen metinler
 `tr("HUD_DURUM") % [...]` biçiminde.
 
 Ayarlar ekranından değiştirilenler: dil, ana ses / efekt / müzik, fare
-hassasiyeti, tam ekran ve **ekran sarsıntısı** (hareket hassasiyeti olanlar
-için; kapatmak oynanışı değiştirmiyor).
+hassasiyeti, tam ekran, **ekran sarsıntısı** (hareket hassasiyeti olanlar için;
+kapatmak oynanışı değiştirmiyor) ve **tuş atama**.
+
+### Tuş atama (Faz 9)
+
+Erişilebilirlikte en çok istenen madde: WASD herkese uymuyor — sol elini
+kullananlar, tek elle oynayanlar, AZERTY düzeni. "Ok tuşları da var" cevabı
+yeterli değil, çünkü zıplama ok tuşlarında yok.
+
+Sekiz eylemin **birincil** tuşu değiştirilebiliyor. İki kilit var ve ikisi de
+"oyuncu kendini oyundan kilitleyemesin" diye:
+
+- **İkincil tuşlar ve oyun kolu bağlamaları hiç silinmiyor.** `tuslari_uygula()`
+  yalnızca `InputEventKey` olaylarını temizliyor; kumandayla oynayan biri tuş
+  atama ekranını açtığı an kumandasını kaybetmemeli.
+- **Çakışan atama reddediliyor**, sessizce çözülmüyor. Diğer eylemi boşaltmak
+  kolay olurdu ama oyuncu hangi tuşu kaybettiğini fark etmeden kaybederdi.
+
+Atamalar `Ayarlar.tuslar` içinde (`user://ayarlar.cfg`). `Girdi` bunları
+kendisi okumuyor: autoload sırasında Girdi, Ayarlar'dan ÖNCE hazırlanıyor, o
+yüzden `Ayarlar.uygula()` atamaları Girdi'ye veriyor.
+
+`tus_atama_testi` beş şeyi ölçüyor: atamanın gerçekten **InputMap'e** işlemesi
+(ekranda yazı değişip oyunda hiçbir şey olmaması klasik hata), çakışmanın
+reddi, oyun kolu bağlamasının korunması, diske yazılıp geri okunması ve
+ekranın kendisi (tıkla → tuşa bas → yazı değişsin, Esc vazgeçsin).
 
 `ceviri_testi` eksik çeviriyi yakalıyor — lokalizasyon hatası çökme olarak
 gelmiyor, ekranda ham anahtar (`AYAR_GERI`) olarak görünüyor ve çoğu zaman
@@ -728,8 +851,10 @@ Böylece çiçekler birbirini, tuzak platformu tetiklemiyor.
 oyun3d/
 ├── project.godot            Ayarlar, autoload, renderer, çarpışma katmanı isimleri
 ├── sahneler/
-│   ├── bolum1.tscn          Kaktüs Parkuru (yatay)
-│   ├── bolum2.tscn          Dikenli Kule (dikey)
+│   ├── bolum1.tscn          Kaktüs Parkuru (yatay, elle)
+│   ├── bolum2.tscn          Dikenli Kule (dikey, elle)
+│   ├── bolum3-6.tscn        Üretilmiş bölümler (bolum_tasarimi/ + bolum_uret.gd)
+│   ├── tus_atama.tscn       Tuş atama ekranı
 │   ├── oyuncu.tscn          Karakter + kamera kolu + AnimationTree
 │   ├── platform.tscn        Ölçüsü/rengi ayarlanabilir platform parçası
 │   ├── toplanabilir.tscn    Çiçek
@@ -755,6 +880,7 @@ oyun3d/
 │   ├── toplanabilir.gd · tuzak.gd · kontrol_noktasi.gd · bitis.gd
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
+├── bolum_tasarimi/          Bölüm VERİSİ (bolum3.gd … bolum6.gd) — hattın girdisi
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
 ├── golgeler/                Shader'lar (tuzak şeritleri, erime)
 ├── performans_butce.json    Draw call / üçgen bütçeleri
@@ -766,6 +892,7 @@ oyun3d/
 │   └── olcum.json           Blender'ın raporu = Godot testinin sözleşmesi
 ├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
 ├── araclar/
+│   ├── bolum_uret.gd        Veriden bölüm sahnesi üretici
 │   ├── animasyon_uret.gd    Animasyon üretici (Godot)
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
 │   ├── sesler.py            Ses üretici
@@ -878,11 +1005,13 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (7 grup) | ✅ hepsi geçti |
 | Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
-| Performans bütçesi | ✅ bolum1 84, bolum2 105 draw call |
+| Performans bütçesi | ✅ altı bölüm bütçe içinde (82–105 draw call) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ağ testi (iki süreç) | ✅ 359 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
 | Telemetri testi (7 grup) | ✅ gizlilik kuralları geçti |
+| Bölüm hattı testi (6 bölüm) | ✅ hepsi bitirilebilir; 100 durağın hepsi erişilebilir |
+| Tuş atama testi (5 grup) | ✅ InputMap, çakışma, kilitlenme, kayıt, ekran |
 | İstemci–sunucu sözleşmesi | ✅ 3 satır, 4 olay adı, 7 ret kuralı (Node ile) |
 | Basın kiti sayfası | ✅ Chromium'da açıldı, 7 görsel yüklendi, konsol hatası yok |
 | Demo dışa aktarımı | ✅ Windows + Web; tarayıcıda menü "Demo sürümü — ilk bölüm" ve tek bölüm gösterdi |
@@ -934,10 +1063,12 @@ açık kalan uçlar:
   model ister; rig'li karakterle birlikte gelir.
 - **Trailer'da ses yok** — Movie Maker ses de yazabiliyor (`.wav` yan dosyası);
   kurgu aşamasında eklenecek.
-- **Bölüm 2 dengelenmedi** — yapı testten geçiyor ama baştan sona oynanıp
-  süresi ölçülmedi. Yol haritasının dediği gibi: 20 kişiye oynat, izle.
-- **Tuş atama ekranı yok** — erişilebilirliğin en çok istenen maddesi.
-  `girdi.gd` eylemleri hâlâ kodda; Girdi Haritası paneline taşınıp kaydedilmeli.
+- **Hiçbir bölüm oynanarak dengelenmedi** — altısı da bitirilebilirlik
+  testinden geçiyor, ama "geçilebilir" ile "iyi" aynı şey değil. Zorluk eğrisi,
+  süre ve çiçek yerleşimi ancak oynatarak ayarlanır: 20 kişiye oynat, izle.
+- **Oyun kolu tuşları atanamıyor** — tuş atama ekranı yalnızca klavye için.
+  Kumanda düğmesi atamak `InputEventJoypadButton` yakalamak demek; aynı ekran
+  büyütülebilir.
 - **LOD ve occlusion yapılmadı** — şu anki sahne boyutunda gerekmedi; bütçe
   aşılırsa ilk başvurulacak yer orası.
 - **APK gerçek cihazda denenmedi** — SDK bu ortamda yok (yukarıdaki liste).

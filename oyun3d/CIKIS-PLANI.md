@@ -64,7 +64,7 @@ kişilerden kurulur ve her oyunda yeniden kurulur. Toplama yöntemi:
 
 **E-posta şablonu** (kısa tut; uzun e-posta okunmuyor):
 
-> Konu: Cactus 3B — 20 dakikalık bir 3B platform oyunu (Steam anahtarı ekte)
+> Konu: Cactus 3B — 45 dakikalık bir 3B platform oyunu (Steam anahtarı ekte)
 >
 > Merhaba [ad],
 >

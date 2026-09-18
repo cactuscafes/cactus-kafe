@@ -24,6 +24,9 @@ var sarsinti := true
 var oyuncu_adi := "Oyuncu"
 ## Anonim oynanış verisi. VARSAYILAN KAPALI: açık rıza olmadan veri gitmez.
 var telemetri := false
+## Özel tuş atamaları: eylem -> birincil tuşun physical keycode'u. Boşken
+## varsayılanlar geçerli.
+var tuslar := {}
 
 # kayıt — bölüm kimliğine göre: {"bolum1": {"sure": 42.0, "olum": 1, "oynanma": 3}}
 var kayitlar := {}
@@ -44,6 +47,7 @@ func yukle() -> void:
 		sarsinti = c.get_value("erisim", "sarsinti", sarsinti)
 		oyuncu_adi = c.get_value("genel", "oyuncu_adi", oyuncu_adi)
 		telemetri = c.get_value("genel", "telemetri", telemetri)
+		tuslar = c.get_value("kontrol", "tuslar", {})
 	var k := ConfigFile.new()
 	kayitlar = {}
 	if k.load(KAYIT_YOLU) == OK:
@@ -65,10 +69,14 @@ func kaydet() -> void:
 	c.set_value("erisim", "sarsinti", sarsinti)
 	c.set_value("genel", "oyuncu_adi", oyuncu_adi)
 	c.set_value("genel", "telemetri", telemetri)
+	c.set_value("kontrol", "tuslar", tuslar)
 	c.save(AYAR_YOLU)
 
 func uygula() -> void:
 	TranslationServer.set_locale(dil)
+	# Tuş atamaları buradan veriliyor: autoload sırasında Girdi, Ayarlar'dan
+	# önce hazırlanıyor, yani Girdi ayarları kendisi okuyamaz.
+	Girdi.tuslari_uygula(tuslar)
 	Ag.kendi_adim = oyuncu_adi
 	Ses.seviye_ayarla(&"Master", master)
 	Ses.seviye_ayarla(&"SFX", sfx)

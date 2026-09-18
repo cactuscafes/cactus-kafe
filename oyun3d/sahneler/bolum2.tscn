@@ -117,6 +117,26 @@ position = Vector3(0.0, 8.0, -6.0)
 olcu = Vector3(3.4, 16.0, 3.4)
 renk = Color(0.38, 0.33, 0.31, 1)
 
+[node name="Giris1" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(0.0, 1.05, 0.8)
+olcu = Vector3(2.6, 0.5, 2.6)
+renk = Color(0.5, 0.44, 0.36, 1)
+
+[node name="Giris2" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(-4.2, 1.25, -2.6)
+olcu = Vector3(2.6, 0.5, 2.6)
+renk = Color(0.5, 0.44, 0.36, 1)
+
+[node name="Giris3" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(-5.6, 1.45, -8.0)
+olcu = Vector3(2.6, 0.5, 2.6)
+renk = Color(0.5, 0.44, 0.36, 1)
+
+[node name="Giris4" parent="Parkur" instance=ExtResource("2_platform")]
+position = Vector3(-2.4, 1.65, -12.2)
+olcu = Vector3(2.6, 0.5, 2.6)
+renk = Color(0.5, 0.44, 0.36, 1)
+
 [node name="Basamak1" parent="Parkur" instance=ExtResource("2_platform")]
 position = Vector3(0.0, 2.3, -12.6)
 olcu = Vector3(3.2, 0.4, 3.2)

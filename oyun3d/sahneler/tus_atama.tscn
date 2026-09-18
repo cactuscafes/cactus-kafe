@@ -1,0 +1,61 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://betikler/menu/tus_atama.gd" id="betik"]
+[ext_resource type="Theme" path="res://arayuz/tema.tres" id="tema"]
+
+[node name="TusAtama" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("tema")
+script = ExtResource("betik")
+
+[node name="Panel" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -235.0
+offset_right = 310.0
+offset_bottom = 235.0
+
+[node name="Kutu" type="VBoxContainer" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = 22.0
+offset_right = -26.0
+offset_bottom = -22.0
+theme_override_constants/separation = 10
+
+[node name="Baslik" type="Label" parent="Panel/Kutu"]
+theme_override_font_sizes/font_size = 24
+text = "TUS_BASLIK"
+
+[node name="Aciklama" type="Label" parent="Panel/Kutu"]
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "TUS_ACIKLAMA"
+
+[node name="Liste" type="GridContainer" parent="Panel/Kutu"]
+unique_name_in_owner = true
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
+
+[node name="Uyari" type="Label" parent="Panel/Kutu"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.949, 0.694, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="Bosluk" type="Control" parent="Panel/Kutu"]
+size_flags_vertical = 3
+
+[node name="Varsayilan" type="Button" parent="Panel/Kutu"]
+unique_name_in_owner = true
+text = "TUS_VARSAYILAN"
+
+[node name="Kapat" type="Button" parent="Panel/Kutu"]
+unique_name_in_owner = true
+text = "AYAR_GERI"

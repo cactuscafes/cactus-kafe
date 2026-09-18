@@ -6,11 +6,32 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.8\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.9\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.9.0 — İçerik ölçeği (Faz 9)
+
+- **Dört yeni bölüm.** Diken Köprüsü (dar taşlar), Rüzgâr Terası (hareketli
+  platformlar), Kaya Bahçesi (düşman baskısı), Son Tırmanış (hepsi birden).
+  Oyun iki bölümden **altı** bölüme çıktı; süre ~20 dakikadan ~45 dakikaya.
+- **Bölüm hattı.** Bölümler artık veriden üretiliyor: `bolum_tasarimi/bolumN.gd`
+  (koordinatlar ve tasarım gerekçesi) → `araclar/bolum_uret.gd` →
+  `sahneler/bolumN.tscn`. Her bölümün 250 satırlık ortak iskeleti (HUD,
+  duraklatma, bitiş ekranı, hayalet kaydedici, ortam) artık kopyalanmıyor.
+- **Bitirilebilirlik doğrulayıcısı.** `testler/bolum_hatti_testi` duraklar
+  arası zıplama menzilini oyuncunun kendi değerlerinden hesaplayıp doğuştan
+  bitişe yol arıyor; çiçekler ve kontrol noktaları da erişilebilir olmalı.
+- **Bölüm 2 onarıldı.** Doğrulayıcı ilk çalıştığında bölüm 2'nin
+  BİTİRİLEMEZ olduğunu buldu: başlangıç platformundan en yakın basamak 15 m
+  ötede, diğerleri 5 m yukarıdaydı ve zemin baştan sona dikenliydi. Kuleye
+  dört giriş taşı eklendi.
+- **Tuş atama ekranı.** Ayarlar > Tuş atama: sekiz eylemin birincil tuşu
+  değiştirilebiliyor, çakışma reddediliyor, ok tuşları ve oyun kolu
+  bağlamaları korunuyor, varsayılana dönülebiliyor.
+- Ana menü altı bölümde iki sütuna geçiyor; ayarlar paneli büyüdü.
 
 ## 0.8.0 — Ticari sürüm hazırlığı (Faz 8)
 
@@ -81,9 +102,9 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 Çıkışta `1.0.0` yazabilmek için gereken, "daha fazla özellik" değil; şunlar:
 
-- [ ] Bölüm sayısı hedefe ulaştı (en az 6 — iki bölüm bir demo, altı bölüm bir oyun)
+- [x] Bölüm sayısı hedefe ulaştı: altı bölüm (Faz 9)
 - [ ] 20 kişiye oynatıldı, geri bildirim işlendi
 - [ ] Gerçek telefonda APK denendi (bu ortamda Android SDK yok)
-- [ ] Tuş atama ekranı (erişilebilirliğin en çok istenen maddesi)
+- [x] Tuş atama ekranı (Faz 9)
 - [ ] Trailer'a ses eklendi
 - [ ] Steam sayfası yayında ve wishlist toplanıyor

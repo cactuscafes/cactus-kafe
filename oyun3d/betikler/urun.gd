@@ -7,7 +7,7 @@ extends Node
 
 const AD := "Cactus 3B"
 ## Anlamlı sürümleme: BÜYÜK.KÜÇÜK.YAMA. Çıkışa kadar 0.x, çıkışta 1.0.
-const SURUM := "0.8.0"
+const SURUM := "0.9.0"
 const GELISTIRICI := "Cactus Cafe"
 
 ## Steam sayfası açılınca burayı doldur; demo içindeki "dilek listesine ekle"

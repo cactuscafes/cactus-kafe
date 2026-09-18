@@ -2,7 +2,7 @@ extends Control
 ## Ana menü.
 
 @onready var _rekor: Label = %Rekor
-@onready var _bolum_kutusu: VBoxContainer = %BolumKutusu
+@onready var _bolum_kutusu: GridContainer = %BolumKutusu
 @onready var _ayarlar: Control = %AyarlarPaneli
 @onready var _krediler: Control = %KredilerPaneli
 @onready var _ag: Control = %AgPaneli
@@ -28,6 +28,10 @@ func _ready() -> void:
 func _bolumleri_kur() -> void:
 	var toplam := 0
 	var bolumler := Bolumler.liste()
+	# Altı bölüm tek sütunda 720p ekrana sığmıyor: en alttaki "Çık" düğmesi
+	# ekranın dışında kalıyordu. Üçten fazlası iki sütuna geçiyor; demoda
+	# (tek bölüm) tek sütun daha derli toplu duruyor.
+	_bolum_kutusu.columns = 2 if bolumler.size() > 3 else 1
 	for i in bolumler.size():
 		var bilgi: Dictionary = bolumler[i]
 		var kimlik: String = bilgi["kimlik"]
@@ -35,7 +39,7 @@ func _bolumleri_kur() -> void:
 		toplam += int(kayit["oynanma"])
 
 		var buton := Button.new()
-		buton.custom_minimum_size = Vector2(340, 0)
+		buton.custom_minimum_size = Vector2(250 if _bolum_kutusu.columns > 1 else 340, 0)
 		var sure: float = kayit["sure"]
 		buton.text = "%d. %s%s" % [
 			i + 1, tr(bilgi["ad"]),

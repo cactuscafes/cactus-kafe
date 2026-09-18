@@ -57,6 +57,17 @@ func _dogrula(kosul: bool, mesaj: String) -> void:
 	if not kosul:
 		_hatalar.append(mesaj)
 
+## Platform turun ortasına gelene kadar bekler: iki ucundan da uzak olmalı ki
+## 20 karelik ölçüm penceresi uca taşmasın.
+func _platform_penceresini_bekle(platform: Node3D) -> void:
+	var baslangic: Vector3 = platform.get("_baslangic")
+	var uc: Vector3 = platform.uc
+	for i in 400:
+		var oran: float = (platform.global_position - baslangic).dot(uc) / uc.length_squared()
+		if oran >= 0.15 and oran <= 0.55:
+			return
+		await get_tree().physics_frame
+
 # --- testler ---------------------------------------------------------------
 
 ## Her bölüm oynanabilir iskelete sahip mi? Yeni bölüm eklerken unutulan şey
@@ -182,11 +193,18 @@ func _toplanabilir_testi() -> void:
 func _hareketli_platform_testi() -> void:
 	var platform: Node3D = _sahne.get_node("HareketliPlatform")
 	await _isinla(platform.global_position + Vector3(0, 1.06, 0))
+	# Ölçüm penceresi platformun UCUNA denk gelmemeli: platform kuleye varınca
+	# karakter kuleye geçiyor ve taşıma ölçülemiyor.
+	#
+	# TUZAK: burada eskiden sabit sayıda kare bekleniyordu ve bu, testi bölüm
+	# sayısına bağlamıştı — önceki alt test her bölüm için 8 kare harcıyor,
+	# altıncı bölüm eklenince platform tur içinde 32 kare ileride oluyor ve
+	# ölçüm tam uca denk geliyordu. Bölüm eklemek, alakasız bir testi
+	# düşürüyordu. Artık platformun turdaki YERİ bekleniyor, kare değil.
+	await _platform_penceresini_bekle(platform)
 	var oyuncu_once := _oyuncu.global_position.z
 	var platform_once := platform.global_position.z
-	# Pencere kısa: platform kuleye varınca karakter kuleye geçer ve ölçüm
-	# "taşınmadı" gibi görünür. Ölçtüğümüz şey taşıma, varış değil.
-	await _bekle(40)
+	await _bekle(20)
 	var oyuncu_fark := _oyuncu.global_position.z - oyuncu_once
 	var platform_fark := platform.global_position.z - platform_once
 	print("platform: oyuncu Δz=%.2f  platform Δz=%.2f" % [oyuncu_fark, platform_fark])

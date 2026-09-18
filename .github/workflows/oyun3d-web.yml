@@ -46,7 +46,7 @@ jobs:
         # timeout şart: bir test betiği DERLENMEZSE Godot boş sahneyle
         # sonsuza kadar çalışır ve iş akışı asılı kalır.
         run: |
-          for t in varlik bolum arayuz dusman ceviri hayalet; do
+          for t in varlik bolum arayuz dusman ceviri hayalet bolum_hatti; do
             echo "--- $t ---"
             timeout 300 godot --headless "res://testler/${t}_testi.tscn"
           done

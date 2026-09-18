@@ -11,12 +11,12 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 **TR**
 > Kaktüs Parkuru'nda çölün dikenleri arasında zıpla, çiçekleri topla, dikenli
 > düşmanların üstüne bin. Kısa, hızlı, rekor kırmaya dayalı bir 3B platform
-> oyunu. İki bölüm, tek oturuşta bitiyor — ama en iyi sürene kolay kolay
+> oyunu. Altı bölüm, tek oturuşta bitiyor — ama en iyi sürene kolay kolay
 > ulaşamayacaksın.
 
 **EN**
 > Hop across a thorny desert, collect the blooms, and bounce off spiny foes.
-> Cactus 3D is a short, fast, record-chasing 3D platformer. Two levels, one
+> Cactus 3D is a short, fast, record-chasing 3D platformer. Six levels, one
 > sitting — beating your own best time is the hard part.
 
 ## Uzun açıklama
@@ -43,7 +43,9 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 
 ## Özellikler (madde madde)
 
-- İki el yapımı bölüm: yatay parkur ve dikey kule tırmanışı
+- Altı bölüm: parkur, kule tırmanışı, diken köprüsü, hareketli platform terası,
+  düşman bahçesi ve hepsini birden isteyen final
+- Tuş atama ekranı ve erişilebilirlik ayarları
 - Üstüne zıplayarak yenilen, devriye gezen ve seni kovalayan düşmanlar
 - Coyote süresi, zıplama tamponu, değişken zıplama yüksekliği
 - Bölüm başına süre ve ölüm rekoru

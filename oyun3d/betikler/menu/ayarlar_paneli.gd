@@ -43,8 +43,22 @@ func _ready() -> void:
 		Ayarlar.dil = DILLER[i][0]
 		Ayarlar.uygula()
 		Ayarlar.kaydet())
+	%TusAtama.pressed.connect(_tus_atamayi_ac)
+	# Telefonda klavye yok; çalışmayan ayarı göstermiyoruz (telemetri ile aynı
+	# kural).
+	%TusAtama.visible = not OS.has_feature("mobile")
 	%Kapat.pressed.connect(func() -> void: kapandi.emit())
 	MenuYardimci.butonlari_seslendir(self)
+
+const TUS_ATAMA := preload("res://sahneler/tus_atama.tscn")
+
+func _tus_atamayi_ac() -> void:
+	var ekran: Control = TUS_ATAMA.instantiate()
+	add_child(ekran)
+	$Panel.visible = false
+	ekran.kapandi.connect(func() -> void:
+		ekran.queue_free()
+		$Panel.visible = true)
 
 func _degisti(alan: String, deger: float) -> void:
 	match alan:

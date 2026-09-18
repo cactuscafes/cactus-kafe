@@ -1,5 +1,5 @@
 {
-  "_aciklama": "Faz 6 ölçüm bütçeleri. Rakamlar araclar/olcum.tscn ile ölçüldü; %15-20 pay bırakıldı. Aşılırsa CI kırmızıya döner — 'şu değişiklik draw call'u iki katına çıkardı' kendiliğinden görünsün diye. doku_mb BİLEREK bütçede yok: yazılımsal Mesa S3TC desteklemediği için dokuları açıyor ve bu makinede 8 kat fazla görünüyor; gerçek donanımda atlas 4.1 MB.",
+  "_aciklama": "Ölçüm bütçeleri (Faz 6; bölüm 3-6 Faz 9'da eklendi). Rakamlar araclar/olcum.tscn ile ölçüldü; %15-20 pay bırakıldı. Aşılırsa CI kırmızıya döner — 'şu değişiklik draw call'u iki katına çıkardı' kendiliğinden görünsün diye. doku_mb BİLEREK bütçede yok: yazılımsal Mesa S3TC desteklemediği için dokuları açıyor ve bu makinede 8 kat fazla görünüyor; gerçek donanımda atlas 4.1 MB.",
   "bolum1": {
     "draw_call": 100,
     "ucgen": 10000
@@ -7,5 +7,21 @@
   "bolum2": {
     "draw_call": 130,
     "ucgen": 13500
+  },
+  "bolum3": {
+    "draw_call": 118,
+    "ucgen": 11300
+  },
+  "bolum4": {
+    "draw_call": 110,
+    "ucgen": 11000
+  },
+  "bolum5": {
+    "draw_call": 112,
+    "ucgen": 12200
+  },
+  "bolum6": {
+    "draw_call": 112,
+    "ucgen": 14200
   }
 }

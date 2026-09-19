@@ -6,11 +6,37 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.9\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.10\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.10.0 — Otomatik oyuncu ve denge (Faz 10)
+
+- **Bot bölümleri gerçekten oynuyor.** `betikler/bot/otomatik_oyuncu.gd`
+  gerçek girdiyle (`Input.action_press`) oynuyor: kamerayı hedefe çevirip
+  yürüyor, kenarda zıplıyor, hareketli platformu bekleyip biniyor, ölünce
+  kontrol noktasından devam ediyor. Karakteri ışınlayan bir bot hiçbir şey
+  kanıtlamazdı — zıplama hissi ve hava kontrolü ölçülmemiş olurdu.
+- **Denge ölçümü.** `araclar/denge_olc.gd` her bölümü bota oynatıp süre, ölüm,
+  zıplama sayısı ve zorlanılan geçişleri yazıyor; `denge_butce.json` sınırları
+  aşılırsa CI kırmızıya dönüyor. Sayılar insan süresi değil: bölümün
+  DEĞİŞTİĞİNİ yakalamak için.
+- **Par turu.** Botun turu `res://hayaletler/` altında oyunla birlikte
+  geliyor. İlk kez oynayanın da yarışacak biri oluyor; HUD "par turu −1,20"
+  yazıyor. Kendi turun daha hızlıysa hayalet ona dönüyor.
+- **Ortak bölüm grafı.** Faz 9'un doğrulayıcısındaki geometri
+  `betikler/bolum_grafi.gd` içine taşındı; test ile bot aynı grafı kullanıyor.
+  İki ayrı uygulama, testin "geçilebilir" dediği boşluğu botun geçememesi
+  demek olurdu.
+- **Bot bir kare bütçesi hatası buldu.** Hayalet her karede `visible` atıyordu;
+  değer değişmese bile görünürlük alt ağaca yayıldığı için hayalet oynarken
+  kare ~60 kat pahalılaşıyordu. Tek satırlık düzeltme ölçümü 120 saniyeden
+  1 saniyeye indirdi — gerçek cihazda da ödenen bir bedeldi.
+- **Eğik platformlar parçalanıyor.** Rampa tek eksen hizalı kutu olarak
+  temsil edilince "4,1 m yukarıda" görünüyordu; artık eğim ekseni boyunca
+  parçalara bölünüyor ve her parçanın kendi yüksekliği var.
 
 ## 0.9.0 — İçerik ölçeği (Faz 9)
 
@@ -103,7 +129,7 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 Çıkışta `1.0.0` yazabilmek için gereken, "daha fazla özellik" değil; şunlar:
 
 - [x] Bölüm sayısı hedefe ulaştı: altı bölüm (Faz 9)
-- [ ] 20 kişiye oynatıldı, geri bildirim işlendi
+- [ ] 20 kişiye oynatıldı, geri bildirim işlendi (bot sayıları üretiyor ama eğlence ölçmüyor)
 - [ ] Gerçek telefonda APK denendi (bu ortamda Android SDK yok)
 - [x] Tuş atama ekranı (Faz 9)
 - [ ] Trailer'a ses eklendi

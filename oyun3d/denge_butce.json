@@ -1,0 +1,10 @@
+{
+  "_aciklama": "Faz 10 denge bütçeleri — BOTUN ölçüleri (araclar/denge_olc.tscn), insan süresi değil. Botun 45 saniyede geçtiği bölümü insan 2-3 dakikada geçer. Bütçenin işi bölümün DEĞİŞTİĞİNİ yakalamak: aynı bot dün 45 saniyede bitişe varıyorsa bugün de varmalı. Sayılar bugünkü ölçümün üstüne pay konarak yazıldı; bir bölümü kasten zorlaştırdıysanız burayı da güncelleyin.",
+  "_bitis_bekleniyor": "Botun bitiş alanına ulaşabildiği bölümlerde true. false olanlar BOTUN sınırı, bölümün hatası değil: bitirilebilirlik ayrıca testler/bolum_hatti_testi tarafından hesapla kanıtlanıyor.",
+  "bolum1": { "bitis_bekleniyor": true,  "azami_sure": 75, "azami_olum": 7,  "asgari_cicek": 0.5 },
+  "bolum2": { "bitis_bekleniyor": false, "azami_olum": 45, "asgari_cicek": 0.2 },
+  "bolum3": { "bitis_bekleniyor": true,  "azami_sure": 75, "azami_olum": 12, "asgari_cicek": 0.5 },
+  "bolum4": { "bitis_bekleniyor": true,  "azami_sure": 75, "azami_olum": 9,  "asgari_cicek": 0.6 },
+  "bolum5": { "bitis_bekleniyor": false, "azami_olum": 8,  "asgari_cicek": 0.3 },
+  "bolum6": { "bitis_bekleniyor": false, "azami_olum": 16, "asgari_cicek": 0.3 }
+}

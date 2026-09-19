@@ -11,6 +11,9 @@ extends Resource
 ## eleman için ayrı Variant tutar, bu boyutta 3-4 kat yer kaplar.
 
 @export var bolum := ""
+## Bu kayıt botun par turu mu? HUD etiketini değiştiriyor: "hayalet -1.20"
+## yerine "par -1.20". Oyuncu kimle yarıştığını bilmeli.
+@export var par := false
 @export var sure := 0.0
 @export var olum := 0
 @export var aralik := 0.05
@@ -70,10 +73,20 @@ func en_yakin_zaman(konum: Vector3, ipucu := 0) -> float:
 static func yol(bolum_kimligi: String) -> String:
 	return "user://hayaletler/%s.res" % bolum_kimligi
 
+## Oyunla birlikte gelen "par" turu: botun (`araclar/denge_olc.gd`) kaydettiği
+## tur. İlk kez oynayan birinin de yarışacak biri olsun diye var — kendi
+## hayaletin ancak bölümü bir kez bitirdikten sonra oluşuyor ve o ana kadar
+## ekrandaki fark satırı bomboş duruyordu.
+static func par_yolu(bolum_kimligi: String) -> String:
+	return "res://hayaletler/%s.res" % bolum_kimligi
+
+## Önce oyuncunun kendi turu, yoksa par turu.
 static func yukle(bolum_kimligi: String) -> HayaletKayit:
 	var y := yol(bolum_kimligi)
 	if not ResourceLoader.exists(y):
-		return null
+		y = par_yolu(bolum_kimligi)
+		if not ResourceLoader.exists(y):
+			return null
 	return ResourceLoader.load(y, "", ResourceLoader.CACHE_MODE_IGNORE) as HayaletKayit
 
 func kaydet() -> Error:

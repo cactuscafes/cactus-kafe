@@ -28,6 +28,7 @@ func _calis() -> void:
 	await _tur_kaydi_testi()
 	await _oynatma_testi()
 	await _yavas_tur_testi()
+	_par_testi()
 
 	if _hatalar.is_empty():
 		print("HAYALET TESTI: GECTI")
@@ -37,6 +38,45 @@ func _calis() -> void:
 			printerr("  ! " + h)
 		print("HAYALET TESTI: KALDI (%d)" % _hatalar.size())
 		get_tree().quit(1)
+
+## Par turu (Faz 10): oyuncunun kendi turu yokken oyunla gelen tur yükleniyor,
+## kendi turu varsa ONA dönülüyor. Sıra yanlış olsaydı oyuncu kendi rekorunu
+## geçtiği hâlde hep botla yarışırdı.
+func _par_testi() -> void:
+	var kimlik := "test_par"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(HayaletKayit.yol(kimlik)))
+	_dogrula(HayaletKayit.yukle(kimlik) == null, "Hiç kayıt yokken kayıt bulundu")
+
+	# Oyunla gelen par turunu taklit et (res:// geliştirmede yazılabilir).
+	var par := _ornek_kayit()
+	par.bolum = kimlik
+	par.par = true
+	par.sure = 30.0
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://hayaletler"))
+	var hata := ResourceSaver.save(par, HayaletKayit.par_yolu(kimlik))
+	_dogrula(hata == OK, "Par turu yazılamadı: %d" % hata)
+
+	var yuklenen := HayaletKayit.yukle(kimlik)
+	_dogrula(yuklenen != null and yuklenen.par,
+		"Kendi turu yokken par turu yüklenmedi")
+	_dogrula(yuklenen != null and absf(yuklenen.sure - 30.0) < 0.001,
+		"Par turunun süresi taşınmadı")
+
+	# Oyuncunun kendi turu varsa o kazanmalı.
+	var kendi := _ornek_kayit()
+	kendi.bolum = kimlik
+	kendi.sure = 22.0
+	_dogrula(kendi.kaydet() == OK, "Kendi turu yazılamadı")
+	var ikinci := HayaletKayit.yukle(kimlik)
+	_dogrula(ikinci != null and not ikinci.par,
+		"Kendi turu varken hâlâ par turu yükleniyor")
+	_dogrula(ikinci != null and absf(ikinci.sure - 22.0) < 0.001,
+		"Kendi turunun süresi yanlış")
+	print("par: kendi tur yokken par (%.0f sn), varken kendi tur (%.0f sn)" % [
+		par.sure, kendi.sure])
+
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(HayaletKayit.yol(kimlik)))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(HayaletKayit.par_yolu(kimlik)))
 
 func _ornek_kayit() -> HayaletKayit:
 	var k := HayaletKayit.new()
@@ -103,7 +143,16 @@ func _tur_kaydi_testi() -> void:
 	await _bekle(10)
 	var oyun := bolum.get_node("Oyun")
 	var kaydedici := bolum.get_node("HayaletKaydedici")
-	_dogrula(not kaydedici.hayalet_var, "Kayıt yokken hayalet var sanıldı")
+	# Faz 10'dan beri oyunla birlikte bir PAR turu geliyor: kendi kaydın
+	# yokken de yarışacak biri var. Eskiden burada "hayalet yok" bekleniyordu;
+	# par turu eklenince o beklenti yanlışa döndü — yeni doğru şu: kendi kaydın
+	# yoksa oynatılan hayalet par turu olmalı.
+	var par_var := ResourceLoader.exists(HayaletKayit.par_yolu("bolum1"))
+	if par_var:
+		_dogrula(kaydedici.hayalet_var and kaydedici.par_mi,
+			"Kendi kaydın yokken par turu oynatılmadı")
+	else:
+		_dogrula(not kaydedici.hayalet_var, "Hiç kayıt yokken hayalet var sanıldı")
 
 	var oyuncu: CharacterBody3D = bolum.get_node("Oyuncu")
 	Input.action_press("ileri")
@@ -123,6 +172,7 @@ func _tur_kaydi_testi() -> void:
 			"Örnek sayısı çok az: %d" % kayit.ornek_sayisi())
 		_dogrula(absf(kayit.sure - oyun.sure) < 0.2,
 			"Kaydedilen süre turla uyuşmuyor (%.2f / %.2f)" % [kayit.sure, oyun.sure])
+		_dogrula(not kayit.par, "Oyuncunun kendi turu par diye işaretlenmiş")
 	get_tree().paused = false
 	bolum.queue_free()
 	await _bekle(3)

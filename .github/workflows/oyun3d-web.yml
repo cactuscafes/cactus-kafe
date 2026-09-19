@@ -72,6 +72,14 @@ jobs:
           timeout 400 xvfb-run -a godot --rendering-driver opengl3 \
             --audio-driver Dummy res://testler/dokunmatik_testi.tscn
 
+      # Bot bölümleri baştan sona OYNUYOR. Hesap (bolum_hatti_testi) "bu
+      # boşluk geçilir" diyor; bu adım "geçildi" diyor. İkisi farklı sorular.
+      - name: Denge (bot bölümleri oynuyor)
+        working-directory: oyun3d
+        # --fixed-fps gerçek zaman senkronizasyonunu kapatıyor: altı bölümün
+        # tamamı ~11 saniyede oynanıyor (gerçek zamanda ~8 dakika sürerdi).
+        run: timeout 300 godot --headless --fixed-fps 60 res://araclar/denge_olc.tscn
+
       # Performans yazılımsal GPU ile ölçülüyor: FPS değil, donanımdan bağımsız
       # sayılar (draw call, üçgen). Bütçe performans_butce.json içinde.
       - name: Performans bütçesi

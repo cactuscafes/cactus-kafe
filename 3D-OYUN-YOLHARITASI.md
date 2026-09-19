@@ -211,6 +211,18 @@ içerik ölçeği. İki bölüm bir demo, altı bölüm bir oyun.
 - **Kalan:** bölümleri oynatarak dengelemek. "Geçilebilir" ile "iyi" aynı şey
   değil ve bunu hesaplayan bir test yok: 20 kişiye oynat, izle.
 
+### Faz 10 — **Otomatik oyuncu ve denge** (Faz 9 sonrası)
+Faz 9 şunu açık bırakmıştı: bölümler oynanarak dengelenmedi. Bunun
+hesaplanabilir kısmı bir botla yapılabilir.
+- **Durum: bitti** → bölümleri gerçek girdiyle oynayan bot
+  ([`oyun3d/betikler/bot/`](oyun3d/betikler/bot/)), denge ölçümü ve bütçesi
+  ([`araclar/denge_olc.gd`](oyun3d/araclar/denge_olc.gd)), oyunla birlikte
+  gelen **par turları** (ilk kez oynayan da biriyle yarışıyor) ve test ile
+  botun paylaştığı tek bölüm grafı.
+- **Kalan (ve botun ölçemediği):** eğlence, kafa karışıklığı, "buradan sonra
+  bıraktım". Bot bitirilebilirliği ve sürtünmeyi ölçüyor; gerisi için hâlâ
+  20 kişiye oynatmak gerekiyor.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

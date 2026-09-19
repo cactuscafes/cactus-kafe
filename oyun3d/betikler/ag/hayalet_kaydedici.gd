@@ -13,6 +13,8 @@ const ARALIK := 0.05   # 20 Hz
 ## Oyuncunun hayaletten ne kadar önde/geride olduğu (saniye, eksi = önde).
 var fark := 0.0
 var hayalet_var := false
+## Oynatılan hayalet oyunla gelen par turu mu, oyuncunun kendi turu mu?
+var par_mi := false
 
 var _oyun: Node
 var _oyuncu: CharacterBody3D
@@ -33,6 +35,7 @@ func _ready() -> void:
 
 	_onceki = HayaletKayit.yukle(_oyun.bolum_kimligi)
 	hayalet_var = _onceki != null and _onceki.ornek_sayisi() > 1
+	par_mi = hayalet_var and _onceki.par
 	if hayalet_var:
 		_hayalet = preload("res://sahneler/hayalet.tscn").instantiate()
 		add_child(_hayalet)

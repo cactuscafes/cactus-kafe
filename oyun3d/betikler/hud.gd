@@ -43,7 +43,10 @@ func _process(delta: float) -> void:
 	if _hayalet_etiketi.visible:
 		# Eksi = hayaletin önündesin. Renk, sayıyı okumadan önce bilgi versin.
 		var f: float = _hayalet.fark
-		_hayalet_etiketi.text = "%s %+.2f" % [tr("HUD_HAYALET"), f]
+		# Kimle yarıştığını bilmek gerekiyor: kendi turun mu, oyunla gelen
+		# par turu mu?
+		var etiket := "HUD_PAR" if _hayalet.par_mi else "HUD_HAYALET"
+		_hayalet_etiketi.text = "%s %+.2f" % [tr(etiket), f]
 		_hayalet_etiketi.add_theme_color_override("font_color",
 			Color(0.42, 0.9, 0.55) if f <= 0.0 else Color(1.0, 0.55, 0.45))
 

@@ -1,7 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 9** bitti: altı bölüm, bölüm üretim hattı ve tuş atama ekranı.
+Şu an **Faz 10** bitti: bölümleri gerçekten oynayan bir bot, denge ölçümü ve
+oyunla gelen par turları.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -17,6 +18,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **7** | **Ağ uzmanlığı**: hayalet yarış (kayıt/oynatma/fark), gerçek zamanlı yarış (otorite, doğrulama, aradeğerleme tamponu), lobi, iki süreçli ağ testi |
 | **8** | Ticari sürüm hazırlığı: demo yapısı, varsayılan kapalı anonim telemetri + Worker, basın kiti, çıkış planı, sürüm notları |
 | **9** | İçerik ölçeği: **dört yeni bölüm**, veriden bölüm üreten hat, bitirilebilirlik doğrulayıcısı (bölüm 2'nin bitirilemez olduğunu buldu), tuş atama ekranı |
+| **10** | **Otomatik oyuncu**: bölümleri gerçek girdiyle oynayan bot, denge ölçümü ve bütçesi, oyunla gelen par turları, ortak bölüm grafı |
 
 ---
 
@@ -85,6 +87,7 @@ godot --headless --path oyun3d res://testler/hayalet_testi.tscn  # hayalet kayd�
 testler/ag_testi.sh /yol/godot                                   # ağ (iki süreç)
 godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm bitirilebilir mi
 godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
+godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
 testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
 # Bu ikisi gerçek pencere ister (bkz. Telefonda oynamak):
@@ -154,6 +157,118 @@ içe aktarımda en sık sessizce kaybedilen şeyler:
 | bölge | UV'ler nesneye ayrılan atlas dikdörtgeninin dışına taşmıyor |
 | renk | Atlastan okunan renk, o bölgenin rengi (V ekseni hatasını yakalayan test) |
 | yoğunluk | Teksel/metre Blender'ın raporuyla %15 içinde ve bantta |
+
+---
+
+## Otomatik oyuncu ve denge (Faz 10)
+
+Faz 9'un bıraktığı tek açık madde şuydu: *"bölümler oynanarak dengelenmedi —
+geçilebilir ile iyi aynı şey değil."* Faz 10 bunun hesaplanabilir kısmını
+yapıyor: bölümleri gerçekten oynayan bir bot.
+
+İki soru, iki araç:
+
+| Soru | Araç | Cevap türü |
+|---|---|---|
+| "Bu boşluk geçilebilir mi?" | `testler/bolum_hatti_testi` | hesap: 4,2 m boşluk, 6,4 m menzil → geçilir |
+| "Bu boşluk kaç denemede geçiliyor?" | `araclar/denge_olc` (bot) | ölçüm: üç denemede bir |
+
+İkincisi denge bilgisidir ve ancak oynayarak çıkar.
+
+### Bot gerçek girdiyle oynuyor
+
+```gdscript
+_kol.rotation.y = atan2(-fark.x, -fark.z)   # kamerayı hedefe çevir
+Input.action_press("ileri", 1.0)            # ve yürü
+```
+
+Karakteri hedefe **ışınlayan** bir bot hiçbir şey kanıtlamazdı: coyote süresi,
+zıplama tamponu, hava kontrolü, hareketli platformun taşıması — hiçbiri
+ölçülmemiş olurdu. Oyuncu kodu girdinin bottan mı klavyeden mi geldiğini
+bilmiyor; ölçtüğümüz şey oyunun kendisi.
+
+Rota `betikler/bolum_grafi.gd`'den geliyor — Faz 9'un doğrulayıcısıyla **aynı**
+graf. İki ayrı uygulama olsaydı, testin "geçilebilir" dediği bir boşluğu botun
+geçememesi durumunda hangisinin haklı olduğunu anlamanın yolu olmazdı.
+
+### Botun öğrendiği üç şey (ve öğrenirken bulunan hatalar)
+
+- **Havada hedefe yönel.** İlk sürüm zıpladıktan sonra kalkış noktasına
+  yöneliyordu; kalkış noktası arkada kaldığı için bot havada geri dönüp
+  dikene düşüyordu. Zıplamanın yarısı havada yönlendirmektir.
+- **Hareketli platformu bekle.** Binmek zıplamak değil beklemektir: platform
+  duruşa gelene kadar durmak gerekiyor. Ayrıca platformun İKİ duruşu tek yer
+  sayılmalı, yoksa platform seni taşırken bot "hedef geride kaldı" deyip geri
+  dönüyor ve çiçeği alamadan iniyor.
+- **Takılınca zıpla.** İleri basıp yerinden oynamıyorsan önünde bir şey var
+  (rampanın yan duvarı). Gerçek oyuncu ne yaparsa: önce zıpla, olmazsa başka
+  yol dene.
+
+Bot yazarken oyunda değil **modelde** bir hata da çıktı: eğik rampa tek eksen
+hizalı kutuyla temsil edilince "üst"ü en yüksek köşe oluyor ve rampa zeminden
+4,1 m yukarıda görünüyordu — oysa alçak ucundan yürüyerek çıkılıyor. Artık eğik
+kutular eğim ekseni boyunca parçalara bölünüyor.
+
+### Par turu
+
+Botun turu `res://hayaletler/` altına kaydedilip oyunla birlikte geliyor:
+
+```bash
+godot --headless --path oyun3d res://araclar/denge_olc.tscn -- --par
+```
+
+Faz 7'nin hayalet yarışı yalnızca kendi turunla yarıştırıyordu, yani bölümü ilk
+kez oynayan kimseyle yarışmıyordu ve ekrandaki fark satırı boş duruyordu. Artık
+ilk turda botun par turu çıkıyor; kendi turun daha hızlıysa hayalet ona dönüyor.
+HUD hangisiyle yarıştığını yazıyor: `par turu −1,20` ya da `hayalet +0,40`.
+
+### Ölçüm (bugünkü bot)
+
+```
+bolum1   bitişte    47.6 sn   2 ölüm   6/8 çiçek
+bolum2   TAKILDI   110.0 sn  30 ölüm   3/10        ← kuleyi tırmanamıyor
+bolum3   bitişte    45.5 sn   7 ölüm   5/8
+bolum4   bitişte    43.7 sn   4 ölüm   7/9
+bolum5   TAKILDI    62.8 sn   1 ölüm   5/10        ← kayanın üstünde takılıyor
+bolum6   TAKILDI   110.0 sn  11 ölüm   5/12
+```
+
+Altısının tamamı **11 saniyede** ölçülüyor: `--fixed-fps 60` gerçek zaman
+senkronizasyonunu kapatıyor, yani 47 saniyelik bölüm 1,5 saniyede oynanıyor.
+Bu olmadan ölçüm gerçek zamanda ~8 dakika sürüyordu ve CI'a giremezdi.
+
+Bot bölüm 2, 5 ve 6'da bitişe ulaşamıyor. **Bu botun sınırı, bölümlerin hatası
+değil**: bitirilebilirlik `bolum_hatti_testi` tarafından ayrıca hesapla
+kanıtlanıyor. `denge_butce.json` bunu böyle yazıyor (`bitis_bekleniyor: false`)
+ve o bölümlerde ölçüt "daha kötüye gitmesin"e dönüşüyor. Botun tırmanamadığı
+kule yine de bir işaret: bölüm 2 insan için de en zoru ve ilk bakılacak yer
+orası.
+
+### Botun bulduğu gerçek hata: her karede `visible`
+
+Ölçüm hayaletli bölümde **60 kat** yavaşladı. Sebep oyunda çıktı:
+
+```gdscript
+visible = not durum["bitti"]   # her karede, değer değişmese bile
+```
+
+Görünürlük Godot'da alt ağaca yayılıyor; aynı değeri her karede atamak ucuz
+değil. Tek satırlık düzeltme (`if visible != gorunur`) ölçümü 120 saniyeden
+1 saniyeye indirdi. Bu, gerçek cihazda da hayalet oynarken ödenen bir bedeldi
+ve kimse fark etmemişti — bot oyunu binlerce kare boyunca oynamasa
+görülmezdi. Profilleyici olmadan bulunan bir kare bütçesi hatası.
+
+### Sayılar ne anlatıyor, ne anlatmıyor
+
+`denge_butce.json` bölüm başına süre ve ölüm sınırı tutuyor; aşılırsa CI
+kırmızıya dönüyor. Bu sayılar **insan süresi değil** — botun 40 saniyede
+bitirdiği bölümü insan 2-3 dakikada bitirir. İşleri bölümün DEĞİŞTİĞİNİ
+yakalamak: aynı bot dün 40 saniyede bitirdiği bölümü bugün 90 saniyede
+bitiriyorsa bölüm zorlaşmış demektir.
+
+> **Bot, oyun testinin yerine geçmez.** Eğlenceyi ölçmüyor, kafa karışıklığını
+> ölçmüyor, "buradan sonra bıraktım" demiyor. Ölçtüğü şey bitirilebilirlik ve
+> sürtünme. Yol haritasının dediği hâlâ geçerli: 20 kişiye oynat, izle.
 
 ---
 
@@ -867,6 +982,8 @@ oyun3d/
 │   ├── efekt.gd             Autoload: sarsıntı ve vuruş duraklaması
 │   ├── dusman.gd            Durum makineli düşman
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
+│   ├── bolum_grafi.gd       Durak/menzil grafı — test ve bot ortak kullanıyor
+│   ├── bot/                 Otomatik oyuncu (denge ölçümü, par turu)
 │   ├── birlestirici.gd      Statik görselleri MultiMesh'e indirir
 │   ├── ag/                  Ağ: ag.gd, hayalet_kayit.gd, hayalet_kaydedici.gd,
 │   │                        hayalet.gd, uzak_oyuncu.gd, uzak_oyuncular.gd
@@ -881,6 +998,8 @@ oyun3d/
 │   ├── hareketli_platform.gd
 │   └── hud.gd               Durum + kare bütçesi
 ├── bolum_tasarimi/          Bölüm VERİSİ (bolum3.gd … bolum6.gd) — hattın girdisi
+├── hayaletler/              Oyunla gelen par turları (botun turu, Faz 10)
+├── denge_butce.json         Bot süre/ölüm sınırları (Faz 10)
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
 ├── golgeler/                Shader'lar (tuzak şeritleri, erime)
 ├── performans_butce.json    Draw call / üçgen bütçeleri
@@ -893,6 +1012,7 @@ oyun3d/
 ├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
 ├── araclar/
 │   ├── bolum_uret.gd        Veriden bölüm sahnesi üretici
+│   ├── denge_olc.gd         Botu bölümlere salar, denge sayılarını yazar
 │   ├── animasyon_uret.gd    Animasyon üretici (Godot)
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
 │   ├── sesler.py            Ses üretici

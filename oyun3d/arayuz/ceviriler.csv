@@ -43,6 +43,7 @@ DOKUNMA_KOS,KOŞ,RUN
 DOKUNMA_DURAKLAT,II,II
 HUD_TUSLAR_DOKUNMA,Sol: hareket · Sağ: kamera · ZIPLA · KOŞ,Left: move · Right: camera · JUMP · RUN
 HUD_HAYALET,hayalet,ghost
+HUD_PAR,par turu,par run
 MENU_YARIS,Yarış (ağ),Race (network)
 AG_BASLIK,Yarış lobisi,Race lobby
 AG_AD,Oyuncu adı,Player name

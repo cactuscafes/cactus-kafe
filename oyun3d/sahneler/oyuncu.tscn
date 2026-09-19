@@ -1,30 +1,13 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://betikler/oyuncu.gd" id="1_oyuncu"]
 [ext_resource type="Script" path="res://betikler/kamera.gd" id="2_kamera"]
-[ext_resource type="AnimationLibrary" path="res://animasyon/oyuncu.tres" id="3_anim"]
 [ext_resource type="AnimationNodeStateMachine" path="res://animasyon/oyuncu_agac.tres" id="4_agac"]
+[ext_resource type="PackedScene" path="res://varliklar/oyuncu.gltf" id="5_model"]
 
 [sub_resource type="CapsuleShape3D" id="Sekil_kapsul"]
 radius = 0.35
 height = 1.7
-
-[sub_resource type="StandardMaterial3D" id="Mat_govde"]
-albedo_color = Color(0.176, 0.451, 0.322, 1)
-roughness = 0.65
-
-[sub_resource type="StandardMaterial3D" id="Mat_uzuv"]
-albedo_color = Color(0.243, 0.549, 0.4, 1)
-roughness = 0.7
-
-[sub_resource type="BoxMesh" id="Mesh_govde"]
-size = Vector3(0.55, 0.7, 0.35)
-
-[sub_resource type="BoxMesh" id="Mesh_kafa"]
-size = Vector3(0.42, 0.42, 0.42)
-
-[sub_resource type="BoxMesh" id="Mesh_kol"]
-size = Vector3(0.15, 0.5, 0.15)
 
 [sub_resource type="QuadMesh" id="Mesh_parcacik"]
 size = Vector2(0.11, 0.11)
@@ -34,9 +17,6 @@ shading_mode = 0
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.898, 0.365, 0.353, 1)
 billboard_mode = 1
-
-[sub_resource type="BoxMesh" id="Mesh_bacak"]
-size = Vector3(0.2, 0.55, 0.2)
 
 [node name="Oyuncu" type="CharacterBody3D"]
 collision_layer = 2
@@ -54,49 +34,9 @@ collision_mask = 33
 
 [node name="Yon" type="Node3D" parent="."]
 
-[node name="Model" type="Node3D" parent="Yon"]
-
-[node name="Govde" type="MeshInstance3D" parent="Yon/Model"]
-position = Vector3(0, 0.1, 0)
-mesh = SubResource("Mesh_govde")
-material_override = SubResource("Mat_govde")
-
-[node name="Kafa" type="MeshInstance3D" parent="Yon/Model"]
-position = Vector3(0, 0.68, 0)
-mesh = SubResource("Mesh_kafa")
-material_override = SubResource("Mat_govde")
-
-[node name="KolSol" type="Node3D" parent="Yon/Model"]
-position = Vector3(-0.36, 0.35, 0)
-
-[node name="Gorsel" type="MeshInstance3D" parent="Yon/Model/KolSol"]
-position = Vector3(0, -0.25, 0)
-mesh = SubResource("Mesh_kol")
-material_override = SubResource("Mat_uzuv")
-
-[node name="KolSag" type="Node3D" parent="Yon/Model"]
-position = Vector3(0.36, 0.35, 0)
-
-[node name="Gorsel" type="MeshInstance3D" parent="Yon/Model/KolSag"]
-position = Vector3(0, -0.25, 0)
-mesh = SubResource("Mesh_kol")
-material_override = SubResource("Mat_uzuv")
-
-[node name="BacakSol" type="Node3D" parent="Yon/Model"]
-position = Vector3(-0.15, -0.3, 0)
-
-[node name="Gorsel" type="MeshInstance3D" parent="Yon/Model/BacakSol"]
-position = Vector3(0, -0.275, 0)
-mesh = SubResource("Mesh_bacak")
-material_override = SubResource("Mat_uzuv")
-
-[node name="BacakSag" type="Node3D" parent="Yon/Model"]
-position = Vector3(0.15, -0.3, 0)
-
-[node name="Gorsel" type="MeshInstance3D" parent="Yon/Model/BacakSag"]
-position = Vector3(0, -0.275, 0)
-mesh = SubResource("Mesh_bacak")
-material_override = SubResource("Mat_uzuv")
+[node name="Model" parent="Yon" instance=ExtResource("5_model")]
+; Ayak tabani kapsulun altina oturuyor: kapsul 1,70 m, merkezi orijinde.
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, 0)
 
 [node name="Parcacik" type="CPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
@@ -115,14 +55,9 @@ initial_velocity_max = 5.0
 scale_amount_min = 0.6
 color = Color(0.898, 0.365, 0.353, 1)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": ExtResource("3_anim")
-}
-
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = ExtResource("4_agac")
-anim_player = NodePath("../AnimationPlayer")
+anim_player = NodePath("../Yon/Model/AnimationPlayer")
 active = true
 
 [node name="KameraKolu" type="SpringArm3D" parent="."]

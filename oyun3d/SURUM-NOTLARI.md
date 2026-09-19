@@ -6,11 +6,29 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.10\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.11\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.11.0 — Karakter (Faz 11)
+
+- **Kaktüs karakter.** Oyuncu artık beş kutu değil: Blender'da modellenmiş,
+  yedi kemikle rig'lenmiş, skinning'li ve iskelet animasyonlu bir kaktüs
+  (`araclar/karakter.py` → `varliklar/oyuncu.gltf`). 96 üçgen, 1,72 m.
+- **Yordamsal animasyon üreticisi emekli oldu.** `araclar/animasyon_uret.gd`
+  ve ürettiği kütüphane silindi; animasyonlar glTF ile geliyor. Durum makinesi
+  (`animasyon/oyuncu_agac.tres`) ve `oyuncu.gd` bir satır bile değişmedi —
+  hareket dili (genlik, süre, faz) bilerek korundu.
+- **Draw call düştü.** Altı ayrı mesh yerine tek skinned mesh: bölüm başına
+  ~13 draw call (bolum1 82 → 69). Performans bütçeleri yeni sayılara indirildi;
+  eski bütçe yeni regresyonu yakalamazdı.
+- **Karakter testi.** `testler/karakter_testi` kemik adlarını, skin'i, dokuyu,
+  boyu ve animasyon sürelerini doğruluyor; en önemlisi karakteri OYNATIP
+  koşarken bacağın kaç radyan salındığını ölçüyor (0,85 rad) — "animasyon
+  çalışıyor görünüyor ama kemik kıpırdamıyor" hatası ancak böyle yakalanıyor.
+- Dikenler geometride değil dokuda: atlasa `oyuncu` bölgesi eklendi.
 
 ## 0.10.0 — Otomatik oyuncu ve denge (Faz 10)
 

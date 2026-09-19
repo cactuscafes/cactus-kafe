@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 10** bitti: bölümleri gerçekten oynayan bir bot, denge ölçümü ve
-oyunla gelen par turları.
+Şu an **Faz 11** bitti: karakter kutu olmaktan çıktı — modellenmiş, rig'li,
+iskeletli bir kaktüs.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -19,6 +19,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **8** | Ticari sürüm hazırlığı: demo yapısı, varsayılan kapalı anonim telemetri + Worker, basın kiti, çıkış planı, sürüm notları |
 | **9** | İçerik ölçeği: **dört yeni bölüm**, veriden bölüm üreten hat, bitirilebilirlik doğrulayıcısı (bölüm 2'nin bitirilemez olduğunu buldu), tuş atama ekranı |
 | **10** | **Otomatik oyuncu**: bölümleri gerçek girdiyle oynayan bot, denge ölçümü ve bütçesi, oyunla gelen par turları, ortak bölüm grafı |
+| **11** | **Karakter**: Blender'da modellenip rig'lenen, skinning'li ve iskelet animasyonlu kaktüs; yordamsal animasyon üreticisi emekli oldu, draw call bölüm başına ~13 düştü |
 
 ---
 
@@ -87,6 +88,7 @@ godot --headless --path oyun3d res://testler/hayalet_testi.tscn  # hayalet kayd�
 testler/ag_testi.sh /yol/godot                                   # ağ (iki süreç)
 godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm bitirilebilir mi
 godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
+godot --headless --path oyun3d res://testler/karakter_testi.tscn     # model, iskelet, animasyon
 godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
 testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
@@ -450,6 +452,12 @@ cp "$HOME/.local/share/godot/app_userdata/Cactus 3B/gorseller/"*.png oyun3d/basi
 ---
 
 ## Hayalet yarış (Faz 7)
+
+> **Faz 11 notu:** hayalet artık oyuncuyla **aynı modeli** kullanıyor (saydam,
+> gölgesiz malzeme). Silueti farklı olan hayalet, yarıştığın şeyin "sen"
+> olmadığını söylüyordu. Animasyonunu kayıttaki hız sürüyor: duruyorsa boşta,
+> yürüyorsa yürüme, koşuyorsa koşma — durum makinesi yok, iki eşik yetiyor.
+
 
 En iyi turunuz kaydediliyor ve bir dahaki sefere onunla yarışıyorsunuz.
 Ekranın üstünde fark yazıyor: **eksi = hayaletin önündesiniz**.
@@ -905,23 +913,60 @@ okunabilir, LFS dışında tutuldu — `.bin` ikili (LFS), doku ise ortak tek do
 
 ---
 
-## Karakter ve animasyon
+## Karakter ve animasyon (Faz 11)
 
-Karakter kutulardan kurulu; `Yon/Model` altındaki uzuvlar birer `Node3D` pivot.
-Animasyonlar `araclar/animasyon_uret.gd` ile **kodla üretiliyor**:
+Karakter artık kutu değil: **modellenmiş, rig'li ve iskeletli** bir kaktüs.
+Model, iskelet, skinning ve beş animasyon tek bir Blender betiğinden çıkıyor:
 
 ```bash
-godot --headless --path oyun3d --script res://araclar/animasyon_uret.gd
+python3 oyun3d/araclar/karakter.py      # -> varliklar/oyuncu.gltf (+ .bin)
 ```
 
-Üretilenler: `animasyon/oyuncu.tres` (bosta, yürüme, koşma, zıplama, düşme) ve
-`animasyon/oyuncu_agac.tres` (durum makinesi).
+```
+araclar/karakter.py
+  ├── mesh        96 üçgen, 1,72 m (gövde, kafa, iki kol pedi, iki bacak)
+  ├── iskelet     7 kemik: Kalca, Govde, Kafa, KolSol/Sag, BacakSol/Sag
+  ├── skinning    bölgeye göre ağırlık, eklemlerde iki kemiğe paylaştırma
+  └── animasyon   bosta 2,6 · yurume 0,9 · kosma 0,55 · zipla 0,45 · dusme 0,8 sn
+```
 
-Neden kodla: Faz 1'de rig'li bir model yok — Mixamo bir Adobe hesabı istiyor.
-Kutu karakterde animasyon, düğüm dönüşlerinin zamana bağlı değeri demek; sinüsle
-üretmek elle keyframe koymaktan hızlı ve tekrarlanabilir. **Faz 2'de** Blender'dan
-gerçek model gelince bu üretici silinecek, animasyonlar GLB ile birlikte gelecek —
-`AnimationTree` yapısı aynen kalabilir. Öğrenilmesi gereken şey zaten o yapı.
+Faz 1'den beri karakter beş kutuydu ve animasyon, kutuların dönüşünü sinüsle
+üreten bir Godot betiğiydi (`animasyon_uret.gd`). O dosyanın kendi yorumunda
+yazıyordu: *"Blender'dan gerçek bir model geldiğinde bu dosya silinecek,
+AnimationTree yapısı aynen kalabilir."* Faz 11 tam olarak bunu yaptı — üretici
+silindi, **durum makinesi ve `oyuncu.gd` bir satır bile değişmedi**. Değişen
+şey iskelet; hareket dili (genlikler, süreler, faz farkları) bilerek aynı
+tutuldu, oyunun hissi değişmesin diye.
+
+Kazanç yalnızca görsel değil: altı ayrı `MeshInstance3D` yerine tek skinned
+mesh, bölüm başına **~13 draw call** düşürdü (bolum1 82 → 69).
+
+### Dikenler mesh'te değil dokuda
+
+Kaburgalar ve dikenler atlasın `oyuncu` bölgesinde çiziliyor. Geometriye diken
+koymak üçgeni üçe katlar ve skinning'i zorlaştırır; low-poly stilinde silueti
+mesh, detayı doku taşır. Oyuncunun yeşili süslemedeki kaktüsten bilerek daha
+açık: oyuncu ekranda bir bakışta bulunmalı.
+
+### Üç tuzak (üçü de sessiz)
+
+- **Karakter bembeyaz çıktı.** Blender'da `img.filepath = "//atlas.png"`
+  yazılmıştı; kaydedilmemiş bir blend dosyasında `//` çözümlenmiyor ve dışa
+  aktarıcı dokuyu **hata vermeden** atlıyor. glTF'te malzeme var, `images`
+  boş. `karakter_testi` artık "albedo_texture null mu" diye bakıyor.
+- **Kemiğin yerel ekseni.** Blender'da kemikler kendi +Y'si boyunca uzar;
+  bacak kemiği aşağı baktığı için yerel X'i dünya X'iyle aynı yöne bakmaz.
+  Salınım işaretleri kemik başına bir kez ölçülüp `_YON` tablosuna yazıldı —
+  "sağ bacak ters sallanıyor" hatasının kaynağı hep budur.
+- **AnimationTree yanlış oynatıcıya bakıyordu.** `anim_player` yolu **ağaca**
+  göre çözülüyor, oyuncuya göre değil. Yanlışsa oyun çalışır, durum makinesi
+  geçiş yapar, ama kemikler kıpırdamaz: ekranda buz gibi bir karakter kayar.
+  Test bunu "koşarken bacak kaç radyan salınıyor" diye ÖLÇÜYOR (0,85 rad).
+
+> **Testte öğrenilen:** boş sahnede karakter sonsuza kadar düşüyor ve
+> `oyuncu.gd` her karede durumu "dusme"ye çekiyordu; testin elle seçtiği
+> durumu eziyordu. Animasyon sistemini ölçmek için oyuncunun kendi sürücüsü
+> kapatılıyor (`set_physics_process(false)`).
 
 **Durum makinesi:** `yer` (bosta ↔ yürüme ↔ koşma arasında bir `BlendSpace1D`,
 karışım konumunu yatay hız sürüyor), `zipla`, `dusme`. Geçişleri `oyuncu.gd`
@@ -1009,12 +1054,12 @@ oyun3d/
 ├── default_bus_layout.tres  Master / SFX / Müzik bus'ları
 ├── varliklar/               Modellenmiş nesneler (.gltf + .bin) ve atlas.png
 │   └── olcum.json           Blender'ın raporu = Godot testinin sözleşmesi
-├── animasyon/               Üretilmiş animasyon kütüphanesi ve durum makinesi
+├── animasyon/               Durum makinesi (animasyonlar artık glTF ile geliyor)
 ├── araclar/
 │   ├── bolum_uret.gd        Veriden bölüm sahnesi üretici
 │   ├── denge_olc.gd         Botu bölümlere salar, denge sayılarını yazar
-│   ├── animasyon_uret.gd    Animasyon üretici (Godot)
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
+│   ├── karakter.py          Rig'li karakter + iskelet animasyonları (bpy)
 │   ├── sesler.py            Ses üretici
 │   ├── navmesh_uret.gd      Navigasyon örgüsü üretici (her bölüm için)
 │   ├── tanitim.gd           Trailer çekimi (oyun kendini oynar)
@@ -1172,8 +1217,11 @@ söyler.
 Faz 8 bitti; `1.0.0` için kalanlar `SURUM-NOTLARI.md` sonunda listeli. Kodda
 açık kalan uçlar:
 
-- **Karakter modeli** — karakter hâlâ kutu. Modellenmiş + rig'li bir kaktüs
-  gelince `animasyon_uret.gd` emekli olur, `AnimationTree` yapısı kalır.
+- **Kök hareketi yok** — animasyonlar yerinde oynuyor, kat edilen yolu kod
+  sürüyor. Root motion, ayak kayması olmayan bir yürüyüş için gerekiyor ve
+  `AnimationTree`'nin `root_motion_track` alanı bunun için var.
+- **El/ayak IK yok** — rampada ayaklar zemine oturmuyor, model bütün olarak
+  yatıyor (`_zemine_yatir`). `SkeletonIK3D` ile ayak başına ışın atmak gerek.
 - **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
   içe aktarıcısı, Blender'da adı `-col` ile biten mesh'ler için otomatik
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.

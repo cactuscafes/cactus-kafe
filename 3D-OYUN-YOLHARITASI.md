@@ -223,6 +223,17 @@ hesaplanabilir kısmı bir botla yapılabilir.
   bıraktım". Bot bitirilebilirliği ve sürtünmeyi ölçüyor; gerisi için hâlâ
   20 kişiye oynatmak gerekiyor.
 
+### Faz 11 — **Karakter: modelden rig'e** (Faz 10 sonrası)
+Oyunun her ekran görüntüsünde duran şey hâlâ beş kutuydu. Bir 3B oyunun en
+görünür parçası karakterdir; rigging ve skinning de 3B'nin öğrenilmesi gereken
+ayrı bir dalı.
+- **Durum: bitti** → Blender'da modellenip yedi kemikle rig'lenen, skinning'li,
+  beş iskelet animasyonlu kaktüs ([`araclar/karakter.py`](oyun3d/araclar/karakter.py)).
+  Yordamsal animasyon üreticisi emekli oldu; durum makinesi ve oyuncu kodu
+  değişmedi. Tek skinned mesh, bölüm başına ~13 draw call kazandırdı.
+- **Kalan:** kök hareketi (root motion) ve ayak IK — ikisi de bu iskeletin
+  üstüne kurulabilir; rampada ayakların zemine oturması için gerekiyor.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

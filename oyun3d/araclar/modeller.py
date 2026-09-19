@@ -55,8 +55,11 @@ BOLGELER = {
     "ahsap":   (1024, 1024, 512, 1024),
     "cicek":   (1536, 1024, 512, 512),
     "dusman":  (0, 2048, 1024, 1024),
+    # Faz 11: oyuncu karakteri. Son boş 1024'lük slot buraya gitti; yeni bir
+    # nesne gelirse atlas 2048x4096'ya çıkacak.
+    "oyuncu":  (1024, 2048, 1024, 1024),
 }
-# Boş kalanlar (Faz 5 için): (1536,1536,512,512) ve (1024,2048,1024,1024)
+# Boş kalan: (1536,1536,512,512)
 
 RENKLER = {
     "kaya":   (0.44, 0.43, 0.41),
@@ -66,6 +69,9 @@ RENKLER = {
     "sandik": (0.50, 0.37, 0.22),
     # Düşman bilerek yeşil DEĞİL: tehlike, süslemeden bir bakışta ayrılmalı.
     "dusman": (0.56, 0.24, 0.31),
+    # Oyuncu kaktüsten biraz daha parlak ve mavimsi: süsleme kaktüsleriyle
+    # karışmamalı, oyuncu ekranda bir bakışta bulunmalı.
+    "oyuncu": (0.24, 0.56, 0.38),
 }
 
 
@@ -108,7 +114,7 @@ def atlas_uret(yol: str) -> None:
         for y in range(yuk_px):
             for x in range(gen_px):
                 k = 0.92 + 0.16 * _deger_gurultusu(x, y, 48, tohum)
-                if ad == "kaktus":
+                if ad in ("kaktus", "oyuncu"):
                     k *= 0.86 + 0.14 * abs(math.sin(x * math.pi / 48.0))
                     # dikenler: düzenli ızgarada, kafes gürültüsüyle seçilmiş
                     if x % 32 < 3 and y % 40 < 3 and _kafes(x // 32, y // 40, tohum) > 0.55:

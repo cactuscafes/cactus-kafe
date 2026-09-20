@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="1_oyuncu"]
 [ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="2_platform"]
@@ -21,34 +21,11 @@
 [ext_resource type="PackedScene" path="res://sahneler/dokunmatik.tscn" id="22_dokunmatik"]
 [ext_resource type="Script" path="res://betikler/ag/hayalet_kaydedici.gd" id="23_hayalet"]
 [ext_resource type="Script" path="res://betikler/ag/uzak_oyuncular.gd" id="24_uzak"]
-
-[sub_resource type="ProceduralSkyMaterial" id="Mat_gok"]
-sky_top_color = Color(0.298, 0.310, 0.404, 1)
-sky_horizon_color = Color(0.647, 0.596, 0.573, 1)
-ground_bottom_color = Color(0.267, 0.216, 0.208, 1)
-ground_horizon_color = Color(0.647, 0.596, 0.573, 1)
-
-[sub_resource type="Sky" id="Gok"]
-sky_material = SubResource("Mat_gok")
-
-[sub_resource type="Environment" id="Ortam"]
-background_mode = 2
-sky = SubResource("Gok")
-tonemap_mode = 4
-tonemap_white = 6.0
-fog_enabled = true
-fog_light_color = Color(0.62, 0.557, 0.541, 1)
-fog_density = 0.006
+[ext_resource type="PackedScene" path="res://sahneler/ortam.tscn" id="25_ortam"]
+[ext_resource type="Script" path="res://betikler/manzara.gd" id="27_manzara"]
 
 [sub_resource type="PlaneMesh" id="Mesh_zemin"]
 size = Vector2(120, 120)
-
-[sub_resource type="StandardMaterial3D" id="Mat_zemin"]
-albedo_color = Color(0.322, 0.184, 0.204, 1)
-roughness = 0.55
-emission_enabled = true
-emission = Color(0.541, 0.196, 0.192, 1)
-emission_energy_multiplier = 0.22
 
 [sub_resource type="BoxShape3D" id="Sekil_zemin"]
 size = Vector3(120, 1, 120)
@@ -70,15 +47,16 @@ emission_energy_multiplier = 0.7
 
 [node name="Bolum2" type="Node3D"]
 
-[node name="Ortam" type="WorldEnvironment" parent="."]
-environment = SubResource("Ortam")
-
-[node name="Gunes" type="DirectionalLight3D" parent="."]
-position = Vector3(0, 20, 0)
-rotation_degrees = Vector3(-38, 25, 0)
-light_color = Color(1, 0.925, 0.859, 1)
-light_energy = 0.8
-shadow_enabled = true
+[node name="Ortam" parent="." instance=ExtResource("25_ortam")]
+gok_ust = Color(0.298, 0.31, 0.404, 1)
+gok_ufuk = Color(0.647, 0.596, 0.573, 1)
+gok_yer = Color(0.267, 0.216, 0.208, 1)
+bulut = 0.35
+sis_renk = Color(0.62, 0.557, 0.541, 1)
+sis = 0.006
+gunes_aci = Vector3(-38, 25, 0)
+gunes_gucu = 0.8
+gunes_renk = Color(1, 0.925, 0.859, 1)
 
 [node name="Zemin" type="StaticBody3D" parent="."]
 collision_layer = 1
@@ -374,3 +352,12 @@ script = ExtResource("23_hayalet")
 
 [node name="UzakOyuncular" type="Node3D" parent="."]
 script = ExtResource("24_uzak")
+
+[node name="Manzara" type="Node3D" parent="."]
+script = ExtResource("27_manzara")
+tohum = 2202
+zemin_y = 0.0
+zemin_renk = Color(0.42, 0.36, 0.33, 1)
+tepe_renk = Color(0.40, 0.33, 0.31, 1)
+serpinti_yaricap = 52.0
+serpinti = false

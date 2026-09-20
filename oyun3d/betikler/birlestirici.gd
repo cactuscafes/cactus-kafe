@@ -56,22 +56,43 @@ func _birlestir(kok: Node) -> void:
 
 ## Örnek renklerinin işe yaraması için malzemede vertex_color_use_as_albedo
 ## açık olmalı; kopyalıyoruz ki kaynak malzeme bozulmasın.
+##
+## FAZ 13: dünya malzemesi artık bir `ShaderMaterial` (`golgeler/dunya.gdshader`).
+## Onda `vertex_color_use_as_albedo` diye bir alan yok — renk çarpımını
+## gölgelendirici kendi yapıyor (`renk * COLOR`). Burada yalnızca taban rengin
+## beyaza çekilmesi gerekiyor; mantık aynı, alan adı farklı. Bu ayrım
+## yazılmadan önce ShaderMaterial'lı bir alt ağaç birleştirilince malzeme
+## SESSİZCE null oluyordu: bütün platformlar varsayılan beyaza dönüyordu.
+const RENK_PARAM := "renk"
+
 func _malzeme(mi: MeshInstance3D) -> Material:
-	var kaynak := mi.material_override
-	if kaynak == null and mi.mesh.get_surface_count() > 0:
-		kaynak = mi.mesh.surface_get_material(0)
-	if kaynak == null:
-		kaynak = StandardMaterial3D.new()
-	var kopya := kaynak.duplicate() as BaseMaterial3D
-	if kopya != null:
-		kopya.vertex_color_use_as_albedo = true
+	var kaynak := _kaynak_malzeme(mi)
+	var kopya := kaynak.duplicate()
+	var temel := kopya as BaseMaterial3D
+	if temel != null:
+		temel.vertex_color_use_as_albedo = true
 		# Renk artık örnek renginden geliyor; taban beyaz olmalı ki çarpım
 		# sonucu istenen rengi versin.
-		kopya.albedo_color = Color.WHITE
+		temel.albedo_color = Color.WHITE
+	var golge := kopya as ShaderMaterial
+	if golge != null and golge.get_shader_parameter(RENK_PARAM) != null:
+		golge.set_shader_parameter(RENK_PARAM, Color.WHITE)
 	return kopya
 
 func _renk(mi: MeshInstance3D) -> Color:
-	var mat := mi.material_override as BaseMaterial3D
-	if mat == null and mi.mesh.get_surface_count() > 0:
-		mat = mi.mesh.surface_get_material(0) as BaseMaterial3D
-	return mat.albedo_color if mat != null else Color.WHITE
+	var mat := _kaynak_malzeme(mi)
+	var temel := mat as BaseMaterial3D
+	if temel != null:
+		return temel.albedo_color
+	var golge := mat as ShaderMaterial
+	if golge != null:
+		var deger: Variant = golge.get_shader_parameter(RENK_PARAM)
+		if deger is Color:
+			return deger
+	return Color.WHITE
+
+func _kaynak_malzeme(mi: MeshInstance3D) -> Material:
+	var kaynak := mi.material_override
+	if kaynak == null and mi.mesh != null and mi.mesh.get_surface_count() > 0:
+		kaynak = mi.mesh.surface_get_material(0)
+	return kaynak if kaynak != null else StandardMaterial3D.new()

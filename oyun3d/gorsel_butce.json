@@ -1,0 +1,33 @@
+{
+  "_aciklama": "Faz 13 görsel bütçesi: bölüm çizildiğinde karenin ortalama parlaklığı ve RMS karşıtlığı (Xvfb + opengl3, 1280x720; testin kendi çıktısından alındı). Amaç piksel eşitliği DEĞİL — 'bu bölüm karardı, patladı ya da düz bir renge çöktü' demek. Bu yüzden pay geniş (±0,10) ve karşıtlık yalnızca ALT sınır: aydınlatmayı iyileştirmek testi kırmamalı, bozmak kırmalı. Ölçümler `testler/gorsel_testi.tscn` her koştuğunda yazdırılıyor.",
+  "bolum1": {
+    "parlaklik": 0.624,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.086
+  },
+  "bolum2": {
+    "parlaklik": 0.459,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.086
+  },
+  "bolum3": {
+    "parlaklik": 0.547,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.095
+  },
+  "bolum4": {
+    "parlaklik": 0.53,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.089
+  },
+  "bolum5": {
+    "parlaklik": 0.633,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.082
+  },
+  "bolum6": {
+    "parlaklik": 0.461,
+    "pay": 0.1,
+    "asgari_karsitlik": 0.089
+  }
+}

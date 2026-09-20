@@ -40,6 +40,9 @@ const BIRLESTIRICI_BETIK := preload("res://betikler/birlestirici.gd")
 const HAYALET_BETIK := preload("res://betikler/ag/hayalet_kaydedici.gd")
 const UZAK_BETIK := preload("res://betikler/ag/uzak_oyuncular.gd")
 const TUZAK_MALZEME := preload("res://golgeler/tuzak_malzeme.tres")
+const ORTAM_SAHNE := preload("res://sahneler/ortam.tscn")
+const DUNYA_GOLGE := preload("res://golgeler/dunya.gdshader")
+const MANZARA_BETIK := preload("res://betikler/manzara.gd")
 
 ## Süsleme adı -> model. Veride "tur" alanı bunlardan biri olmalı.
 const SUSLER := {
@@ -138,6 +141,7 @@ func _sahne_kur(veri: Dictionary) -> Node3D:
 	_kontrol_noktalari_ekle(kok, veri)
 	_bitis_ekle(kok, veri)
 	_susleme_ekle(kok, veri)
+	_manzara_ekle(kok, veri)
 	_dusmanlari_ekle(kok, veri)
 	_birlestirici_ekle(kok)
 	_oyuncu_ekle(kok, veri)
@@ -156,37 +160,29 @@ func _ekle(ebeveyn: Node, dugum: Node, kok: Node) -> Node:
 	return dugum
 
 func _ortam_ekle(kok: Node3D, veri: Dictionary) -> void:
-	var gok_mat := ProceduralSkyMaterial.new()
-	var gok_renk: Color = veri.get("gok_ufuk", Color(0.72, 0.75, 0.71))
-	gok_mat.sky_horizon_color = gok_renk
-	gok_mat.ground_horizon_color = gok_renk
-	gok_mat.ground_bottom_color = veri.get("gok_yer", Color(0.35, 0.37, 0.34))
+	# Aydınlatmanın TEKNİK kurulumu `sahneler/ortam.tscn` içinde (Faz 13);
+	# burada yalnızca bölümün sanat yönü veriliyor. Altı bölüm aynı sahneyi
+	# örnekliyor: gölge kademesini değiştirmek tek dosyada bir satır.
+	var ortam := ORTAM_SAHNE.instantiate()
+	ortam.name = "Ortam"
+	ortam.gok_ufuk = veri.get("gok_ufuk", Color(0.72, 0.75, 0.71))
+	ortam.gok_yer = veri.get("gok_yer", Color(0.35, 0.37, 0.34))
 	if veri.has("gok_ust"):
-		gok_mat.sky_top_color = veri["gok_ust"]
-	var gok := Sky.new()
-	gok.sky_material = gok_mat
-
-	var ortam := Environment.new()
-	ortam.background_mode = Environment.BG_SKY
-	ortam.sky = gok
-	ortam.tonemap_mode = Environment.TONE_MAPPER_AGX   # bolum1/2 ile aynı görünüm
-	ortam.tonemap_white = 6.0
-	ortam.fog_enabled = true
-	ortam.fog_light_color = veri.get("sis_renk", Color(0.702, 0.741, 0.729))
-	ortam.fog_density = veri.get("sis", 0.0035)
-
-	var dugum := WorldEnvironment.new()
-	dugum.name = "Ortam"
-	dugum.environment = ortam
-	_ekle(kok, dugum, kok)
-
-	var gunes := DirectionalLight3D.new()
-	gunes.name = "Gunes"
-	gunes.position = Vector3(0, 12, 0)
-	gunes.rotation_degrees = veri.get("gunes_aci", Vector3(-52, -38, 0))
-	gunes.light_energy = veri.get("gunes_gucu", 0.85)
-	gunes.shadow_enabled = true
-	_ekle(kok, gunes, kok)
+		ortam.gok_ust = veri["gok_ust"]
+	else:
+		# Üst rengi verilmemişse ufuktan türetiliyor. Yalnızca koyulaştırmak
+		# yetmiyor: kum rengi bir ufkun koyusu KAHVE oluyor ve tepede kahve
+		# bir gökyüzü çıkıyor. Gökyüzü yukarı doğru hem koyulaşır hem MAVİYE
+		# kayar — atmosferin kendisi böyle davranıyor.
+		ortam.gok_ust = ortam.gok_ufuk.lerp(Color(0.28, 0.44, 0.68), 0.55)
+	ortam.bulut = veri.get("bulut", 0.45)
+	ortam.sis_renk = veri.get("sis_renk", Color(0.702, 0.741, 0.729))
+	ortam.sis = veri.get("sis", 0.0035)
+	ortam.gunes_aci = veri.get("gunes_aci", Vector3(-52, -38, 0))
+	ortam.gunes_gucu = veri.get("gunes_gucu", 0.85)
+	if veri.has("gunes_renk"):
+		ortam.gunes_renk = veri["gunes_renk"]
+	_ekle(kok, ortam, kok)
 
 func _zemin_ekle(kok: Node3D, veri: Dictionary) -> void:
 	var olcu: float = veri.get("zemin_olcu", 140.0)
@@ -209,10 +205,8 @@ func _zemin_ekle(kok: Node3D, veri: Dictionary) -> void:
 		gorsel.material_override = TUZAK_MALZEME
 		gorsel.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	else:
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = veri.get("zemin_renk", Color(0.514, 0.545, 0.494))
-		mat.roughness = 0.95
-		gorsel.material_override = mat
+		gorsel.material_override = zemin_malzemesi(
+			veri.get("zemin_renk", Color(0.514, 0.545, 0.494)))
 	_ekle(govde, gorsel, kok)
 
 	var sekil := BoxShape3D.new()
@@ -222,6 +216,24 @@ func _zemin_ekle(kok: Node3D, veri: Dictionary) -> void:
 	carpisma.position = Vector3(0, -0.5, 0)
 	carpisma.shape = sekil
 	_ekle(govde, carpisma, kok)
+
+## Zemin malzemesi — dünya gölgelendiricisi, zemine göre ayarlanmış (Faz 13).
+##
+## Zemin 140 metrelik tek bir düzlem: aynı desen ölçeğiyle boyanırsa desen
+## uzakta titreşiyor, yakında ise kutulardan daha ince duruyor. Ölçek
+## büyütülüyor (daha geniş lekeler) ve dip karartması kapatılıyor — düzlemin
+## "dibi" yok, kapatılmazsa bütün zemin tek tonda koyulaşıyor.
+static func zemin_malzemesi(renk: Color) -> ShaderMaterial:
+	var mat := ShaderMaterial.new()
+	mat.shader = DUNYA_GOLGE
+	mat.set_shader_parameter("renk", renk)
+	mat.set_shader_parameter("puruzluluk", 0.95)
+	mat.set_shader_parameter("desen_olcek", 0.42)
+	mat.set_shader_parameter("desen_gucu", 0.16)
+	mat.set_shader_parameter("ust_agarma", 0.0)
+	mat.set_shader_parameter("tabaka_gucu", 0.0)
+	mat.set_shader_parameter("dip_gucu", 0.0)
+	return mat
 
 ## Dikenli alanlar. Görsel, Faz 6'daki dünya uzayında çizgili gölgelendirici.
 func _tuzaklari_ekle(kok: Node3D, veri: Dictionary) -> void:
@@ -364,6 +376,23 @@ func _susleme_ekle(kok: Node3D, veri: Dictionary) -> void:
 		var temel := Basis(Vector3.UP, deg_to_rad(s.get("aci", 0.0))).scaled(Vector3.ONE * olcek)
 		dugum.transform = Transform3D(temel, s["konum"])
 		_ekle(kap, dugum, kok)
+
+## Uzak manzara (Faz 13): ufku kapatan zemin, tepeler ve serpinti. Düğüm
+## çalışma anında dolduruyor — .tscn'de yalnızca ayarları duruyor.
+func _manzara_ekle(kok: Node3D, veri: Dictionary) -> void:
+	var dugum := Node3D.new()
+	dugum.name = "Manzara"
+	dugum.set_script(MANZARA_BETIK)
+	# Tohum bölümün kimliğinden: aynı bölüm her açılışta aynı manzarayı
+	# kuruyor, farklı bölümler birbirine benzemiyor.
+	dugum.tohum = abs(hash(veri["kimlik"]))
+	dugum.zemin_y = veri.get("zemin_y", 0.0)
+	dugum.zemin_renk = veri.get("zemin_renk", Color(0.514, 0.545, 0.494))
+	dugum.tepe_renk = veri.get("tepe_renk", dugum.zemin_renk.darkened(0.3))
+	dugum.serpinti = not veri.get("zemin_tuzakli", false)
+	# Serpinti oyun zemininin kenarını aşmamalı: aşarsa kayalar boşlukta durur.
+	dugum.serpinti_yaricap = float(veri.get("zemin_olcu", 140.0)) * 0.44
+	_ekle(kok, dugum, kok)
 
 func _dusmanlari_ekle(kok: Node3D, veri: Dictionary) -> void:
 	var liste: Array = veri.get("dusmanlar", [])

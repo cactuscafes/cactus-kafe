@@ -105,6 +105,17 @@ text = "AYAR_TELEMETRI"
 unique_name_in_owner = true
 text = "AYAR_SARSINTI"
 
+[node name="GrafikSatir" type="HBoxContainer" parent="Panel/Kutu"]
+theme_override_constants/separation = 14
+
+[node name="Etiket" type="Label" parent="Panel/Kutu/GrafikSatir"]
+custom_minimum_size = Vector2(170, 0)
+text = "AYAR_GRAFIK"
+
+[node name="Grafik" type="OptionButton" parent="Panel/Kutu/GrafikSatir"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+
 [node name="DilSatir" type="HBoxContainer" parent="Panel/Kutu"]
 theme_override_constants/separation = 14
 

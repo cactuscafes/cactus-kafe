@@ -12,6 +12,10 @@ AYAR_MUZIK,Müzik,Music
 AYAR_HASSASIYET,Fare hassasiyeti,Mouse sensitivity
 AYAR_TAM_EKRAN,Tam ekran,Fullscreen
 AYAR_SARSINTI,Ekran sarsıntısı,Screen shake
+AYAR_GRAFIK,Grafik,Graphics
+AYAR_GRAFIK_DUSUK,Düşük,Low
+AYAR_GRAFIK_ORTA,Orta,Medium
+AYAR_GRAFIK_YUKSEK,Yüksek,High
 AYAR_DIL,Dil / Language,Dil / Language
 AYAR_GERI,Geri,Back
 DURAKLAT_BASLIK,Duraklatıldı,Paused

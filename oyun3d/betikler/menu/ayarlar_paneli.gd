@@ -11,8 +11,13 @@ signal kapandi
 @onready var _sarsinti: CheckButton = %Sarsinti
 @onready var _telemetri: CheckButton = %Telemetri
 @onready var _dil: OptionButton = %Dil
+@onready var _grafik: OptionButton = %Grafik
 
 const DILLER := [["tr", "Türkçe"], ["en", "English"]]
+## Grafik ön ayarları (Faz 13). Ne açıp kapattıkları `betikler/ortam.gd`de:
+## düşük = gölgesiz ve serpintisiz, orta = gölge + dolgu ışığı + serpinti,
+## yüksek = ayrıca parlama ve SSAO (SSAO yalnızca masaüstü render yolunda).
+const GRAFIKLER := ["AYAR_GRAFIK_DUSUK", "AYAR_GRAFIK_ORTA", "AYAR_GRAFIK_YUKSEK"]
 
 func _ready() -> void:
 	_master.value = Ayarlar.master
@@ -26,6 +31,12 @@ func _ready() -> void:
 	# Sunucu kurulmadıysa seçeneği hiç gösterme: çalışmayan ayar, olmayan
 	# ayardan kötüdür.
 	_telemetri.visible = not Urun.TELEMETRI_URL.is_empty()
+	_grafik_etiketle()
+	# Dil değişince OptionButton öğeleri kendiliğinden çevrilmiyor: Godot
+	# yalnızca Control'ün `text` alanını çeviriyor, koddan eklenen öğeleri
+	# değil. Etiketler yeniden yazılmazsa dil Türkçeden İngilizceye geçince
+	# bu kutu Türkçe kalıyor.
+	Ayarlar.degisti.connect(_grafik_etiketle)
 	for i in DILLER.size():
 		_dil.add_item(DILLER[i][1], i)
 		if DILLER[i][0] == Ayarlar.dil:
@@ -39,6 +50,15 @@ func _ready() -> void:
 	_tam_ekran.toggled.connect(func(a: bool) -> void: _degisti("tam_ekran", 1.0 if a else 0.0))
 	_sarsinti.toggled.connect(func(a: bool) -> void: _degisti("sarsinti", 1.0 if a else 0.0))
 	_telemetri.toggled.connect(func(a: bool) -> void: _degisti("telemetri", 1.0 if a else 0.0))
+	# Grafik ayarı YÜRÜRLÜKTEKİ bölüme hemen uygulanıyor: oyuncu duraklatma
+	# menüsünde seçeneği değiştirip farkı görmeli, yeniden başlatmamalı.
+	_grafik.item_selected.connect(func(i: int) -> void:
+		Ayarlar.grafik = i
+		Ayarlar.kaydet()
+		for dugum in get_tree().get_nodes_in_group("ortam"):
+			dugum.kalite_uygula()
+		for dugum in get_tree().get_nodes_in_group("manzara"):
+			dugum.kalite_uygula())
 	_dil.item_selected.connect(func(i: int) -> void:
 		Ayarlar.dil = DILLER[i][0]
 		Ayarlar.uygula()
@@ -49,6 +69,12 @@ func _ready() -> void:
 	%TusAtama.visible = not OS.has_feature("mobile")
 	%Kapat.pressed.connect(func() -> void: kapandi.emit())
 	MenuYardimci.butonlari_seslendir(self)
+
+func _grafik_etiketle() -> void:
+	_grafik.clear()
+	for i in GRAFIKLER.size():
+		_grafik.add_item(tr(GRAFIKLER[i]), i)
+	_grafik.select(clampi(Ayarlar.grafik, 0, GRAFIKLER.size() - 1))
 
 const TUS_ATAMA := preload("res://sahneler/tus_atama.tscn")
 

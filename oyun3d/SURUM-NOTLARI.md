@@ -6,11 +6,36 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.12\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.13\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.13.0 — Dünya sanatı ve aydınlatma (Faz 13)
+
+- **Aydınlatma tek yerden.** Altı bölüm artık aynı `sahneler/ortam.tscn`
+  örneğini kullanıyor: anahtar + dolgu ışığı, gökyüzünden ortam ışığı,
+  ayarlanmış gölge kademeleri (yakın kademe dar, en uzak 65 m), havadan
+  perspektifli sis. Bölüme özel olan yalnızca sanat yönü — gök renkleri,
+  sis, güneş açısı, bulut miktarı.
+- **Gökyüzü gölgelendiricisi.** Degrade + bulut bandı + güneş diski
+  (`golgeler/gok.gdshader`). Üç renkli düz degrade gitti; ekranın üçte biri
+  artık gökyüzü.
+- **Dünya malzemesi.** Kutular tek renk olmaktan çıktı
+  (`golgeler/dunya.gdshader`): dünya uzayında üç eksenli gürültü, yan
+  yüzlerde tabakalar, üst yüzlerde ağarma ve kutunun dibine doğru karartma.
+  Doku yok — desen konumdan üretiliyor, her ölçekte aynı sıklıkta.
+- **Uzak manzara.** `betikler/manzara.gd` ufku kapatan geniş zemini, 24
+  mesa siluetini ve serpiştirilen kaya/kaktüsü çalışma anında kuruyor;
+  yerleşim bölüm kimliğinden gelen tohumla üretildiği için her açılışta
+  aynı. Tamamı çarpışmasız — bölüm grafını yanıltmaması şart.
+- **Grafik ön ayarı.** Ayarlar panelinde düşük / orta / yüksek. Düşükte
+  gölge, dolgu ışığı ve serpinti kapalı; yüksekte ayrıca parlama ve SSAO.
+  İlk açılışta tarayıcı ve mobil "orta", masaüstü "yüksek" başlıyor.
+- **Görsel test.** `testler/gorsel_testi` bölümü gerçekten çizip karenin
+  parlaklığını ve karşıtlığını ölçüyor (bütçe `gorsel_butce.json`), ayrıca
+  ortam/sis/gölge kurulumunu ve manzaranın çarpışmasız olduğunu doğruluyor.
 
 ## 0.12.0 — Animasyon cilası (Faz 12)
 

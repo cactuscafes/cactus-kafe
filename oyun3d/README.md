@@ -1,8 +1,9 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 12** bitti: karakterin ayakları zemine oturuyor — iki kemikli
-bacak, ayak IK'sı ve ölçüyle belirlenen adım temposu.
+Şu an **Faz 13** bitti: dünya kum rengi kutulardan çıktı — anahtar/dolgu
+aydınlatması, gökyüzü ve dünya gölgelendiricileri, ufku kapatan uzak manzara
+ve grafik ön ayarı.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -21,6 +22,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **10** | **Otomatik oyuncu**: bölümleri gerçek girdiyle oynayan bot, denge ölçümü ve bütçesi, oyunla gelen par turları, ortak bölüm grafı |
 | **11** | **Karakter**: Blender'da modellenip rig'lenen, skinning'li ve iskelet animasyonlu kaktüs; yordamsal animasyon üreticisi emekli oldu, draw call bölüm başına ~13 düştü |
 | **12** | **Animasyon cilası**: iki kemikli bacak (7 → 11 kemik), ayak IK'sı (rampa/basamak), ölçüyle belirlenen adım temposu (kayma 4,3 → 2,0 kat), ayak IK testi |
+| **13** | **Dünya sanatı ve aydınlatma**: paylaşılan ışık kurulumu (anahtar + dolgu, gökyüzünden ortam), gökyüzü ve dünya gölgelendiricileri, uzak manzara (mesa siluetleri + serpinti), grafik ön ayarı, görsel test |
 
 ---
 
@@ -91,6 +93,8 @@ godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm b
 godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
 godot --headless --path oyun3d res://testler/karakter_testi.tscn     # model, iskelet, animasyon
 godot --headless --path oyun3d res://testler/ayak_ik_testi.tscn      # ayak zemine oturuyor mu
+xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
+  --audio-driver Dummy res://testler/gorsel_testi.tscn            # aydınlatma + manzara
 godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
 testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
@@ -652,10 +656,100 @@ olsaydı gruplanamazlardı.
 dokuyu açması — **gerçek donanımda 4 MB**. Bu yüzden `doku_mb` bütçeye dahil
 değil. Gölge atlası 4096'dan 2048'e (mobilde 1024) indirildi.
 
+## Dünya sanatı ve aydınlatma (Faz 13)
+
+Faz 12'de karakter düzeldi; durduğu dünya hâlâ düz kum rengi kutulardı. Tek
+yönlü ışık, gölgede tek tona düşen yüzler, üç renkli düz bir gökyüzü ve
+140 metrede keskin bir çizgiyle biten zemin. Hepsi her karede görünüyordu,
+hiçbir test görmüyordu.
+
+### Aydınlatma tek yerden
+
+Altı bölüm aynı `sahneler/ortam.tscn` örneğini kullanıyor. Bölüme özel olan
+yalnızca **sanat yönü** — gök renkleri, sis, güneş açısı, bulut miktarı;
+teknik kurulum ortak. Önceden ikisi elle yazılmış sahnede, dördü üreticideydi:
+gölge ayarını değiştirmek altı yerde aynı değişikliği yapmaktı ve biri
+unutulunca "neden burası daha karanlık?" sorusunun cevabı olmuyordu.
+
+| Karar | Neden |
+|---|---|
+| **Anahtar + dolgu** ışık | Tek ışıkta gölgede kalan iki yüz de aynı tona düşüyor, kutunun kenarı kayboluyor. Dolgu (gökyüzü renginde, 140° yandan, gölgesiz) o yüzleri ayırıyor |
+| Ortam ışığı **gökyüzünden** | Gölgeler siyaha değil gökyüzünün mavisine düşüyor. Sabit bir ortam rengi bunu yapamaz |
+| Gölge kademeleri 0,055 / 0,15 / 0,38, en uzak **65 m** | Kamera 5 m arkada; keskinlik ilk 4 metrede gerekiyor. Godot'nun varsayılanı bu kadrajda yakını bulanıklaştırıyordu. 65 m'den ötesini zaten sis yutuyor |
+| `fog_aerial_perspective = 0.4` | Uzak yüzeyler gökyüzünün rengine kayıyor; derinlik hissi buradan geliyor. Tek renkli sis, arkadaki kayayı öndekiyle aynı tonda boyuyordu |
+| `fog_sky_affect = 0.0` | Gökyüzünün kendi degradesi ve bulutu var; üstüne sis binince ufuk düz bir lekeye dönüyor |
+
+### Üç gölgelendirici, üç iş
+
+**`golgeler/gok.gdshader`** — degrade + bulut bandı + güneş diski. Bulutlar
+üç oktav değer gürültüsü; ufka doğru sönüyorlar, çünkü çizgide kesilen bulut
+"duvar kâğıdı" gibi duruyor. Gökyüzü kare başına bir kez ve derinlik testi
+olmadan çiziliyor: ekranın üçte birini doldurmanın bedeli neredeyse yok.
+
+**`golgeler/dunya.gdshader`** — kutulara yüzey veriyor. Üç katman, üçü de
+ayrı bir işi görüyor: dünya uzayında üç eksenli gürültü (düz renk olmaması),
+yan yüzlerde yatay tabakalar (kaya hissi), ve **kutunun dibine doğru
+karartma** — yığılmış kutuların birbirinden ayrılmasını sağlayan şey bu.
+
+> **Neden doku değil:** kutular farklı ölçeklerde; her birine doku açmak UV,
+> atlas ve gerilme demekti. Desen dünya KONUMUNDAN üretilince bitişik iki kutu
+> aynı desenin devamını taşıyor ve ölçek değişince desenin sıklığı değişmiyor.
+> Kutunun kendi tabanından yükseklik `MODEL_MATRIX`ten çıkıyor, bu yüzden
+> MultiMesh'te birleştirilmiş platformlarda da doğru çalışıyor.
+
+> **TUZAK — birleştirici ShaderMaterial'ı tanımıyordu.** `birlestirici.gd`
+> malzemeyi `as BaseMaterial3D` ile alıp `vertex_color_use_as_albedo`
+> açıyordu; ShaderMaterial'da o alan yok, dönüştürme `null` veriyor ve
+> malzeme SESSİZCE kayboluyordu — bütün platformlar varsayılan beyaza
+> dönüyordu. Artık iki tür de destekleniyor: renk çarpımını gölgelendirici
+> kendi yapıyor (`renk * COLOR`), birleştirici yalnızca taban rengi beyaza
+> çekiyor.
+
+### Uzak manzara
+
+`betikler/manzara.gd` üç katman kuruyor: ufku kapatan geniş zemin, 24 mesa
+silueti ve serpiştirilen kaya/kaktüs. Önceden zemin 140 metrede keskin bir
+çizgiyle bitiyordu; oyun "bir masanın üstünde" geçiyormuş gibi duruyordu.
+
+- **Çarpışmasız — bu bir süs değil kural.** Bölümün ulaşılabilirlik grafı
+  (`bolum_grafi.gd`) çarpışma kutularından çıkıyor. Manzaraya çarpışma
+  eklemek bölüm doğrulayıcısını ve botu sessizce yanıltırdı: "şuraya
+  zıplanabiliyor" diyen bir kaya. `gorsel_testi` bunu her koşuda doğruluyor.
+- **Oyun alanının dışına.** Serpinti, bütün çarpışma kutularının sardığı
+  kutunun (zemin hariç) 7 metre dışına konuyor — oyuncunun gittiği yere
+  değil arkasına.
+- **Her açılışta aynı.** Yerleşim bölüm kimliğinden gelen tohumdan üretiliyor;
+  rastgele olsaydı ekran görüntüsü ve görsel testi anlamını yitirirdi.
+- **Dikenli zeminde serpinti yok.** Ölümcül zemine kaktüs dikmek "buraya
+  basılabilir" diyor; görsel süs, oynanış işaretini bozamaz.
+
+### Grafik ön ayarı
+
+Ayarlar panelinde düşük / orta / yüksek. Oyun içinde anında uygulanıyor —
+oyuncu duraklatma menüsünde farkı görmeli, yeniden başlatmamalı.
+
+| | düşük | orta | yüksek |
+|---|---|---|---|
+| gölge | – | ✓ | ✓ |
+| dolgu ışığı | – | ✓ | ✓ |
+| serpinti | – | yarısı | tamamı |
+| parlama (glow) | – | – | ✓ |
+| SSAO | – | – | ✓ (yalnızca Forward+) |
+
+İlk açılışta tarayıcı ve mobil **orta**, masaüstü **yüksek** başlıyor.
+Parlamanın orta ön ayarda kapalı olması ölçülmüş bir karar: Compatibility
+yolunda ekran boyu bir mip zinciri açıyor (~11 MB doku belleği) ve bu stilde
+kazancı süs düzeyinde.
+
+> **Web kısıtı belirleyici oldu.** Oyunun ana dağıtımı tarayıcı; orada
+> Compatibility render yolu çalışıyor ve **SSAO yok**. Bu yüzden derinlik
+> ekranda değil MALZEMEDE üretildi: dip karartması, havadan perspektifli sis,
+> dolgu ışığı. Üçü de hem masaüstünde hem tarayıcıda aynı çalışıyor.
+
 ## Shader'lar
 
-`golgeler/` altında iki shader, ikisi de `gl_compatibility` (tarayıcı) ile
-uyumlu:
+`golgeler/` altında dört shader, dördü de `gl_compatibility` (tarayıcı) ile
+uyumlu (`dunya.gdshader` ve `gok.gdshader` yukarıda anlatıldı):
 
 **`tuzak.gdshader`** — dikenli alanda kayan uyarı şeritleri ve nabız.
 Erişilebilirlik gerekçesi: tehlike yalnızca kırmızıyla anlatılırsa kırmızı-yeşil
@@ -670,7 +764,7 @@ diğerinin erimesini sürüklerdi.
 
 ## Lokalizasyon ve erişilebilirlik
 
-Çeviriler `arayuz/ceviriler.csv` (35 anahtar, TR + EN). Godot Control
+Çeviriler `arayuz/ceviriler.csv` (79 anahtar, TR + EN). Godot Control
 düğümlerinin metnini kendiliğinden çeviriyor, o yüzden sahnelerde düz metin
 yerine anahtar yazılı (`text = "DURAKLAT_DEVAM"`). Kodda üretilen metinler
 `tr("HUD_DURUM") % [...]` biçiminde.
@@ -852,7 +946,7 @@ duyuluyor.
 ## Ayarlar ve kayıt
 
 İkisi de `user://` altında `ConfigFile`: `ayarlar.cfg` (ses seviyeleri, fare
-hassasiyeti, tam ekran) ve `kayit.cfg` (en iyi süre, o turdaki ölüm, oynanma
+hassasiyeti, tam ekran, dil, tuş atamaları, **grafik ön ayarı**) ve `kayit.cfg` (en iyi süre, o turdaki ölüm, oynanma
 sayısı). `user://` her platformda oyuna ait yazılabilir klasördür — Windows'ta
 AppData, tarayıcıda IndexedDB. Proje klasörüne yazmak dışa aktarılmış oyunda
 çalışmaz; geliştirirken fark edilmeyen, çıktıktan sonra patlayan bir hatadır.
@@ -1117,6 +1211,8 @@ oyun3d/
 │   ├── bolum_grafi.gd       Durak/menzil grafı — test ve bot ortak kullanıyor
 │   ├── bot/                 Otomatik oyuncu (denge ölçümü, par turu)
 │   ├── birlestirici.gd      Statik görselleri MultiMesh'e indirir
+│   ├── ortam.gd             Bölümün aydınlatması ve gökyüzü (tek kurulum)
+│   ├── manzara.gd           Uzak manzara: ufuk, mesa siluetleri, serpinti
 │   ├── ag/                  Ağ: ag.gd, hayalet_kayit.gd, hayalet_kaydedici.gd,
 │   │                        hayalet.gd, uzak_oyuncu.gd, uzak_oyuncular.gd
 │   ├── dokunmatik.gd        Ekran kontrolleri (çubuk, düğmeler)
@@ -1133,7 +1229,7 @@ oyun3d/
 ├── hayaletler/              Oyunla gelen par turları (botun turu, Faz 10)
 ├── denge_butce.json         Bot süre/ölüm sınırları (Faz 10)
 ├── ses/                     Sentezlenmiş ses efektleri ve müzik
-├── golgeler/                Shader'lar (tuzak şeritleri, erime)
+├── golgeler/                Shader'lar: tuzak şeritleri, erime, gökyüzü, dünya malzemesi
 ├── performans_butce.json    Draw call / üçgen bütçeleri
 ├── navigasyon/              Pişirilmiş navigasyon örgüleri (bölüm başına)
 ├── MAGAZA.md                Mağaza metni, trailer ve Steam sırası
@@ -1159,6 +1255,8 @@ oyun3d/
     ├── dusman_testi.gd      Yapay zekâ, hasar, navigasyon
     ├── ceviri_testi.gd      Çeviri bütünlüğü
     ├── dokunmatik_testi.gd  Ekran kontrolleri (gerçek pencere ister)
+    ├── ayak_ik_testi.gd     Ayak IK: düz zemin, rampa, basamak, havada
+    ├── gorsel_testi.gd      Aydınlatma ölçümü + manzara denetimi (pencere ister)
     ├── hayalet_testi.gd     Hayalet kaydı, aradeğerleme, HUD
     └── ag_testi.sh          İki süreçli ağ testi (+ ag_sunucu / ag_istemci)
 ```
@@ -1194,6 +1292,9 @@ godot --headless --export-release "Web" ../cikti/web/index.html
 
 **Web notu:** tarayıcı hedefi `gl_compatibility` renderer ile çalışır. Masaüstündeki
 `forward_plus` ile aynı gölge ve efektleri beklemeyin — hata değil, platform farkı.
+Faz 13'ün aydınlatması bu kısıtla tasarlandı: derinlik ekran uzayında (SSAO)
+değil malzemede üretiliyor, böylece iki yolda da aynı görünüyor. SSAO yalnızca
+yüksek grafik ön ayarında ve yalnızca Forward+ tarafında devreye giriyor.
 
 **Web + iş parçacığı:** ön ayarda `thread_support` açık; bu, sayfanın
 `Cross-Origin-Opener-Policy: same-origin` ve `Cross-Origin-Embedder-Policy:
@@ -1250,22 +1351,24 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Adım | Durum |
 |---|---|
 | `--headless --import` | ✅ hatasız |
-| Bölüm testleri (7 test) | ✅ hepsi geçti |
+| Bölüm testleri (10 test) | ✅ hepsi geçti |
 | Varlık testleri (5 varlık) | ✅ hepsi geçti |
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (7 grup) | ✅ hepsi geçti |
-| Çeviri testleri | ✅ 35 anahtar × 2 dil, eksik yok |
-| Performans bütçesi | ✅ altı bölüm bütçe içinde (82–105 draw call) |
+| Çeviri testleri | ✅ 79 anahtar × 2 dil, eksik yok |
+| Performans bütçesi | ✅ altı bölüm bütçe içinde (67–77 draw call, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
+| Ayak IK testi (4 durum) | ✅ rampada bilek hatası 8,8 → 0,2 cm, basamakta 6,1 → 0,1 cm |
+| Görsel test (6 bölüm) | ✅ aydınlatma bütçe içinde, manzara çarpışmasız (Xvfb ile) |
 | Ağ testi (iki süreç) | ✅ 359 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
 | Telemetri testi (7 grup) | ✅ gizlilik kuralları geçti |
 | Bölüm hattı testi (6 bölüm) | ✅ hepsi bitirilebilir; 100 durağın hepsi erişilebilir |
 | Tuş atama testi (5 grup) | ✅ InputMap, çakışma, kilitlenme, kayıt, ekran |
 | İstemci–sunucu sözleşmesi | ✅ 3 satır, 4 olay adı, 7 ret kuralı (Node ile) |
-| Basın kiti sayfası | ✅ Chromium'da açıldı, 7 görsel yüklendi, konsol hatası yok |
+| Basın kiti sayfası | ✅ Chromium'da açıldı, 11 görsel yüklendi, konsol hatası yok |
 | Demo dışa aktarımı | ✅ Windows + Web; tarayıcıda menü "Demo sürümü — ilk bölüm" ve tek bölüm gösterdi |
 | Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
@@ -1305,22 +1408,26 @@ Faz 8 bitti; `1.0.0` için kalanlar `SURUM-NOTLARI.md` sonunda listeli. Kodda
 açık kalan uçlar:
 
 - **Kök hareketi yok** — animasyonlar yerinde oynuyor, kat edilen yolu kod
-  sürüyor. Root motion, ayak kayması olmayan bir yürüyüş için gerekiyor ve
-  `AnimationTree`'nin `root_motion_track` alanı bunun için var.
-- **El/ayak IK yok** — rampada ayaklar zemine oturmuyor, model bütün olarak
-  yatıyor (`_zemine_yatir`). `SkeletonIK3D` ile ayak başına ışın atmak gerek.
+  sürüyor. Faz 12 kaymayı 4,3 kattan 2,0 kata indirdi ama bitirmedi; bitirmek
+  hızı animasyonun belirlemesi demek (`AnimationTree.root_motion_track`) ve
+  Faz 10'un bütün denge bütçesinin yeniden ayarlanması.
+- **El IK'sı yok** — ayak IK'sı Faz 12'de geldi (`betikler/ayak_ik.gd`); duvara
+  yaslanma ve tutunma aynı modifiye edici altyapısının üstüne kurulabilir.
 - **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
   içe aktarıcısı, Blender'da adı `-col` ile biten mesh'ler için otomatik
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.
 - **Malzeme paylaşımı** — beş nesnenin beş ayrı malzemesi var, hepsi aynı
   atlası gösteriyor. Tek malzemeye indirmek draw call düşürür (Faz 6).
-- **Kök hareketi (root motion) ve gerçek ayak IK'sı** — ikisi de iskeletli
-  model ister; rig'li karakterle birlikte gelir.
 - **Trailer'da ses yok** — Movie Maker ses de yazabiliyor (`.wav` yan dosyası);
   kurgu aşamasında eklenecek.
-- **Hiçbir bölüm oynanarak dengelenmedi** — altısı da bitirilebilirlik
-  testinden geçiyor, ama "geçilebilir" ile "iyi" aynı şey değil. Zorluk eğrisi,
-  süre ve çiçek yerleşimi ancak oynatarak ayarlanır: 20 kişiye oynat, izle.
+- **Hiçbir bölüm İNSAN tarafından oynanarak dengelenmedi** — Faz 10'un botu
+  altısını da baştan sona oynuyor ve süre/ölüm/çiçek bütçesini tutuyor, ama
+  bot eğlenceyi, kafa karışıklığını ve "buradan sonra bıraktım"ı ölçemiyor:
+  20 kişiye oynat, izle.
+- **Çevre sanatı prosedürel** — Faz 13 dünyayı doldurdu (aydınlatma, malzeme,
+  uzak manzara) ama her bölüme kendi kimliğini veren el yapımı yapılar
+  (kaya kemerleri, yıkık duvarlar, bitki çeşitliliği) yok. O iş modelleme
+  masasında.
 - **Oyun kolu tuşları atanamıyor** — tuş atama ekranı yalnızca klavye için.
   Kumanda düğmesi atamak `InputEventJoypadButton` yakalamak demek; aynı ekran
   büyütülebilir.

@@ -31,4 +31,6 @@ func _uygula() -> void:
 		return
 	_gorsel.scale = olcu
 	(_carpisma.shape as BoxShape3D).size = olcu
-	(_gorsel.material_override as StandardMaterial3D).albedo_color = renk
+	# Faz 13: malzeme artık `golgeler/dunya.gdshader`. Renk tek tip bir dolgu
+	# değil, gölgelendiricinin desenini boyayan taban renk.
+	(_gorsel.material_override as ShaderMaterial).set_shader_parameter("renk", renk)

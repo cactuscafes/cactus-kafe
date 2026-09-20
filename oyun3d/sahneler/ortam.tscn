@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://betikler/ortam.gd" id="1_ortam"]
+
+[node name="Ortam" type="Node3D"]
+script = ExtResource("1_ortam")
+
+[node name="Dunya" type="WorldEnvironment" parent="."]
+
+[node name="Gunes" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+shadow_enabled = true
+
+[node name="Dolgu" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)

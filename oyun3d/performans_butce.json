@@ -1,27 +1,27 @@
 {
-  "_aciklama": "Ölçüm bütçeleri (Faz 6; bölüm 3-6 Faz 9'da, sayılar Faz 11'de güncellendi). Rakamlar araclar/olcum.tscn ile ölçüldü; %15-20 pay bırakıldı. Aşılırsa CI kırmızıya döner — 'şu değişiklik draw call'u iki katına çıkardı' kendiliğinden görünsün diye. Faz 11'de karakter altı kutudan tek skinned mesh'e dönünce draw call bölüm başına ~13 düştü ve bütçeler ona göre indi: eski bütçe yeni regresyonu yakalamazdı. doku_mb BİLEREK bütçede yok: yazılımsal Mesa S3TC desteklemediği için dokuları açıyor ve bu makinede 8 kat fazla görünüyor; gerçek donanımda atlas 4.1 MB.",
+  "_aciklama": "Ölçüm bütçeleri. Rakamlar araclar/olcum.tscn ile EN YÜKSEK grafik ön ayarında ölçüldü (en kötü durum); %15 pay bırakıldı. Aşılırsa CI kırmızıya döner — 'şu değişiklik draw call'u iki katına çıkardı' kendiliğinden görünsün diye. Faz 13'te sayılar yeniden ölçüldü: uzak manzara (ufuk zemini, mesa siluetleri, serpinti) üçgen ekledi ama gölge mesafesinin 65 m'ye inmesi draw call'u DÜŞÜRDÜ — uzaktaki gölge üreticileri artık eleniyor. doku_mb BİLEREK bütçede yok: yazılımsal Mesa S3TC desteklemediği için dokuları açıyor ve bu makinede kat kat fazla görünüyor; gerçek donanımda atlas 4.1 MB.",
   "bolum1": {
-    "draw_call": 84,
-    "ucgen": 9700
+    "draw_call": 77,
+    "ucgen": 11400
   },
   "bolum2": {
-    "draw_call": 97,
-    "ucgen": 13500
+    "draw_call": 82,
+    "ucgen": 12000
   },
   "bolum3": {
-    "draw_call": 94,
-    "ucgen": 11000
+    "draw_call": 77,
+    "ucgen": 9600
   },
   "bolum4": {
-    "draw_call": 97,
-    "ucgen": 10700
+    "draw_call": 82,
+    "ucgen": 9400
   },
   "bolum5": {
-    "draw_call": 98,
-    "ucgen": 11700
+    "draw_call": 89,
+    "ucgen": 13200
   },
   "bolum6": {
-    "draw_call": 98,
-    "ucgen": 13600
+    "draw_call": 89,
+    "ucgen": 13200
   }
 }

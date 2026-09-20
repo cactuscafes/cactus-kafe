@@ -254,6 +254,33 @@ görünüyor" sınıfından: hiçbir test düşmüyor, her ekran görüntüsünd
   (Faz 10) ona göre yeniden ayarlanır. Ayrıca el IK'sı (duvara yaslanma) ve
   bakış yönü (look-at) aynı modifiye edici altyapısının üstüne kurulabilir.
 
+### Faz 13 — **Dünya sanatı ve aydınlatma** (Faz 12 sonrası)
+Karakter Faz 11-12'de düzeldi ama durduğu dünya hâlâ düz kum rengi kutulardı:
+tek yönlü ışık, gölgede tek tona düşen yüzler, üç renkli düz bir gökyüzü ve
+140 metrede keskin bir çizgiyle biten zemin. Oyunun her karesinde görünen ama
+hiçbir testin görmediği şeyler.
+- **Durum: bitti** → altı bölümün paylaştığı aydınlatma kurulumu
+  ([`sahneler/ortam.tscn`](oyun3d/sahneler/ortam.tscn) + anahtar/dolgu ışığı,
+  gökyüzünden ortam ışığı, ayarlanmış gölge kademeleri), gökyüzü
+  gölgelendiricisi (degrade + bulut + güneş diski), kutulara yüzey veren
+  dünya gölgelendiricisi (üç eksenli gürültü, tabakalar, dip karartması),
+  çalışma anında kurulan uzak manzara
+  ([`betikler/manzara.gd`](oyun3d/betikler/manzara.gd): ufuk zemini, mesa
+  siluetleri, serpiştirilen kaya/kaktüs) ve **grafik ön ayarı** (düşük/orta/
+  yüksek). Görsel test bölümü çizip parlaklık ve karşıtlığı ölçüyor.
+- **Neden doku değil gölgelendirici:** kutular farklı ölçeklerde; her birine
+  doku açmak UV, atlas ve gerilme demekti. Desen dünya konumundan üretilince
+  bitişik iki kutu aynı desenin devamını taşıyor ve ölçek değişince sıklık
+  değişmiyor. Bedeli de doku belleği değil, birkaç aritmetik işlem.
+- **Web kısıtı belirleyici oldu:** oyunun ana dağıtımı tarayıcı, orada
+  Compatibility render yolu çalışıyor ve SSAO yok. Bu yüzden derinlik
+  ekranda değil MALZEMEDE üretildi (dip karartması, havadan perspektifli
+  sis); SSAO yalnızca yüksek ön ayarda, masaüstünde.
+- **Kalan:** el yapımı çevre sanatı — her bölüme kendi kimliğini veren
+  yapılar (kaya kemerleri, yıkık duvarlar, bitki çeşitliliği). Prosedürel
+  serpinti dünyayı dolduruyor ama "buranın neresi olduğunu" anlatmıyor;
+  o iş modelleme masasında.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

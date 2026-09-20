@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://golgeler/dunya.gdshader" id="1_dunya"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_dunya")
+shader_parameter/renk = Color(0.55, 0.47, 0.34, 1)
+shader_parameter/puruzluluk = 0.9
+shader_parameter/desen_olcek = 1.1
+shader_parameter/desen_gucu = 0.2
+shader_parameter/ust_agarma = 0.13
+shader_parameter/tabaka_gucu = 0.07
+shader_parameter/tabaka_sikligi = 2.6
+shader_parameter/dip_gucu = 0.3
+shader_parameter/dip_yukseklik = 0.8

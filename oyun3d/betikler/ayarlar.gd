@@ -22,6 +22,10 @@ var dil := "tr"
 ## tutuyor.
 var sarsinti := true
 var oyuncu_adi := "Oyuncu"
+## Grafik ön ayarı: 0 düşük, 1 orta, 2 yüksek. Bölümün aydınlatması bunu
+## okuyor (`betikler/ortam.gd`). VARSAYILAN ORTA ve platforma göre iniyor:
+## oyunun ana dağıtımı tarayıcı, orada yüksek kaliteyi varsaymak yanlış olur.
+var grafik := 1
 ## Anonim oynanış verisi. VARSAYILAN KAPALI: açık rıza olmadan veri gitmez.
 var telemetri := false
 ## Özel tuş atamaları: eylem -> birincil tuşun physical keycode'u. Boşken
@@ -36,6 +40,8 @@ func _ready() -> void:
 	uygula()
 
 func yukle() -> void:
+	# Ayar dosyası yoksa (ilk açılış) ön ayar cihazdan tahmin ediliyor.
+	grafik = _varsayilan_grafik()
 	var c := ConfigFile.new()
 	if c.load(AYAR_YOLU) == OK:
 		master = c.get_value("ses", "master", master)
@@ -46,6 +52,7 @@ func yukle() -> void:
 		dil = c.get_value("genel", "dil", dil)
 		sarsinti = c.get_value("erisim", "sarsinti", sarsinti)
 		oyuncu_adi = c.get_value("genel", "oyuncu_adi", oyuncu_adi)
+		grafik = int(c.get_value("ekran", "grafik", grafik))
 		telemetri = c.get_value("genel", "telemetri", telemetri)
 		tuslar = c.get_value("kontrol", "tuslar", {})
 	var k := ConfigFile.new()
@@ -65,6 +72,7 @@ func kaydet() -> void:
 	c.set_value("ses", "muzik", muzik)
 	c.set_value("kontrol", "hassasiyet", hassasiyet)
 	c.set_value("ekran", "tam_ekran", tam_ekran)
+	c.set_value("ekran", "grafik", grafik)
 	c.set_value("genel", "dil", dil)
 	c.set_value("erisim", "sarsinti", sarsinti)
 	c.set_value("genel", "oyuncu_adi", oyuncu_adi)
@@ -88,6 +96,14 @@ func uygula() -> void:
 	elif tam_ekran:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	degisti.emit()
+
+## İlk açılışta grafik ön ayarı: mobil ve tarayıcı düşük donanımı da
+## kapsıyor, masaüstünde yüksek varsayılıyor. Oyuncu ayarlar panelinden
+## değiştirebiliyor; bu yalnızca ilk tahmin.
+func _varsayilan_grafik() -> int:
+	if OS.has_feature("mobile") or OS.has_feature("web"):
+		return 1
+	return 2
 
 ## Bölümün kaydını döndürür; hiç oynanmadıysa sıfırlı sözlük.
 func kayit(bolum: String) -> Dictionary:

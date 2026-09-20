@@ -20,6 +20,10 @@ const ORNEK := 90
 var _rapor := {}
 
 func _ready() -> void:
+	# Ölçüm EN YÜKSEK grafik ön ayarında yapılıyor (Faz 13): bütçe en kötü
+	# durumu tutmalı. Ayrıca kaydedilmiş bir ayar dosyası ölçümü sessizce
+	# değiştirmesin — sayı makineye göre oynarsa bütçe anlamını yitirir.
+	Ayarlar.grafik = 2
 	await get_tree().process_frame
 	var butce := _butce_oku()
 	var asilan: Array[String] = []

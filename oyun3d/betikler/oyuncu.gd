@@ -40,6 +40,13 @@ signal can_degisti(can: int, en_fazla: int)
 @export var kisa_ziplama_orani := 0.45
 @export var dusme_carpani := 1.35
 
+@export_group("Animasyon")
+## Gövdenin zemin eğimine yatma payı (0 = hiç, 1 = eğimin tamamı).
+## Ayak IK'sı işin çoğunu yaptığı için 1 fazla geliyor; bkz. `_zemine_yatir`.
+@export_range(0.0, 1.0) var govde_yatirma := 0.35
+## Ayak IK etkisinin saniyede değişme hızı (yere inince açılır, havada kapanır).
+@export var ik_gecis_hizi := 6.0
+
 var _yercekimi: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 var _ziplama_hizi := 0.0
 var _kojot := 0.0
@@ -57,6 +64,8 @@ var _dokunulmazlik := 0.0
 @onready var _model: Node3D = $Yon/Model
 @onready var _parcacik: CPUParticles3D = $Parcacik
 
+var _ayak_ik: AyakIK
+
 var _durum: AnimationNodeStateMachinePlayback
 
 func _ready() -> void:
@@ -66,6 +75,22 @@ func _ready() -> void:
 	_ziplama_hizi = sqrt(2.0 * _yercekimi * ziplama_yuksekligi)
 	_agac.active = true
 	_durum = _agac.get("parameters/playback")
+	_ayak_ik_kur()
+
+## Ayak IK'sı sahneye elle değil koddan ekleniyor: modifiye edici Skeleton3D'nin
+## ÇOCUĞU olmak zorunda, iskelet ise içe aktarılmış glTF sahnesinin içinde.
+## Sahnede oraya düğüm koymak "editable instance" gerektirir; model her
+## yeniden üretildiğinde (araclar/karakter.py) o bağ kopar. Koddan eklemek
+## modelin yeniden üretilmesine dayanıklı.
+func _ayak_ik_kur() -> void:
+	var iskelet := _model.get_node_or_null("iskelet/Skeleton3D") as Skeleton3D
+	if iskelet == null:
+		push_warning("Ayak IK: iskelet bulunamadı, model değişmiş olabilir")
+		return
+	_ayak_ik = AyakIK.new()
+	_ayak_ik.name = "AyakIK"
+	_ayak_ik.influence = 0.0   # ilk kare havada sayılıyor; _ik_isle açıyor
+	iskelet.add_child(_ayak_ik)
 
 func _physics_process(delta: float) -> void:
 	var yerde := is_on_floor()
@@ -88,6 +113,7 @@ func _physics_process(delta: float) -> void:
 
 	_animasyon(yerde)
 	_zemine_yatir(delta)
+	_ik_isle(delta, is_on_floor())
 	_dokunulmazligi_isle(delta)
 
 ## Adım sesi zamana değil KAT EDİLEN YOLA bağlı: koşarken sıklaşır,
@@ -176,10 +202,28 @@ func _ezme_kontrolu() -> void:
 		velocity.y = _ziplama_hizi * ezme_sicramasi
 		return
 
-## Modeli zeminin eğimine yatırır — rampada dik durmak yerine yokuşa uyar.
-## Gerçek ayak IK'sı iskelet ister; bu, kutu karakterde aynı işi gören ucuz
-## sürümü. Eğim `Yon` düğümüne uygulanıyor: animasyonlar `Yon/Model`in
-## dönüşünü yazıyor, ikisi çakışmasın diye.
+## Ayak IK'sını havada kapatır, yerde açar.
+##
+## Havada zemin ışını ya boşa gidiyor ya da altından geçen bir platformu
+## buluyor; ikisinde de bacaklar saçmalıyor. Kapatma ANİ DEĞİL: etkiyi bir
+## karede 1'den 0'a düşürmek, zıplamanın ilk karesinde bacakları yerinden
+## sıçratıyor (IK pozundan animasyon pozuna atlama). Harmanlama bunu
+## zıplamanın kendi süresine yayıyor.
+func _ik_isle(delta: float, yerde: bool) -> void:
+	if _ayak_ik == null:
+		return
+	var hedef := 1.0 if yerde else 0.0
+	_ayak_ik.influence = move_toward(_ayak_ik.influence, hedef, delta * ik_gecis_hizi)
+
+## Modeli zeminin eğimine hafifçe yatırır.
+##
+## FAZ 12'DE KÜÇÜLDÜ: bu, kutu karakterde ayak IK'sının yerine geçen ucuz
+## numaraydı — bütün gövdeyi yokuşa yatırıyordu. Artık ayaklar zemine kendi
+## oturuyor (`betikler/ayak_ik.gd`), gövdeyi de tam eğime yatırmak fazladan
+## oluyor: karakter yokuşta öne kapaklanmış görünüyor. Kalan pay bilinçli —
+## rampaya girerken gövdenin hafif yaslanması eğimi okunur kılıyor.
+## Eğim `Yon` düğümüne uygulanıyor: animasyonlar `Yon/Model`in dönüşünü
+## yazıyor, ikisi çakışmasın diye.
 func _zemine_yatir(delta: float) -> void:
 	var hedef := Vector3.ZERO
 	if _zemin_isini.is_colliding():
@@ -188,7 +232,7 @@ func _zemine_yatir(delta: float) -> void:
 		var ileri := -_yon.global_transform.basis.z
 		var yan := _yon.global_transform.basis.x
 		hedef = Vector3(-asin(clampf(n.dot(ileri), -1.0, 1.0)), 0.0,
-			asin(clampf(n.dot(yan), -1.0, 1.0)))
+			asin(clampf(n.dot(yan), -1.0, 1.0))) * govde_yatirma
 	_yon.rotation.x = lerpf(_yon.rotation.x, hedef.x, minf(1.0, delta * 8.0))
 	_yon.rotation.z = lerpf(_yon.rotation.z, hedef.z, minf(1.0, delta * 8.0))
 

@@ -1,12 +1,18 @@
-"""Cactus 3B — Faz 11: rig'li, iskeletli oyuncu karakteri (Blender / bpy).
+"""Cactus 3B — Faz 11-12: rig'li, iskeletli oyuncu karakteri (Blender / bpy).
 
     pip install bpy pillow
     python3 oyun3d/araclar/karakter.py
 
-Ne yapar: low-poly bir kaktüs karakteri modeller, ona yedi kemikli bir iskelet
-kurar, mesh'i kemiklere bağlar (skinning), beş animasyonu (boşta, yürüme,
-koşma, zıplama, düşme) keyframe'ler ve hepsini tek bir glTF olarak
+Ne yapar: low-poly bir kaktüs karakteri modeller, ona on bir kemikli bir
+iskelet kurar (Faz 12'de bacak uyluk + baldır + ayak olarak üçe bölündü),
+mesh'i kemiklere bağlar (skinning), beş animasyonu (boşta, yürüme, koşma,
+zıplama, düşme) keyframe'ler ve hepsini tek bir glTF olarak
 `varliklar/oyuncu.gltf` dosyasına yazar.
+
+ADIM TEMPOSU ÖLÇÜLÜYOR (Faz 12): yürüme ve koşmanın süresi elle yazılmıyor;
+animasyonun adım boyu pozdan ölçülüp oyunun hızına göre hesaplanıyor
+(bkz. KAYMA_HEDEFI). Elle yazılan süre, hareket hızı değiştiğinde sessizce
+yanlış kalıyordu.
 
 NEDEN ŞİMDİ: Faz 1'den beri karakter beş kutudan ibaretti ve animasyon,
 kutuların dönüşünü sinüsle üreten bir Godot betiğiydi (`animasyon_uret.gd`).
@@ -54,6 +60,12 @@ BOY = 1.72           # kafa tepesi
 KOL_Z = 0.92         # omuz yüksekliği
 KOL_X = 0.24         # gövde kenarından omuz
 BACAK_X = 0.13
+## Faz 12: bacak iki kemiğe bölündü. Tek kemikli bacakta IK diye bir şey yok —
+## çözülecek zincir yok, diz yok. Ayak IK'sının anlamı "dizi nereye kıracağım"
+## sorusudur; o soru ancak uyluk + baldır varken sorulabiliyor.
+DIZ_Z = 0.34         # diz yüksekliği
+BILEK_Z = 0.10       # ayak bileği
+AYAK_UZUNLUK = 0.17  # bilekten parmağa (Godot'da ileri = -Z)
 
 ## Kemik adları Godot'ya aynen geçiyor; animasyon izleri bu adlara bağlı.
 KEMIKLER = [
@@ -63,11 +75,37 @@ KEMIKLER = [
     ("Kafa", (0, 0, GOVDE_Z), (0, 0, KAFA_Z), "Govde"),
     ("KolSol", (-KOL_X, 0, KOL_Z), (-KOL_X - 0.10, 0, KOL_Z + 0.34), "Govde"),
     ("KolSag", (KOL_X, 0, KOL_Z), (KOL_X + 0.10, 0, KOL_Z + 0.34), "Govde"),
-    ("BacakSol", (-BACAK_X, 0, KALCA_Z), (-BACAK_X, 0, AYAK), "Kalca"),
-    ("BacakSag", (BACAK_X, 0, KALCA_Z), (BACAK_X, 0, AYAK), "Kalca"),
+    ("BacakSol", (-BACAK_X, 0, KALCA_Z), (-BACAK_X, 0, DIZ_Z), "Kalca"),
+    ("BacakSag", (BACAK_X, 0, KALCA_Z), (BACAK_X, 0, DIZ_Z), "Kalca"),
+    ("DizSol", (-BACAK_X, 0, DIZ_Z), (-BACAK_X, 0, BILEK_Z), "BacakSol"),
+    ("DizSag", (BACAK_X, 0, DIZ_Z), (BACAK_X, 0, BILEK_Z), "BacakSag"),
+    # Ayak ileri bakıyor: Blender +Y, Godot'da -Z (ileri).
+    ("AyakSol", (-BACAK_X, 0, BILEK_Z), (-BACAK_X, AYAK_UZUNLUK, BILEK_Z * 0.4), "DizSol"),
+    ("AyakSag", (BACAK_X, 0, BILEK_Z), (BACAK_X, AYAK_UZUNLUK, BILEK_Z * 0.4), "DizSag"),
 ]
 
 KARE_HIZI = 30.0
+
+# --- adım kalibrasyonu (Faz 12) --------------------------------------------
+## Oyunun yatay hızları — `betikler/oyuncu.gd` içindeki `yurume_hizi` ve
+## `kosma_hizi` ile aynı olmak zorunda. `testler/karakter_testi.gd` ikisini
+## karşılaştırıyor: biri değişip diğeri unutulursa test düşüyor.
+HIZ = {"yurume": 4.2, "kosma": 7.4}
+## KAYMA ORANI: bir çevrimde ayak yerde kaç kat "kayıyor".
+##
+## Gövde bir çevrimde `hiz * sure` metre gidiyor; bacaklar ise ancak
+## `adim` metre atabiliyor (adım, bacak uzunluğunun ve salınım genliğinin
+## geometrik sonucu — 0,52 m'lik bacakla en fazla ~1,5 m). Oran ikisinin
+## bölümü: 1,0 = ayak yere yapışık, 2,0 = ayak yerde iki katı kayıyor.
+##
+## NEDEN 1,0 DEĞİL: oyunun koşma hızı 7,4 m/s — 1,72 m'lik bir karakter için
+## saniyede 4,3 boy. Kaymayı tamamen kapatmak çevrimi 0,21 sn'ye indirir,
+## yani saniyede ~9 adım: bacaklar görünmez bir pervaneye döner. Hızı
+## düşürmek ise oyunun bütün denge bütçesini (Faz 10) ve hayalet turlarını
+## bozar. 2,0 bu ikisinin arasındaki bilinçli seçim: kayma Faz 11'deki
+## ~4,6 kattan yarıdan fazla azalıyor, adım sıklığı saniyede ~4,5'te —
+## hızlı ama okunabilir — kalıyor.
+KAYMA_HEDEFI = 2.0
 
 
 def _temizle() -> None:
@@ -112,9 +150,16 @@ def govde_mesh() -> bpy.types.Object:
     for isaret in (-1, 1):
         _kutu(bm, (isaret * (KOL_X + 0.02), 0, KOL_Z + 0.02), (0.20, 0.17, 0.15))
         _kutu(bm, (isaret * (KOL_X + 0.07), 0, KOL_Z + 0.20), (0.15, 0.15, 0.30))
-    # Bacaklar.
+    # Bacaklar: uyluk, baldır ve ayak ayrı parçalar — diz kırılınca mesh de
+    # kırılsın diye. Tek kutu olsaydı diz bükülünce kutu esneyip "lastik bacak"
+    # görüntüsü verirdi.
     for isaret in (-1, 1):
-        _kutu(bm, (isaret * BACAK_X, 0, KALCA_Z * 0.5), (0.17, 0.17, KALCA_Z + 0.04))
+        _kutu(bm, (isaret * BACAK_X, 0, (KALCA_Z + DIZ_Z) * 0.5),
+              (0.17, 0.17, KALCA_Z - DIZ_Z + 0.06))
+        _kutu(bm, (isaret * BACAK_X, 0, (DIZ_Z + BILEK_Z) * 0.5),
+              (0.15, 0.15, DIZ_Z - BILEK_Z + 0.06))
+        _kutu(bm, (isaret * BACAK_X, AYAK_UZUNLUK * 0.35, BILEK_Z * 0.5),
+              (0.15, AYAK_UZUNLUK + 0.10, BILEK_Z + 0.02))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     me = bpy.data.meshes.new("oyuncu")
     bm.to_mesh(me)
@@ -147,7 +192,12 @@ def _kemik_sec(ko: Vector) -> str:
     (`agirlik_ata`); burada yalnızca ana kemik seçiliyor.
     """
     if ko.z < KALCA_Z - 0.02 and abs(ko.x) > 0.04:
-        return "BacakSol" if ko.x < 0 else "BacakSag"
+        sag = ko.x > 0
+        if ko.z < BILEK_Z + 0.03 or ko.y > 0.06:
+            return "AyakSag" if sag else "AyakSol"
+        if ko.z < DIZ_Z + 0.02:
+            return "DizSag" if sag else "DizSol"
+        return "BacakSag" if sag else "BacakSol"
     if abs(ko.x) > KOL_X - 0.06 and ko.z > KOL_Z - 0.12:
         return "KolSol" if ko.x < 0 else "KolSag"
     if ko.z > GOVDE_Z - 0.02:
@@ -178,6 +228,12 @@ def agirlik_ata(obj: bpy.types.Object) -> dict[str, int]:
             pay = min(1.0, (v.co.z - (KALCA_Z - 0.16)) / 0.16) * 0.5
             obj.vertex_groups[ana].add([v.index], 1.0 - pay, "REPLACE")
             obj.vertex_groups["Kalca"].add([v.index], pay, "REPLACE")
+        elif ana.startswith("Diz") and v.co.z > DIZ_Z - 0.06:
+            # Diz çevresi: baldır ile uyluk paylaşıyor, yoksa diz kırılınca
+            # mesh makas gibi ayrılıyor.
+            ust = "BacakSol" if ana.endswith("Sol") else "BacakSag"
+            obj.vertex_groups[ana].add([v.index], 0.6, "REPLACE")
+            obj.vertex_groups[ust].add([v.index], 0.4, "REPLACE")
         elif ana.startswith("Kol") and v.co.z < KOL_Z + 0.06:
             obj.vertex_groups[ana].add([v.index], 0.65, "REPLACE")
             obj.vertex_groups["Govde"].add([v.index], 0.35, "REPLACE")
@@ -193,7 +249,8 @@ def agirlik_ata(obj: bpy.types.Object) -> dict[str, int]:
 
 ## Kemiğin yerel X ekseninde pozitif dönüş, dünyada hangi yöne gidiyor?
 ## Bacaklar aşağı, kollar yukarı baktığı için işaretler ters. Bir kez ölçüldü.
-_YON = {"BacakSol": -1.0, "BacakSag": -1.0, "KolSol": 1.0, "KolSag": 1.0,
+_YON = {"BacakSol": -1.0, "BacakSag": -1.0, "DizSol": -1.0, "DizSag": -1.0,
+        "AyakSol": -1.0, "AyakSag": -1.0, "KolSol": 1.0, "KolSag": 1.0,
         "Govde": 1.0, "Kafa": 1.0, "Kalca": 1.0}
 
 
@@ -232,10 +289,65 @@ def _bitir(eylem: bpy.types.Action, arm: bpy.types.Object, dongu: bool) -> None:
     arm.animation_data.action = None
 
 
-def animasyonlari_uret(arm: bpy.types.Object) -> dict[str, float]:
+def _adim_olc(arm: bpy.types.Object, sure: float) -> float:
+    """Bir çevrimde atılan yol (metre). ÖLÇÜLÜR, hesaplanmaz.
+
+    Adım boyunu formülle tahmin etmek (2·bacak·sin(genlik)) dizi ve ayağı
+    yok sayıyor; ikisi de adımı kısaltıyor. Onun yerine poz gerçekten
+    değerlendiriliyor ve iki ayak bileğinin en açık olduğu an ölçülüyor:
+    gövde bir adımda tam o kadar ilerler. Çevrim iki adım, yani iki katı.
+
+    Eylem çağrı sırasında `arm`a bağlı olmalı (`_bitir`den ÖNCE)."""
+    sahne = bpy.context.scene
+    en_acik = 0.0
+    for k in range(9):
+        f = 1.0 + sure * KARE_HIZI * k / 8.0
+        sahne.frame_set(int(f), subframe=f - int(f))
+        bpy.context.view_layer.update()
+        # Blender'da +Y ileri (dışa aktarımda Godot'nun -Z'si oluyor).
+        sol = arm.pose.bones["AyakSol"].head.y
+        sag = arm.pose.bones["AyakSag"].head.y
+        en_acik = max(en_acik, abs(sol - sag))
+    return en_acik * 2.0
+
+
+def _egriler(eylem: bpy.types.Action) -> list:
+    """Eylemin f-eğrileri. Blender 4.4+ katmanlı eylemlerde `action.fcurves`
+    yok: eğriler katman > şerit > slot torbasının içinde duruyor. Eski API
+    de destekleniyor ki betik iki sürümde de çalışsın."""
+    if hasattr(eylem, "fcurves"):
+        return list(eylem.fcurves)
+    egriler: list = []
+    for katman in eylem.layers:
+        for serit in katman.strips:
+            for slot in eylem.slots:
+                torba = serit.channelbag(slot)
+                if torba is not None:
+                    egriler.extend(torba.fcurves)
+    return egriler
+
+
+def _zamani_olcekle(eylem: bpy.types.Action, oran: float) -> None:
+    """Eylemin süresini oranla çarpar — poz aynı, tempo değişir.
+
+    Animasyonu iki kez kurmak yerine anahtarların zamanı ölçekleniyor:
+    adım boyu tempodan bağımsız (aynı açılar, aynı mesafe), dolayısıyla
+    ölçüm bir kez yapılıp süre sonradan yerine oturtulabiliyor."""
+    for eg in _egriler(eylem):
+        for anahtar in eg.keyframe_points:
+            for nokta in (anahtar.co, anahtar.handle_left, anahtar.handle_right):
+                nokta.x = 1.0 + (nokta.x - 1.0) * oran
+        eg.update()
+
+
+def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
     """Beş animasyon. Hareket dili Faz 1'deki yordamsal sürümle aynı tutuldu:
-    oyunun hissi değişmemeli, yalnızca altındaki iskelet değişmeli."""
+    oyunun hissi değişmemeli, yalnızca altındaki iskelet değişmeli.
+
+    Faz 12: yürüme ve koşmanın SÜRESİ artık elle yazılmıyor; adım boyu
+    ölçülüp oyunun hızına göre hesaplanıyor (bkz. KAYMA_HEDEFI)."""
     sureler: dict[str, float] = {}
+    adimlar: dict[str, float] = {}
 
     def kare(sn: float) -> float:
         return 1.0 + sn * KARE_HIZI
@@ -248,28 +360,53 @@ def animasyonlari_uret(arm: bpy.types.Object) -> dict[str, float]:
             "KolSol": (0.05 if t == 1.3 else 0.0, 0.0, 0.10),
             "KolSag": (-0.05 if t == 1.3 else 0.0, 0.0, -0.10),
             "BacakSol": (0.0, 0.0, 0.0), "BacakSag": (0.0, 0.0, 0.0),
+            # Dizler tam düz değil: kilitli diz hem doğal durmuyor hem de
+            # ayak IK'sına çözüm alanı bırakmıyor (tam düz bacak, hedefe
+            # uzanmak için kıracak açı bulamaz).
+            "DizSol": (-0.08, 0.0, 0.0), "DizSag": (-0.08, 0.0, 0.0),
+            "AyakSol": (0.04, 0.0, 0.0), "AyakSag": (0.04, 0.0, 0.0),
         }, (0.0, 0.0, yuk))
     _bitir(eylem, arm, True)
     sureler["bosta"] = 2.6
 
-    # yürüme / koşma: aynı kalıp, farklı genlik ve süre
+    # yürüme / koşma: aynı kalıp, farklı genlik. Süre geçici — ölçümden sonra
+    # ölçekleniyor; buradaki değer yalnızca anahtarların aralığını belirliyor.
     for ad, sure, bacak, kol, zipzip, egim in (
             ("yurume", 0.9, 0.45, 0.28, 0.04, 0.03),
             ("kosma", 0.55, 0.85, 0.55, 0.09, 0.16)):
         eylem = _eylem(arm, ad)
+        diz_genlik = bacak * 1.25
         for k in range(9):
             t = sure * k / 8.0
             f = math.tau * k / 8.0
+            # DİZ: ayak yere bastığında (bacak önde, f=0) düz, geri savrulurken
+            # bükülü. Bu olmadan bacak sopa gibi salınıyor ve adım "yürüyüş"
+            # değil "pergel" gibi görünüyor.
+            diz_sol = -diz_genlik * (0.5 - 0.5 * math.cos(f))
+            diz_sag = -diz_genlik * (0.5 - 0.5 * math.cos(f + math.pi))
+            bacak_sol = math.sin(f) * bacak
+            bacak_sag = math.sin(f + math.pi) * bacak
             _anahtar(arm, kare(t), {
-                "BacakSol": (math.sin(f) * bacak, 0.0, 0.0),
-                "BacakSag": (math.sin(f + math.pi) * bacak, 0.0, 0.0),
+                "BacakSol": (bacak_sol, 0.0, 0.0),
+                "BacakSag": (bacak_sag, 0.0, 0.0),
+                "DizSol": (diz_sol, 0.0, 0.0),
+                "DizSag": (diz_sag, 0.0, 0.0),
+                # AYAK: uyluk + baldırın tersi kadar döndürülüyor ki taban
+                # yere paralel kalsın (ayak ucu havaya kalkmasın).
+                "AyakSol": (-(bacak_sol + diz_sol) * 0.55, 0.0, 0.0),
+                "AyakSag": (-(bacak_sag + diz_sag) * 0.55, 0.0, 0.0),
                 "KolSol": (math.sin(f + math.pi) * kol, 0.0, 0.10),
                 "KolSag": (math.sin(f) * kol, 0.0, -0.10),
                 "Govde": (egim, 0.0, 0.0),
                 "Kafa": (-egim * 0.6, 0.0, 0.0),   # baş yere değil ileri baksın
             }, (0.0, 0.0, abs(math.sin(f)) * zipzip - zipzip * 0.5))
+        # Adım boyu ölçülüyor, sonra süre oyunun hızına oturtuluyor.
+        adim = _adim_olc(arm, sure)
+        gereken = adim * KAYMA_HEDEFI / HIZ[ad]
+        _zamani_olcekle(eylem, gereken / sure)
         _bitir(eylem, arm, True)
-        sureler[ad] = sure
+        sureler[ad] = gereken
+        adimlar[ad] = adim
 
     # zıplama: çöküp itme
     eylem = _eylem(arm, "zipla")
@@ -279,6 +416,9 @@ def animasyonlari_uret(arm: bpy.types.Object) -> dict[str, float]:
             (0.45, -0.5, 0.25, -0.8, -0.05, 0.02)):
         _anahtar(arm, kare(t), {
             "BacakSol": (bacak_s, 0.0, 0.0), "BacakSag": (bacak_g, 0.0, 0.0),
+            "DizSol": (-0.75 if t > 0.0 else -0.1, 0.0, 0.0),
+            "DizSag": (-0.35 if t > 0.0 else -0.1, 0.0, 0.0),
+            "AyakSol": (0.25, 0.0, 0.0), "AyakSag": (0.15, 0.0, 0.0),
             "KolSol": (kol, 0.0, 0.16), "KolSag": (kol, 0.0, -0.16),
             "Govde": (egim, 0.0, 0.0), "Kafa": (0.0, 0.0, 0.0),
         }, (0.0, 0.0, yuk))
@@ -291,12 +431,14 @@ def animasyonlari_uret(arm: bpy.types.Object) -> dict[str, float]:
         _anahtar(arm, kare(t), {
             "BacakSol": (-0.35 + sallanma, 0.0, 0.0),
             "BacakSag": (0.3 - sallanma, 0.0, 0.0),
+            "DizSol": (-0.5 - sallanma, 0.0, 0.0), "DizSag": (-0.25, 0.0, 0.0),
+            "AyakSol": (0.2, 0.0, 0.0), "AyakSag": (0.1, 0.0, 0.0),
             "KolSol": (-1.3, 0.0, 0.22), "KolSag": (-1.3, 0.0, -0.22),
             "Govde": (-0.08, 0.0, 0.0), "Kafa": (0.05, 0.0, 0.0),
         }, (0.0, 0.0, 0.0))
     _bitir(eylem, arm, True)
     sureler["dusme"] = 0.8
-    return sureler
+    return sureler, adimlar
 
 
 def disa_aktar(mesh: bpy.types.Object, arm: bpy.types.Object, yol: str) -> None:
@@ -343,7 +485,7 @@ def main() -> int:
     mod = mesh.modifiers.new("iskelet", "ARMATURE")
     mod.object = arm
 
-    sureler = animasyonlari_uret(arm)
+    sureler, adimlar = animasyonlari_uret(arm)
     disa_aktar(mesh, arm, os.path.join(VARLIK, "oyuncu.gltf"))
 
     ucgen = modeller.ucgen_say(mesh)
@@ -352,8 +494,18 @@ def main() -> int:
         "ucgen": ucgen,
         "boy_m": round(boy, 3),
         "kemik": len(KEMIKLER),
+        # Ayak IK'sı bu uzunlukları kullanıyor: uyluk + baldır, bacağın
+        # uzanabileceği azami mesafe.
+        "uyluk_m": round(KALCA_Z - DIZ_Z, 3),
+        "baldir_m": round(DIZ_Z - BILEK_Z, 3),
+        "bilek_m": round(BILEK_Z, 3),
         "teksel_m": round(yogunluk, 1),
-        "animasyon": {ad: round(sn, 2) for ad, sn in sureler.items()},
+        "animasyon": {ad: round(sn, 3) for ad, sn in sureler.items()},
+        # Adım boyu ve kayma oranı: `karakter_testi` bütçeyi burdan okuyor.
+        "adim_m": {ad: round(m, 3) for ad, m in adimlar.items()},
+        "hiz": dict(HIZ),
+        "kayma": {ad: round(HIZ[ad] * sureler[ad] / adimlar[ad], 2)
+                  for ad in adimlar},
         "kemik_koseleri": sayim,
     }
     yol = os.path.join(VARLIK, "oyuncu_olcum.json")
@@ -364,6 +516,10 @@ def main() -> int:
         ucgen, boy, len(KEMIKLER), yogunluk))
     print("animasyonlar: %s" % ", ".join(
         "%s %.2f sn" % (a, s) for a, s in sureler.items()))
+    for ad in adimlar:
+        print("%s: adim %.2f m, cevrim %.2f sn, kayma %.2fx, %.1f adim/sn" % (
+            ad, adimlar[ad], sureler[ad],
+            HIZ[ad] * sureler[ad] / adimlar[ad], 2.0 / sureler[ad]))
     print("ölçüm -> %s" % yol)
     return 0
 

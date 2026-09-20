@@ -234,6 +234,26 @@ ayrı bir dalı.
 - **Kalan:** kök hareketi (root motion) ve ayak IK — ikisi de bu iskeletin
   üstüne kurulabilir; rampada ayakların zemine oturması için gerekiyor.
 
+### Faz 12 — **Animasyon cilası: ayak IK ve adım temposu** (Faz 11 sonrası)
+Faz 11'in açık bıraktığı madde. Karakter rampada dik duruyor, ayaklarının biri
+havada kalıyor; yürürken de ayak yerde kayıyor. İkisi de "çalışıyor ama yanlış
+görünüyor" sınıfından: hiçbir test düşmüyor, her ekran görüntüsünde görünüyor.
+- **Durum: bitti** → bacak iki kemiğe bölündü (iskelet 7 → 11 kemik), ayak IK'sı
+  modifiye edici olarak yazıldı ([`betikler/ayak_ik.gd`](oyun3d/betikler/ayak_ik.gd)),
+  adım boyu ölçülüp çevrim süresi oyunun hızına oturtuldu
+  ([`araclar/karakter.py`](oyun3d/araclar/karakter.py)).
+  Ölçülen sonuç: rampada bilek hatası 8,8 cm → 0,2 cm, basamakta 6,1 cm →
+  0,1 cm, ayak kayması 4,3 kat → 2,0 kat.
+- **Öğrenilen iki şey.** (1) İki kemikli zincirde IK'nın kapalı formu var:
+  kosinüs teoremi. Yinelemeli çözücü (FABRIK/CCD) gereksiz ve kare kare
+  titreyebiliyor. (2) Godot'da bir modifiye edicinin yazdığı poz DIŞARIDAN
+  okunamıyor — motor pozu yedekleyip geri yüklüyor, sonuç yalnızca deriye
+  gidiyor. Test bu yüzden zincire ikinci bir modifiye edici takıyor.
+- **Kalan:** kök hareketi (root motion) — asıl kaymayı bitirecek yol, ama
+  hareket hızını animasyonun belirlemesi demek; oyunun bütün denge bütçesi
+  (Faz 10) ona göre yeniden ayarlanır. Ayrıca el IK'sı (duvara yaslanma) ve
+  bakış yönü (look-at) aynı modifiye edici altyapısının üstüne kurulabilir.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

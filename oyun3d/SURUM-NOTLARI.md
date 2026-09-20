@@ -6,11 +6,34 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.11\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.12\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.12.0 — Animasyon cilası (Faz 12)
+
+- **Ayak IK.** Karakterin ayakları artık zemine oturuyor
+  (`betikler/ayak_ik.gd`). Her ayağın altına ışın atılıyor, bacak zinciri
+  hedefe kosinüs teoremiyle çözülüyor, ayak tabanı zeminin normaline
+  yaslanıyor; bir ayak diğerinden alçaktaysa kalça çömeliyor (en fazla
+  0,35 m). Rampada ölçülen bilek hatası 8,8 cm'den 0,2 cm'ye, basamakta
+  6,1 cm'den 0,1 cm'ye indi.
+- **Bacak iki kemiğe bölündü.** İskelet 7 kemikten 11'e çıktı: uyluk, baldır
+  ve ayak. Tek kemikli bacakta çözülecek bir zincir, kırılacak bir diz yoktu;
+  IK'nın ön koşulu bu. Yürüme ve koşmada diz artık gerçekten bükülüyor.
+- **Adım temposu ölçümle belirleniyor.** `araclar/karakter.py` animasyonun
+  adım boyunu pozu değerlendirip ÖLÇÜYOR (yürüme 0,89 m, koşma 1,46 m) ve
+  çevrim süresini oyunun hızına göre hesaplıyor. Ayağın yerdeki kayması
+  4,3 kattan 2,0 kata indi; bütçe `karakter_testi` içinde.
+- **Gövde yatırması küçüldü.** Faz 11'e kadar bütün gövde yokuşa yatıyordu —
+  ayak IK'sının yerine geçen ucuz numaraydı. Artık payı 0,35; ayaklar işi
+  kendi yapıyor.
+- **Ayak IK testi.** `testler/ayak_ik_testi` düz zemin, rampa, basamak ve
+  havada olmak üzere dört durumu ölçüyor. Modifiye edicinin yazdığı poz
+  dışarıdan okunamadığı için test iskelete ikinci bir "prob" modifiye edici
+  takıyor — ölçülen şey deriye giden pozun ta kendisi.
 
 ## 0.11.0 — Karakter (Faz 11)
 

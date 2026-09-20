@@ -24,3 +24,6 @@ oyun3d/*.tmp
 cikti/
 *.keystore
 *.jks
+
+# Python onbellegi (araclar/*.py)
+__pycache__/

@@ -1,14 +1,29 @@
 {
-  "ucgen": 96,
+  "ucgen": 144,
   "boy_m": 1.72,
-  "kemik": 7,
+  "kemik": 11,
+  "uyluk_m": 0.28,
+  "baldir_m": 0.24,
+  "bilek_m": 0.1,
   "teksel_m": 380.0,
   "animasyon": {
     "bosta": 2.6,
-    "yurume": 0.9,
-    "kosma": 0.55,
+    "yurume": 0.423,
+    "kosma": 0.395,
     "zipla": 0.45,
     "dusme": 0.8
+  },
+  "adim_m": {
+    "yurume": 0.888,
+    "kosma": 1.463
+  },
+  "hiz": {
+    "yurume": 4.2,
+    "kosma": 7.4
+  },
+  "kayma": {
+    "yurume": 2.0,
+    "kosma": 2.0
   },
   "kemik_koseleri": {
     "Kalca": 8,
@@ -16,7 +31,11 @@
     "Kafa": 4,
     "KolSol": 16,
     "KolSag": 16,
-    "BacakSol": 6,
-    "BacakSag": 6
+    "BacakSol": 3,
+    "BacakSag": 3,
+    "DizSol": 2,
+    "DizSag": 2,
+    "AyakSol": 17,
+    "AyakSag": 17
   }
 }

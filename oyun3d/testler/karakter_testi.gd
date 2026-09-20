@@ -1,5 +1,5 @@
 extends Node
-## Karakter testi (Faz 11): model, iskelet, skinning ve animasyon.
+## Karakter testi (Faz 11-12): model, iskelet, skinning, animasyon ve adım.
 ##
 ##   godot --headless --path oyun3d res://testler/karakter_testi.tscn
 ##
@@ -13,7 +13,9 @@ extends Node
 ##    donuyor;
 ##  - AnimationTree yanlış AnimationPlayer'a bakıyor — animasyon çalışıyor
 ##    görünüyor ama kemikler kıpırdamıyor;
-##  - kemik adları değişmiş — durum makinesi animasyonu bulamıyor.
+##  - kemik adları değişmiş — durum makinesi animasyonu bulamıyor;
+##  - adım temposu oyunun hızıyla uyumsuz (Faz 12) — karakter yürümüyor,
+##    buz üstünde kayıyor gibi görünüyor.
 ##
 ## Bu yüzden test yalnızca "dosya var mı" demiyor, karakteri OYNATIP kemiğin
 ## kıpırdadığını ölçüyor.
@@ -21,7 +23,10 @@ extends Node
 const MODEL := "res://varliklar/oyuncu.gltf"
 const OLCUM := "res://varliklar/oyuncu_olcum.json"
 const KEMIKLER := ["Kalca", "Govde", "Kafa", "KolSol", "KolSag",
-	"BacakSol", "BacakSag"]
+	"BacakSol", "BacakSag", "DizSol", "DizSag", "AyakSol", "AyakSag"]
+## Kayma bütçesi: ayak bir çevrimde yerde en fazla bu kadar katı kayabilir.
+## Hedef 2,0 (araclar/karakter.py::KAYMA_HEDEFI); pay yuvarlamalar için.
+const KAYMA_BUTCESI := 2.2
 
 var _hatalar: Array[String] = []
 
@@ -35,7 +40,8 @@ func _ready() -> void:
 	var olcum: Dictionary = JSON.parse_string(dosya.get_as_text())
 
 	_modeli_dogrula(olcum)
-	await _oyuncuyu_dogrula()
+	_adimi_dogrula(olcum)
+	await _oyuncuyu_dogrula(olcum)
 
 	if _hatalar.is_empty():
 		print("KARAKTER TESTI: GECTI")
@@ -108,12 +114,38 @@ func _modeli_dogrula(olcum: Dictionary) -> void:
 			oynatici.get_animation_list().size(), float(olcum["boy_m"])])
 	kok.free()
 
+# --------------------------------------------------------- adım / kayma
+
+## Ayak yerde ne kadar kayıyor? Gövde bir çevrimde `hiz * sure` metre gidiyor,
+## bacaklar `adim` metre atabiliyor; oran ikisinin bölümü. Bu bir tercih
+## meselesi ama SESSİZCE bozulabilen bir tercih: animasyonun süresi elle
+## değiştirilirse ya da hareket hızı artırılırsa kayma büyür ve kimse fark
+## etmez. Bütçe onu görünür kılıyor.
+func _adimi_dogrula(olcum: Dictionary) -> void:
+	if not olcum.has("adim_m") or not olcum.has("hiz"):
+		_hatalar.append("Ölçümde adım verisi yok — araclar/karakter.py eski")
+		return
+	var adimlar: Dictionary = olcum["adim_m"]
+	var hizlar: Dictionary = olcum["hiz"]
+	var sureler: Dictionary = olcum["animasyon"]
+	for ad: String in adimlar:
+		var adim := float(adimlar[ad])
+		_dogrula(adim > 0.2, "'%s' adım boyu ölçülememiş (%.3f m)" % [ad, adim])
+		if adim <= 0.2:
+			continue
+		var kayma: float = float(hizlar[ad]) * float(sureler[ad]) / adim
+		print("%s: adım %.2f m, çevrim %.2f sn, kayma %.2fx" % [
+			ad, adim, sureler[ad], kayma])
+		_dogrula(kayma <= KAYMA_BUTCESI,
+			"'%s' ayağı yerde %.2f kat kayıyor (bütçe %.2f)" % [
+				ad, kayma, KAYMA_BUTCESI])
+
 # ------------------------------------------------------- oyuncu sahnesinde
 
 ## Asıl soru: AnimationTree gerçekten İSKELETİ oynatıyor mu? Ağaç yanlış
 ## AnimationPlayer'a bakıyorsa oyun çalışır, animasyon "geçer" ama kemikler
 ## kıpırdamaz — ekranda buz gibi bir karakter kayar.
-func _oyuncuyu_dogrula() -> void:
+func _oyuncuyu_dogrula(olcum: Dictionary) -> void:
 	var oyuncu: CharacterBody3D = (load("res://sahneler/oyuncu.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(oyuncu)
 	await get_tree().process_frame
@@ -127,6 +159,17 @@ func _oyuncuyu_dogrula() -> void:
 	_dogrula(absf((model as Node3D).position.y + 0.85) < 0.02,
 		"Model kapsülün tabanına oturmuyor (y=%.2f)" % (model as Node3D).position.y)
 
+	# Animasyonun temposu bu hızlara göre hesaplandı (araclar/karakter.py).
+	# İkisi ayrı dosyada duruyor; biri değişip diğeri unutulursa kayma bütçesi
+	# sessizce geçersiz olur.
+	var hizlar: Dictionary = olcum.get("hiz", {})
+	for ad: String in hizlar:
+		var alan := "%s_hizi" % ad
+		var oyundaki: float = oyuncu.get(alan)
+		_dogrula(absf(oyundaki - float(hizlar[ad])) < 0.01,
+			"oyuncu.%s = %.2f ama ölçümde %.2f — adım kalibrasyonu eskimiş" % [
+				alan, oyundaki, hizlar[ad]])
+
 	var agac: AnimationTree = oyuncu.get_node("AnimationTree")
 	_dogrula(agac.active, "AnimationTree kapalı")
 	# anim_player yolu AĞACA göre çözülür, oyuncuya göre değil.
@@ -136,6 +179,10 @@ func _oyuncuyu_dogrula() -> void:
 
 	var iskelet := _bul(model, "Skeleton3D") as Skeleton3D
 	_dogrula(iskelet != null, "Oyuncuda iskelet yok")
+	# Ayak IK'sı koddan ekleniyor (bkz. oyuncu.gd::_ayak_ik_kur); gerçekten
+	# eklendiğini burada, davranışını `ayak_ik_testi` doğruluyor.
+	_dogrula(iskelet != null and iskelet.get_node_or_null("AyakIK") != null,
+		"Ayak IK modifiye edicisi iskelete eklenmemiş")
 	if iskelet == null or oynatici == null:
 		oyuncu.queue_free()
 		return

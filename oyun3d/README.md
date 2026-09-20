@@ -1,8 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 11** bitti: karakter kutu olmaktan çıktı — modellenmiş, rig'li,
-iskeletli bir kaktüs.
+Şu an **Faz 12** bitti: karakterin ayakları zemine oturuyor — iki kemikli
+bacak, ayak IK'sı ve ölçüyle belirlenen adım temposu.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -20,6 +20,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **9** | İçerik ölçeği: **dört yeni bölüm**, veriden bölüm üreten hat, bitirilebilirlik doğrulayıcısı (bölüm 2'nin bitirilemez olduğunu buldu), tuş atama ekranı |
 | **10** | **Otomatik oyuncu**: bölümleri gerçek girdiyle oynayan bot, denge ölçümü ve bütçesi, oyunla gelen par turları, ortak bölüm grafı |
 | **11** | **Karakter**: Blender'da modellenip rig'lenen, skinning'li ve iskelet animasyonlu kaktüs; yordamsal animasyon üreticisi emekli oldu, draw call bölüm başına ~13 düştü |
+| **12** | **Animasyon cilası**: iki kemikli bacak (7 → 11 kemik), ayak IK'sı (rampa/basamak), ölçüyle belirlenen adım temposu (kayma 4,3 → 2,0 kat), ayak IK testi |
 
 ---
 
@@ -89,6 +90,7 @@ testler/ag_testi.sh /yol/godot                                   # ağ (iki sür
 godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm bitirilebilir mi
 godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
 godot --headless --path oyun3d res://testler/karakter_testi.tscn     # model, iskelet, animasyon
+godot --headless --path oyun3d res://testler/ayak_ik_testi.tscn      # ayak zemine oturuyor mu
 godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
 testler/telemetri_testi.sh /yol/godot                            # gizlilik + sunucu sözleşmesi
 
@@ -810,10 +812,15 @@ zorunda kalmıyor.
 
 ### Zemine yatma
 
-Karakter modeli rampada dik durmuyor, zeminin normaline yatıyor. Gerçek ayak
-IK'sı iskelet ister; bu, kutu karakterde aynı işi gören ucuz sürümü. Eğim
-`Yon` düğümüne uygulanıyor — animasyonlar `Yon/Model`in dönüşünü yazıyor,
-ikisi çakışmasın diye.
+Karakter modeli rampada dik durmuyor, zeminin normaline yatıyor. Eğim `Yon`
+düğümüne uygulanıyor — animasyonlar `Yon/Model`in dönüşünü yazıyor, ikisi
+çakışmasın diye.
+
+> **Faz 12 notu:** bu, kutu karakterde ayak IK'sının yerine geçen ucuz
+> numaraydı ve bütün gövdeyi yokuşa yatırıyordu. Ayaklar artık zemine kendi
+> oturduğu için payı 0,35'e indirildi (`oyuncu.gd::govde_yatirma`): gövdenin
+> hafif yaslanması eğimi okunur kılıyor, tamamı yatırmak karakteri yokuşta
+> kapaklanmış gösteriyordu.
 
 ---
 
@@ -913,7 +920,7 @@ okunabilir, LFS dışında tutuldu — `.bin` ikili (LFS), doku ise ortak tek do
 
 ---
 
-## Karakter ve animasyon (Faz 11)
+## Karakter ve animasyon (Faz 11-12)
 
 Karakter artık kutu değil: **modellenmiş, rig'li ve iskeletli** bir kaktüs.
 Model, iskelet, skinning ve beş animasyon tek bir Blender betiğinden çıkıyor:
@@ -924,10 +931,12 @@ python3 oyun3d/araclar/karakter.py      # -> varliklar/oyuncu.gltf (+ .bin)
 
 ```
 araclar/karakter.py
-  ├── mesh        96 üçgen, 1,72 m (gövde, kafa, iki kol pedi, iki bacak)
-  ├── iskelet     7 kemik: Kalca, Govde, Kafa, KolSol/Sag, BacakSol/Sag
+  ├── mesh        144 üçgen, 1,72 m (gövde, kafa, iki kol pedi, uyluk/baldır/ayak)
+  ├── iskelet     11 kemik: Kalca, Govde, Kafa, KolSol/Sag,
+  │               BacakSol/Sag (uyluk), DizSol/Sag (baldır), AyakSol/Sag
   ├── skinning    bölgeye göre ağırlık, eklemlerde iki kemiğe paylaştırma
-  └── animasyon   bosta 2,6 · yurume 0,9 · kosma 0,55 · zipla 0,45 · dusme 0,8 sn
+  ├── adım        poz değerlendirilip ÖLÇÜLÜYOR: yurume 0,89 m, kosma 1,46 m
+  └── animasyon   bosta 2,6 · yurume 0,42 · kosma 0,40 · zipla 0,45 · dusme 0,8 sn
 ```
 
 Faz 1'den beri karakter beş kutuydu ve animasyon, kutuların dönüşünü sinüsle
@@ -971,6 +980,84 @@ açık: oyuncu ekranda bir bakışta bulunmalı.
 **Durum makinesi:** `yer` (bosta ↔ yürüme ↔ koşma arasında bir `BlendSpace1D`,
 karışım konumunu yatay hız sürüyor), `zipla`, `dusme`. Geçişleri `oyuncu.gd`
 `travel()` ile tetikliyor.
+
+### Ayak IK — ayaklar zemine oturuyor (Faz 12)
+
+Faz 11'in bıraktığı iki açık madde de "çalışıyor ama yanlış görünüyor"
+sınıfındaydı: rampada bir ayak havada kalıyordu, yürürken ayak yerde
+kayıyordu. İkisi de testten geçiyor, her ekran görüntüsünde görünüyordu.
+
+```
+betikler/ayak_ik.gd  (SkeletonModifier3D)
+  fizik karesinde   her kalçanın altına ışın → hedef + zemin normali
+  modifiye ederken  kalça çömelmesi → iki kemikli çözüm → ayağı zemine yasla
+```
+
+**Neden kapalı form:** uyluk ve baldır uzunlukları sabit, hedefe uzaklık
+biliniyor — üçgenin açıları **kosinüs teoremiyle** doğrudan çıkıyor.
+Yinelemeli çözücüye (FABRIK/CCD) gerek yok; iki kemikte kapalı form hem daha
+hızlı hem de her karede aynı cevabı veriyor (yinelemeli çözücüler kare kare
+titreyebiliyor). Kemik uzunlukları rest pozundan okunuyor: karakter
+değişirse IK kendiliğinden uyuyor, elle sayı girilmiyor.
+
+**Işın nerede atılıyor:** `_physics_process` içinde ve ayağın şu anki yerinden
+değil, **kalçanın altından**. Animasyon ayağı havaya kaldırdığında ışın da
+havaya kalkar ve ayak zemini kaçırır; kalça sabit referans. Fizik sorgusunu
+modifiye edicinin içinde yapmak da olmaz — Godot fizik karesi dışındaki
+sorguya uyarı veriyor.
+
+**Ölçülen sonuç** (`testler/ayak_ik_testi`): rampada bilek hatası **8,8 cm →
+0,2 cm**, basamakta **6,1 cm → 0,1 cm**. Düz zeminde fark yok; zaten olmamalı.
+
+Üç tasarım kararı, üçü de sınırı bilerek çiziyor:
+
+- **Çömelme en fazla 0,35 m.** Bir ayak çok aşağıdaysa kalça iniyor. Sınırsız
+  bırakmak karakteri uçurum kenarında yere yapıştırıyordu.
+- **Aşağı ışın menzili 0,8 m.** Bacağın erişebileceğinden azıcık uzun
+  (0,52 bacak − 0,10 bilek + 0,35 çömelme). Daha kısası basamaktan inerken
+  zemini hiç görmüyor, daha uzunu erişilemeyen hedefe bacağı boşuna geriyor.
+- **Havada etki 0'a iniyor** ama bir karede değil: ani kapanma zıplamanın ilk
+  karesinde bacakları yerinden sıçratıyordu.
+
+> **Ayağı yaslamak IK'nın yarısı.** Bileği doğru yere koymak yetmiyor; ayak
+> bacağın çocuğu olduğu için yokuşta burnu havaya kalkıyor. Taban, zeminin
+> normaline en kısa dönüşle yaslanıyor — ayağın ileri yönü olabildiğince
+> korunuyor. Tabanın kemik yerel uzayındaki ekseni rest pozundan bir kez
+> çıkarılıyor: ayak kemiği ileri-aşağı baktığı için tabanın normali kemiğin
+> eksenlerinden hiçbiri değil.
+
+> **TUZAK — modifiye edicinin yazdığı poz dışarıdan OKUNAMIYOR.** Godot
+> modifiye ediciler çalışmadan önce pozu yedekliyor, sonra geri yüklüyor;
+> sonuç yalnızca deri (skinning) dönüşümlerine gidiyor ve
+> `get_bone_global_pose()` eski değeri veriyor. İlk test bu yüzden "IK hiçbir
+> şey yapmıyor" diyordu — oysa yapıyordu. Çözüm: iskelete **ikinci bir
+> modifiye edici** ("prob") takmak. Modifiye ediciler çocuk sırasına göre
+> zincirleniyor, dolayısıyla prob kendi sırası geldiğinde IK'nın çıktısını
+> okuyor — deriye giden pozun ta kendisini.
+
+### Adım temposu ölçüyle belirleniyor (Faz 12)
+
+Gövde bir çevrimde `hiz × sure` metre gidiyor; bacaklar ancak `adim` metre
+atabiliyor. Oran ikisinin bölümü: **kayma oranı**. Faz 11'de yürümede 4,3'tü —
+ayak yerde dört katı kayıyordu.
+
+Adım boyu artık tahmin edilmiyor, `araclar/karakter.py` içinde **ölçülüyor**:
+poz kare kare değerlendirilip iki ayak bileğinin en açık olduğu an bulunuyor
+(gövde bir adımda tam o kadar ilerler), çevrim iki adım. Sonuç: yürüme
+0,89 m, koşma 1,46 m. Çevrim süresi buradan hesaplanıyor —
+`sure = adim × KAYMA_HEDEFI / hiz` — ve anahtarların zamanı ölçekleniyor.
+
+**Neden hedef 1,0 değil:** koşma hızı 7,4 m/s, yani 1,72 m'lik bir karakter
+için saniyede 4,3 boy. Kaymayı tamamen kapatmak çevrimi 0,21 sn'ye indirir:
+saniyede ~9 adım, görünmez bir pervane. Hızı düşürmek ise Faz 10'un bütün
+denge bütçesini ve par turlarını bozar. **2,0** bu ikisinin arasında bilinçli
+bir seçim; `karakter_testi` bütçeyi 2,2 olarak bekçiliyor ve `oyuncu.gd`'deki
+hızların ölçümdekilerle aynı kaldığını da doğruluyor (biri değişip diğeri
+unutulursa kalibrasyon sessizce geçersiz olurdu).
+
+Kaymayı gerçekten bitirecek yol **kök hareketi** (root motion): hızı
+animasyonun belirlemesi. Bedeli, oyunun bütün denge bütçesinin yeniden
+ayarlanması — Faz 12'nin kapsamı değil, yol haritasında duruyor.
 
 ### Kontrolcüde ne var
 

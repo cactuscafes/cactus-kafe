@@ -51,6 +51,13 @@ jobs:
             timeout 300 godot --headless "res://testler/${t}_testi.tscn"
           done
 
+      # Boss testi kendi adımında: `--fixed-fps` ŞART. Dövüşteki vuruş
+      # duraklaması zaman ölçeğini 0,05'e indiriyor; gerçek zamanda her vuruş
+      # saniyelerce sürüyor ve test dakikalarca bekliyor.
+      - name: Boss dövüşü (sabit kare hızı)
+        working-directory: oyun3d
+        run: timeout 300 godot --headless --fixed-fps 60 res://testler/boss_testi.tscn
+
       # Ağ testi iki Godot süreci açıyor: tek süreçte ağ kodu test edilemez.
       - name: Ağ (iki süreç)
         working-directory: oyun3d

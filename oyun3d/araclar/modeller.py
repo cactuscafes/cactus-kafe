@@ -36,14 +36,21 @@ from mathutils import Matrix
 from PIL import Image
 
 BURASI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BURASI)
 PROJE = os.path.dirname(BURASI)
 VARLIK = os.path.join(PROJE, "varliklar")
+
+import rig  # ortak hat: glTF'e .bin damgası (bkz. rig.bin_damgasi)
 
 # Atlas kare olmak zorunda değil. Düşman eklenince 2048² doldu ve düşmana
 # ancak 512²'lik bir bölge kalıyordu — 178 teksel/m, banttın altı. Dokuyu
 # 4096²'ye çıkarmak (dosya ~4 kat) yerine bir satır eklendi.
 ATLAS_GEN = 2048
-ATLAS_YUK = 3072
+# Faz 16: boss için yer açıldı (3072 -> 4608). Bir önceki faz "yeni bir nesne
+# gelirse atlas büyüyecek" diye yazıyordu; geldi. 4608, 4'ün katı olduğu için
+# VRAM sıkıştırması (S3TC/ETC) sorun çıkarmıyor — ikinin kuvveti olması şart
+# değil, 4'ün katı olması şart.
+ATLAS_YUK = 4608
 
 # Atlas alanı yüzey alanına göre paylaştırılır: 2.2 m'lik kaktüs, 0.15 m'lik
 # çiçekle aynı kareyi alırsa ya kaktüs bulanık olur ya çiçekte doku israf edilir.
@@ -56,9 +63,13 @@ BOLGELER = {
     "ahsap":   (1024, 1024, 512, 1024),
     "cicek":   (1536, 1024, 512, 512),
     "dusman":  (0, 2048, 1024, 1024),
-    # Faz 11: oyuncu karakteri. Son boş 1024'lük slot buraya gitti; yeni bir
-    # nesne gelirse atlas 2048x4096'ya çıkacak.
+    # Faz 11: oyuncu karakteri. O sıranın son boş 1024'lük slotu buraya gitti.
     "oyuncu":  (1024, 2048, 1024, 1024),
+    # Faz 16: bölüm sonu canavarı. 2,4 m boyunda ve 2,4 m eninde — düşmanla
+    # aynı 1024'lük bölgeyi paylaşsaydı teksel yoğunluğu 155'e düşerdi
+    # (bant 250-420). 2048x1536'lık kendi bölgesiyle 279'a çıkıyor: bant
+    # içinde ve düşmanla aynı sınıfta görünüyor.
+    "boss":    (0, 3072, 2048, 1536),
 }
 # Boş kalan: (1536,1536,512,512)
 
@@ -73,6 +84,9 @@ RENKLER = {
     # Oyuncu kaktüsten biraz daha parlak ve mavimsi: süsleme kaktüsleriyle
     # karışmamalı, oyuncu ekranda bir bakışta bulunmalı.
     "oyuncu": (0.24, 0.56, 0.38),
+    # Boss düşmandan daha koyu ve daha mor: aynı aileden ama "bu başka bir
+    # şey" demesi gereken bir renk.
+    "boss":   (0.44, 0.20, 0.34),
 }
 
 
@@ -132,7 +146,7 @@ def atlas_uret(yol: str) -> None:
                     kaba = _deger_gurultusu(x, y, 96, tohum + 2)
                     ince = _deger_gurultusu(x, y, 24, tohum + 3)
                     k *= 0.80 + 0.28 * kaba + 0.12 * ince
-                elif ad == "dusman":
+                elif ad in ("dusman", "boss"):
                     kaba = _deger_gurultusu(x, y, 64, tohum + 4)
                     k *= 0.78 + 0.34 * kaba
                     if x % 40 < 4 and y % 40 < 4:
@@ -391,6 +405,7 @@ def disa_aktar(obj: bpy.types.Object, yol: str) -> None:
         export_apply=True,
         export_keep_originals=True,  # atlası kopyalama, ortak dosyaya başvur
     )
+    rig.bin_damgasi(yol)
 
 
 def main() -> int:

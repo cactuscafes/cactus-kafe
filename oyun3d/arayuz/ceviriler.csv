@@ -35,6 +35,9 @@ HUD_TUSLAR,WASD hareket · Shift koş · Space zıpla · R yeniden · Esc durakl
 OYUN_KONTROL,Kontrol noktası,Checkpoint
 OYUN_OLDUN,Kontrol noktasına döndün,Back to checkpoint
 OYUN_EKSIK_CICEK,Önce %d çiçeğin hepsini topla (%d kaldı),Collect all %d blooms first (%d left)
+OYUN_BOSS_BEKLIYOR,Çıkış kapalı — önce canavarı yen,The way out is sealed — defeat the beast first
+OYUN_BOSS_YENILDI,Canavar yenildi!,The beast is down!
+HUD_BOSS,Diken Ana,Thorn Mother
 BOLUM1_AD,Kaktüs Parkuru,Cactus Run
 BOLUM2_AD,Dikenli Kule,Thorn Tower
 BOLUM3_AD,Diken Köprüsü,Thorn Bridge

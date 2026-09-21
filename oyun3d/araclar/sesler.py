@@ -281,6 +281,29 @@ def hop() -> list[float]:
     return karistir(govde, [v * 0.35 for v in hava])
 
 
+def boss_carp() -> list[float]:
+    """Canavarın yere çarpması: derin bir gümbürtü + çakıl.
+
+    Düşmanın "ezme" sesinden farklı olmak zorunda: aynı aileden bir ses,
+    oyuncuya "bu da o düşman" diyor. Derin ve uzun olması boyu anlatıyor.
+    """
+    govde = uygula(sinus(0.55, 120, 38), zarf(int(0.55 * ORNEK), 0.005, 0.85))
+    catirti = uygula(alcak_gecir(gurultu(0.55, 17), 700.0),
+                     zarf(int(0.55 * ORNEK), 0.01, 0.75))
+    ince = uygula(alcak_gecir(gurultu(0.18, 23), 4200.0),
+                  zarf(int(0.18 * ORNEK), 0.01, 0.9))
+    return karistir(govde, [v * 0.7 for v in catirti], [v * 0.25 for v in ince])
+
+
+def boss_kukre() -> list[float]:
+    """Kükreme: evre değişiminin sesi. Alçalan iki ton + gürültü gövdesi."""
+    n = int(0.9 * ORNEK)
+    alt = uygula(sinus(0.9, 210, 90, "ucgen"), zarf(n, 0.08, 0.45))
+    ust = uygula(sinus(0.9, 320, 140), zarf(n, 0.12, 0.5))
+    hava = uygula(alcak_gecir(gurultu(0.9, 41), 1600.0), zarf(n, 0.1, 0.5))
+    return karistir(alt, [v * 0.5 for v in ust], [v * 0.45 for v in hava])
+
+
 def muzik_gerilim() -> list[float]:
     """Müziğin GERİLİM KATMANI — ana döngüyle aynı uzunlukta (16 sn).
 
@@ -372,6 +395,8 @@ def main() -> int:
     yaz("diken_at.wav", diken_at(), 0.6)
     yaz("diken_carp.wav", diken_carp(), 0.6)
     yaz("hop.wav", hop(), 0.6)
+    yaz("boss_carp.wav", boss_carp(), 0.72)
+    yaz("boss_kukre.wav", boss_kukre(), 0.68)
     yaz("kus.wav", kus(), 0.45)
     yaz("ruzgar.wav", ruzgar(), 0.5)
     yaz("muzik.wav", muzik(), 0.55)

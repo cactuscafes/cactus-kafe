@@ -11,13 +11,14 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 **TR**
 > Kaktüs Parkuru'nda çölün dikenleri arasında zıpla, çiçekleri topla, dikenli
 > düşmanların üstüne bin. Kısa, hızlı, rekor kırmaya dayalı bir 3B platform
-> oyunu. Altı bölüm, tek oturuşta bitiyor — ama en iyi sürene kolay kolay
-> ulaşamayacaksın.
+> oyunu. Altı bölüm ve sonunda seni sınayan bir canavar; tek oturuşta
+> bitiyor — ama en iyi sürene kolay kolay ulaşamayacaksın.
 
 **EN**
 > Hop across a thorny desert, collect the blooms, and bounce off spiny foes.
-> Cactus 3D is a short, fast, record-chasing 3D platformer. Six levels, one
-> sitting — beating your own best time is the hard part.
+> Cactus 3D is a short, fast, record-chasing 3D platformer. Six levels and a
+> boss to finish them off, all in one sitting — beating your own best time is
+> the hard part.
 
 ## Uzun açıklama
 
@@ -40,6 +41,11 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 > savunmasız kalır, uzaktan diken atanın yakın dövüşü yoktur — yanına varmak
 > yeter. Siper gerçekten siperdir: diken duvardan geçmez.
 >
+> **Sonunda bir canavar var.** Kalıbı gizli değil: saldırmadan önce poz
+> alıyor, yorulunca kafasını yere indiriyor. Yalnızca yorgunken
+> vurabiliyorsun — ve her vurduğunda kükreyip hızlanıyor. Üçüncü vuruş
+> birinciyle aynı dövüş değil.
+>
 > **Rekor senin rakibin.** Her bölüm süreni ve ölümünü kaydeder. Bölümü
 > bitirmek kolay; temiz bitirmek değil.
 
@@ -49,6 +55,7 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
   düşman bahçesi ve hepsini birden isteyen final
 - Tuş atama ekranı ve erişilebilirlik ayarları
 - Üç düşman türü: kovalayan, üstüne zıplayan ve uzaktan diken atan
+- Dört evreli bir bölüm sonu canavarı: kalıbı öğren, açığını bekle
 - Coyote süresi, zıplama tamponu, değişken zıplama yüksekliği
 - Bölüm başına süre ve ölüm rekoru
 - Tarayıcıda oynanır — indirme yok
@@ -57,7 +64,7 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 ## Etiketler
 
 `Platformer` · `3D Platformer` · `Precision Platformer` · `Speedrun` ·
-`Singleplayer` · `Colorful` · `Short` · `Casual` · `Indie`
+`Singleplayer` · `Colorful` · `Short` · `Casual` · `Indie` · `Boss Rush`
 
 ---
 

@@ -95,6 +95,7 @@ godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atam
 godot --headless --path oyun3d res://testler/karakter_testi.tscn     # model, iskelet, animasyon
 godot --headless --path oyun3d res://testler/ayak_ik_testi.tscn      # ayak zemine oturuyor mu
 godot --headless --path oyun3d res://testler/ses_testi.tscn          # ses kaydı, 3B, müzik katmanı
+godot --headless --fixed-fps 60 --path oyun3d res://testler/boss_testi.tscn  # dövüş kalıbı, açık penceresi
 xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
   --audio-driver Dummy res://testler/gorsel_testi.tscn            # aydınlatma + manzara
 godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
@@ -852,7 +853,7 @@ Ayrıntı ve Steam kuralları: [MAGAZA.md](MAGAZA.md).
 
 ---
 
-## Düşman ve dövüş (Faz 4, 14)
+## Düşman ve dövüş (Faz 4, 14, 16)
 
 ### Üç tür, tek durum makinesi (Faz 14)
 
@@ -883,6 +884,61 @@ Tür ve bölüme özel ayarlar veriden geliyor:
 görünür hazırlık; mermi duvardan geçmez; atıcı yerinden kıpırdamaz — yaklaşmak
 her zaman işe yarar. Kovalayan bir menzilli düşman oyuncuya kazanma yolu
 bırakmazdı.
+
+### Bölüm sonu canavarı (Faz 16)
+
+Üç düşman türü bir şeyler ÖĞRETİYORDU ama hiçbiri SINAMIYORDU: final bölümü
+zorluğu yoğunlukla kuruyordu ve yoğunluk bir doruk değil, aynı şeyin daha
+fazlası. Boss, öğrenilen üç şeyi — zamanlama, mesafe, siper — tek bir
+karşılaşmada arka arkaya soruyor.
+
+| Evre | Ne oluyor | Oyuncu ne yapıyor |
+|---|---|---|
+| **BEKLE** | Canavar oyuncuya yürüyor (2,6 m/sn) | Konum seçiyor |
+| **TELGRAF** | Saldırı pozu — DURUYOR (0,45 / 0,38 sn) | Kaçma penceresi |
+| **VURUŞ** | Çarpma (alan, 4,6 m) ya da üç dikenli yelpaze | Kaçtıysa ıskalıyor |
+| **SERSEM** | Kafa yerde, gövde çökük (2,4 sn) | Üstüne biniyor |
+
+**Tek açık, tek kural: canavar yalnızca SERSEM evresinde hasar alıyor.** Her an
+vurulabilseydi dövüş "yeterince zıpla" olurdu; hiç vurulamasaydı oyuncu ne
+yapacağını bilemezdi. Açığın ne zaman olduğunu animasyon söylüyor — sersem
+pozu diğer yedisinden bariz farklı. Yanlış anda üstüne binmek hasar vermiyor
+ama oyuncuyu **sektiriyor**: "vuramadım" ile "yanlış yaptım" arasındaki farkı
+anlatan şey o sektirme; sessizce hiçbir şey olmaması ikisini de aynı gösterir.
+
+> **Zorluk ritimle artıyor, sayıyla değil.** Canavarın canı 3 ama üçüncü vuruş
+> birinciyle aynı dövüş değil: her vuruşta kükrüyor, bekleme ×0,75 kısalıyor
+> (1,10 → 0,83 → 0,62 sn), sersem penceresi daralıyor ve kalıba bir saldırı
+> daha ekleniyor. Cana ya da hasara dokunmak "aynı dövüş, daha uzun" demekti;
+> nefesi kısmak "aynı dövüş, daha az hata payı" demek.
+
+İki saldırının seçimi **mesafeye** bağlı: yakında çarpma, uzakta diken
+yelpazesi. Hem dibinde durmak hem uzakta beklemek cezalı olmalı, yoksa dövüşün
+tek doğru yanıtı "uzakta bekle" olurdu.
+
+Bölüm 6'da **bitiş kilitli**: canavar yenilmeden çıkış açılmıyor
+(`OYUN_BOSS_BEKLIYOR`). Doruk noktasını atlayıp çıkışa yürüyebilmek, dövüşü
+isteğe bağlı bir süse çevirirdi.
+
+Model aynı hattan (`araclar/rig.py`) ve aynı atlastan çıkıyor: 9 kemik, 158
+üçgen, 2,43 m boy, sekiz animasyon — yeni doku, yeni malzeme yok.
+
+> **Bir dövüş neden TEST edilir:** boss, oyunun tek "elle ayarlanmış" anı.
+> Telgraf süresi, sersem penceresi ve kalıp uzunluğunun ancak birbirine göre
+> anlamı var; biri değişince dövüş sessizce imkânsız ya da anlamsız hâle
+> geliyor ve bunu fark etmek her seferinde bölümün sonuna kadar oynamak
+> demek. `testler/boss_testi` dövüşü betikle oynuyor: SERSEM dışında 42
+> denemede hasar girmediğini, sersem penceresinde girdiğini, ritmin gerçekten
+> hızlandığını ve bitiş kilidinin açıldığını ölçüyor. `--fixed-fps 60` şart —
+> vuruş duraklaması zaman ölçeğini 0,05'e indiriyor, gerçek zamanda her vuruş
+> saniyelerce sürüyor.
+
+**Bot dövüşmeyi bilmiyor** ve bu bilerek böyle: canavar bölüm 6'da botun
+ölümünü 11'den 23'e çıkardı (aynı bölüm, `Boss` düğümü silinerek ölçüldü).
+Bot telgrafı okumuyor, menzilden çıkmıyor, sersem penceresini beklemiyor —
+çiçeğin peşinde canavarın dibinde duruyor. Bu yüzden bölüm 6'nın ölüm bütçesi
+artık bir zorluk ölçüsü değil, yalnızca "daha kötüye gitmedi" nöbetçisi;
+dövüşün dengesini ölçen şey `boss_testi`.
 
 ### Rig ve animasyon (Faz 14)
 
@@ -1321,6 +1377,7 @@ oyun3d/
 │   ├── dusman_hoplayan.gd   Zıplayarak saldıran alt tür
 │   ├── dusman_atici.gd      Uzaktan diken atan alt tür
 │   ├── diken.gd             Atıcının mermisi (Area3D, ışınla ön sınama)
+│   ├── boss.gd              Bölüm sonu canavarı: evre kalıbı, açık penceresi
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
 │   ├── bolum_grafi.gd       Durak/menzil grafı — test ve bot ortak kullanıyor
 │   ├── bot/                 Otomatik oyuncu (denge ölçümü, par turu)
@@ -1357,6 +1414,9 @@ oyun3d/
 │   ├── denge_olc.gd         Botu bölümlere salar, denge sayılarını yazar
 │   ├── modeller.py          Varlık üretici (Blender/bpy)
 │   ├── karakter.py          Rig'li karakter + iskelet animasyonları (bpy)
+│   ├── rig.py               Ortak rig hattı: iskelet, ağırlık, poz, dışa aktarım
+│   ├── dusman_karakter.py   Rig'li düşman (bpy)
+│   ├── boss_karakter.py     Rig'li bölüm sonu canavarı (bpy)
 │   ├── sesler.py            Ses üretici
 │   ├── navmesh_uret.gd      Navigasyon örgüsü üretici (her bölüm için)
 │   ├── tanitim.gd           Trailer çekimi (oyun kendini oynar)
@@ -1372,6 +1432,7 @@ oyun3d/
     ├── ayak_ik_testi.gd     Ayak IK: düz zemin, rampa, basamak, havada
     ├── gorsel_testi.gd      Aydınlatma ölçümü + manzara denetimi (pencere ister)
     ├── ses_testi.gd         Ses kaydı, havuz, 3B, kısma, katmanlı müzik
+    ├── boss_testi.gd        Dövüş kalıbı, açık penceresi, bitiş kilidi
     ├── hayalet_testi.gd     Hayalet kaydı, aradeğerleme, HUD
     └── ag_testi.sh          İki süreçli ağ testi (+ ag_sunucu / ag_istemci)
 ```
@@ -1473,18 +1534,20 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (10 grup) | ✅ hepsi geçti (rig, hoplayan, atıcı, diken/duvar dahil) |
 | Ses testleri (8 grup) | ✅ kayıt, havuz, 3B, dinleyici, kısma, katmanlı müzik, çevre, gerilim |
-| Çeviri testleri | ✅ 79 anahtar × 2 dil, eksik yok |
+| Boss testi (5 grup) | ✅ SERSEM dışında 42 denemede hasar yok, betikli dövüş 652 karede bitti, ritim 1,10 → 0,83 → 0,62 sn, bitiş kilidi açıldı |
+| Çeviri testleri | ✅ 82 anahtar × 2 dil, eksik yok |
 | Performans bütçesi | ✅ altı bölüm bütçe içinde (67–81 draw call, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ayak IK testi (4 durum) | ✅ rampada bilek hatası 8,8 → 0,2 cm, basamakta 6,1 → 0,1 cm |
 | Görsel test (6 bölüm) | ✅ aydınlatma bütçe içinde, manzara çarpışmasız (Xvfb ile) |
-| Ağ testi (iki süreç) | ✅ 359 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
+| Ağ testi (iki süreç) | ✅ 360 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
+| Denge ölçümü (bot altı bölümü oynuyor) | ✅ altı art arda koşu, hepsi 23–25 sn, bütçe içinde |
 | Telemetri testi (7 grup) | ✅ gizlilik kuralları geçti |
 | Bölüm hattı testi (6 bölüm) | ✅ hepsi bitirilebilir; 100 durağın hepsi erişilebilir |
 | Tuş atama testi (5 grup) | ✅ InputMap, çakışma, kilitlenme, kayıt, ekran |
 | İstemci–sunucu sözleşmesi | ✅ 3 satır, 4 olay adı, 7 ret kuralı (Node ile) |
-| Basın kiti sayfası | ✅ Chromium'da açıldı, 11 görsel yüklendi, konsol hatası yok |
+| Basın kiti sayfası | ✅ Chromium'da açıldı, 12 görsel yüklendi, konsol hatası yok |
 | Demo dışa aktarımı | ✅ Windows + Web; tarayıcıda menü "Demo sürümü — ilk bölüm" ve tek bölüm gösterdi |
 | Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
@@ -1534,8 +1597,14 @@ açık kalan uçlar:
   görmüyor; her biri kendi durum makinesini yalnız yaşıyor.
 - **Yenilme tek tip** — her düşman aynı erime efektiyle gidiyor ve hepsi aynı
   sesi çıkarıyor. Tür başına ses ve yenilme, ucuz bir kimlik kazancı olurdu.
-- **Boss yok** — altı bölümün sonunda öğrenilenleri sınayan tek bir karşılaşma
-  yok; final bölümü bunu düşman yoğunluğuyla yapıyor.
+- **Tek boss** — Faz 16 bölüm 6'ya bir canavar koydu, ama oyunun tek dövüş
+  doruğu o. Ara bölümlerin kendi küçük "sınav" anları (mini boss, kovalamaca,
+  zamanlı kaçış) yok.
+- **Bot dövüşmeyi bilmiyor** — canavarın telgrafını okumuyor, menzilinden
+  çıkmıyor, sersem penceresini beklemiyor. Bölüm 6'nın ölüm sayısı bu yüzden
+  bir zorluk ölçüsü değil ("daha kötüye gitmedi" nöbetçisi); dövüşün dengesini
+  `testler/boss_testi` betikli bir dövüşle ölçüyor. Botu dövüştürmek, Faz
+  10'un graf temelli botuna bir durum makinesi daha eklemek demek.
 - **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
   içe aktarıcısı, Blender'da adı `-col` ile biten mesh'ler için otomatik
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.

@@ -106,13 +106,26 @@ func _ready() -> void:
 func _animasyon_kur() -> void:
 	if _oynatici == null:
 		return
-	for ad in ["yurume", "bosta", "kosma", "farketti", "saldiri", "ezildi"]:
-		if not _oynatici.has_animation(ad):
+	for ad in _donguye_alinacaklar():
+		var anim := _oynatici.get_animation(ad)
+		if anim == null:
+			# Eksik animasyon SESSİZ kalmamalı: alt tür kendi listesini
+			# vermeyi unuttuysa düşman donuk duruyor ve sebebi aranıyor.
 			push_warning("Düşman animasyonu eksik: %s" % ad)
-	_oynatici.get_animation("yurume").loop_mode = Animation.LOOP_LINEAR
-	_oynatici.get_animation("kosma").loop_mode = Animation.LOOP_LINEAR
-	_oynatici.get_animation("bosta").loop_mode = Animation.LOOP_LINEAR
-	_oynat("yurume")
+			continue
+		anim.loop_mode = Animation.LOOP_LINEAR
+	_oynat(_ilk_animasyon())
+
+## Döngüye alınacak animasyonlar — alt tür kendi kümesini veriyor. Boss'un
+## "kosma"sı yok, hoplayanın "zipla"sı var; ortak liste ikisine de uymuyor.
+func _donguye_alinacaklar() -> Array[String]:
+	return ["yurume", "kosma", "bosta"]
+
+func _ilk_animasyon() -> String:
+	return "yurume"
+
+func _yenilme_animasyonu() -> String:
+	return "ezildi"
 
 ## Animasyon oynatır. Aynı animasyon zaten oynuyorsa baştan başlatmıyor —
 ## her karede `play()` çağırmak animasyonu ilk karesinde dondurur.
@@ -316,7 +329,10 @@ func _gec(yeni: Durum) -> void:
 	match yeni:
 		Durum.YENILDI:
 			_zaman = 0.0
-			_oynatici.play("ezildi", 0.05)
+			# Yenilme animasyonu alt türe göre: boss çöküyor ("yenildi"),
+			# küçük düşman eziliyor ("ezildi"). Sabit ad yazmak boss'ta
+			# "Animation not found" yağmuruna yol açıyordu.
+			_oynat(_yenilme_animasyonu())
 			_kisma_iste()
 			Ses.cal_3b("dusman_oldu", global_position, ses_perdesi)
 			# Çarpışmayı kapat: yenilen düşmanın üstünde durulmasın.

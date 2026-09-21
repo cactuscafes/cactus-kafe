@@ -26,6 +26,9 @@ var _oyuncu: CharacterBody3D
 ## süzmek (gerilim hesabı için) kare başına bir dizi ayırıyordu; düşman
 ## sayısı sabit, liste de sabit olabilir.
 var _dusmanlar: Array[Node] = []
+## Bölümün canavarı (varsa). Bitiş, o yenilmeden açılmıyor.
+var _boss: Node = null
+var boss_yenildi := false
 
 func _ready() -> void:
 	_oyuncu = get_node(oyuncu_yolu)
@@ -40,6 +43,10 @@ func _ready() -> void:
 	_dusmanlar = _bolumdekiler("dusman")
 	for dugum in _dusmanlar:
 		dugum.yenildi.connect(_dusman_yenilince)
+	var bosslar := _bolumdekiler("boss")
+	if not bosslar.is_empty():
+		_boss = bosslar[0]
+		_boss.yenildi.connect(_boss_yenilince)
 	hedef_toplanabilir = cicekler.size()
 	Telemetri.olay("bolum_basladi", {"bolum": bolum_kimligi})
 	Ses.ortam_baslat(ortam_sesi)
@@ -83,11 +90,24 @@ func _gerilimi_guncelle() -> void:
 		# atlamak, listeyi her karede yeniden kurmaktan ucuz.
 		if is_instance_valid(d) and d.get("durum") in [1, 2, 3]:
 			pesimde += 1   # FARKETTI, KOVALA, SALDIRI
+	# Canavar tek başına iki düşman sayılıyor: dövüş başladığında müzik
+	# tavana çıkmalı, "bir düşman daha" gibi duyulmamalı.
+	if is_instance_valid(_boss) and _boss.get("durum") in [1, 2, 3]:
+		pesimde += 2
 	Ses.gerilim_ayarla(minf(float(pesimde) / 2.0, 1.0))
 
 func _toplayinca() -> void:
 	toplanan += 1
 	mesaj = ""
+	durum_degisti.emit()
+
+## Bölümün canavarı (yoksa null). HUD can çubuğunu buradan buluyor.
+func boss() -> Node:
+	return _boss
+
+func _boss_yenilince() -> void:
+	boss_yenildi = true
+	mesaj = tr("OYUN_BOSS_YENILDI")
 	durum_degisti.emit()
 
 func _dusman_yenilince() -> void:
@@ -109,7 +129,11 @@ func _olunce() -> void:
 func bitirmeyi_dene() -> void:
 	if bitti:
 		return
-	if toplanan < hedef_toplanabilir:
+	# Canavar varsa bitiş KİLİTLİ: doruk noktasını atlayıp çıkışa yürümek,
+	# dövüşü isteğe bağlı bir süse çevirirdi.
+	if _boss != null and not boss_yenildi:
+		mesaj = tr("OYUN_BOSS_BEKLIYOR")
+	elif toplanan < hedef_toplanabilir:
 		mesaj = tr("OYUN_EKSIK_CICEK") % [
 			hedef_toplanabilir, hedef_toplanabilir - toplanan,
 		]

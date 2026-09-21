@@ -26,7 +26,12 @@ var _sahibi: Node3D
 func kur(yon: Vector3, sahibi: Node3D) -> void:
 	_yon = yon.normalized()
 	_sahibi = sahibi
-	look_at(global_position + _yon, Vector3.UP)
+	# Yön neredeyse dikeyse (oyuncu tam tepede) `look_at` yukarı vektörüyle
+	# çakışıyor ve hata veriyor: mermi görünmez oluyor, üstelik konsol dolup
+	# taşıyor. Dikeyde başka bir yukarı seçiliyor — mermi için yalnızca
+	# görsel yön önemli, dönme ekseni değil.
+	var yukari := Vector3.UP if absf(_yon.dot(Vector3.UP)) < 0.99 else Vector3.FORWARD
+	look_at(global_position + _yon, yukari)
 
 func _ready() -> void:
 	add_to_group("mermi")

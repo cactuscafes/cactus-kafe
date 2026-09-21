@@ -6,11 +6,47 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.15\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.16\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.16.0 — Boss: dövüşün doruğu (Faz 16)
+
+- **Bölüm sonu canavarı.** Dokuz kemikli, 158 üçgenlik, 2,43 m boyunda bir
+  yaratık (`araclar/boss_karakter.py`) ve sekiz animasyon: bosta, yürüme,
+  çarpma, atış, sersem, sarsılma, kükreme, yenildi. Düşmanla aynı rig hattını
+  (`araclar/rig.py`) ve aynı atlası kullanıyor — yeni doku, yeni malzeme yok.
+- **Dört evreli kalıp.** BEKLE → TELGRAF → VURUŞ → SERSEM. Telgraf oyuncunun
+  kaçma penceresi (çarpmada 0,45 sn, atışta 0,38 sn); sersem canavarın açığı.
+- **Tek açık, tek kural: canavar yalnızca SERSEM evresinde hasar alıyor.** Her
+  an vurulabilseydi dövüş "yeterince zıpla" olurdu. Yanlış anda üstüne
+  binmek hasar vermiyor ama oyuncuyu sektiriyor: "vuramadım" ile "yanlış
+  yaptım" arasındaki farkı anlatan şey o sektirme.
+- **Zorluk ritimle artıyor, sayıyla değil.** Her vuruşta canavar kükrüyor;
+  bekleme %25 kısalıyor, sersem penceresi daralıyor, kalıba bir saldırı daha
+  ekleniyor. Canı 3 — ama üçüncü vuruş birinciyle aynı dövüş değil.
+- **İki saldırı, iki mesafe.** Yakında alan hasarlı çarpma, uzakta üç dikenli
+  yelpaze. Seçim mesafeye bağlı: hem uzakta beklemek hem dibinde durmak
+  cezalı, yoksa dövüşün tek doğru yanıtı "uzakta bekle" olurdu.
+- **Bitiş kilitli.** Bölüm 6'da canavar yenilmeden çıkış açılmıyor
+  (`OYUN_BOSS_BEKLIYOR`); doruk noktasını atlayıp çıkışa yürümek, dövüşü
+  isteğe bağlı bir süse çevirirdi. Zirve alanı dövüşe yer açmak için
+  büyütüldü.
+- **Gerilim müziği canavarı iki düşman sayıyor.** Faz 15'in katmanlı müziği
+  boss karşılaşmasında tavana yakın kalıyor.
+- **Boss testi** (`testler/boss_testi`): rig ve animasyon denetimi, SERSEM
+  dışında 42 deneme boyunca hasar ALMAMASI, betikle baştan sona oynanan tam
+  bir dövüş (652 kare), ritmin gerçekten hızlanması (1,10 → 0,83 → 0,62 sn)
+  ve bitiş kilidinin canavar yenilince açılması.
+- **Denge ölçer donuyordu — düzeltildi.** Bot bir bölümü BİTİRDİĞİNDE bitiş
+  ekranı `get_tree().paused = true` yapıyor; bot da ölçer de duraklanabilir
+  düğümlerdi, ikisi de o karede donuyor ve `await bot.bitti` sonsuza kadar
+  bekliyordu. Belirtisi şuydu: süreç yaşıyor, CPU dönüyor, hiçbir çıktı yok.
+  İkisi de `PROCESS_MODE_ALWAYS` oldu, her bölüm başında duraklatma
+  sıfırlanıyor, ve bir nöbetçi 60 sn gerçek zamanda ilerleme olmazsa NEDENİNİ
+  yazıp 1 ile çıkıyor — CI'da sessiz zaman aşımı yerine okunur bir hata.
 
 ## 0.15.0 — Ses: konum, çevre ve katmanlı müzik (Faz 15)
 

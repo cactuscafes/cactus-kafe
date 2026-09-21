@@ -60,7 +60,10 @@ const VERI := {
 			"renk": Color(0.54, 0.47, 0.36)},
 		{"ad": "Sarmal4", "konum": Vector3(4.0, 12.0, -40.5), "olcu": Vector3(3.6, 0.5, 3.6),
 			"renk": Color(0.54, 0.47, 0.36)},
-		{"ad": "Zirve", "konum": Vector3(0, 13.0, -37.0), "olcu": Vector3(7, 0.8, 7),
+		# ARENA (Faz 16): 7x7'lik zirve, canavar dövüşü için 15x13'e büyüdü.
+		# Kaçacak yer olmadan telgraflı saldırının anlamı kalmıyor: oyuncunun
+		# yana kaçabileceği en az bir çarpma menzili (4,6 m) boşluk gerekiyor.
+		{"ad": "Zirve", "konum": Vector3(0, 13.0, -37.0), "olcu": Vector3(15, 0.8, 13),
 			"renk": Color(0.45, 0.52, 0.42)},
 	],
 
@@ -95,7 +98,11 @@ const VERI := {
 		Vector3(-5.0, 7.7, -38.0),
 	],
 
-	"bitis": Vector3(0, 14.6, -37.0),
+	"bitis": Vector3(0, 14.6, -33.0),
+
+	# Bölüm sonu canavarı. Arenanın uzak ucunda bekliyor: oyuncu zirveye
+	# çıktığında onu KARŞIDAN görüyor, sırtına basmıyor.
+	"boss": {"konum": Vector3(0, 13.5, -41.0), "aci": 180.0},
 
 	"dusmanlar": [
 		{"konum": Vector3(0, 2.9, -7.5), "aci": 90.0, "devriye_ucu": Vector3(2.0, 0, 0)},

@@ -320,6 +320,36 @@ kaldı — ve ses, sessizce bozulan şeylerin başında geliyor.
   bankası (şu an perde kaydırmasıyla ayrışıyorlar), müziğin bölüme göre
   değişmesi ve gerçek kayıt/mix — sentez, lisanslı sesin yerine geçmiyor.
 
+### Faz 16 — **Boss: dövüşün doruğu** (Faz 15 sonrası)
+Üç düşman türü (Faz 14) bir şeyler öğretiyordu ama hiçbiri sınamıyordu.
+Altı bölümün sonunda "işte bunu öğrendin, şimdi göster" diyen bir an yoktu;
+final bölümü zorluğu yoğunlukla kuruyordu — yoğunluk bir doruk değil.
+- **Durum: bitti** → dokuz kemikli, 158 üçgenlik bölüm sonu canavarı
+  ([`araclar/boss_karakter.py`](oyun3d/araclar/boss_karakter.py)) ve dört
+  evreli kalıp: BEKLE → TELGRAF → VURUŞ → SERSEM
+  ([`betikler/boss.gd`](oyun3d/betikler/boss.gd)). Canavar yalnızca SERSEM
+  evresinde hasar alıyor; her vuruşta kükreyip ritmi hızlandırıyor. Bölüm 6'da
+  bitiş, canavar yenilmeden açılmıyor.
+- **Karar: zorluk ritimle artsın, sayıyla değil.** Cana ya da hasara dokunmak
+  "aynı dövüş, daha uzun" demekti. Bekleme her evrede ×0,75 kısalıyor
+  (1,10 → 0,83 → 0,62 sn), sersem penceresi daralıyor, kalıba bir saldırı daha
+  ekleniyor: aynı dövüş, daha az nefes.
+- **Öğrenilen: bir dövüş elle test edilemez.** Telgraf süresi, sersem
+  penceresi ve kalıp uzunluğunun ancak birbirine göre anlamı var; biri
+  değişince dövüş sessizce imkânsız ya da anlamsız oluyor. `boss_testi`
+  dövüşü betikle baştan sona oynuyor — elle denemek her seferinde bölümün
+  sonuna kadar oynamak demekti.
+- **Yan ürün: denge ölçerin donması çözüldü.** Bot bir bölümü BİTİRDİĞİNDE
+  bitiş ekranı ağacı duraklatıyordu; bot da ölçer de duraklanabilir
+  düğümlerdi ve `await bot.bitti` sonsuza kadar bekliyordu. Belirti aldatıcı:
+  süreç yaşıyor, CPU dönüyor, tek satır çıktı yok. Ders, ölçüm aracının
+  ölçtüğü şeyin kurallarına TABİ OLMAMASI gerektiği; ikinci ders, sessiz
+  donmaya karşı nöbetçi koymak (artık 60 sn ilerleme yoksa nedenini yazıp
+  çıkıyor).
+- **Kalan:** bot dövüşmeyi bilmiyor (canavar botun ölümünü 11'den 23'e
+  çıkardı), tek boss var — ara bölümlerin kendi sınav anları yok, ve dövüşün
+  ikinci evresi hâlâ birincinin hızlısı: yeni bir saldırı değil.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

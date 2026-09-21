@@ -7,7 +7,7 @@
   "cicek": {
     "atlas_px": [
       2048,
-      3072
+      4608
     ],
     "bolge": "cicek",
     "bolge_px": [
@@ -32,7 +32,7 @@
   "kaktus": {
     "atlas_px": [
       2048,
-      3072
+      4608
     ],
     "bolge": "kaktus",
     "bolge_px": [
@@ -57,7 +57,7 @@
   "kaya": {
     "atlas_px": [
       2048,
-      3072
+      4608
     ],
     "bolge": "kaya",
     "bolge_px": [
@@ -82,7 +82,7 @@
   "sandik": {
     "atlas_px": [
       2048,
-      3072
+      4608
     ],
     "bolge": "sandik",
     "bolge_px": [
@@ -107,7 +107,7 @@
   "tabela": {
     "atlas_px": [
       2048,
-      3072
+      4608
     ],
     "bolge": "ahsap",
     "bolge_px": [

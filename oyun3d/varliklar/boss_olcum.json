@@ -1,0 +1,34 @@
+{
+  "ucgen": 158,
+  "boy_m": 2.434,
+  "en_m": 2.38,
+  "kemik": 9,
+  "teksel_m": 259.0,
+  "animasyon": {
+    "bosta": 2.2,
+    "yurume": 1.167,
+    "carpma": 1.1,
+    "atis": 0.9,
+    "sersem": 1.2,
+    "sarsilma": 0.45,
+    "kukreme": 1.1,
+    "yenildi": 1.4
+  },
+  "adim_m": {
+    "yurume": 1.517
+  },
+  "hiz": {
+    "yurume": 2.6
+  },
+  "kemik_koseleri": {
+    "Kok": 6,
+    "Govde": 30,
+    "Kafa": 5,
+    "Cene": 13,
+    "KolSol": 24,
+    "KolSag": 24,
+    "BacakSol": 3,
+    "BacakSag": 2,
+    "Kuyruk": 4
+  }
+}

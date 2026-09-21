@@ -52,6 +52,9 @@ const EFEKTLER := {
 	"diken_carp": preload("res://ses/diken_carp.wav"),
 	"hop": preload("res://ses/hop.wav"),
 	"kus": preload("res://ses/kus.wav"),
+	# Faz 16
+	"boss_carp": preload("res://ses/boss_carp.wav"),
+	"boss_kukre": preload("res://ses/boss_kukre.wav"),
 }
 
 ## Çevre döngüleri — bölüm verisinden seçiliyor ("ortam_sesi").

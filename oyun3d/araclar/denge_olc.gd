@@ -18,10 +18,35 @@ const BOT := preload("res://betikler/bot/otomatik_oyuncu.gd")
 const RAPOR_YOLU := "user://denge.json"
 const BUTCE_YOLU := "res://denge_butce.json"
 
+## Bir bölüm için AZAMİ GERÇEK ZAMAN. Oyun içi süre değil duvar saati:
+## `--fixed-fps` ile altı bölüm ~20 saniyede oynanıyor, en yavaş bölüm 6 sn.
+## 60 saniye "yavaşladı" değil "durdu" demek.
+const _AZAMI_GERCEK_MS := 60000
+
 var _ayrintili := false
 var _par_yaz := false
+var _su_bolum := ""
+var _bolum_basladi := 0
+
+## Nöbetçi. Ölçer bir kez donduğunda (ağaç duraklı kaldığında) hiçbir şey
+## yazmadan saatlerce dönüyordu; CI'da bu "timeout 300" satırından başka iz
+## bırakmıyor. Donarsa artık NEDEN donduğunu söyleyip 1 ile çıkıyor.
+func _process(_delta: float) -> void:
+	if _su_bolum.is_empty():
+		return
+	if Time.get_ticks_msec() - _bolum_basladi < _AZAMI_GERCEK_MS:
+		return
+	printerr("  ! %s: %d sn gerçek zamanda ilerlemedi (ağaç duraklı: %s)"
+		% [_su_bolum, _AZAMI_GERCEK_MS / 1000, get_tree().paused])
+	printerr("DENGE: NÖBETÇİ DURDURDU")
+	get_tree().quit(1)
 
 func _ready() -> void:
+	# Ölçüm aracı oyunun duraklatmasından ETKİLENMEMELİ. Bölüm bitince bitiş
+	# ekranı `get_tree().paused = true` yapıyor (doğru davranış: oyuncu sonucu
+	# okuyor). Ölçer duraklanabilir kalsaydı orada sonsuza kadar donardı —
+	# nitekim donuyordu; nöbetçi (`_AZAMI_GERCEK_MS`) o donmayı yakalıyor.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	await get_tree().process_frame
 	var istenen := ""
 	var ayrintili := false
@@ -94,6 +119,9 @@ func _oyna(bilgi: Dictionary) -> Dictionary:
 		# eski kaydı siliyoruz ki bu tur mutlaka kaydedilsin.
 		DirAccess.remove_absolute(
 			ProjectSettings.globalize_path(HayaletKayit.yol(kimlik)))
+	# Önceki bölüm bitiş ekranıyla kapandıysa ağaç hâlâ duraklı: yeni bölüm
+	# eklenir ama hiçbir şey işlemez.
+	get_tree().paused = false
 	var kok: Node3D = (load(bilgi["sahne"]) as PackedScene).instantiate()
 	get_tree().root.add_child(kok)
 	await get_tree().physics_frame
@@ -101,11 +129,20 @@ func _oyna(bilgi: Dictionary) -> Dictionary:
 
 	var bot: Node = BOT.new()
 	bot.name = "Bot"
+	# Bot da duraklatmayı aşıyor: bölüm bitiş alanı `bolum_bitti` yayınladığı
+	# ANDA ağaç duruyor, bot bunu ancak bir sonraki karede görüp `bitti`
+	# sinyalini yayınlıyor. Duraklanabilir bot o kareye hiç gelemez ve ölçer
+	# `await bot.bitti`de sonsuza kadar bekler.
+	bot.process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().root.add_child(bot)
 	bot.ayrintili = _ayrintili
 	bot.kur(kok)
+	_bolum_basladi = Time.get_ticks_msec()
+	_su_bolum = kimlik
 	var sonuc: Dictionary = await bot.bitti
+	_su_bolum = ""
 	bot.queue_free()
+	get_tree().paused = false
 
 	if _par_yaz and bool(sonuc["bitise_ulasti"]):
 		_par_kaydet(kimlik, kok)

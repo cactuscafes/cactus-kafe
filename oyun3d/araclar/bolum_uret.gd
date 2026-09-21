@@ -42,6 +42,7 @@ const TUZAK_MALZEME := preload("res://golgeler/tuzak_malzeme.tres")
 const ORTAM_SAHNE := preload("res://sahneler/ortam.tscn")
 const DUNYA_GOLGE := preload("res://golgeler/dunya.gdshader")
 const MANZARA_BETIK := preload("res://betikler/manzara.gd")
+const BOSS := preload("res://sahneler/boss.tscn")
 
 ## Süsleme adı -> model. Veride "tur" alanı bunlardan biri olmalı.
 const SUSLER := {
@@ -142,6 +143,7 @@ func _sahne_kur(veri: Dictionary) -> Node3D:
 	_susleme_ekle(kok, veri)
 	_manzara_ekle(kok, veri)
 	_dusmanlari_ekle(kok, veri)
+	_boss_ekle(kok, veri)
 	_birlestirici_ekle(kok)
 	_oyuncu_ekle(kok, veri)
 	_oyun_ekle(kok, veri)
@@ -434,6 +436,25 @@ func _dusmanlari_ekle(kok: Node3D, veri: Dictionary) -> void:
 					veri["kimlik"], tur, alan])
 		_ekle(kap, dugum, kok)
 
+## Bölüm sonu canavarı (Faz 16). Verideki "boss" sözlüğü: konum + ayarlar.
+## Düşmanlarla aynı kaba DEĞİL kendi düğümüne konuyor: bitişi kilitleyen,
+## can çubuğu olan ve müziği tavana çıkaran tek düğüm o; aranması kolay olmalı.
+func _boss_ekle(kok: Node3D, veri: Dictionary) -> void:
+	var b: Dictionary = veri.get("boss", {})
+	if b.is_empty():
+		return
+	var dugum: Node3D = BOSS.instantiate()
+	dugum.name = "Boss"
+	dugum.transform = Transform3D(
+		Basis(Vector3.UP, deg_to_rad(b.get("aci", 0.0))), b["konum"])
+	for alan: String in b.get("ayarlar", {}):
+		if alan in dugum:
+			dugum.set(alan, b["ayarlar"][alan])
+		else:
+			_hatalar.append("%s: boss'ta böyle bir ayar yok: %s" % [
+				veri["kimlik"], alan])
+	_ekle(kok, dugum, kok)
+
 ## Faz 6: aynı mesh'i paylaşan görselleri tek MultiMesh'te birleştiriyor.
 func _birlestirici_ekle(kok: Node3D) -> void:
 	var dugum := Node3D.new()
@@ -486,6 +507,54 @@ func _hud_ekle(kok: Node3D) -> void:
 		Color(0.902, 0.925, 0.898), false)
 	olcum.anchor_top = 1.0
 	olcum.anchor_bottom = 1.0
+	_boss_cubugu(hud, kok)
+
+## Canavarın can çubuğu (Faz 16). Ekranın üst ortasında, dövüş başlayınca
+## görünüyor. Sayı değil ÇUBUK: oyuncunun gözü dövüş sırasında rakamı
+## okuyamıyor, çubuğun kısalmasını görüyor.
+func _boss_cubugu(hud: CanvasLayer, kok: Node) -> void:
+	var kutu := Control.new()
+	kutu.name = "BossCan"
+	kutu.unique_name_in_owner = true
+	kutu.anchor_left = 0.5
+	kutu.anchor_right = 0.5
+	kutu.offset_left = -220.0
+	kutu.offset_right = 220.0
+	kutu.offset_top = 96.0
+	kutu.offset_bottom = 132.0
+	kutu.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	kutu.visible = false
+	_ekle(hud, kutu, kok)
+
+	var ad := Label.new()
+	ad.name = "Ad"
+	ad.text = "HUD_BOSS"
+	ad.offset_right = 440.0
+	ad.offset_bottom = -4.0
+	ad.offset_top = -26.0
+	ad.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ad.add_theme_font_size_override("font_size", 20)
+	ad.add_theme_color_override("font_color", Color(1.0, 0.86, 0.86))
+	ad.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	ad.add_theme_constant_override("outline_size", 6)
+	_ekle(kutu, ad, kok)
+
+	var zemin := ColorRect.new()
+	zemin.name = "Zemin"
+	zemin.color = Color(0.08, 0.05, 0.07, 0.75)
+	zemin.offset_right = 440.0
+	zemin.offset_bottom = 18.0
+	_ekle(kutu, zemin, kok)
+
+	var dolu := ColorRect.new()
+	dolu.name = "Dolu"
+	dolu.unique_name_in_owner = true
+	dolu.color = Color(0.82, 0.25, 0.35)
+	dolu.offset_left = 3.0
+	dolu.offset_top = 3.0
+	dolu.offset_right = 437.0
+	dolu.offset_bottom = 15.0
+	_ekle(kutu, dolu, kok)
 
 func _etiket(hud: CanvasLayer, kok: Node, ad: String, sol_ust: Vector2,
 		sag_alt: Vector2, boyut: int, renk: Color, anahat_koyu: bool) -> Label:

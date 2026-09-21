@@ -27,6 +27,10 @@ const KADRAJLAR := [
 	["09_teras", "res://sahneler/bolum4.tscn", Vector3(0, 2.6, 4.4), 8.0, 40],
 	["10_bahce", "res://sahneler/bolum5.tscn", Vector3(0, 1.6, -2.0), -6.0, 50],
 	["11_zirve", "res://sahneler/bolum6.tscn", Vector3(0, 3.4, -7.5), 0.0, 40],
+	# Faz 16: doruk noktası. Oyuncu arenanın ağzına, canavar kadrajın
+	# karşısına düşüyor — mağaza sayfasında "sonunda ne var" sorusunun
+	# cevabı tek karede görünmeli.
+	["12_canavar", "res://sahneler/bolum6.tscn", Vector3(3.8, 14.2, -35.6), 22.0, 50],
 	# Son kare mobil kontrolleri gösteriyor: mağaza sayfasında "telefonda da
 	# oynanır" iddiasının kanıtı ekran görüntüsüdür, cümle değil.
 	["07_mobil", "res://sahneler/bolum1.tscn", Vector3(0, 1.2, 4), 0.0, 40, true],

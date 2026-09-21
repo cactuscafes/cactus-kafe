@@ -14,6 +14,9 @@ işaretleri kemik başına bir kez ölçülüp bir tabloya yazılıyor (`yon`
 sözlükleri). "Sağ bacak ters sallanıyor" hatasının kaynağı hep budur.
 """
 
+import json
+import os
+
 import bpy
 from mathutils import Vector
 
@@ -180,3 +183,32 @@ def disa_aktar(mesh: bpy.types.Object, arm: bpy.types.Object, yol: str) -> None:
         export_optimize_animation_size=False,
         export_keep_originals=True,
     )
+    bin_damgasi(yol)
+
+
+def bin_damgasi(gltf_yolu: str) -> None:
+    """glTF'e yanındaki .bin dosyasının özetini yazar.
+
+    TUZAK — GODOT SADECE .gltf'İN HASH'İNE BAKIYOR: geometri ve UV'ler yan
+    dosyada (.bin) duruyor. Model değişip .gltf metni aynı kalırsa (sık olur:
+    aynı sayıda köşe, aynı malzeme) Godot içe aktarımı ATLAMIYOR mu? Atlıyor —
+    ve oyunda hâlâ ESKİ mesh görünüyor. Faz 16'da atlas büyüdü, UV'ler
+    değişti, .gltf metni aynı kaldı ve varlık testi "UV bölge dışında" diye
+    bağırdı; sebebi varlık değil önbellekti.
+
+    Çözüm: .bin'in özetini .gltf'e yazmak. Böylece geometri değiştiğinde
+    .gltf de değişiyor ve Godot yeniden içe aktarıyor.
+    """
+    import hashlib
+    with open(gltf_yolu, "r", encoding="utf-8") as f:
+        veri = json.load(f)
+    klasor = os.path.dirname(gltf_yolu)
+    ozet = hashlib.sha1()
+    for tampon in veri.get("buffers", []):
+        yol = tampon.get("uri")
+        if yol and not yol.startswith("data:"):
+            with open(os.path.join(klasor, yol), "rb") as b:
+                ozet.update(b.read())
+    veri.setdefault("asset", {}).setdefault("extras", {})["bin_sha1"] = ozet.hexdigest()
+    with open(gltf_yolu, "w", encoding="utf-8") as f:
+        json.dump(veri, f, ensure_ascii=False, separators=(",", ":"))

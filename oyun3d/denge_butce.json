@@ -6,5 +6,6 @@
   "bolum3": { "bitis_bekleniyor": true,  "azami_sure": 75, "azami_olum": 12, "asgari_cicek": 0.5 },
   "bolum4": { "bitis_bekleniyor": true,  "azami_sure": 75, "azami_olum": 9,  "asgari_cicek": 0.6 },
   "bolum5": { "bitis_bekleniyor": false, "azami_olum": 8,  "asgari_cicek": 0.3 },
-  "bolum6": { "bitis_bekleniyor": false, "azami_olum": 16, "asgari_cicek": 0.3 }
+  "_bolum6": "Faz 16'da canavar geldi ve bot ölümü 11'den 23'e çıktı (aynı bölüm, Boss düğümü silinerek ölçüldü). Sebep bölümün zorlaşması DEĞİL, botun dövüşmeyi bilmemesi: telgrafı okumuyor, menzilden çıkmıyor, sersem penceresini beklemiyor — çiçeğin peşinde canavarın dibinde duruyor. Bu yüzden bolum6 ölüm sayısı artık bir zorluk ölçüsü değil, yalnızca 'daha kötüye gitmedi' nöbetçisi. Dövüşün dengesini ölçen şey testler/boss_testi.",
+  "bolum6": { "bitis_bekleniyor": false, "azami_olum": 28, "asgari_cicek": 0.3 }
 }

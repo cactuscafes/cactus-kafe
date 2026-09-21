@@ -15,6 +15,12 @@ const BUTCE_MS := 16.6
 @onready var _olcum: Label = $Olcum
 @onready var _can: Label = %Can
 @onready var _hayalet_etiketi: Label = %Hayalet
+## Canavar can çubuğu — yalnızca canavarı olan bölümlerde var (Faz 16).
+@onready var _boss_kutu: Control = get_node_or_null("%BossCan")
+@onready var _boss_dolu: ColorRect = get_node_or_null("%Dolu")
+
+var _boss: Node = null
+var _boss_genislik := 0.0
 
 var _oyun: Node
 var _hayalet: Node
@@ -28,8 +34,27 @@ func _ready() -> void:
 	var oyuncu := get_node(oyuncu_yolu)
 	oyuncu.can_degisti.connect(_cani_yaz)
 	_cani_yaz(oyuncu.can, oyuncu.can_max)
+	_boss_kur()
 	_durumu_yaz()
 	_olcumu_yaz()
+
+## Canavar varsa çubuğu bağlar. Çubuk bölüm başında GÖRÜNMÜYOR: dövüş
+## başlamadan ekranda duran bir can çubuğu, oyuncuya olmayan bir tehdidi
+## işaret ediyor.
+func _boss_kur() -> void:
+	if _boss_kutu == null or not _oyun.has_method("boss"):
+		return
+	_boss = _oyun.boss()
+	if _boss == null:
+		return
+	_boss_genislik = _boss_dolu.offset_right - _boss_dolu.offset_left
+	_boss.can_degisti.connect(_boss_cani_yaz)
+
+func _boss_cani_yaz(can: int, en_fazla: int) -> void:
+	if _boss_dolu == null:
+		return
+	var oran := clampf(float(can) / maxf(float(en_fazla), 1.0), 0.0, 1.0)
+	_boss_dolu.offset_right = _boss_dolu.offset_left + _boss_genislik * oran
 
 func _process(delta: float) -> void:
 	_durum.text = tr("HUD_DURUM") % [
@@ -49,6 +74,11 @@ func _process(delta: float) -> void:
 		_hayalet_etiketi.text = "%s %+.2f" % [tr(etiket), f]
 		_hayalet_etiketi.add_theme_color_override("font_color",
 			Color(0.42, 0.9, 0.55) if f <= 0.0 else Color(1.0, 0.55, 0.45))
+
+	# Çubuk dövüş başlayınca görünüyor: canavar oyuncuyu fark ettiğinde.
+	if _boss_kutu != null:
+		_boss_kutu.visible = (is_instance_valid(_boss)
+			and _boss.get("durum") in [1, 2, 3] and not _oyun.bitti)
 
 	_sayac -= delta
 	if _sayac <= 0.0:

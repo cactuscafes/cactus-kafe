@@ -27,6 +27,6 @@ func _process(delta: float) -> void:
 	position.y = _taban + sin(_t * 2.0) * salinim
 
 func _giren(_govde: Node3D) -> void:
-	Ses.cal("toplama", 0.8)
+	Ses.cal_3b("toplama", global_position, 0.8)
 	alindi.emit()
 	queue_free()

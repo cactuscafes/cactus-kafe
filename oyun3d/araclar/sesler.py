@@ -10,6 +10,11 @@ daha iyi sonuç verir — Faz 3'ün asıl dersi lisans okumak ve ses seçmektir.
 ortamda o siteler kapalı olduğu için sesler üretiliyor. Yerlerine gerçek ses
 koyacaksan dosya adlarını koru; oyun kodunda değişiklik gerekmez.
 
+FAZ 15 — ÇEVRE VE KATMANLI MÜZİK: rüzgâr döngüsü, kuş ötüşü, tür başına
+düşman sesleri ve müziğin GERİLİM KATMANI eklendi. Gerilim katmanı ana
+döngüyle aynı uzunlukta ve aynı akorlar üzerine kurulu: ikisi aynı anda
+çalıyor, biri kısık duruyor (bkz. `betikler/ses.gd`).
+
 TASARIM NOTU: Her efekt kısa (0.05–0.9 sn) ve tepe seviyesi -3 dBFS'e
 normalize. Aynı anda birkaç ses çalınca kırpma olmasın diye SFX bus'ı -6 dB'de
 başlıyor (bkz. default_bus_layout.tres).
@@ -208,6 +213,106 @@ def tik() -> list[float]:
     return uygula(ton, zarf(len(ton), 0.05, 0.8))
 
 
+# --- Faz 15: çevre, tür sesleri ve müzik katmanı ---------------------------
+
+def ruzgar() -> list[float]:
+    """8 saniyelik döngü: çölün rüzgârı.
+
+    Süzgeçten geçmiş gürültü + yavaş bir genlik dalgalanması. Döngü noktasında
+    duyulmaması için baş ve son 0,4 saniye birbirine karıştırılıyor (crossfade);
+    aksi hâlde her 8 saniyede bir 'tık' duyuluyor ve arka plan sesi, varlığını
+    en çok o tıkla belli ediyor.
+    """
+    uzunluk = 8.0
+    n = int(uzunluk * ORNEK)
+    ham = alcak_gecir(alcak_gecir(gurultu(uzunluk + 0.5, 77), 420.0), 900.0)
+    veri = []
+    for i in range(len(ham)):
+        t = i / ORNEK
+        # İki yavaş LFO: tek LFO nefes alıp veren bir makine gibi duyuluyor.
+        dalga = 0.55 + 0.30 * math.sin(2 * math.pi * 0.11 * t) \
+            + 0.15 * math.sin(2 * math.pi * 0.037 * t + 1.3)
+        veri.append(ham[i] * dalga)
+    kesisme = int(0.4 * ORNEK)
+    dongu = veri[:n]
+    for i in range(kesisme):
+        oran = i / kesisme
+        dongu[i] = dongu[i] * oran + veri[n + i] * (1.0 - oran)
+    return dongu
+
+
+def kus() -> list[float]:
+    """Tek bir kuş ötüşü: üç kısa cik. Çevre sesi motoru rastgele aralıklarla
+    çalıyor — döngüye gömülü bir kuş, üçüncü tekrarda sahte duyuluyor."""
+    parcalar = []
+    for i, (bas, son) in enumerate(((2400, 3100), (2900, 2500), (2600, 3300))):
+        ton = sinus(0.055, bas, son)
+        parcalar.append(uygula(ton, zarf(len(ton), 0.15, 0.6)))
+        if i < 2:
+            parcalar.append([0.0] * int(0.06 * ORNEK))
+    cikti = []
+    for p in parcalar:
+        cikti.extend(p)
+    return cikti
+
+
+def diken_at() -> list[float]:
+    """Atıcının fırlatışı: kısa bir 'tss' + alçalan ton."""
+    hava = uygula(alcak_gecir(gurultu(0.16, 5), 3000.0),
+                  zarf(int(0.16 * ORNEK), 0.02, 0.85))
+    ton = uygula(sinus(0.16, 900, 380, "ucgen"), zarf(int(0.16 * ORNEK), 0.01, 0.9))
+    return karistir(hava, [v * 0.5 for v in ton])
+
+
+def diken_carp() -> list[float]:
+    """Dikenin taşa saplanması: tok, kısa."""
+    vurus = uygula(alcak_gecir(gurultu(0.09, 9), 1400.0),
+                   zarf(int(0.09 * ORNEK), 0.01, 0.9))
+    ton = uygula(sinus(0.09, 320, 140), zarf(int(0.09 * ORNEK), 0.01, 0.95))
+    return karistir(vurus, [v * 0.6 for v in ton])
+
+
+def hop() -> list[float]:
+    """Hoplayanın sıçrayışı: yukarı kayan kısa bir homurtu."""
+    ton = sinus(0.22, 180, 420, "ucgen")
+    govde = uygula(ton, zarf(len(ton), 0.05, 0.6))
+    hava = uygula(alcak_gecir(gurultu(0.22, 3), 1100.0),
+                  zarf(int(0.22 * ORNEK), 0.2, 0.7))
+    return karistir(govde, [v * 0.35 for v in hava])
+
+
+def muzik_gerilim() -> list[float]:
+    """Müziğin GERİLİM KATMANI — ana döngüyle aynı uzunlukta (16 sn).
+
+    Uyarlanan müzik burada iki parçayı karıştırıp bir üçüncüsünü üretmek
+    değil: iki parça AYNI ANDA baştan çalıyor, biri kısık duruyor ve düşman
+    kovalarken açılıyor. Bu yüzden bu katmanın uzunluğu ve tempo ızgarası ana
+    döngüyle birebir aynı olmak zorunda — yoksa iki parça kayar ve açılış
+    anında akort tutmaz.
+    """
+    uzunluk = 16.0
+    n = int(uzunluk * ORNEK)
+    cikti = [0.0] * n
+    # Kök notaların altına inen bir drone: ana döngünün akorlarıyla uyumlu.
+    for frek, oran in ((110.0, 0.30), (146.83, 0.16)):
+        faz = 0.0
+        for i in range(n):
+            faz += 2 * math.pi * frek / ORNEK
+            t = i / n
+            # Gerilim yavaşça artıyor: döngü boyunca hafif bir kabarma.
+            kabarma = 0.75 + 0.25 * math.sin(2 * math.pi * t)
+            cikti[i] += (math.sin(faz) * 0.7 + math.sin(faz * 2.01) * 0.3) * oran * kabarma
+    # Nabız: saniyede iki vuruş, kalp atışı temposu.
+    vurus_sure = 0.5
+    for adet in range(int(uzunluk / vurus_sure)):
+        basla = int(adet * vurus_sure * ORNEK)
+        vurus = uygula(sinus(0.16, 150, 60), zarf(int(0.16 * ORNEK), 0.01, 0.9))
+        for k, v in enumerate(vurus):
+            if basla + k < n:
+                cikti[basla + k] += v * (0.5 if adet % 2 == 0 else 0.3)
+    return cikti
+
+
 def muzik() -> list[float]:
     """16 saniyelik döngü: yumuşak pad akorları + hafif arpej.
 
@@ -264,7 +369,13 @@ def main() -> int:
     yaz("dusman_farketti.wav", dusman_farketti(), 0.6)
     yaz("dusman_saldiri.wav", dusman_saldiri(), 0.6)
     yaz("tik.wav", tik(), 0.5)
+    yaz("diken_at.wav", diken_at(), 0.6)
+    yaz("diken_carp.wav", diken_carp(), 0.6)
+    yaz("hop.wav", hop(), 0.6)
+    yaz("kus.wav", kus(), 0.45)
+    yaz("ruzgar.wav", ruzgar(), 0.5)
     yaz("muzik.wav", muzik(), 0.55)
+    yaz("muzik_gerilim.wav", muzik_gerilim(), 0.5)
     toplam = sum(os.path.getsize(os.path.join(SES, f)) for f in os.listdir(SES)
                  if f.endswith(".wav"))
     print("toplam %.2f MB" % (toplam / 1e6))

@@ -71,3 +71,12 @@ script = ExtResource("2_kamera")
 [node name="Kamera" type="Camera3D" parent="KameraKolu"]
 current = true
 fov = 70.0
+
+; Faz 15 — DİNLEYİCİ: 3B sesler varsayılan olarak KAMERADAN duyuluyor, yani
+; karakterin 5 m arkasından. Üçüncü şahıs oyunda bu, karakterin hemen yanındaki
+; düşmanı "uzakta" duymaya yol açıyor. Dinleyici kameranın çocuğu (yön ondan
+; gelsin: sağdaki ses sağdan duyulsun) ama karaktere doğru 2,6 m kaydırılmış —
+; konum karakterin, yön kameranın.
+[node name="Dinleyici" type="AudioListener3D" parent="KameraKolu/Kamera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.6)
+current = true

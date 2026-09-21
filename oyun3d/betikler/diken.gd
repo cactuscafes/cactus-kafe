@@ -58,6 +58,9 @@ func _carpisma_var_mi(adim: float) -> Node3D:
 func _degdi(govde: Node3D) -> void:
 	if govde == _sahibi:
 		return
+	# Çarpma sesi 3B: oyuncu, ıskalayan dikenin nereye saplandığını duyarak
+	# atıcının yerini öğreniyor.
+	Ses.cal_3b("diken_carp", global_position, 1.0)
 	if govde != null and govde.has_method("hasar_al"):
 		var itme := Vector3(_yon.x, 0.0, _yon.z)
 		govde.hasar_al(hasar, itme.normalized() if itme.length() > 0.01 else Vector3.FORWARD)

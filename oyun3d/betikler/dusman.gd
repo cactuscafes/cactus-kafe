@@ -43,6 +43,13 @@ signal yenildi
 @export_group("Can")
 @export var can := 2
 
+@export_group("Ses")
+## Türün sesini ayıran perde kaydırması (yarım ton). Aynı ses bankasını
+## kullanan üç türün birbirinden AYIRT EDİLMESİ gerekiyor; ayrı ses dosyaları
+## yerine perde kullanmak, ses bütçesini üçe katlamadan aynı işi görüyor.
+## Küçük düşman tiz, iri düşman pes — gözün gördüğü boyu kulak da duyuyor.
+@export var ses_perdesi := 0.0
+
 @export_group("Saldırı")
 @export var kovalama_hizi := 4.3
 @export var saldiri_menzili := 2.1
@@ -228,6 +235,8 @@ func ezildi() -> bool:
 	if durum == Durum.YENILDI:
 		return false
 	can -= 1
+	# Ezme sesi 3B DEĞİL: oyuncu tam üstünde, kendi vuruşu. 3B yapmak onu
+	# kamera açısına göre sağa sola kaydırıyor ve vuruşun ağırlığını alıyor.
 	Ses.cal("ezme", 1.5)
 	Efekt.sarsint(0.3)
 	Efekt.vurus_duraklamasi(0.07, 0.06)
@@ -258,6 +267,10 @@ func _yenilme(delta: float) -> void:
 		mat.set_shader_parameter("esik", oran)
 	if _yenilme_zamani > ERIME_SURESI:
 		queue_free()
+
+## Düşman öldüğünde müziği kısar. Alt türler de aynı yolu kullanıyor.
+func _kisma_iste() -> void:
+	Ses.kis()
 
 ## Alt türlerin görünümü: aynı mesh, farklı renk ve ölçü.
 ##
@@ -304,7 +317,8 @@ func _gec(yeni: Durum) -> void:
 		Durum.YENILDI:
 			_zaman = 0.0
 			_oynatici.play("ezildi", 0.05)
-			Ses.cal("dusman_oldu")
+			_kisma_iste()
+			Ses.cal_3b("dusman_oldu", global_position, ses_perdesi)
 			# Çarpışmayı kapat: yenilen düşmanın üstünde durulmasın.
 			$Carpisma.set_deferred("disabled", true)
 			set_collision_layer_value(7, false)
@@ -312,10 +326,10 @@ func _gec(yeni: Durum) -> void:
 			yenildi.emit()
 		Durum.FARKETTI:
 			_zaman = 0.45
-			Ses.cal("dusman_farketti", 1.0)
+			Ses.cal_3b("dusman_farketti", global_position, ses_perdesi + 1.0)
 		Durum.SALDIRI:
 			_zaman = hazirlik
-			Ses.cal("dusman_saldiri", 1.5)
+			Ses.cal_3b("dusman_saldiri", global_position, ses_perdesi + 1.5)
 		Durum.CEKIL:
 			_zaman = cekilme_suresi
 		_:

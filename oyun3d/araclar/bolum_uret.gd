@@ -454,6 +454,9 @@ func _oyun_ekle(kok: Node3D, veri: Dictionary) -> void:
 	dugum.set_script(OYUN_BETIK)
 	dugum.bolum_kimligi = veri["kimlik"]
 	dugum.oyuncu_yolu = NodePath("../Oyuncu")
+	# Çevre sesi bölümün sanat yönünün parçası (Faz 15): veri vermezse
+	# çölün rüzgârı çalıyor, boş string verirse bölüm sessiz kalıyor.
+	dugum.ortam_sesi = veri.get("ortam_sesi", "ruzgar")
 	_ekle(kok, dugum, kok)
 
 func _hud_ekle(kok: Node3D) -> void:

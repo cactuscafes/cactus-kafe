@@ -38,6 +38,7 @@ func _ready() -> void:
 	_atis_sayaci = atis_araligi * 0.5
 	# İri ve sarımsı: yerinden kıpırdamayan şey ağır görünmeli.
 	_gorunum(Color(1.35, 1.12, 0.52), 1.16)
+	ses_perdesi = -2.5   # iri: pes
 	# Uzaktan iş gördüğü için görüşü de uzun; yoksa oyuncu menzilde olup
 	# fark edilmeden duruyor ve atıcı "bozuk" görünüyor.
 	gorus_mesafesi = 18.0
@@ -92,4 +93,4 @@ func _at() -> void:
 	mermi.global_position = baslangic
 	mermi.hasar = hasar
 	mermi.kur(hedef - baslangic, self)
-	Ses.cal("dusman_saldiri", 1.2)
+	Ses.cal_3b("diken_at", baslangic, 1.2)

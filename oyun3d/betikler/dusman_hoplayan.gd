@@ -32,6 +32,7 @@ func _ready() -> void:
 	can = 1
 	# Küçük ve mavimsi: zıplayan şey küçük olmalı, gözde "hafif" duruyor.
 	_gorunum(Color(0.62, 0.78, 1.35), 0.82)
+	ses_perdesi = 3.0    # küçük: tiz
 	gorus_mesafesi = 12.0
 
 ## Kovalama yerine hoplama döngüsü.
@@ -70,7 +71,7 @@ func _kovala(delta: float) -> void:
 				_evre = Evre.TOPAR
 				_evre_zamani = toparlanma_suresi
 				_oynatici.play("ezildi", 0.06)
-				Ses.cal("inis", 0.9)
+				Ses.cal_3b("inis", global_position, 0.9, -4.0)
 		Evre.TOPAR:
 			_yurut(Vector3.ZERO, 0.0)
 			if _evre_zamani <= 0.0:
@@ -89,7 +90,7 @@ func _sicra(fark: Vector3) -> void:
 	# değil. Süre = 2·v_dikey / g (tam balistik).
 	var sure := 2.0 * sicrama_hizi / _yercekimi
 	velocity = Vector3(duz.x * uzaklik / sure, sicrama_hizi, duz.z * uzaklik / sure)
-	Ses.cal("dusman_saldiri", 1.4)
+	Ses.cal_3b("hop", global_position, 1.4)
 
 ## Havadayken oyuncuya değerse hasar veriyor. Temel sınıfın menzilli yakın
 ## dövüşü kapalı olduğu için tek hasar kaynağı bu.

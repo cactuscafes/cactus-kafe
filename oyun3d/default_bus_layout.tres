@@ -19,3 +19,12 @@ bus/2/mute = false
 bus/2/bypass_fx = false
 bus/2/volume_db = -10.0
 bus/2/send = &"Master"
+; Faz 15: çevre sesi kendi bus'ında ama SFX'e bağlı — oyuncunun "Efektler"
+; ayarı onu da kapsıyor, buradaki -8 dB ise rüzgârın efektlerin önüne
+; geçmemesi için konan sabit denge.
+bus/3/name = &"Ortam"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = -8.0
+bus/3/send = &"SFX"

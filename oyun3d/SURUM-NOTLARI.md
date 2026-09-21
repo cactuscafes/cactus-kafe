@@ -6,11 +6,40 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.14\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.15\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.15.0 — Ses: konum, çevre ve katmanlı müzik (Faz 15)
+
+- **3B ses.** Dünyadaki olaylar artık geldikleri yerden duyuluyor
+  (`Ses.cal_3b`): düşmanın saldırısı, dikenin taşa saplanması, uzaktaki bir
+  ölüm. Oyuncunun kendi sesleri (adım, zıplama, hasar, ezme) bilerek 2B
+  kaldı — kendi sesini kamera açısına göre sağdan solda duymamak için.
+- **Dinleyici karaktere yaklaştırıldı.** 3B ses varsayılan olarak kameradan
+  duyuluyordu, yani karakterin 5 m arkasından. `AudioListener3D` kameranın
+  altında ama karaktere doğru 2,6 m kaydırılmış: konum karakterin, yön
+  kameranın.
+- **Çevre sesi.** 8 saniyelik rüzgâr döngüsü (döngü noktası çapraz
+  geçişli) + rastgele aralıklarla kuş ötüşü. Kuşlar döngünün içinde değil:
+  gömülü bir kuş üçüncü tekrarda sahte duyuluyor.
+- **Katmanlı, uyarlanan müzik.** Sakin taban ve gerilim katmanı AYNI ANDA
+  çalıyor; gerilim, peşine düşen düşman sayısına göre açılıp kapanıyor
+  (açılış hızlı, kapanış yavaş). İki katman aynı uzunlukta ve aynı akorlar
+  üzerine kurulu, yoksa açıldığı anda akort tutmaz.
+- **Kısma (ducking).** Ölüm, kontrol noktası, bitiş ve düşman ölümünde
+  müzik 0,5 sn geri çekiliyor. Kısma BUS'a değil oynatıcıya uygulanıyor:
+  bus oyuncunun ayarı, oraya yazmak her ölümde müzik seviyesini biraz daha
+  düşürürdü.
+- **Tür başına düşman sesi**: aynı ses bankası, perde kaydırmasıyla ayrışan
+  üç tür (küçük tiz, iri pes) + atıcının kendi atış ve çarpma sesi.
+- **Ses testi** (`testler/ses_testi`): koddaki her `Ses.cal("...")` adının
+  kütüphanede olduğunu doğruluyor (yazım hatası sessizce sesi yok ediyor),
+  öksüz ses dosyası arıyor, havuzun büyümediğini, 3B sesin doğru konumdan
+  çaldığını, kısmanın eski seviyeye döndüğünü ve iki müzik katmanının
+  eşzamanlı kaldığını ölçüyor.
 
 ## 0.14.0 — Düşmanlar: rig ve dövüş derinliği (Faz 14)
 

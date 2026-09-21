@@ -16,4 +16,5 @@ func _giren(govde: Node3D) -> void:
 	_kullanildi = true
 	_bayrak.rotation_degrees.z = -35.0
 	Ses.cal("kontrol")
+	Ses.kis()
 	get_node(oyun_yolu).kontrol_noktasi(global_position + Vector3(0.0, 1.0, 0.0))

@@ -300,6 +300,26 @@ germekten ibaretti. Dövüş de tek soru soruyordu — "üstüne nasıl çıkar�
   yenilme anı hâlâ tek tip (erime), ve boss yok. Bir de ses: her düşman türü
   aynı sesi çıkarıyor.
 
+### Faz 15 — **Ses: konum, çevre ve katmanlı müzik** (Faz 14 sonrası)
+Ses Faz 3'ten beri büyümemişti: 10 sentezlenmiş parça, hepsi kafanın içinde,
+tek bir müzik döngüsü. Oyun görsel olarak üç faz büyüdü, duyulan şey aynı
+kaldı — ve ses, sessizce bozulan şeylerin başında geliyor.
+- **Durum: bitti** → 3B konumlu ses ve karaktere yaklaştırılmış dinleyici,
+  çevre sesi (rüzgâr döngüsü + seyrek kuş), oyunun durumundan beslenen
+  katmanlı müzik (gerilim katmanı), kısma (ducking), tür başına düşman sesi
+  ve `testler/ses_testi`.
+- **Öğrenilen: sesi test etmek garip görünüyor ama gerekli.** Yanlış yazılmış
+  bir ses adı oyunu bozmuyor, yalnızca o olayı sessizleştiriyor — hata mesajı
+  yok, kimse fark etmiyor. Test, koddaki bütün `Ses.cal("...")` adlarını
+  tarayıp kütüphaneyle karşılaştırıyor; daha ilk koşuda kendi belgemdeki
+  örnek adı yakaladı (yorum satırları artık taranmıyor).
+- **İki karar, ikisi de "her şeyi 3B yapma" karşıtı:** oyuncunun kendi sesi
+  konumlandırılmıyor (kamera dönünce kendi adımını sağdan duyuyorsun) ve
+  kısma bus'a değil oynatıcıya uygulanıyor (bus oyuncunun ayarı).
+- **Kalan:** yüzeye göre adım sesi (kum/taş/ahşap), tür başına ayrı ses
+  bankası (şu an perde kaydırmasıyla ayrışıyorlar), müziğin bölüme göre
+  değişmesi ve gerçek kayıt/mix — sentez, lisanslı sesin yerine geçmiyor.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

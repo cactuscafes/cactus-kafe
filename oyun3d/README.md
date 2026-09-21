@@ -1,9 +1,8 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 14** bitti: düşmanlar rig'lendi ve çoğaldı — kemikli düşman
-modeli, zıplayarak saldıran ve uzaktan diken atan iki yeni tür, oyuncuyla
-paylaşılan rig hattı.
+Şu an **Faz 15** bitti: ses derinleşti — 3B konumlu efektler, çevre sesi,
+oyunun durumundan beslenen katmanlı müzik ve ses testi.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -24,6 +23,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **12** | **Animasyon cilası**: iki kemikli bacak (7 → 11 kemik), ayak IK'sı (rampa/basamak), ölçüyle belirlenen adım temposu (kayma 4,3 → 2,0 kat), ayak IK testi |
 | **13** | **Dünya sanatı ve aydınlatma**: paylaşılan ışık kurulumu (anahtar + dolgu, gökyüzünden ortam), gökyüzü ve dünya gölgelendiricileri, uzak manzara (mesa siluetleri + serpinti), grafik ön ayarı, görsel test |
 | **14** | **Düşmanlar**: rig'li düşman (6 kemik, 7 animasyon), ortak rig hattı (`araclar/rig.py`), iki yeni tür (hoplayan, atıcı), veriden tür seçimi, mermi ve tünelleme testi |
+| **15** | **Ses**: 3B konumlu efektler ve karaktere yakın dinleyici, çevre sesi (rüzgâr + kuş), katmanlı/uyarlanan müzik, kısma (ducking), ses testi |
 
 ---
 
@@ -94,6 +94,7 @@ godot --headless --path oyun3d res://testler/bolum_hatti_testi.tscn  # bölüm b
 godot --headless --path oyun3d res://testler/tus_atama_testi.tscn    # tuş atama
 godot --headless --path oyun3d res://testler/karakter_testi.tscn     # model, iskelet, animasyon
 godot --headless --path oyun3d res://testler/ayak_ik_testi.tscn      # ayak zemine oturuyor mu
+godot --headless --path oyun3d res://testler/ses_testi.tscn          # ses kaydı, 3B, müzik katmanı
 xvfb-run -a godot --path oyun3d --rendering-driver opengl3 \
   --audio-driver Dummy res://testler/gorsel_testi.tscn            # aydınlatma + manzara
 godot --headless --path oyun3d res://araclar/denge_olc.tscn          # bot bölümleri oynuyor
@@ -970,15 +971,16 @@ düğümüne uygulanıyor — animasyonlar `Yon/Model`in dönüşünü yazıyor,
 
 ---
 
-## Ses (Faz 3)
+## Ses (Faz 3, 15)
 
 ```bash
 python3 oyun3d/araclar/sesler.py
 ```
 
-On parça sentezlenir (`ses/`): iki ayak sesi, zıplama, iniş, toplama, ölüm,
-kontrol noktası, bitiş fanfarı, arayüz tıklaması ve 16 saniyelik müzik döngüsü.
-Dış bağımlılık yok, toplam 820 KB.
+Yirmi bir parça sentezlenir (`ses/`): ayak sesleri, zıplama, iniş, toplama,
+ölüm, kontrol noktası, bitiş fanfarı, arayüz tıklaması, düşman sesleri,
+**rüzgâr döngüsü, kuş ötüşü** ve iki müzik katmanı. Dış bağımlılık yok,
+toplam 2,0 MB (pakette QOA ile sıkışıyor).
 
 > Normalde ses **indirilir**: freesound.org, Kenney, itch.io ses paketleri. Faz
 > 3'ün asıl dersi lisans okumak ve ses seçmektir; bu ortamda o siteler kapalı
@@ -986,8 +988,44 @@ Dış bağımlılık yok, toplam 820 KB.
 > kodunda değişiklik gerekmez.
 
 **Bus yapısı** (`default_bus_layout.tres`): Master → SFX (-6 dB) ve Müzik
-(-10 dB). Ayarlar ekranındaki üç kaydırıcı doğrudan bu bus'ların desibelini
-yazıyor; oyun kodu ses seviyesiyle hiç ilgilenmiyor.
+(-10 dB); çevre sesi kendi bus'ında (Ortam, -8 dB) ama SFX'e bağlı, yani
+oyuncunun "Efektler" ayarı onu da kapsıyor. Ayarlar ekranındaki üç kaydırıcı
+doğrudan bu bus'ların desibelini yazıyor; oyun kodu ses seviyesiyle hiç
+ilgilenmiyor.
+
+### Dört katman (Faz 15)
+
+| Katman | Ne çalıyor | Neden |
+|---|---|---|
+| 2B efekt | Oyuncunun kendi sesleri + arayüz | Kendi adımını kamera açısına göre sağdan duymak yanlış |
+| 3B efekt | Dünyadaki olaylar: düşman saldırısı, dikenin çarpması, uzaktaki ölüm | Sesin NEREDEN geldiği bilgi taşıyor |
+| Çevre | Rüzgâr döngüsü + seyrek kuş | Sessiz bir bölüm "ölü" duyuluyor |
+| Müzik | Sakin taban + gerilim katmanı | Oyunun durumu müziği sürüyor |
+
+**Dinleyici karakterin yanında.** 3B ses varsayılan olarak **kameradan**
+duyuluyor — üçüncü şahıs oyunda bu, karakterin dibindeki düşmanı 5 m uzakta
+duymak demek. `AudioListener3D` kameranın çocuğu (yön ondan gelsin) ama
+karaktere doğru 2,6 m kaydırılmış: **konum karakterin, yön kameranın.**
+
+**Katmanlı müzik: iki parça aynı anda çalıyor.** Gerilim katmanı sonradan
+başlatılmıyor — döngünün ortasından girerdi ve akort tutmazdı. İkisi birlikte
+başlıyor, biri kısık duruyor. Açılma hızlı (tehlike hemen duyulmalı), kapanma
+yavaş (tehlike geçti hissi yavaş oturur). Gerilimi besleyen şey mesafe değil
+**durum**: uyuyan bir düşmanın iki adım ötesinden geçmek gergin değil, fark
+edilmiş olmak gergin.
+
+**Kısma (ducking) bus'a değil oynatıcıya.** Ölüm, kontrol noktası, bitiş ve
+düşman ölümünde müzik 0,5 sn geri çekiliyor. Bus'a yazmak kolay olurdu ama
+bus oyuncunun ayarı: her ölümde müzik seviyesi biraz daha düşer ve kimse
+sebebini bulamazdı. `ses_testi` bunu ayrıca doğruluyor.
+
+> **Ses neden test ediliyor?** Yanlış yazılmış bir ses adı oyunu bozmuyor,
+> yalnızca o olayı sessizleştiriyor — hata mesajı yok, çökme yok, kimse fark
+> etmiyor. `testler/ses_testi` koddaki bütün `Ses.cal("...")` adlarını tarayıp
+> kütüphaneyle karşılaştırıyor, öksüz (üretilmiş ama kullanılmayan) ses dosyası
+> arıyor, havuzun büyümediğini ve iki müzik katmanının eşzamanlı kaldığını
+> ölçüyor. İlk koşuda testin kendi belgesindeki örnek adı yakaladı; tarayıcı
+> artık yorum satırlarını atlıyor.
 
 **Adım sesi zamana değil kat edilen yola bağlı.** Zamana bağlarsan yürürken de
 koşarken de aynı ritimde tıkırdar ve kulağa yanlış gelir; yola bağlayınca
@@ -1333,6 +1371,7 @@ oyun3d/
     ├── dokunmatik_testi.gd  Ekran kontrolleri (gerçek pencere ister)
     ├── ayak_ik_testi.gd     Ayak IK: düz zemin, rampa, basamak, havada
     ├── gorsel_testi.gd      Aydınlatma ölçümü + manzara denetimi (pencere ister)
+    ├── ses_testi.gd         Ses kaydı, havuz, 3B, kısma, katmanlı müzik
     ├── hayalet_testi.gd     Hayalet kaydı, aradeğerleme, HUD
     └── ag_testi.sh          İki süreçli ağ testi (+ ag_sunucu / ag_istemci)
 ```
@@ -1427,12 +1466,13 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Adım | Durum |
 |---|---|
 | `--headless --import` | ✅ hatasız |
-| Bölüm testleri (10 test) | ✅ hepsi geçti |
+| Bölüm testleri (11 test) | ✅ hepsi geçti |
 | Varlık testleri (5 varlık) | ✅ hepsi geçti |
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
 | Düşman testleri (10 grup) | ✅ hepsi geçti (rig, hoplayan, atıcı, diken/duvar dahil) |
+| Ses testleri (8 grup) | ✅ kayıt, havuz, 3B, dinleyici, kısma, katmanlı müzik, çevre, gerilim |
 | Çeviri testleri | ✅ 79 anahtar × 2 dil, eksik yok |
 | Performans bütçesi | ✅ altı bölüm bütçe içinde (67–81 draw call, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |

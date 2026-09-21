@@ -53,10 +53,18 @@ func _dokunmatigi_goster(bolum: Node3D) -> void:
 func _ready() -> void:
 	await get_tree().process_frame
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(KLASOR))
+	# Tek kadraj: `-- 04_dusman` verilince yalnızca o kare çekiliyor.
+	# Yazılımsal GPU'da 1920x1080 bir kare dakikalar sürüyor; bir kadrajı
+	# düzeltmek için on birini yeniden çekmek gerekmiyor.
+	var istenen := ""
+	for arg in OS.get_cmdline_user_args():
+		istenen = arg
 	var acik_sahne := ""
 	var bolum: Node3D = null
 
 	for kadraj: Array in KADRAJLAR:
+		if not istenen.is_empty() and kadraj[0] != istenen:
+			continue
 		if kadraj[1] != acik_sahne:
 			if bolum != null:
 				bolum.queue_free()
@@ -69,12 +77,18 @@ func _ready() -> void:
 			if hud != null:
 				hud.get_node("Olcum").visible = false
 			await get_tree().process_frame
-			# Düşmanlar dondurulur (Faz 14): oyuncu kadraja ışınlanırken
-			# saldırıya uğrayıp ölüyor ve kare "Kontrol noktasına döndün"
-			# yazısıyla çıkıyordu. Görseller tekrarlanabilir olmalı; oynanış
-			# anı değil, KADRAJ çekiliyor.
+			# Düşmanlar ve tuzaklar dondurulur (Faz 14): oyuncu kadraja
+			# ışınlanırken saldırıya uğrayıp ya da dikene düşüp ölüyor, kare
+			# "Kontrol noktasına döndün" yazısıyla çıkıyordu. Görseller
+			# tekrarlanabilir olmalı; burada oynanış anı değil KADRAJ
+			# çekiliyor.
 			for d in get_tree().get_nodes_in_group("dusman"):
 				(d as Node).set_physics_process(false)
+			for a in bolum.find_children("*", "Area3D", true, false):
+				# Tuzak katmanı (3) — çiçek ve kontrol noktası dokunulmadan
+				# kalıyor, onlar kareyi bozmuyor.
+				if (a as Area3D).get_collision_layer_value(3):
+					(a as Area3D).monitoring = false
 
 		var oyuncu: CharacterBody3D = bolum.get_node("Oyuncu")
 		var kol: SpringArm3D = oyuncu.get_node("KameraKolu")

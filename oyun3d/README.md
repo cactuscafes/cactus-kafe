@@ -1536,7 +1536,7 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Ses testleri (8 grup) | ✅ kayıt, havuz, 3B, dinleyici, kısma, katmanlı müzik, çevre, gerilim |
 | Boss testi (5 grup) | ✅ SERSEM dışında 42 denemede hasar yok, betikli dövüş 652 karede bitti, ritim 1,10 → 0,83 → 0,62 sn, bitiş kilidi açıldı |
 | Çeviri testleri | ✅ 82 anahtar × 2 dil, eksik yok |
-| Performans bütçesi | ✅ altı bölüm bütçe içinde (67–81 draw call, en yüksek grafik ön ayarında) |
+| Performans bütçesi | ✅ altı bölüm bütçe içinde (67–85 draw call, 8,6–12,9 bin üçgen, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ayak IK testi (4 durum) | ✅ rampada bilek hatası 8,8 → 0,2 cm, basamakta 6,1 → 0,1 cm |

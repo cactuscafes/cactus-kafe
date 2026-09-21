@@ -94,6 +94,13 @@ const VERI := {
 		{"konum": Vector3(-4.0, 1.7, -17.0), "aci": 90.0, "devriye_ucu": Vector3(7.0, 0, 0)},
 		{"konum": Vector3(3.0, 1.7, -22.0), "aci": 180.0, "devriye_ucu": Vector3(-5.0, 0, 0)},
 		{"konum": Vector3(0, 1.8, -31.0), "aci": 0.0, "devriye_ucu": Vector3(0, 0, -3.0)},
+		# ATICI BURADA TANITILIYOR: bölüm 5'in zemini ölümcül DEĞİL, yani
+		# vurulmanın bedeli can, ölüm değil. Yeni bir tehdidin öğrenileceği
+		# yer burası (bkz. bolum3: orada denendi, ölüm makinesi oldu).
+		# Bahçede üç tür bir arada: atıcı uzaktan baskı yapıyor, hoplayan
+		# yaklaşanı cezalandırıyor, temel düşman aradaki boşluğu dolduruyor.
+		{"tur": "atici", "konum": Vector3(-6.0, 1.4, -12.0), "aci": 90.0},
+		{"tur": "hoplayan", "konum": Vector3(5.0, 1.7, -20.0), "aci": 180.0},
 	],
 
 	"susleme": [

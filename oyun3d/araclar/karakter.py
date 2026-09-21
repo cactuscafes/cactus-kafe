@@ -30,6 +30,11 @@ kemiği aşağı bakıyor, yani onun yerel X'i dünya X'iyle aynı yöne bakmıy
 Bu yüzden salınımlar kemiğin YEREL ekseninde veriliyor ve yönü her kemik için
 bir kez ölçülüp sabitlendi (`_YON` çarpanları); "sağ bacak ters sallanıyor"
 hatasının kaynağı hep budur.
+
+ORTAK HAT (Faz 14): iskelet kurma, ağırlık, poz yazma, f-eğrisi erişimi ve
+glTF dışa aktarımı `araclar/rig.py` içinde — düşman da aynı hattı kullanıyor.
+Burada kalan her şey BU karaktere özgü: ölçüler, kemik tablosu, mesh, ağırlık
+bölgeleri ve animasyonlar.
 """
 
 import json
@@ -47,6 +52,7 @@ PROJE = os.path.dirname(BURASI)
 VARLIK = os.path.join(PROJE, "varliklar")
 
 import modeller  # atlas, UV açma, malzeme ve ölçüm ortak
+import rig       # iskelet, ağırlık, animasyon ve dışa aktarım hattı (Faz 14)
 
 # --- ölçüler (metre, Blender Z-up; ayak tabanı z=0) -------------------------
 AYAK = 0.0
@@ -84,7 +90,7 @@ KEMIKLER = [
     ("AyakSag", (BACAK_X, 0, BILEK_Z), (BACAK_X, AYAK_UZUNLUK, BILEK_Z * 0.4), "DizSag"),
 ]
 
-KARE_HIZI = 30.0
+KARE_HIZI = rig.KARE_HIZI
 
 # --- adım kalibrasyonu (Faz 12) --------------------------------------------
 ## Oyunun yatay hızları — `betikler/oyuncu.gd` içindeki `yurume_hizi` ve
@@ -108,29 +114,6 @@ HIZ = {"yurume": 4.2, "kosma": 7.4}
 KAYMA_HEDEFI = 2.0
 
 
-def _temizle() -> None:
-    for koleksiyon in (bpy.data.objects, bpy.data.meshes, bpy.data.armatures,
-                       bpy.data.actions, bpy.data.materials, bpy.data.images):
-        for veri in list(koleksiyon):
-            koleksiyon.remove(veri, do_unlink=True)
-
-
-def _kutu(bm, merkez, olcu, egim=0.0):
-    """Eksen hizalı kutu; `egim` üst yüzü daraltır (koniklik)."""
-    cx, cy, cz = merkez
-    gx, gy, gz = (o * 0.5 for o in olcu)
-    ust = 1.0 - egim
-    kose = [
-        (cx - gx, cy - gy, cz - gz), (cx + gx, cy - gy, cz - gz),
-        (cx + gx, cy + gy, cz - gz), (cx - gx, cy + gy, cz - gz),
-        (cx - gx * ust, cy - gy * ust, cz + gz), (cx + gx * ust, cy - gy * ust, cz + gz),
-        (cx + gx * ust, cy + gy * ust, cz + gz), (cx - gx * ust, cy + gy * ust, cz + gz),
-    ]
-    v = [bm.verts.new(k) for k in kose]
-    for yuz in [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1),
-                (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)]:
-        bm.faces.new([v[i] for i in yuz])
-    return v
 
 
 def govde_mesh() -> bpy.types.Object:
@@ -141,24 +124,24 @@ def govde_mesh() -> bpy.types.Object:
     """
     bm = bmesh.new()
     # Gövde: yukarı doğru hafif incelen bir prizma.
-    _kutu(bm, (0, 0, (KALCA_Z + GOVDE_Z) * 0.5 - 0.03),
+    rig.kutu(bm, (0, 0, (KALCA_Z + GOVDE_Z) * 0.5 - 0.03),
           (0.46, 0.34, GOVDE_Z - KALCA_Z + 0.30), egim=0.12)
     # Kafa: kaktüsün tepesi, gövdeden dar.
-    _kutu(bm, (0, 0, (GOVDE_Z + KAFA_Z) * 0.5 + 0.06),
+    rig.kutu(bm, (0, 0, (GOVDE_Z + KAFA_Z) * 0.5 + 0.06),
           (0.36, 0.30, KAFA_Z - GOVDE_Z + 0.16), egim=0.18)
     # Kollar: saguaro pedi gibi yana çıkıp yukarı dönüyor.
     for isaret in (-1, 1):
-        _kutu(bm, (isaret * (KOL_X + 0.02), 0, KOL_Z + 0.02), (0.20, 0.17, 0.15))
-        _kutu(bm, (isaret * (KOL_X + 0.07), 0, KOL_Z + 0.20), (0.15, 0.15, 0.30))
+        rig.kutu(bm, (isaret * (KOL_X + 0.02), 0, KOL_Z + 0.02), (0.20, 0.17, 0.15))
+        rig.kutu(bm, (isaret * (KOL_X + 0.07), 0, KOL_Z + 0.20), (0.15, 0.15, 0.30))
     # Bacaklar: uyluk, baldır ve ayak ayrı parçalar — diz kırılınca mesh de
     # kırılsın diye. Tek kutu olsaydı diz bükülünce kutu esneyip "lastik bacak"
     # görüntüsü verirdi.
     for isaret in (-1, 1):
-        _kutu(bm, (isaret * BACAK_X, 0, (KALCA_Z + DIZ_Z) * 0.5),
+        rig.kutu(bm, (isaret * BACAK_X, 0, (KALCA_Z + DIZ_Z) * 0.5),
               (0.17, 0.17, KALCA_Z - DIZ_Z + 0.06))
-        _kutu(bm, (isaret * BACAK_X, 0, (DIZ_Z + BILEK_Z) * 0.5),
+        rig.kutu(bm, (isaret * BACAK_X, 0, (DIZ_Z + BILEK_Z) * 0.5),
               (0.15, 0.15, DIZ_Z - BILEK_Z + 0.06))
-        _kutu(bm, (isaret * BACAK_X, AYAK_UZUNLUK * 0.35, BILEK_Z * 0.5),
+        rig.kutu(bm, (isaret * BACAK_X, AYAK_UZUNLUK * 0.35, BILEK_Z * 0.5),
               (0.15, AYAK_UZUNLUK + 0.10, BILEK_Z + 0.02))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     me = bpy.data.meshes.new("oyuncu")
@@ -168,21 +151,6 @@ def govde_mesh() -> bpy.types.Object:
     bpy.context.collection.objects.link(obj)
     return obj
 
-
-def iskelet_kur() -> bpy.types.Object:
-    arm_veri = bpy.data.armatures.new("iskelet")
-    arm = bpy.data.objects.new("iskelet", arm_veri)
-    bpy.context.collection.objects.link(arm)
-    bpy.context.view_layer.objects.active = arm
-    bpy.ops.object.mode_set(mode="EDIT")
-    for ad, bas, uc, ebeveyn in KEMIKLER:
-        kemik = arm_veri.edit_bones.new(ad)
-        kemik.head = Vector(bas)
-        kemik.tail = Vector(uc)
-        if ebeveyn is not None:
-            kemik.parent = arm_veri.edit_bones[ebeveyn]
-    bpy.ops.object.mode_set(mode="OBJECT")
-    return arm
 
 
 def _kemik_sec(ko: Vector) -> str:
@@ -254,90 +222,16 @@ _YON = {"BacakSol": -1.0, "BacakSag": -1.0, "DizSol": -1.0, "DizSag": -1.0,
         "Govde": 1.0, "Kafa": 1.0, "Kalca": 1.0}
 
 
-def _poz(arm: bpy.types.Object, ad: str) -> bpy.types.PoseBone:
-    kemik = arm.pose.bones[ad]
-    kemik.rotation_mode = "XYZ"
-    return kemik
-
-
 def _anahtar(arm: bpy.types.Object, kare: float, acilar: dict[str, tuple],
              konum: tuple | None = None) -> None:
-    for ad, aci in acilar.items():
-        kemik = _poz(arm, ad)
-        kemik.rotation_euler = (aci[0] * _YON[ad], aci[1], aci[2])
-        kemik.keyframe_insert("rotation_euler", frame=kare)
-    kalca = _poz(arm, "Kalca")
-    kalca.location = Vector(konum or (0.0, 0.0, 0.0))
-    kalca.keyframe_insert("location", frame=kare)
+    """Ortak poz yazıcısına bu karakterin işaret tablosunu ve kök kemiğini
+    bağlar (`araclar/rig.py`)."""
+    rig.anahtar(arm, kare, acilar, _YON, "Kalca", konum)
 
 
-def _eylem(arm: bpy.types.Object, ad: str) -> bpy.types.Action:
-    eylem = bpy.data.actions.new(ad)
-    eylem.use_fake_user = True
-    if arm.animation_data is None:
-        arm.animation_data_create()
-    arm.animation_data.action = eylem
-    # Blender 4.4+ "slot"lu eylemler: keyframe eklemeden önce slot atanmazsa
-    # anahtarlar hiçbir yere yazılmıyor ve dışa aktarımda animasyon boş çıkıyor.
-    if hasattr(arm.animation_data, "action_slot") and eylem.slots:
-        arm.animation_data.action_slot = eylem.slots[0]
-    return eylem
 
 
-def _bitir(eylem: bpy.types.Action, arm: bpy.types.Object, dongu: bool) -> None:
-    eylem.use_cyclic = dongu
-    arm.animation_data.action = None
 
-
-def _adim_olc(arm: bpy.types.Object, sure: float) -> float:
-    """Bir çevrimde atılan yol (metre). ÖLÇÜLÜR, hesaplanmaz.
-
-    Adım boyunu formülle tahmin etmek (2·bacak·sin(genlik)) dizi ve ayağı
-    yok sayıyor; ikisi de adımı kısaltıyor. Onun yerine poz gerçekten
-    değerlendiriliyor ve iki ayak bileğinin en açık olduğu an ölçülüyor:
-    gövde bir adımda tam o kadar ilerler. Çevrim iki adım, yani iki katı.
-
-    Eylem çağrı sırasında `arm`a bağlı olmalı (`_bitir`den ÖNCE)."""
-    sahne = bpy.context.scene
-    en_acik = 0.0
-    for k in range(9):
-        f = 1.0 + sure * KARE_HIZI * k / 8.0
-        sahne.frame_set(int(f), subframe=f - int(f))
-        bpy.context.view_layer.update()
-        # Blender'da +Y ileri (dışa aktarımda Godot'nun -Z'si oluyor).
-        sol = arm.pose.bones["AyakSol"].head.y
-        sag = arm.pose.bones["AyakSag"].head.y
-        en_acik = max(en_acik, abs(sol - sag))
-    return en_acik * 2.0
-
-
-def _egriler(eylem: bpy.types.Action) -> list:
-    """Eylemin f-eğrileri. Blender 4.4+ katmanlı eylemlerde `action.fcurves`
-    yok: eğriler katman > şerit > slot torbasının içinde duruyor. Eski API
-    de destekleniyor ki betik iki sürümde de çalışsın."""
-    if hasattr(eylem, "fcurves"):
-        return list(eylem.fcurves)
-    egriler: list = []
-    for katman in eylem.layers:
-        for serit in katman.strips:
-            for slot in eylem.slots:
-                torba = serit.channelbag(slot)
-                if torba is not None:
-                    egriler.extend(torba.fcurves)
-    return egriler
-
-
-def _zamani_olcekle(eylem: bpy.types.Action, oran: float) -> None:
-    """Eylemin süresini oranla çarpar — poz aynı, tempo değişir.
-
-    Animasyonu iki kez kurmak yerine anahtarların zamanı ölçekleniyor:
-    adım boyu tempodan bağımsız (aynı açılar, aynı mesafe), dolayısıyla
-    ölçüm bir kez yapılıp süre sonradan yerine oturtulabiliyor."""
-    for eg in _egriler(eylem):
-        for anahtar in eg.keyframe_points:
-            for nokta in (anahtar.co, anahtar.handle_left, anahtar.handle_right):
-                nokta.x = 1.0 + (nokta.x - 1.0) * oran
-        eg.update()
 
 
 def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
@@ -353,7 +247,7 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
         return 1.0 + sn * KARE_HIZI
 
     # boşta: hafif nefes, kollar dışa açık
-    eylem = _eylem(arm, "bosta")
+    eylem = rig.eylem(arm, "bosta")
     for t, yuk in ((0.0, 0.0), (1.3, 0.022), (2.6, 0.0)):
         _anahtar(arm, kare(t), {
             "Govde": (0.0, 0.0, 0.0), "Kafa": (0.0, 0.0, 0.0),
@@ -366,7 +260,7 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
             "DizSol": (-0.08, 0.0, 0.0), "DizSag": (-0.08, 0.0, 0.0),
             "AyakSol": (0.04, 0.0, 0.0), "AyakSag": (0.04, 0.0, 0.0),
         }, (0.0, 0.0, yuk))
-    _bitir(eylem, arm, True)
+    rig.bitir(eylem, arm, True)
     sureler["bosta"] = 2.6
 
     # yürüme / koşma: aynı kalıp, farklı genlik. Süre geçici — ölçümden sonra
@@ -374,7 +268,7 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
     for ad, sure, bacak, kol, zipzip, egim in (
             ("yurume", 0.9, 0.45, 0.28, 0.04, 0.03),
             ("kosma", 0.55, 0.85, 0.55, 0.09, 0.16)):
-        eylem = _eylem(arm, ad)
+        eylem = rig.eylem(arm, ad)
         diz_genlik = bacak * 1.25
         for k in range(9):
             t = sure * k / 8.0
@@ -401,15 +295,15 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
                 "Kafa": (-egim * 0.6, 0.0, 0.0),   # baş yere değil ileri baksın
             }, (0.0, 0.0, abs(math.sin(f)) * zipzip - zipzip * 0.5))
         # Adım boyu ölçülüyor, sonra süre oyunun hızına oturtuluyor.
-        adim = _adim_olc(arm, sure)
+        adim = rig.adim_olc(arm, sure, ("AyakSol", "AyakSag"))
         gereken = adim * KAYMA_HEDEFI / HIZ[ad]
-        _zamani_olcekle(eylem, gereken / sure)
-        _bitir(eylem, arm, True)
+        rig.zamani_olcekle(eylem, gereken / sure)
+        rig.bitir(eylem, arm, True)
         sureler[ad] = gereken
         adimlar[ad] = adim
 
     # zıplama: çöküp itme
-    eylem = _eylem(arm, "zipla")
+    eylem = rig.eylem(arm, "zipla")
     for t, bacak_s, bacak_g, kol, egim, yuk in (
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
             (0.18, -0.9, 0.5, -1.1, -0.12, 0.05),
@@ -422,11 +316,11 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
             "KolSol": (kol, 0.0, 0.16), "KolSag": (kol, 0.0, -0.16),
             "Govde": (egim, 0.0, 0.0), "Kafa": (0.0, 0.0, 0.0),
         }, (0.0, 0.0, yuk))
-    _bitir(eylem, arm, False)
+    rig.bitir(eylem, arm, False)
     sureler["zipla"] = 0.45
 
     # düşme: bacaklar açık, kollar yukarı
-    eylem = _eylem(arm, "dusme")
+    eylem = rig.eylem(arm, "dusme")
     for t, sallanma in ((0.0, 0.0), (0.4, 0.12), (0.8, 0.0)):
         _anahtar(arm, kare(t), {
             "BacakSol": (-0.35 + sallanma, 0.0, 0.0),
@@ -436,34 +330,14 @@ def animasyonlari_uret(arm: bpy.types.Object) -> tuple[dict, dict]:
             "KolSol": (-1.3, 0.0, 0.22), "KolSag": (-1.3, 0.0, -0.22),
             "Govde": (-0.08, 0.0, 0.0), "Kafa": (0.05, 0.0, 0.0),
         }, (0.0, 0.0, 0.0))
-    _bitir(eylem, arm, True)
+    rig.bitir(eylem, arm, True)
     sureler["dusme"] = 0.8
     return sureler, adimlar
 
 
-def disa_aktar(mesh: bpy.types.Object, arm: bpy.types.Object, yol: str) -> None:
-    for o in bpy.context.scene.objects:
-        o.select_set(False)
-    mesh.select_set(True)
-    arm.select_set(True)
-    bpy.context.view_layer.objects.active = arm
-    bpy.ops.export_scene.gltf(
-        filepath=yol,
-        export_format="GLTF_SEPARATE",
-        use_selection=True,
-        export_yup=True,
-        export_apply=False,          # skinning'li mesh'te modifier uygulanmaz
-        export_skins=True,
-        export_animations=True,
-        export_animation_mode="ACTIONS",
-        export_bake_animation=True,
-        export_optimize_animation_size=False,
-        export_keep_originals=True,
-    )
-
 
 def main() -> int:
-    _temizle()
+    rig.temizle()
     bpy.context.scene.render.fps = int(KARE_HIZI)
 
     mesh = govde_mesh()
@@ -479,14 +353,14 @@ def main() -> int:
     img.name = "atlas"
     modeller.malzeme_ata(mesh, img)
 
-    arm = iskelet_kur()
+    arm = rig.iskelet_kur(KEMIKLER)
     sayim = agirlik_ata(mesh)
     mesh.parent = arm
     mod = mesh.modifiers.new("iskelet", "ARMATURE")
     mod.object = arm
 
     sureler, adimlar = animasyonlari_uret(arm)
-    disa_aktar(mesh, arm, os.path.join(VARLIK, "oyuncu.gltf"))
+    rig.disa_aktar(mesh, arm, os.path.join(VARLIK, "oyuncu.gltf"))
 
     ucgen = modeller.ucgen_say(mesh)
     boy = max(v.co.z for v in mesh.data.vertices)

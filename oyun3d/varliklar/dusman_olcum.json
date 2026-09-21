@@ -1,0 +1,36 @@
+{
+  "ucgen": 128,
+  "boy_m": 1.11,
+  "en_m": 1.1,
+  "kemik": 6,
+  "teksel_m": 380.0,
+  "animasyon": {
+    "bosta": 1.8,
+    "yurume": 0.66,
+    "kosma": 0.417,
+    "farketti": 0.45,
+    "saldiri": 0.62,
+    "zipla": 0.75,
+    "ezildi": 0.34
+  },
+  "adim_m": {
+    "yurume": 0.502,
+    "kosma": 0.717
+  },
+  "hiz": {
+    "yurume": 1.9,
+    "kosma": 4.3
+  },
+  "kayma": {
+    "yurume": 2.5,
+    "kosma": 2.5
+  },
+  "kemik_koseleri": {
+    "Kok": 35,
+    "Govde": 6,
+    "Cene": 17,
+    "BacakSol": 17,
+    "BacakSag": 19,
+    "Kuyruk": 2
+  }
+}

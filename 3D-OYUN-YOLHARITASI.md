@@ -281,6 +281,25 @@ hiçbir testin görmediği şeyler.
   serpinti dünyayı dolduruyor ama "buranın neresi olduğunu" anlatmıyor;
   o iş modelleme masasında.
 
+### Faz 14 — **Düşmanlar: rig ve dövüş derinliği** (Faz 13 sonrası)
+Oyuncu (Faz 11-12) ve dünya (Faz 13) canlandıktan sonra ekrandaki son cansız
+şey düşmandı: modellenmişti ama kemiksizdi, hareketi `_model.scale` ile ezip
+germekten ibaretti. Dövüş de tek soru soruyordu — "üstüne nasıl çıkarım?".
+- **Durum: bitti** → altı kemikli rig'li düşman (gövde, çene, iki bacak,
+  kuyruk) ve yedi animasyon ([`araclar/dusman_karakter.py`](oyun3d/araclar/dusman_karakter.py)),
+  oyuncuyla paylaşılan rig hattı ([`araclar/rig.py`](oyun3d/araclar/rig.py)),
+  ve iki yeni tür: **hoplayan** (zıplayarak saldırır, inişte savunmasız) ile
+  **atıcı** (uzaktan diken atar, yerinden kıpırdamaz). İkisi de temel
+  düşmanı genişletiyor; tür ve ayarları bölüm verisinden geliyor.
+- **Öğrenilen: zorluk yerel bir karar değil.** Atıcı önce bölüm 3'e kondu.
+  Bot ölçtü: süre 45 sn → 105 sn, ölüm 7 → 15. Sebep menzil değil, zeminin
+  ölümcül olması — menzili kısaltmak kurtarmadı. Yeni bir tehdit, hatanın
+  UCUZ olduğu yerde öğretilir; atıcı zemini güvenli olan bölüm 5'e taşındı.
+  Bu kararı veren şey bir sezgi değil, Faz 10'un botu oldu.
+- **Kalan:** düşmanların birbirinden haberi yok (sürü davranışı, çevreleme),
+  yenilme anı hâlâ tek tip (erime), ve boss yok. Bir de ses: her düşman türü
+  aynı sesi çıkarıyor.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

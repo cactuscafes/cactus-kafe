@@ -103,6 +103,10 @@ const VERI := {
 		{"konum": Vector3(2.0, 7.7, -38.0), "aci": 90.0, "devriye_ucu": Vector3(-5.0, 0, 0)},
 		{"konum": Vector3(-3.0, 7.7, -40.0), "aci": 0.0, "devriye_ucu": Vector3(0, 0, 3.0)},
 		{"konum": Vector3(0, 13.5, -37.0), "aci": 180.0, "devriye_ucu": Vector3(0, 0, 2.5)},
+		# Final: öğrenilen üç tehdit bir arada. Atıcı arenayı tarıyor,
+		# hoplayan zirve yolunu kesiyor.
+		{"tur": "atici", "konum": Vector3(4.5, 9.2, -39.5), "aci": 180.0},
+		{"tur": "hoplayan", "konum": Vector3(0.5, 10.1, -48.0), "aci": 0.0},
 	],
 
 	"susleme": [

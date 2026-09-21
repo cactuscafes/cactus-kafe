@@ -1,10 +1,27 @@
 extends CharacterBody3D
+class_name Dusman
 ## Durum makineli düşman: devriye → fark et → kovala → saldır → çekil.
 ##
 ## Durum makinesi tek bir enum ve tek bir `match` ile duruyor. "if kovaliyor
 ## and not saldiriyor and gordu" gibi bayrak yığını yerine bunu tercih etmenin
 ## sebebi: her an TEK bir durumda olunduğu koda bakınca görülüyor, ve yeni
 ## durum eklemek eskileri bozmuyor.
+##
+## FAZ 14 — İSKELET ANİMASYONU: düşman artık rig'li
+## (`araclar/dusman_karakter.py`). Her duruma bir animasyon karşılık geliyor
+## ve geçişleri `_gec()` yapıyor.
+##
+## NEDEN AnimationTree DEĞİL: oyuncuda `AnimationTree` var çünkü yürüme ile
+## koşma arasını HIZLA karıştırmak gerekiyor (BlendSpace1D). Düşmanın durumu
+## ayrık: ya devriyede ya kovalıyor ya saldırıyor — karıştırılacak bir eksen
+## yok. AnimationTree eklemek, durum makinesinin İKİNCİ bir kopyasını
+## (ağacın kendi makinesini) bu dosyayla eşzamanlı tutmak demekti. Tek
+## makine, tek doğruluk kaynağı; geçiş yumuşaklığını `play()`in harman
+## süresi veriyor.
+##
+## FAZ 14 — ALT TÜRLER: `dusman_hoplayan.gd` ve `dusman_atici.gd` bu dosyayı
+## GENİŞLETİYOR. Ortak olan her şey (algı, devriye, unutma, ezilme, erime)
+## burada; alt tür yalnızca kovalama ve saldırı davranışını değiştiriyor.
 
 enum Durum { DEVRIYE, FARKETTI, KOVALA, SALDIRI, CEKIL, YENILDI }
 
@@ -46,16 +63,58 @@ var _yenilme_zamani := 0.0
 var _erime_malzemeleri: Array[ShaderMaterial] = []
 var _yercekimi: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
+## Durum -> animasyon. Karşılığı olmayan durum (CEKIL) kovalama animasyonunu
+## sürdürüyor: geri çekilme de bir yürüyüş.
+const ANIMASYON := {
+	Durum.DEVRIYE: "yurume", Durum.FARKETTI: "farketti", Durum.KOVALA: "kosma",
+	Durum.SALDIRI: "saldiri", Durum.CEKIL: "kosma",
+}
+## Geçiş harmanı: 0 olursa poz zıplıyor, 0,3'ten uzunsa saldırı hazırlığı geç
+## okunuyor ve oyuncu tepki penceresini kaçırıyor.
+const HARMAN := 0.12
+## Animasyonların ÖLÇÜLDÜĞÜ hızlar (araclar/dusman_karakter.py::HIZ ile aynı;
+## `dusman_testi` ikisini karşılaştırıyor). Bu düşmanın hızı farklıysa
+## animasyon aynı oranda hızlanıyor — alt türler hızı değiştirdiğinde ayak
+## kayması kendiliğinden düzeliyor.
+const ANIM_YURUME_HIZI := 1.9
+const ANIM_KOSMA_HIZI := 4.3
+
 @onready var _ajan: NavigationAgent3D = $Ajan
 @onready var _gorus: RayCast3D = $Gorus
 @onready var _model: Node3D = $Model
 @onready var _parcacik: CPUParticles3D = $Parcacik
+@onready var _oynatici: AnimationPlayer = $Model/Gorsel/AnimationPlayer
 
 func _ready() -> void:
 	add_to_group("dusman")
 	_baslangic = global_position
 	_devriye_hedefi = _baslangic + devriye_ucu
 	_oyuncu = get_tree().get_first_node_in_group("oyuncu")
+	_animasyon_kur()
+
+## Animasyonların oyunun hızına bağlanması: yürüme animasyonu `dusman_karakter`
+## içinde 1,9 m/s'ye göre ölçüldü. Bu düşmanın devriye hızı farklıysa
+## (alt türler değiştiriyor) animasyon aynı oranda hızlanıyor, yoksa ayak
+## kayması görünür oluyor.
+func _animasyon_kur() -> void:
+	if _oynatici == null:
+		return
+	for ad in ["yurume", "bosta", "kosma", "farketti", "saldiri", "ezildi"]:
+		if not _oynatici.has_animation(ad):
+			push_warning("Düşman animasyonu eksik: %s" % ad)
+	_oynatici.get_animation("yurume").loop_mode = Animation.LOOP_LINEAR
+	_oynatici.get_animation("kosma").loop_mode = Animation.LOOP_LINEAR
+	_oynatici.get_animation("bosta").loop_mode = Animation.LOOP_LINEAR
+	_oynat("yurume")
+
+## Animasyon oynatır. Aynı animasyon zaten oynuyorsa baştan başlatmıyor —
+## her karede `play()` çağırmak animasyonu ilk karesinde dondurur.
+func _oynat(ad: String, hiz := 1.0) -> void:
+	if _oynatici == null or not _oynatici.has_animation(ad):
+		return
+	if _oynatici.current_animation != ad:
+		_oynatici.play(ad, HARMAN)
+	_oynatici.speed_scale = hiz
 
 func _physics_process(delta: float) -> void:
 	if _oyuncu == null:
@@ -92,20 +151,24 @@ func _devriye(_delta: float) -> void:
 	var fark := _devriye_hedefi - global_position
 	fark.y = 0.0
 	if fark.length() < 0.6:
+		# Ucu döndü: bir an durup nefesleniyor. Durmuş bir düşmanın yürüme
+		# animasyonunu oynatmak ayakları boşluğa kaydırır.
 		_devriye_hedefi = (_baslangic if _devriye_hedefi != _baslangic
 			else _baslangic + devriye_ucu)
+		_oynat("bosta")
 		return
 	_yurut(fark.normalized(), devriye_hizi)
+	_oynat("yurume", devriye_hizi / ANIM_YURUME_HIZI)
 
 func _farketti() -> void:
-	_yurut(Vector3.ZERO, 0.0)
 	# Kısa duraklama: oyuncuya "fark edildim" sinyalini okuma süresi verir.
-	_model.scale = _model.scale.lerp(Vector3(1.15, 0.9, 1.15), 0.25)
+	# İrkilmeyi artık animasyon taşıyor (Faz 14); eskiden model ölçeği
+	# esnetiliyordu.
+	_yurut(Vector3.ZERO, 0.0)
 	if _zaman <= 0.0:
 		_gec(Durum.KOVALA)
 
 func _kovala(delta: float) -> void:
-	_model.scale = _model.scale.lerp(Vector3.ONE, 0.2)
 	if _oyuncu == null:
 		_gec(Durum.DEVRIYE)
 		return
@@ -129,14 +192,18 @@ func _kovala(delta: float) -> void:
 	yon.y = 0.0
 	if yon.length_squared() > 0.0001:
 		_yurut(yon.normalized(), kovalama_hizi)
+	# Animasyon GERÇEKLEŞEN hıza bağlı, hedeflenen hıza değil: duvara dayanmış
+	# ya da yavaşlamış bir düşmanın bacakları da yavaşlıyor.
+	var suanki := Vector2(velocity.x, velocity.z).length()
+	_oynat("kosma", clampf(suanki / ANIM_KOSMA_HIZI, 0.35, 2.0))
 
 func _saldiri() -> void:
 	_yurut(Vector3.ZERO, 0.0)
 	if _oyuncu != null:
 		_bak(_oyuncu.global_position - global_position)
-	# Hazırlık: model geriye çekilir, sonra ileri savrulur.
-	var oran := clampf(1.0 - _zaman / hazirlik, 0.0, 1.0)
-	_model.scale = Vector3(1.0 - 0.18 * oran, 1.0 + 0.22 * oran, 1.0 - 0.18 * oran)
+	# Hazırlık animasyonu (geri yaylanma → öne savrulma) `_gec`te başladı.
+	# Vuruş anı animasyonun kendisinden değil `hazirlik` sayacından geliyor:
+	# hasarın zamanlaması oynanışa ait bir sayı, animasyona değil.
 	if _zaman > 0.0:
 		return
 	# Vuruş anı: oyuncu hâlâ menzilde mi?
@@ -147,7 +214,6 @@ func _saldiri() -> void:
 	_gec(Durum.CEKIL)
 
 func _cekil() -> void:
-	_model.scale = _model.scale.lerp(Vector3.ONE, 0.2)
 	if _oyuncu != null:
 		var geri := global_position - _oyuncu.global_position
 		geri.y = 0.0
@@ -167,9 +233,11 @@ func ezildi() -> bool:
 	Efekt.vurus_duraklamasi(0.07, 0.06)
 	_parcacik.restart()
 	if can > 0:
-		# Hayatta kaldı: ezilip yayılıyor ve saldırıya geçiyor.
-		_model.scale = Vector3(1.4, 0.5, 1.4)
+		# Hayatta kaldı: eziliyor, sonra saldırıya geçiyor. Ezilme animasyonu
+		# kovalamanın üstüne oynatılıyor — durum KOVALA ama gövde hâlâ
+		# toparlanıyor; oyuncuya "vurdum ama ölmedi" geri bildirimi bu.
 		_gec(Durum.KOVALA)
+		_oynatici.play("ezildi", 0.05)
 		return false
 	_gec(Durum.YENILDI)
 	return true
@@ -191,6 +259,27 @@ func _yenilme(delta: float) -> void:
 	if _yenilme_zamani > ERIME_SURESI:
 		queue_free()
 
+## Alt türlerin görünümü: aynı mesh, farklı renk ve ölçü.
+##
+## Oyuncunun türü BİR BAKIŞTA ayırt etmesi gerekiyor — davranış farkını
+## öğrenebilmesi için önce farkı GÖRMESİ lazım. Ölçü de değişiyor çünkü renk
+## tek başına yetmiyor: renk körü oyuncu için ayırt edici olan boy ve siluet
+## (aynı gerekçe tuzak şeritlerinde de var).
+func _gorunum(renk: Color, olcek: float) -> void:
+	_model.scale = Vector3.ONE * olcek
+	for dugum in _model.find_children("*", "MeshInstance3D", true, false):
+		var mi := dugum as MeshInstance3D
+		if mi.mesh == null or mi.mesh.get_surface_count() == 0:
+			continue
+		var kaynak := mi.mesh.surface_get_material(0) as BaseMaterial3D
+		if kaynak == null:
+			continue
+		# Kopya: kaynak malzeme atlasla paylaşılıyor, üstüne yazmak bütün
+		# düşmanları boyardı.
+		var kopya := kaynak.duplicate() as BaseMaterial3D
+		kopya.albedo_color = renk
+		mi.material_override = kopya
+
 ## Modelin malzemesini erime shader'ıyla değiştirir. Her örnek kendi
 ## kopyasını alıyor: iki düşman aynı anda yenilirse biri diğerinin erimesini
 ## sürüklemesin.
@@ -209,9 +298,12 @@ func _gec(yeni: Durum) -> void:
 	if durum == yeni:
 		return
 	durum = yeni
+	if ANIMASYON.has(yeni):
+		_oynat(ANIMASYON[yeni])
 	match yeni:
 		Durum.YENILDI:
 			_zaman = 0.0
+			_oynatici.play("ezildi", 0.05)
 			Ses.cal("dusman_oldu")
 			# Çarpışmayı kapat: yenilen düşmanın üstünde durulmasın.
 			$Carpisma.set_deferred("disabled", true)

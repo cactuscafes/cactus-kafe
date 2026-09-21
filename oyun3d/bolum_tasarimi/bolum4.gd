@@ -87,6 +87,10 @@ const VERI := {
 		{"konum": Vector3(6.0, 3.5, -21.0), "aci": 90.0, "devriye_ucu": Vector3(3.0, 0, 0)},
 		{"konum": Vector3(7.5, 6.3, -33.0), "aci": 0.0, "devriye_ucu": Vector3(0, 0, 3.0)},
 		{"konum": Vector3(-2.0, 8.5, -48.0), "aci": 90.0, "devriye_ucu": Vector3(4.0, 0, 0)},
+		# HOPLAYAN BURADA TANITILIYOR. Asansörün indirdiği geniş sahanlıkta
+		# bekliyor: oyuncu havada da tehdit olduğunu, düşme riskinin düşük
+		# olduğu bir yerde öğreniyor.
+		{"tur": "hoplayan", "konum": Vector3(0.0, 3.0, -11.5), "aci": 180.0},
 	],
 
 	"susleme": [

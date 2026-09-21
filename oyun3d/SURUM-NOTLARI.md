@@ -6,11 +6,37 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.13\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.14\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.14.0 — Düşmanlar: rig ve dövüş derinliği (Faz 14)
+
+- **Rig'li düşman.** Düşman artık kemikli: gövde, çene, iki bacak ve kuyruk
+  (6 kemik, 128 üçgen) — `araclar/dusman_karakter.py`. Yürüyor, çiğniyor,
+  ezilince çöküyor. Hareketi taklit eden ölçek oynatması (`_model.scale`)
+  emekli oldu; her duruma bir animasyon karşılık geliyor.
+- **Ortak rig hattı.** İskelet kurma, ağırlık, poz yazma, f-eğrisi erişimi ve
+  glTF dışa aktarımı `araclar/rig.py`'ye taşındı; oyuncu ve düşman aynı hattı
+  kullanıyor. Oyuncunun modeli bit bit aynı çıkıyor (ölçüm dosyası değişmedi).
+- **İki yeni düşman türü.** `hoplayan` zıplayarak saldırıyor (çömel → sıçra →
+  in → topar; inişte savunmasız), `atici` uzaktan diken atıyor (yerinden
+  kıpırdamıyor, siper işe yarıyor). İkisi de `dusman.gd`yi genişletiyor:
+  algı, devriye, unutma, ezilme ve erime ortak.
+- **Düşman türü bölüm verisinden.** `bolum_tasarimi/*.gd` içinde
+  `{"tur": "atici", "ayarlar": {...}}`; tür ve bölüme özel ayarlar veriden
+  geliyor.
+- **Atıcı bölüm 3'ten geri alındı.** Ölçüldü: zemini baştan sona ölümcül bir
+  bölümde menzilli düşman botun süresini 45 sn'den 105 sn'ye, ölümünü 7'den
+  15'e çıkardı. Menzili kısaltmak kurtarmadı; yeni tehdit, hatanın ucuz
+  olduğu bölüm 5'te tanıtılıyor.
+- **Atlas artık tekrarlanabilir.** `hash(ad)` Python'da süreç başına rastgele
+  (`PYTHONHASHSEED`); doku her üretimde farklı çıkıyordu. `crc32` ile sabit.
+- Düşman testi büyüdü: rig ve animasyon denetimi, hoplayanın gerçekten yerden
+  kesilmesi ve savunmasız penceresi, atıcının yerinden oynamaması, dikenin
+  ince duvarı DELMEMESİ (hızlı cisim tünelleme sınavı).
 
 ## 0.13.0 — Dünya sanatı ve aydınlatma (Faz 13)
 

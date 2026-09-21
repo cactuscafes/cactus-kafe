@@ -26,7 +26,7 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 > Cactus 3B, tek oturuşta bitirilen bir 3B platform oyunu. Dikenli tarlaların
 > üstünden basamak taşlarına atlıyor, hareketli platformlara yetişiyor, kule
 > tepesindeki çıkışa tırmanıyorsun. Yolda sekiz kaktüs çiçeği ve seni fark
-> edince peşine düşen dikenli düşmanlar var.
+> edince peşine düşen üç tür dikenli düşman var.
 >
 > **Zıplama hissi önce gelir.** Kenardan düştükten sonra hâlâ zıplayabilirsin
 > (coyote süresi), havadayken bastığın zıplama yere değince hatırlanır, tuşu
@@ -35,8 +35,10 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 >
 > **Düşmanlar adil.** Seni 120 derecelik bir koni içinde ve engel yoksa
 > görürler — arkadan yaklaşabilir, platformun arkasına saklanabilirsin.
-> Saldırıdan önce hazırlanırlar; kaçmak için bir anın vardır. Üstlerine
-> binersen iki vuruşta yenilirler ve seni yukarı sektirirler.
+> Saldırıdan önce hazırlanırlar; kaçmak için bir anın vardır. Üç türün de
+> kendi açığı var: kovalayanın üstüne binilir, zıplayan indikten sonra bir an
+> savunmasız kalır, uzaktan diken atanın yakın dövüşü yoktur — yanına varmak
+> yeter. Siper gerçekten siperdir: diken duvardan geçmez.
 >
 > **Rekor senin rakibin.** Her bölüm süreni ve ölümünü kaydeder. Bölümü
 > bitirmek kolay; temiz bitirmek değil.
@@ -46,7 +48,7 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 - Altı bölüm: parkur, kule tırmanışı, diken köprüsü, hareketli platform terası,
   düşman bahçesi ve hepsini birden isteyen final
 - Tuş atama ekranı ve erişilebilirlik ayarları
-- Üstüne zıplayarak yenilen, devriye gezen ve seni kovalayan düşmanlar
+- Üç düşman türü: kovalayan, üstüne zıplayan ve uzaktan diken atan
 - Coyote süresi, zıplama tamponu, değişken zıplama yüksekliği
 - Bölüm başına süre ve ölüm rekoru
 - Tarayıcıda oynanır — indirme yok

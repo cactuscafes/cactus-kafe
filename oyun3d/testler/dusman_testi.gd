@@ -6,6 +6,13 @@ extends Node
 ## Yapay zekâ elle test edilmesi en pahalı şey: durumu görmek için oyunu açıp
 ## düşmanın yanına gitmek, beklemek, arkasından dolaşmak gerekiyor. Burada
 ## oyuncu ışınlanıp durum makinesinin ne yaptığı okunuyor.
+##
+## FAZ 14: düşman rig'lendi ve iki alt tür geldi. Eklenen üç soru:
+##  - model gerçekten iskeletli mi, animasyonları yerinde mi, hızları
+##    animasyonun ölçüldüğü hızlarla aynı mı (ikisi ayrı dosyada duruyor);
+##  - hoplayan gerçekten YERDEN KESİLİYOR mu ve indikten sonra savunmasız
+##    bir penceresi var mı (adil olmasının şartı);
+##  - atıcının dikeni DUVARDAN geçiyor mu (siper gerçekten siper mi).
 
 var _hatalar: Array[String] = []
 var _bolum: Node3D
@@ -31,6 +38,7 @@ func _calis() -> void:
 	_oyuncu = _bolum.get_node("Oyuncu")
 	_dusman = _bolum.get_node("Dusmanlar/Dusman3")
 
+	_rig_dogrula()
 	_navigasyon_testi()
 	await _ezme_testi()
 	await _devriye_testi()
@@ -38,6 +46,9 @@ func _calis() -> void:
 	await _saldiri_testi()
 	await _dokunulmazlik_testi()
 	await _olum_testi()
+	await _hoplayan_testi()
+	await _atici_testi()
+	await _diken_duvar_testi()
 
 	if _hatalar.is_empty():
 		print("DUSMAN TESTI: GECTI")
@@ -47,6 +58,81 @@ func _calis() -> void:
 			printerr("  ! " + h)
 		print("DUSMAN TESTI: KALDI (%d)" % _hatalar.size())
 		get_tree().quit(1)
+
+# ------------------------------------------------------------- rig (Faz 14)
+
+const OLCUM := "res://varliklar/dusman_olcum.json"
+## Ayak kayması bütçesi (araclar/dusman_karakter.py::KAYMA_HEDEFI = 2,5).
+const KAYMA_BUTCESI := 2.8
+
+func _rig_dogrula() -> void:
+	var dosya := FileAccess.open(OLCUM, FileAccess.READ)
+	if dosya == null:
+		_hatalar.append("%s yok — araclar/dusman_karakter.py çalıştırılmalı" % OLCUM)
+		return
+	var olcum: Dictionary = JSON.parse_string(dosya.get_as_text())
+	var model := _dusman.get_node_or_null("Model/Gorsel")
+	var iskelet := _bul(model, "Skeleton3D") as Skeleton3D
+	_dogrula(iskelet != null, "Düşmanda iskelet (Skeleton3D) yok")
+	if iskelet != null:
+		_dogrula(iskelet.get_bone_count() == int(olcum["kemik"]),
+			"Düşman kemik sayısı %d, ölçümde %d" % [
+				iskelet.get_bone_count(), olcum["kemik"]])
+	var mesh := _bul(model, "MeshInstance3D") as MeshInstance3D
+	_dogrula(mesh != null and mesh.skin != null,
+		"Düşman mesh'i iskelete bağlı değil (skin yok) — poz donar")
+	if mesh != null:
+		var mat := mesh.mesh.surface_get_material(0) as BaseMaterial3D
+		_dogrula(mat != null and mat.albedo_texture != null,
+			"Düşmanın dokusu yok — oyunda bembeyaz görünür")
+
+	var oynatici := _bul(model, "AnimationPlayer") as AnimationPlayer
+	_dogrula(oynatici != null, "Düşmanda AnimationPlayer yok")
+	if oynatici != null:
+		var beklenen: Dictionary = olcum["animasyon"]
+		for ad: String in beklenen:
+			if not oynatici.has_animation(ad):
+				_hatalar.append("Düşman animasyonu yok: %s (gelen: %s)" % [
+					ad, ", ".join(oynatici.get_animation_list())])
+				continue
+			var sure := oynatici.get_animation(ad).length
+			_dogrula(absf(sure - float(beklenen[ad])) < 0.08,
+				"'%s' süresi %.2f sn, ölçümde %.2f sn" % [ad, sure, beklenen[ad]])
+		# Durum makinesindeki her durumun animasyonu gerçekten var mı?
+		for durum: int in _dusman.ANIMASYON:
+			var ad: String = _dusman.ANIMASYON[durum]
+			_dogrula(oynatici.has_animation(ad),
+				"Durum %d için '%s' animasyonu yok" % [durum, ad])
+
+	# Animasyonun ölçüldüğü hızlar ile oyundaki hızlar aynı mı? İkisi ayrı
+	# dosyada; biri değişip diğeri unutulursa ayak kayması sessizce büyür.
+	var hizlar: Dictionary = olcum.get("hiz", {})
+	_dogrula(absf(float(hizlar.get("yurume", 0.0)) - _dusman.ANIM_YURUME_HIZI) < 0.01,
+		"yürüme hızı ölçümde %.2f, dusman.gd'de %.2f" % [
+			hizlar.get("yurume", 0.0), _dusman.ANIM_YURUME_HIZI])
+	_dogrula(absf(float(hizlar.get("kosma", 0.0)) - _dusman.ANIM_KOSMA_HIZI) < 0.01,
+		"koşma hızı ölçümde %.2f, dusman.gd'de %.2f" % [
+			hizlar.get("kosma", 0.0), _dusman.ANIM_KOSMA_HIZI])
+	var kayma: Dictionary = olcum.get("kayma", {})
+	for ad: String in kayma:
+		_dogrula(float(kayma[ad]) <= KAYMA_BUTCESI,
+			"düşman '%s' ayağı %.2f kat kayıyor (bütçe %.2f)" % [
+				ad, kayma[ad], KAYMA_BUTCESI])
+	print("düşman rig: %d kemik, %d animasyon, kayma %s" % [
+		iskelet.get_bone_count() if iskelet else -1,
+		(olcum["animasyon"] as Dictionary).size(), str(kayma)])
+
+func _bul(kok: Node, sinif: String) -> Node:
+	if kok == null:
+		return null
+	var yigin: Array[Node] = [kok]
+	while not yigin.is_empty():
+		var d: Node = yigin.pop_back()
+		if d.is_class(sinif):
+			return d
+		for c in d.get_children():
+			yigin.append(c)
+	return null
 
 ## Bayat navigasyon örgüsünün en sık belirtisi: düşman kovalayamıyor çünkü
 ## iki nokta arasında yol yok. Örgüyü yeniden pişirmeyi unutmak buradan
@@ -192,3 +278,131 @@ func _olum_testi() -> void:
 		"Ölümden sonra doğum noktasına dönülmedi")
 	# Doğar doğmaz kısa dokunulmazlık: üstünde duran düşman anında vurmasın.
 	_dogrula(_oyuncu.dokunulmaz_mi(), "Doğumda kısa dokunulmazlık verilmedi")
+
+# ------------------------------------------------- alt türler (Faz 14)
+
+## Bölümün kendi düşmanlarını durdurur. Alt tür testleri TEK bir düşmanın
+## davranışını ölçüyor; yakındaki başka bir düşmanın vuruşu "atıcının dikeni
+## vurdu" diye okunursa test doğru sebepten değil yanlış sebepten geçer.
+## Düşmanın baktığı yönde, verilen mesafede bir nokta.
+func _onune(d: Node3D, mesafe: float) -> Vector3:
+	var model: Node3D = d.get_node("Model")
+	var onu := -model.global_transform.basis.z
+	return d.global_position + onu * mesafe + Vector3(0, 0.6, 0)
+
+func _bolumun_dusmanlarini_durdur() -> void:
+	for d in get_tree().get_nodes_in_group("dusman"):
+		(d as Node).set_physics_process(false)
+
+## Hoplayan gerçekten yerden kesiliyor mu? "Zıplıyor" iddiasının tek kanıtı
+## bu: kovalarken en yüksek noktası başlangıç yüksekliğinin üstünde olmalı.
+## Ayrıca indikten sonra TOPARLANMA penceresi olmalı — oyuncunun üstüne
+## binebileceği açık. Penceresiz bir hoplayan yenilemez olurdu.
+func _hoplayan_testi() -> void:
+	_bolumun_dusmanlarini_durdur()
+	var sahne: PackedScene = load("res://sahneler/dusman_hoplayan.tscn")
+	var h: CharacterBody3D = sahne.instantiate()
+	# Konum ağaca EKLEMEDEN önce veriliyor: düşman `_ready` içinde devriye
+	# başlangıcını kendi konumundan alıyor. Sonradan taşınan bir düşman
+	# "başlangıç noktama döneyim" diye doğduğu yere yürüyor — testte bu,
+	# "yerinden oynadı" diye okunuyordu.
+	# Bölümün kendi düşmanının yanı: orada düz zemin olduğu ve görüşün açık
+	# olduğu ZATEN biliniyor (devriye/farketme testleri orayı kullanıyor).
+	h.position = _dusman.position + Vector3(2.0, 0.3, 0.0)
+	_bolum.get_node("Dusmanlar").add_child(h)
+	await _bekle(4)
+	# Oyuncu düşmanın TAM ÖNÜNE konuyor: görüş açısı 120°, yanına konan
+	# oyuncu fark edilmiyor ve test "zıplamıyor" diye okuyordu.
+	_oyuncu.global_position = _onune(h, 5.0)
+	_oyuncu.velocity = Vector3.ZERO
+	await _bekle(20)
+
+	var taban := h.global_position.y
+	var en_yuksek := taban
+	var havada_kare := 0
+	var topar_kare := 0
+	for i in 260:
+		await get_tree().physics_frame
+		en_yuksek = maxf(en_yuksek, h.global_position.y)
+		if not h.is_on_floor():
+			havada_kare += 1
+		if h.get("_evre") == 3:      # Evre.TOPAR
+			topar_kare += 1
+	print("hoplayan: en yüksek +%.2f m, %d kare havada, %d kare toparlanma" % [
+		en_yuksek - taban, havada_kare, topar_kare])
+	_dogrula(en_yuksek - taban > 0.8,
+		"Hoplayan zıplamıyor (en fazla +%.2f m)" % (en_yuksek - taban))
+	_dogrula(havada_kare > 10, "Hoplayan havada hiç kalmıyor")
+	_dogrula(topar_kare > 5,
+		"Hoplayanın iniş sonrası savunmasız penceresi yok — yenilemez olur")
+	h.queue_free()
+	await _bekle(4)
+
+## Atıcı: (1) yerinden kıpırdamamalı — yaklaşmak her zaman işe yaramalı,
+## (2) diken atmalı, (3) diken hasar vermeli.
+func _atici_testi() -> void:
+	_bolumun_dusmanlarini_durdur()
+	var sahne: PackedScene = load("res://sahneler/dusman_atici.tscn")
+	var a: CharacterBody3D = sahne.instantiate()
+	a.position = _dusman.position + Vector3(2.0, 0.3, 0.0)   # bkz. hoplayan testi
+	_bolum.get_node("Dusmanlar").add_child(a)
+	await _bekle(10)
+	var basladigi := a.global_position
+	# Oyuncuyu tam karşısına, atış menziline koy.
+	_oyuncu.global_position = _onune(a, 6.0)
+	_oyuncu.velocity = Vector3.ZERO
+	_oyuncu.dokunulmazligi_bitir()
+	var can_once: int = _oyuncu.can
+	var mermi_gordu := false
+	for i in 300:
+		await get_tree().physics_frame
+		if not get_tree().get_nodes_in_group("mermi").is_empty():
+			mermi_gordu = true
+		if _oyuncu.can < can_once:
+			break
+	# YATAY yer değişimi: düşman havada doğduysa düşüşü "yürüdü" sayılmasın.
+	var kayma := Vector2(a.global_position.x - basladigi.x,
+		a.global_position.z - basladigi.z).length()
+	print("atıcı: mermi %s, can %d -> %d, yatay yer değişimi %.2f m" % [
+		"atıldı" if mermi_gordu else "ATILMADI", can_once, _oyuncu.can, kayma])
+	_dogrula(mermi_gordu, "Atıcı diken atmadı")
+	_dogrula(_oyuncu.can < can_once, "Atıcının dikeni hasar vermedi")
+	_dogrula(kayma < 1.0,
+		"Atıcı yerinden oynadı (%.2f m) — yaklaşmanın karşılığı kalmaz" % kayma)
+	a.queue_free()
+	await _bekle(4)
+
+## Siper gerçekten siper mi? Diken duvara doğru atılıyor, arkasındaki
+## oyuncuya ulaşmamalı. Hızlı cisim tünelleme hatası tam burada çıkar:
+## kare başına 23 cm atlayan bir mermi ince duvarı delip geçebilir.
+func _diken_duvar_testi() -> void:
+	var duvar := StaticBody3D.new()
+	duvar.collision_layer = 1
+	var sekil := CollisionShape3D.new()
+	var kutu := BoxShape3D.new()
+	kutu.size = Vector3(4.0, 3.0, 0.3)     # İNCE duvar: tünelleme sınavı
+	sekil.shape = kutu
+	duvar.add_child(sekil)
+	_bolum.add_child(duvar)
+	duvar.global_position = Vector3(0.0, 1.5, -16.0)
+
+	_oyuncu.global_position = Vector3(0.0, 1.0, -14.0)
+	_oyuncu.velocity = Vector3.ZERO
+	_oyuncu.dokunulmazligi_bitir()
+	await _bekle(6)
+	var can_once: int = _oyuncu.can
+
+	var diken: Area3D = (load("res://sahneler/diken.tscn") as PackedScene).instantiate()
+	_bolum.add_child(diken)
+	diken.global_position = Vector3(0.0, 1.0, -20.0)
+	diken.kur(Vector3(0, 0, 1), null)
+	var kare := 0
+	while is_instance_valid(diken) and kare < 120:
+		await get_tree().physics_frame
+		kare += 1
+	print("diken/duvar: %d karede durdu, can %d -> %d" % [kare, can_once, _oyuncu.can])
+	_dogrula(kare < 120, "Diken duvara çarpıp yok olmadı")
+	_dogrula(_oyuncu.can == can_once,
+		"Diken duvarın içinden geçip oyuncuya vurdu (tünelleme)")
+	duvar.queue_free()
+	await _bekle(4)

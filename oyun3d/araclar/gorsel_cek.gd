@@ -69,6 +69,12 @@ func _ready() -> void:
 			if hud != null:
 				hud.get_node("Olcum").visible = false
 			await get_tree().process_frame
+			# Düşmanlar dondurulur (Faz 14): oyuncu kadraja ışınlanırken
+			# saldırıya uğrayıp ölüyor ve kare "Kontrol noktasına döndün"
+			# yazısıyla çıkıyordu. Görseller tekrarlanabilir olmalı; oynanış
+			# anı değil, KADRAJ çekiliyor.
+			for d in get_tree().get_nodes_in_group("dusman"):
+				(d as Node).set_physics_process(false)
 
 		var oyuncu: CharacterBody3D = bolum.get_node("Oyuncu")
 		var kol: SpringArm3D = oyuncu.get_node("KameraKolu")

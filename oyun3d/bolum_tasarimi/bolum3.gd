@@ -94,6 +94,13 @@ const VERI := {
 		{"konum": Vector3(-2.5, 1.9, -11.5), "aci": 90.0, "devriye_ucu": Vector3(5.0, 0, 0)},
 		{"konum": Vector3(2.5, 2.3, -26.5), "aci": 180.0, "devriye_ucu": Vector3(-4.5, 0, 0)},
 		{"konum": Vector3(-2.5, 2.3, -24.5), "aci": 0.0, "devriye_ucu": Vector3(0, 0, -3.0)},
+		# ATICI BURADA YOK — denendi ve geri alındı. Menzilli düşman, zemini
+		# baştan sona ölümcül ve köprüleri dar olan bir bölümde geri tepmeyle
+		# birleşince ölüm makinesine dönüyor: botun süresi 45 sn'den 105 sn'ye,
+		# ölümü 7'den 15'e çıktı. Menzili 16 m'den 9 m'ye indirmek de
+		# kurtarmadı — sorun menzil değil, HATANIN BEDELİ. Yeni bir tehdit,
+		# hatanın ucuz olduğu yerde öğretilir; atıcı bu yüzden zemini ölümcül
+		# olmayan bölüm 5'te tanıtılıyor.
 	],
 
 	# Süsleme yalnızca geniş platformlarda: dar köprülerde göz karıştırıyor

@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Cactus 3B"
 config/description="Çölde zıpla, çiçekleri topla, dikenli düşmanların üstüne bin."
-config/version="0.13.0"
+config/version="0.14.0"
 run/main_scene="res://sahneler/ana_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
@@ -50,6 +50,9 @@ locale/fallback="tr"
 3d_physics/layer_4="toplanabilir"
 3d_physics/layer_5="kontrol"
 3d_physics/layer_6="platform"
+; Faz 14: düşman gövdeleri ve atıcının dikeni.
+3d_physics/layer_7="dusman"
+3d_physics/layer_8="mermi"
 
 [rendering]
 

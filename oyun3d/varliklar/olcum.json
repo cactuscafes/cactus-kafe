@@ -29,31 +29,6 @@
     "teksel_metre": 380.0,
     "ucgen": 120
   },
-  "dusman": {
-    "atlas_px": [
-      2048,
-      3072
-    ],
-    "bolge": "dusman",
-    "bolge_px": [
-      0,
-      2048,
-      1024,
-      1024
-    ],
-    "boyut_m": [
-      1.14,
-      1.084,
-      1.011
-    ],
-    "taban_renk": [
-      0.56,
-      0.24,
-      0.31
-    ],
-    "teksel_metre": 380.0,
-    "ucgen": 86
-  },
   "kaktus": {
     "atlas_px": [
       2048,

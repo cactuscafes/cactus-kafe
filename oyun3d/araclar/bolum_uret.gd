@@ -26,7 +26,6 @@ const PLATFORM := preload("res://sahneler/platform.tscn")
 const HAREKETLI := preload("res://sahneler/hareketli_platform.tscn")
 const TOPLANABILIR := preload("res://sahneler/toplanabilir.tscn")
 const KONTROL := preload("res://sahneler/kontrol_noktasi.tscn")
-const DUSMAN := preload("res://sahneler/dusman.tscn")
 const OYUNCU := preload("res://sahneler/oyuncu.tscn")
 const DURAKLAT := preload("res://sahneler/duraklat.tscn")
 const BITIS_EKRANI := preload("res://sahneler/bitis_ekrani.tscn")
@@ -394,6 +393,14 @@ func _manzara_ekle(kok: Node3D, veri: Dictionary) -> void:
 	dugum.serpinti_yaricap = float(veri.get("zemin_olcu", 140.0)) * 0.44
 	_ekle(kok, dugum, kok)
 
+## Düşman türleri (Faz 14). Veride "tur" yoksa temel düşman geliyor —
+## eski bölüm verileri aynen çalışsın diye.
+const DUSMAN_TURLERI := {
+	"temel": "res://sahneler/dusman.tscn",
+	"hoplayan": "res://sahneler/dusman_hoplayan.tscn",
+	"atici": "res://sahneler/dusman_atici.tscn",
+}
+
 func _dusmanlari_ekle(kok: Node3D, veri: Dictionary) -> void:
 	var liste: Array = veri.get("dusmanlar", [])
 	var kap := Node3D.new()
@@ -401,11 +408,30 @@ func _dusmanlari_ekle(kok: Node3D, veri: Dictionary) -> void:
 	_ekle(kok, kap, kok)
 	for i in liste.size():
 		var d: Dictionary = liste[i]
-		var dugum: Node3D = DUSMAN.instantiate()
-		dugum.name = "Dusman%d" % (i + 1)
+		var tur: String = d.get("tur", "temel")
+		if not DUSMAN_TURLERI.has(tur):
+			_hatalar.append("%s: bilinmeyen düşman türü '%s'" % [veri["kimlik"], tur])
+			continue
+		var sahne: PackedScene = load(DUSMAN_TURLERI[tur])
+		var dugum: Node3D = sahne.instantiate()
+		# Ad türü taşıyor: hata ayıklarken ve denge raporunda hangi düşmanın
+		# zorladığı sahne ağacından okunuyor.
+		dugum.name = "Dusman%d" % (i + 1) if tur == "temel" else "%s%d" % [
+			tur.capitalize(), i + 1]
 		var temel := Basis(Vector3.UP, deg_to_rad(d.get("aci", 0.0)))
 		dugum.transform = Transform3D(temel, d["konum"])
 		dugum.devriye_ucu = d.get("devriye_ucu", Vector3(4, 0, 0))
+		if d.has("can"):
+			dugum.can = d["can"]
+		# Bölüme özel ince ayar: türün varsayılanı her yerde doğru olmuyor.
+		# Örnek — bölüm 3'te atıcının menzili kısa, çünkü orada zemin ölümcül
+		# ve uzun menzil oyuncuyu köprünün ortasında yakalıyor.
+		for alan: String in d.get("ayarlar", {}):
+			if alan in dugum:
+				dugum.set(alan, d["ayarlar"][alan])
+			else:
+				_hatalar.append("%s: '%s' düşmanında böyle bir ayar yok: %s" % [
+					veri["kimlik"], tur, alan])
 		_ekle(kap, dugum, kok)
 
 ## Faz 6: aynı mesh'i paylaşan görselleri tek MultiMesh'te birleştiriyor.

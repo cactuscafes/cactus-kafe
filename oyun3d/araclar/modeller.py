@@ -28,6 +28,7 @@ import math
 import os
 import random
 import sys
+import zlib
 
 import bpy  # bmesh'ten önce: bpy yüklenmeden bmesh modülü kayıtlı olmuyor
 import bmesh
@@ -110,7 +111,11 @@ def atlas_uret(yol: str) -> None:
     px = img.load()
     for ad, (x0, y0, gen_px, yuk_px) in BOLGELER.items():
         renk = RENKLER[ad]
-        tohum = hash(ad) & 0xFFFF
+        # TUZAK: burada `hash(ad)` yazıyordu. Python'da str hash'i SÜREÇ
+        # BAŞINA rastgele (PYTHONHASHSEED); yani atlas her çalıştırmada farklı
+        # çıkıyordu — 4 MB'lık doku her üretimde yeniden yazılıyor, desen
+        # sessizce değişiyordu. crc32 sürümler ve süreçler arası sabit.
+        tohum = zlib.crc32(ad.encode("utf-8")) & 0xFFFF
         for y in range(yuk_px):
             for x in range(gen_px):
                 k = 0.92 + 0.16 * _deger_gurultusu(x, y, 48, tohum)
@@ -242,44 +247,6 @@ def sandik() -> bpy.types.Object:
     bmesh.ops.translate(bm, verts=bm.verts, vec=(0, 0, 0.4))
     return _nesne("sandik", bm)
 
-
-def dusman() -> bpy.types.Object:
-    """Yuvarlak, dikenli düşman.
-
-    Silueti kasten farklı: oyuncudaki kaktüs ve süslemedeki saguaro uzun ve
-    dik; bu yuvarlak ve dikenli. Tehlikeyi renkten önce siluetten tanımak
-    gerekir — renk körü oyuncu için tek ipucu budur.
-    """
-    rast = random.Random(21)
-    bm = bmesh.new()
-    govde = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.42)["verts"]
-    for v in govde:
-        v.co.z *= 0.86
-    # dikenler: gövdenin dışına bakan küçük koniler
-    for i in range(10):
-        aci = i * math.tau / 10.0
-        yukseklik = 0.06 + rast.random() * 0.30
-        diken = bmesh.ops.create_cone(
-            bm, cap_ends=True, cap_tris=False, segments=4,
-            radius1=0.07, radius2=0.0, depth=0.26,
-        )["verts"]
-        bmesh.ops.rotate(
-            bm, verts=diken, cent=(0, 0, 0),
-            matrix=Matrix.Rotation(math.radians(90), 3, "Y"),
-        )
-        bmesh.ops.rotate(
-            bm, verts=diken, cent=(0, 0, 0),
-            matrix=Matrix.Rotation(aci, 3, "Z"),
-        )
-        bmesh.ops.translate(bm, verts=diken, vec=(
-            math.cos(aci) * 0.44, math.sin(aci) * 0.44, yukseklik))
-    tepe = bmesh.ops.create_cone(
-        bm, cap_ends=True, cap_tris=False, segments=4,
-        radius1=0.08, radius2=0.0, depth=0.3,
-    )["verts"]
-    bmesh.ops.translate(bm, verts=tepe, vec=(0, 0, 0.5))
-    bmesh.ops.translate(bm, verts=bm.verts, vec=(0, 0, 0.42))
-    return _nesne("dusman", bm)
 
 
 def cicek() -> bpy.types.Object:
@@ -436,13 +403,15 @@ def main() -> int:
     img = bpy.data.images.load(atlas_yolu)
     img.name = "atlas"
 
+    # Düşman BURADA DEĞİL: Faz 14'te rig'lendi ve kendi betiğine taşındı
+    # (`araclar/dusman_karakter.py`). Rig'li varlıkların hattı farklı —
+    # iskelet, ağırlık ve animasyon gerekiyor; `araclar/rig.py` onu taşıyor.
     kurucular = {
         "kaya": (kaya, "kaya"),
         "kaktus": (kaktus, "kaktus"),
         "tabela": (tabela, "ahsap"),
         "sandik": (sandik, "sandik"),
         "cicek": (cicek, "cicek"),
-        "dusman": (dusman, "dusman"),
     }
 
     rapor: dict[str, dict] = {}

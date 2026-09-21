@@ -1,9 +1,9 @@
 # Cactus 3B — oyun projesi
 
 [3B Oyun Yol Haritası](../3D-OYUN-YOLHARITASI.md)'nın uygulandığı yer.
-Şu an **Faz 13** bitti: dünya kum rengi kutulardan çıktı — anahtar/dolgu
-aydınlatması, gökyüzü ve dünya gölgelendiricileri, ufku kapatan uzak manzara
-ve grafik ön ayarı.
+Şu an **Faz 14** bitti: düşmanlar rig'lendi ve çoğaldı — kemikli düşman
+modeli, zıplayarak saldıran ve uzaktan diken atan iki yeni tür, oyuncuyla
+paylaşılan rig hattı.
 Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md).
 
 | Faz | Ne geldi |
@@ -23,6 +23,7 @@ Yayın hâlâ sizde — [MAGAZA.md](MAGAZA.md), [CIKIS-PLANI.md](CIKIS-PLANI.md)
 | **11** | **Karakter**: Blender'da modellenip rig'lenen, skinning'li ve iskelet animasyonlu kaktüs; yordamsal animasyon üreticisi emekli oldu, draw call bölüm başına ~13 düştü |
 | **12** | **Animasyon cilası**: iki kemikli bacak (7 → 11 kemik), ayak IK'sı (rampa/basamak), ölçüyle belirlenen adım temposu (kayma 4,3 → 2,0 kat), ayak IK testi |
 | **13** | **Dünya sanatı ve aydınlatma**: paylaşılan ışık kurulumu (anahtar + dolgu, gökyüzünden ortam), gökyüzü ve dünya gölgelendiricileri, uzak manzara (mesa siluetleri + serpinti), grafik ön ayarı, görsel test |
+| **14** | **Düşmanlar**: rig'li düşman (6 kemik, 7 animasyon), ortak rig hattı (`araclar/rig.py`), iki yeni tür (hoplayan, atıcı), veriden tür seçimi, mermi ve tünelleme testi |
 
 ---
 
@@ -850,7 +851,58 @@ Ayrıntı ve Steam kuralları: [MAGAZA.md](MAGAZA.md).
 
 ---
 
-## Düşman ve dövüş (Faz 4)
+## Düşman ve dövüş (Faz 4, 14)
+
+### Üç tür, tek durum makinesi (Faz 14)
+
+| Tür | Nasıl saldırır | Açığı | Nerede tanıtılıyor |
+|---|---|---|---|
+| **temel** | Kovalar, menzilde yakın dövüş | Üstüne binilir (2 can) | Bölüm 1 |
+| **hoplayan** | Çömelir, sıçrar, iniş hasarı verir | İnişten sonra 0,7 sn savunmasız (1 can) | Bölüm 4 |
+| **atıcı** | Yerinde durur, diken atar | Yanına varmak: yakın dövüşü yok | Bölüm 5 |
+
+İkisi de `betikler/dusman.gd`yi **genişletiyor**: algı, devriye, unutma,
+ezilme ve erime ortak; alt tür yalnızca kovalama ve saldırıyı değiştiriyor.
+Tür ve bölüme özel ayarlar veriden geliyor:
+
+```gdscript
+{"tur": "atici", "konum": Vector3(-6, 1.4, -12), "aci": 90.0,
+ "ayarlar": {"atis_menzili": 9.0}}
+```
+
+> **Ölçülen ders: zorluk yerel bir karar değil.** Atıcı önce bölüm 3'e
+> konmuştu — geniş bir platformun üstünde, makul görünüyordu. Bot ölçtü:
+> **süre 45 sn → 105 sn, ölüm 7 → 15**. Sebep atıcının kendisi değil, bölüm 3'ün
+> zemininin baştan sona ölümcül olması: menzilli hasar + geri tepme + dar
+> köprü = düşme. Menzili 16 m'den 9 m'ye indirmek kurtarmadı. Atıcı, zemini
+> güvenli olan bölüm 5'e taşındı; yeni bir tehdit hatanın UCUZ olduğu yerde
+> öğretilir. Bu kararı veren şey sezgi değil Faz 10'un botu oldu.
+
+**Adil olmanın üç kuralı** (atıcıda yazılı, hepsi için geçerli): atıştan önce
+görünür hazırlık; mermi duvardan geçmez; atıcı yerinden kıpırdamaz — yaklaşmak
+her zaman işe yarar. Kovalayan bir menzilli düşman oyuncuya kazanma yolu
+bırakmazdı.
+
+### Rig ve animasyon (Faz 14)
+
+Düşman Faz 13'e kadar kemiksizdi: hareketi `_model.scale` ile ezip germekten
+ibaretti — uzaktan iş görüyor, yakından "kayan bir kitle" gibi duruyordu.
+Artık altı kemikli (gövde, çene, iki bacak, kuyruk), 128 üçgen, yedi
+animasyon. Model oyuncuyla **aynı hattan** çıkıyor: `araclar/rig.py` iskelet
+kurmayı, ağırlık atamayı, poz yazmayı ve dışa aktarımı taşıyor;
+`dusman_karakter.py` yalnızca kemik tablosunu, mesh'i ve animasyonları veriyor.
+
+> **Neden AnimationTree yok:** oyuncuda var, çünkü yürüme↔koşma arasını hızla
+> karıştırmak gerekiyor (BlendSpace1D). Düşmanın durumu ayrık — ya devriyede
+> ya kovalıyor ya saldırıyor; karıştırılacak bir eksen yok. AnimationTree
+> eklemek, durum makinesinin İKİNCİ bir kopyasını (ağacın kendi makinesini)
+> `dusman.gd` ile eşzamanlı tutmak demekti. Tek makine, tek doğruluk kaynağı;
+> geçiş yumuşaklığını `play()`in harman süresi veriyor.
+
+Silueti bilerek korundu — yuvarlak ve dikenli, oyuncunun uzun kaktüsünden
+farklı. Tehlikeyi renkten önce siluetten tanımak gerekiyor; renk körü oyuncu
+için tek ipucu bu. Türler de renk + BOY ile ayrışıyor (hoplayan küçük ve
+mavimsi, atıcı iri ve sarımsı): renk tek başına yetmez.
 
 ### Durum makinesi
 
@@ -964,6 +1016,23 @@ Blender'ın `bpy` modülüyle beş nesne üretilir — kaya, kaktüs, tabela, sa
 çiçek — UV'leri açılır, ortak atlasa paketlenir, `varliklar/` altına glTF olarak
 yazılır. Ölçüler `varliklar/olcum.json` dosyasına raporlanır; Godot tarafındaki
 test bu raporu sözleşme olarak kullanır.
+
+**Rig'li varlıklar ayrı hatta** (oyuncu Faz 11, düşman Faz 14): iskelet,
+ağırlık ve animasyon gerekiyor. Ortak kısım `araclar/rig.py`, karaktere özgü
+kısım kendi betiğinde:
+
+```bash
+python3 oyun3d/araclar/karakter.py         # -> varliklar/oyuncu.gltf
+python3 oyun3d/araclar/dusman_karakter.py  # -> varliklar/dusman.gltf
+```
+
+> **TUZAK — atlas her üretimde farklı çıkıyordu.** Bölge tohumu
+> `hash(ad)` ile üretiliyordu; Python'da str hash'i **süreç başına rastgele**
+> (`PYTHONHASHSEED`). Yani "tekrarlanabilir" denen hat, her çalıştırmada 4
+> MB'lık dokuyu farklı desenle yeniden yazıyordu — fark ancak `git diff`te
+> görünüyordu. `crc32` sürümler ve süreçler arası sabit. (Kalan bir
+> belirsizlik: `bmesh.ops.bevel` köşe sırası koşudan koşuya değişebiliyor,
+> sandığın `.bin`i o yüzden bazen farklı yazılıyor.)
 
 > **Betikle modellemek elle modellemenin yerine geçmez.** Bu ortamda Blender'ın
 > arayüzü yok, o yüzden nesneler kodla kuruldu. Fazın asıl kazancı hattın
@@ -1180,9 +1249,13 @@ Numara yerine isim kullanın; `project.godot` içinde tanımlı:
 | 4 | toplanabilir | Çiçekler (Area3D) |
 | 5 | kontrol | Kontrol noktaları ve bitiş (Area3D) |
 | 6 | platform | Hareketli platform (AnimatableBody3D) |
+| 7 | dusman | Düşman gövdeleri |
+| 8 | mermi | Atıcının dikeni (Area3D) |
 
-Karakterin maskesi zemin + platform; Area3D'lerin maskesi yalnızca oyuncu.
-Böylece çiçekler birbirini, tuzak platformu tetiklemiyor.
+Karakterin maskesi zemin + platform + düşman; Area3D'lerin maskesi yalnızca
+oyuncu. Böylece çiçekler birbirini, tuzak platformu tetiklemiyor. Dikenin
+maskesi zemin + oyuncu + platform: duvara çarpıyor, oyuncuya vuruyor, ama
+onu atan düşmana takılmıyor (atıcı ışın sorgusunda hariç tutuluyor).
 
 ---
 
@@ -1206,7 +1279,10 @@ oyun3d/
 │   ├── ses.gd               Autoload: ses havuzu, müzik, bus seviyeleri
 │   ├── ayarlar.gd           Autoload: ayar + rekor kalıcılığı
 │   ├── efekt.gd             Autoload: sarsıntı ve vuruş duraklaması
-│   ├── dusman.gd            Durum makineli düşman
+│   ├── dusman.gd            Durum makineli düşman (temel sınıf)
+│   ├── dusman_hoplayan.gd   Zıplayarak saldıran alt tür
+│   ├── dusman_atici.gd      Uzaktan diken atan alt tür
+│   ├── diken.gd             Atıcının mermisi (Area3D, ışınla ön sınama)
 │   ├── bolumler.gd          Autoload: bölüm kütüğü
 │   ├── bolum_grafi.gd       Durak/menzil grafı — test ve bot ortak kullanıyor
 │   ├── bot/                 Otomatik oyuncu (denge ölçümü, par turu)
@@ -1356,9 +1432,9 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Web dışa aktarımı | ✅ `index.wasm` + `index.pck` |
 | Windows dışa aktarımı | ✅ geçerli PE32+ ikili |
 | Arayüz testleri (6 grup) | ✅ hepsi geçti |
-| Düşman testleri (7 grup) | ✅ hepsi geçti |
+| Düşman testleri (10 grup) | ✅ hepsi geçti (rig, hoplayan, atıcı, diken/duvar dahil) |
 | Çeviri testleri | ✅ 79 anahtar × 2 dil, eksik yok |
-| Performans bütçesi | ✅ altı bölüm bütçe içinde (67–77 draw call, en yüksek grafik ön ayarında) |
+| Performans bütçesi | ✅ altı bölüm bütçe içinde (67–81 draw call, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ayak IK testi (4 durum) | ✅ rampada bilek hatası 8,8 → 0,2 cm, basamakta 6,1 → 0,1 cm |
@@ -1413,6 +1489,13 @@ açık kalan uçlar:
   Faz 10'un bütün denge bütçesinin yeniden ayarlanması.
 - **El IK'sı yok** — ayak IK'sı Faz 12'de geldi (`betikler/ayak_ik.gd`); duvara
   yaslanma ve tutunma aynı modifiye edici altyapısının üstüne kurulabilir.
+- **Düşmanların birbirinden haberi yok** — sürü davranışı, çevreleme ve
+  "arkadaşım vuruldu" tepkisi yok. Üç tür bir arada dursa da birbirini
+  görmüyor; her biri kendi durum makinesini yalnız yaşıyor.
+- **Yenilme tek tip** — her düşman aynı erime efektiyle gidiyor ve hepsi aynı
+  sesi çıkarıyor. Tür başına ses ve yenilme, ucuz bir kimlik kazancı olurdu.
+- **Boss yok** — altı bölümün sonunda öğrenilenleri sınayan tek bir karşılaşma
+  yok; final bölümü bunu düşman yoğunluğuyla yapıyor.
 - **Prop çarpışması** — süsleme nesnelerinin çarpışması yok. Godot'nun glTF
   içe aktarıcısı, Blender'da adı `-col` ile biten mesh'ler için otomatik
   `StaticBody3D` üretir; sandık ve kayaya bu uygulanacak.

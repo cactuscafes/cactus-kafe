@@ -1,6 +1,6 @@
 {
   "name": "cactus-3b-telemetri",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "description": "Cactus 3B anonim telemetri toplayıcısı (Cloudflare Worker + D1)",

@@ -91,8 +91,8 @@ jobs:
       # boşluk geçilir" diyor; bu adım "geçildi" diyor. İkisi farklı sorular.
       - name: Denge (bot bölümleri oynuyor)
         working-directory: oyun3d
-        # --fixed-fps gerçek zaman senkronizasyonunu kapatıyor: altı bölümün
-        # tamamı ~11 saniyede oynanıyor (gerçek zamanda ~8 dakika sürerdi).
+        # --fixed-fps gerçek zaman senkronizasyonunu kapatıyor: sekiz bölümün
+        # tamamı ~30 saniyede oynanıyor (gerçek zamanda ~11 dakika sürerdi).
         run: timeout 300 godot --headless --fixed-fps 60 res://araclar/denge_olc.tscn
 
       # Performans yazılımsal GPU ile ölçülüyor: FPS değil, donanımdan bağımsız

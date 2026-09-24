@@ -23,7 +23,8 @@ extends Node
 ## CI'da dokunmatik ve performans adımları gibi Xvfb altında koşuyor.
 
 const BUTCE := "res://gorsel_butce.json"
-const BOLUMLER := ["bolum1", "bolum2", "bolum3", "bolum4", "bolum5", "bolum6"]
+const BOLUMLER := ["bolum1", "bolum2", "bolum3", "bolum4", "bolum5", "bolum6",
+	"bolum7", "bolum8"]
 ## Ölçümden önce beklenen kare: ışık, gölge atlası ve gökyüzü ışıması oturuyor.
 const BEKLE := 45
 

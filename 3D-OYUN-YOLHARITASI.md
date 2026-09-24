@@ -350,6 +350,32 @@ final bölümü zorluğu yoğunlukla kuruyordu — yoğunluk bir doruk değil.
   çıkardı), tek boss var — ara bölümlerin kendi sınav anları yok, ve dövüşün
   ikinci evresi hâlâ birincinin hızlısı: yeni bir saldırı değil.
 
+### Faz 17 — **İçerik ölçeği 2: iki yeni bölüm** (Faz 16 sonrası)
+Faz 9 içerik ölçeğini bir kez yapmıştı: dört bölüm, "altı bölüm bir oyun".
+O günden beri oyuna üç düşman türü, konumlu ses ve bir canavar girdi — ama
+hiçbiri YENİ bir bölümde kullanılmadı; hepsi mevcut altı bölüme sonradan
+serpiştirildi. Bir kelime dağarcığının işe yaradığını, onunla yeni bir şey
+söyleyerek anlarsın.
+- **Durum: bitti** → sekiz bölüm. **Kum Kanyonu** ([`bolum_tasarimi/bolum7.gd`](oyun3d/bolum_tasarimi/bolum7.gd))
+  oyunun iddia ettiği ama öğretmediği şeyi öğretiyor: siper. İki atıcı çapraz
+  hatta, sütunlar hattı kesiyor. **Diken Ana'nın İni** ([`bolum_tasarimi/bolum8.gd`](oyun3d/bolum_tasarimi/bolum8.gd))
+  canavarla rövanş; canavar tek satır kod yazılmadan, yalnızca bölüm
+  verisindeki `boss.ayarlar` sözlüğüyle zorlaştı.
+- **Öğrenilen: "şunu tekrarladık" demeden önce ölç.** Bölüm 7 ilk ölçümde
+  24 ölüm verdi ve tanı hazırdı: Faz 14 menzilli düşmanı ölümcül zemine
+  koymanın hata olduğunu öğrenmişti, demek aynı hatayı yaptık. Yanlış tanı.
+  Suçlu, kestirme olsun diye koyduğum bir salıncaktı: bot rotasını oraya
+  çeviriyor ve arka arkaya düşüyordu. Salıncak kaldırıldı, **24 ölüm 1'e
+  indi**. Doğru genelleme "menzilli düşman + ölümcül zemin" değil, "aynı
+  anda iki baskı ekseni".
+- **Öğrenilen: veriden ayarlanabilirlik ancak İKİNCİ kullanımda kanıtlanır.**
+  Faz 16 boss'u baştan `ayarlar` sözlüğüyle yazmıştı ama o sözlük hiç
+  kullanılmamıştı. Rövanş onu sınadı ve geçti: yeni boss betiği yok.
+- **Kalan:** bot hâlâ dövüşmüyor (bölüm 8'in arena çiçekleri bu yüzden
+  ulaşılamaz kalıyor), üst üste binen duraklardan (kayanın üstünden
+  platforma) inemiyor — bölüm 5 ve 8'de aynı sorun, ve sekiz bölümün
+  hiçbiri hâlâ İNSAN tarafından dengelenmedi.
+
 ### Her ay, istisnasız: **bir game jam**
 48 saatlik kapsam disiplini, bitirme alışkanlığı ve portföy — üçünü birden verir.
 Ludum Dare, GMTK Jam, Global Game Jam, Brackeys Jam, itch.io/jams.

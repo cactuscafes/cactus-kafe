@@ -1,0 +1,527 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://sahneler/ortam.tscn" id="1_0y0ie"]
+[ext_resource type="Script" path="res://betikler/ortam.gd" id="2_rs4un"]
+[ext_resource type="Material" path="res://golgeler/tuzak_malzeme.tres" id="3_nnkxs"]
+[ext_resource type="Script" path="res://betikler/tuzak.gd" id="4_5q828"]
+[ext_resource type="NavigationMesh" path="res://navigasyon/bolum7.tres" id="5_lql1h"]
+[ext_resource type="PackedScene" path="res://sahneler/platform.tscn" id="6_7qs68"]
+[ext_resource type="Script" path="res://betikler/platform.gd" id="7_0tc1q"]
+[ext_resource type="PackedScene" path="res://sahneler/toplanabilir.tscn" id="8_tlyr1"]
+[ext_resource type="Script" path="res://betikler/toplanabilir.gd" id="9_atv54"]
+[ext_resource type="PackedScene" path="res://sahneler/kontrol_noktasi.tscn" id="10_g3h3p"]
+[ext_resource type="Script" path="res://betikler/kontrol_noktasi.gd" id="11_27lqq"]
+[ext_resource type="Script" path="res://betikler/bitis.gd" id="12_2twp6"]
+[ext_resource type="PackedScene" path="res://varliklar/tabela.gltf" id="13_ew3dq"]
+[ext_resource type="PackedScene" path="res://varliklar/kaktus.gltf" id="14_r0660"]
+[ext_resource type="PackedScene" path="res://varliklar/kaya.gltf" id="15_2wvhg"]
+[ext_resource type="PackedScene" path="res://varliklar/sandik.gltf" id="16_4wbuh"]
+[ext_resource type="Script" path="res://betikler/manzara.gd" id="17_0yufd"]
+[ext_resource type="PackedScene" path="res://sahneler/dusman.tscn" id="18_wv26a"]
+[ext_resource type="Script" path="res://betikler/dusman.gd" id="19_ueq6j"]
+[ext_resource type="PackedScene" path="res://sahneler/dusman_atici.tscn" id="20_wfcal"]
+[ext_resource type="Script" path="res://betikler/dusman_atici.gd" id="21_gasmv"]
+[ext_resource type="PackedScene" path="res://sahneler/dusman_hoplayan.tscn" id="22_klqa3"]
+[ext_resource type="Script" path="res://betikler/dusman_hoplayan.gd" id="23_g8p2h"]
+[ext_resource type="Script" path="res://betikler/birlestirici.gd" id="24_6o2h3"]
+[ext_resource type="PackedScene" path="res://sahneler/oyuncu.tscn" id="25_d3io4"]
+[ext_resource type="Script" path="res://betikler/oyuncu.gd" id="26_a78ti"]
+[ext_resource type="Script" path="res://betikler/oyun.gd" id="27_ahu3k"]
+[ext_resource type="Script" path="res://betikler/hud.gd" id="28_coycs"]
+[ext_resource type="PackedScene" path="res://sahneler/duraklat.tscn" id="29_843x6"]
+[ext_resource type="Script" path="res://betikler/menu/duraklat.gd" id="30_rj4b8"]
+[ext_resource type="PackedScene" path="res://sahneler/bitis_ekrani.tscn" id="31_a4e7y"]
+[ext_resource type="Script" path="res://betikler/menu/bitis_ekrani.gd" id="32_khhn3"]
+[ext_resource type="PackedScene" path="res://sahneler/dokunmatik.tscn" id="33_5s3uf"]
+[ext_resource type="Script" path="res://betikler/dokunmatik.gd" id="34_3k4jb"]
+[ext_resource type="Script" path="res://betikler/ag/hayalet_kaydedici.gd" id="35_4hvli"]
+[ext_resource type="Script" path="res://betikler/ag/uzak_oyuncular.gd" id="36_tqebu"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1q5we"]
+size = Vector2(130, 130)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lwbic"]
+size = Vector3(130, 1, 130)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5hnst"]
+size = Vector3(130, 1.2, 130)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gffxb"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yxfmb"]
+albedo_color = Color(0.949, 0.808, 0.404, 1)
+emission_enabled = true
+emission = Color(0.949, 0.808, 0.404, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_8644b"]
+size = Vector3(4, 0.12, 4)
+
+[node name="Bolum7" type="Node3D" unique_id=1884318149]
+metadata/uretildi = "araclar/bolum_uret.gd — elle düzenlemeyin"
+metadata/tasarim = "res://bolum_tasarimi/bolum7.gd"
+
+[node name="Ortam" type="Node3D" parent="." unique_id=265222905 instance=ExtResource("1_0y0ie")]
+script = ExtResource("2_rs4un")
+gok_ust = Color(0.541, 0.53900003, 0.599, 1)
+gok_ufuk = Color(0.86, 0.66, 0.5, 1)
+gok_yer = Color(0.34, 0.24, 0.22, 1)
+sis_renk = Color(0.82, 0.62, 0.5, 1)
+sis = 0.004
+gunes_aci = Vector3(-38, -20, 0)
+gunes_gucu = 1.0
+
+[node name="Zemin" type="StaticBody3D" parent="." unique_id=833383089]
+collision_mask = 0
+
+[node name="Gorsel" type="MeshInstance3D" parent="Zemin" unique_id=1721876239]
+material_override = ExtResource("3_nnkxs")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_1q5we")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Zemin" unique_id=1055823823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_lwbic")
+
+[node name="Tuzak" type="Area3D" parent="." unique_id=1805117256]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("4_5q828")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Tuzak" unique_id=725139092]
+shape = SubResource("BoxShape3D_5hnst")
+
+[node name="Navigasyon" type="NavigationRegion3D" parent="." unique_id=1880695572]
+navigation_mesh = ExtResource("5_lql1h")
+
+[node name="Parkur" type="Node3D" parent="." unique_id=1836394014]
+
+[node name="Baslangic" type="StaticBody3D" parent="Parkur" unique_id=1639380431 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 13)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(9, 1.2, 8)
+renk = Color(0.6, 0.44, 0.32, 1)
+
+[node name="Plato1" type="StaticBody3D" parent="Parkur" unique_id=1964273866 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(12, 1.2, 8)
+renk = Color(0.56, 0.41, 0.3, 1)
+
+[node name="Sutun1" type="StaticBody3D" parent="Parkur" unique_id=1561561126 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 2.6, 3.6)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(1.6, 4, 1.6)
+renk = Color(0.45, 0.33, 0.27, 1)
+
+[node name="Sutun2" type="StaticBody3D" parent="Parkur" unique_id=443074058 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 2.6, 0.4)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(1.6, 4, 1.6)
+renk = Color(0.45, 0.33, 0.27, 1)
+
+[node name="Cikinti1" type="StaticBody3D" parent="Parkur" unique_id=1331696725 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 1.2, 1)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(4, 1.2, 4.5)
+renk = Color(0.5, 0.37, 0.29, 1)
+
+[node name="Kopru1" type="StaticBody3D" parent="Parkur" unique_id=1777591626 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.2, -5.8)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(3.2, 0.8, 3.2)
+renk = Color(0.62, 0.46, 0.33, 1)
+
+[node name="Kopru2" type="StaticBody3D" parent="Parkur" unique_id=1058077414 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.4, -11.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(3.2, 0.8, 3.2)
+renk = Color(0.62, 0.46, 0.33, 1)
+
+[node name="Plato2" type="StaticBody3D" parent="Parkur" unique_id=622806258 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -20)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(12, 1.2, 9)
+renk = Color(0.56, 0.41, 0.3, 1)
+
+[node name="Sutun3" type="StaticBody3D" parent="Parkur" unique_id=703662500 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 3.4, -17.8)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(1.6, 4, 1.6)
+renk = Color(0.45, 0.33, 0.27, 1)
+
+[node name="Sutun4" type="StaticBody3D" parent="Parkur" unique_id=1229122377 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 3.4, -22.2)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(1.6, 4, 1.6)
+renk = Color(0.45, 0.33, 0.27, 1)
+
+[node name="Cikinti2" type="StaticBody3D" parent="Parkur" unique_id=1657249531 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2, 1.8, -20.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(4, 1.2, 4.5)
+renk = Color(0.5, 0.37, 0.29, 1)
+
+[node name="Kopru3" type="StaticBody3D" parent="Parkur" unique_id=1350226634 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1.8, -28.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(3.2, 0.8, 3.2)
+renk = Color(0.62, 0.46, 0.33, 1)
+
+[node name="Kopru4" type="StaticBody3D" parent="Parkur" unique_id=1080518979 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 2, -33.4)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(3.2, 0.8, 3.2)
+renk = Color(0.62, 0.46, 0.33, 1)
+
+[node name="Plato3" type="StaticBody3D" parent="Parkur" unique_id=412954002 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -41)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(11, 1.2, 8)
+renk = Color(0.56, 0.41, 0.3, 1)
+
+[node name="Kule1" type="StaticBody3D" parent="Parkur" unique_id=101730481 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -47.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(7, 1.4, 6)
+renk = Color(0.52, 0.4, 0.31, 1)
+
+[node name="Kule2" type="StaticBody3D" parent="Parkur" unique_id=495865280 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 3.9, -50.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(5, 1.4, 5)
+renk = Color(0.52, 0.4, 0.31, 1)
+
+[node name="Zirve" type="StaticBody3D" parent="Parkur" unique_id=2132867222 instance=ExtResource("6_7qs68")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.8, -53.5)
+collision_mask = 0
+script = ExtResource("7_0tc1q")
+olcu = Vector3(7, 1.6, 6)
+renk = Color(0.46, 0.48, 0.36, 1)
+
+[node name="Toplananlar" type="Node3D" parent="." unique_id=171405666]
+
+[node name="Cicek1" type="Area3D" parent="Toplananlar" unique_id=1761431176 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 13)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek2" type="Area3D" parent="Toplananlar" unique_id=602797608 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 2.6, 0.5)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek3" type="Area3D" parent="Toplananlar" unique_id=596853887 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 2.8, 1)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek4" type="Area3D" parent="Toplananlar" unique_id=836159478 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.8, -5.8)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek5" type="Area3D" parent="Toplananlar" unique_id=375760262 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 3.2, -20)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek6" type="Area3D" parent="Toplananlar" unique_id=2121964633 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2, 3.4, -20.5)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek7" type="Area3D" parent="Toplananlar" unique_id=1243519621 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 3.4, -28.5)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek8" type="Area3D" parent="Toplananlar" unique_id=31476910 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, -41)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek9" type="Area3D" parent="Toplananlar" unique_id=14192313 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.7, -47.5)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="Cicek10" type="Area3D" parent="Toplananlar" unique_id=1736283777 instance=ExtResource("8_tlyr1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 6.6, -53.5)
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("9_atv54")
+
+[node name="KontrolNoktalari" type="Node3D" parent="." unique_id=122857234]
+
+[node name="KN1" type="Area3D" parent="KontrolNoktalari" unique_id=1273123774 instance=ExtResource("10_g3h3p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 2.5)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("11_27lqq")
+
+[node name="KN2" type="Area3D" parent="KontrolNoktalari" unique_id=465268914 instance=ExtResource("10_g3h3p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, -20)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("11_27lqq")
+
+[node name="KN3" type="Area3D" parent="KontrolNoktalari" unique_id=996165815 instance=ExtResource("10_g3h3p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, -41)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("11_27lqq")
+
+[node name="Bitis" type="Area3D" parent="." unique_id=1153366351]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 6.4, -53.5)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("12_2twp6")
+oyun_yolu = NodePath("../Oyun")
+
+[node name="Carpisma" type="CollisionShape3D" parent="Bitis" unique_id=1652550926]
+shape = SubResource("BoxShape3D_gffxb")
+
+[node name="Gorsel" type="MeshInstance3D" parent="Bitis" unique_id=2106745933]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.13, 0)
+material_override = SubResource("StandardMaterial3D_yxfmb")
+mesh = SubResource("BoxMesh_8644b")
+
+[node name="Susleme" type="Node3D" parent="." unique_id=1103968758]
+
+[node name="Tabela1" type="Node3D" parent="Susleme" unique_id=79924970 instance=ExtResource("13_ew3dq")]
+transform = Transform3D(0.9702957, 0, -0.2419219, 0, 1, 0, 0.2419219, 0, 0.9702957, 2.6, 1.6, 15.4)
+
+[node name="Kaktus2" type="Node3D" parent="Susleme" unique_id=1202872915 instance=ExtResource("14_r0660")]
+transform = Transform3D(0.81915206, 0, 0.57357645, 0, 1, 0, -0.57357645, 0, 0.81915206, -3.4, 1.6, 15)
+
+[node name="Kaya3" type="Node3D" parent="Susleme" unique_id=1409550175 instance=ExtResource("15_2wvhg")]
+transform = Transform3D(-0.45000005, 0, 0.7794228, 0, 0.9, 0, -0.7794228, 0, -0.45000005, 4.8, 1.6, 0)
+
+[node name="Sandik4" type="Node3D" parent="Susleme" unique_id=1747046349 instance=ExtResource("16_4wbuh")]
+transform = Transform3D(0.92718387, 0, 0.3746066, 0, 1, 0, -0.3746066, 0, 0.92718387, -5.2, 2.2, -18.5)
+
+[node name="Kaya5" type="Node3D" parent="Susleme" unique_id=1584708184 instance=ExtResource("15_2wvhg")]
+transform = Transform3D(0.39999998, 0, 0.69282037, 0, 0.8, 0, -0.69282037, 0, 0.39999998, 4.6, 2.2, -23)
+
+[node name="Kaktus6" type="Node3D" parent="Susleme" unique_id=367075169 instance=ExtResource("14_r0660")]
+transform = Transform3D(0.8426489, 0, -0.70706636, 0, 1.1, 0, 0.70706636, 0, 0.8426489, -4.6, 2.8, -43)
+
+[node name="Kaya7" type="Node3D" parent="Susleme" unique_id=1372787840 instance=ExtResource("15_2wvhg")]
+transform = Transform3D(0.67614806, 0, 0.18117332, 0, 0.7, 0, -0.18117332, 0, 0.67614806, 1.4, 5.6, -53)
+
+[node name="Manzara" type="Node3D" parent="." unique_id=1824852333]
+script = ExtResource("17_0yufd")
+tohum = 4102974267
+serpinti_yaricap = 57.2
+serpinti = false
+zemin_renk = Color(0.58, 0.34, 0.26, 1)
+tepe_renk = Color(0.406, 0.238, 0.182, 1)
+
+[node name="Dusmanlar" type="Node3D" parent="." unique_id=81202397]
+
+[node name="Dusman1" type="CharacterBody3D" parent="Dusmanlar" unique_id=1696355763 instance=ExtResource("18_wv26a")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 3.5, 1.9, 3.5)
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("19_ueq6j")
+devriye_ucu = Vector3(-5, 0, 0)
+
+[node name="Atici2" type="CharacterBody3D" parent="Dusmanlar" unique_id=574540320 instance=ExtResource("20_wfcal")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -8.8, 2, 1)
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("21_gasmv")
+atis_menzili = 13.0
+devriye_ucu = Vector3(4, 0, 0)
+
+[node name="Atici3" type="CharacterBody3D" parent="Dusmanlar" unique_id=402720523 instance=ExtResource("20_wfcal")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 9.2, 2.6, -20.5)
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("21_gasmv")
+atis_menzili = 13.0
+devriye_ucu = Vector3(4, 0, 0)
+
+[node name="Hoplayan4" type="CharacterBody3D" parent="Dusmanlar" unique_id=1906181004 instance=ExtResource("22_klqa3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.5, -21.5)
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("23_g8p2h")
+devriye_ucu = Vector3(4, 0, 0)
+
+[node name="Dusman5" type="CharacterBody3D" parent="Dusmanlar" unique_id=1987817539 instance=ExtResource("18_wv26a")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.5, 3.1, -38.5)
+collision_layer = 64
+collision_mask = 33
+floor_snap_length = 0.4
+script = ExtResource("19_ueq6j")
+devriye_ucu = Vector3(-5, 0, 0)
+
+[node name="Birlestirici" type="Node3D" parent="." unique_id=237801436]
+script = ExtResource("24_6o2h3")
+hedefler = Array[NodePath]([NodePath("../Parkur"), NodePath("../Susleme")])
+
+[node name="Oyuncu" type="CharacterBody3D" parent="." unique_id=1477513549 instance=ExtResource("25_d3io4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 13)
+collision_layer = 2
+collision_mask = 97
+floor_max_angle = 0.959931
+floor_snap_length = 0.4
+script = ExtResource("26_a78ti")
+
+[node name="Oyun" type="Node" parent="." unique_id=1858312836]
+script = ExtResource("27_ahu3k")
+bolum_kimligi = "bolum7"
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=993355065]
+script = ExtResource("28_coycs")
+
+[node name="Durum" type="Label" parent="HUD" unique_id=31854479]
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 520.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+
+[node name="Can" type="Label" parent="HUD" unique_id=1197679615]
+unique_name_in_owner = true
+offset_left = 18.0
+offset_top = 46.0
+offset_right = 320.0
+offset_bottom = 74.0
+theme_override_colors/font_color = Color(0.898, 0.365, 0.353, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+
+[node name="Hayalet" type="Label" parent="HUD" unique_id=1716286731]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -180.0
+offset_top = 52.0
+offset_right = 180.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Mesaj" type="Label" parent="HUD" unique_id=1397853506]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 96.0
+offset_bottom = 130.0
+theme_override_colors/font_color = Color(1, 0.949, 0.847, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Olcum" type="Label" parent="HUD" unique_id=1276147822]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -62.0
+offset_right = 720.0
+offset_bottom = -14.0
+theme_override_colors/font_color = Color(0.902, 0.925, 0.898, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 14
+
+[node name="BossCan" type="Control" parent="HUD" unique_id=1219485523]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -220.0
+offset_top = 96.0
+offset_right = 220.0
+offset_bottom = 132.0
+mouse_filter = 2
+
+[node name="Ad" type="Label" parent="HUD/BossCan" unique_id=180679110]
+layout_mode = 0
+offset_top = -26.0
+offset_right = 440.0
+offset_bottom = -4.0
+theme_override_colors/font_color = Color(1, 0.86, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "HUD_BOSS"
+horizontal_alignment = 1
+
+[node name="Zemin" type="ColorRect" parent="HUD/BossCan" unique_id=672684206]
+layout_mode = 0
+offset_right = 440.0
+offset_bottom = 18.0
+color = Color(0.08, 0.05, 0.07, 0.75)
+
+[node name="Dolu" type="ColorRect" parent="HUD/BossCan" unique_id=2030244582]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 437.0
+offset_bottom = 15.0
+color = Color(0.82, 0.25, 0.35, 1)
+
+[node name="Duraklat" type="CanvasLayer" parent="." unique_id=89869379 instance=ExtResource("29_843x6")]
+layer = 10
+script = ExtResource("30_rj4b8")
+
+[node name="BitisEkrani" type="CanvasLayer" parent="." unique_id=2101758935 instance=ExtResource("31_a4e7y")]
+layer = 11
+script = ExtResource("32_khhn3")
+
+[node name="Dokunmatik" type="CanvasLayer" parent="." unique_id=698376207 instance=ExtResource("33_5s3uf")]
+layer = 8
+script = ExtResource("34_3k4jb")
+
+[node name="HayaletKaydedici" type="Node" parent="." unique_id=724407552]
+script = ExtResource("35_4hvli")
+
+[node name="UzakOyuncular" type="Node3D" parent="." unique_id=1692229483]
+script = ExtResource("36_tqebu")

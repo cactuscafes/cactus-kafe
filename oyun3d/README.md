@@ -65,12 +65,14 @@ Ayarlar hem menüden hem duraklatmadan açılıyor; aynı panel, tek yerde.
 | 3 | Diken Köprüsü | Dar: zeminin tamamı dikenli, ilerlemenin tek yolu taştan taşa |
 | 4 | Rüzgâr Terası | Ritim: dört hareketli platform (ileri, yanal, dikey, çapraz) — beklemeyi öğretiyor |
 | 5 | Kaya Bahçesi | Dövüş: zemin güvenli, baskı düşmandan; beş düşman, geniş alanlar |
-| 6 | Son Tırmanış | Final: yeni mekanik yok, dördünün hepsi arka arkaya |
+| 6 | Zirve Dövüşü | Doruk: dördü arka arkaya, tepede canavarla ilk karşılaşma |
+| 7 | Kum Kanyonu | Siper: iki atıcı çapraz hatta, sütunlar hattı kesiyor |
+| 8 | Diken Ana'nın İni | Rövanş: üç tür sırayla, sonra canavar — dört canlı, daha hızlı |
 
 Bölümler `betikler/bolumler.gd` kütüğünde. Yeni bölüm eklemek = kütüğe bir
 satır: menüdeki düğme, "sonraki bölüm" akışı ve rekor kaydı kendiliğinden
 gelir. Rekorlar bölüm başına tutuluyor. Bölüm 1 ve 2 elle yazılmış `.tscn`;
-3-6 veriden üretiliyor (bkz. [Bölüm hattı](#bölüm-hattı-faz-9)).
+3-8 veriden üretiliyor (bkz. [Bölüm hattı](#bölüm-hattı-faz-9-17)).
 
 ### Bölümün amacı
 
@@ -283,13 +285,19 @@ bitiriyorsa bölüm zorlaşmış demektir.
 
 ---
 
-## Bölüm hattı (Faz 9)
+## Bölüm hattı (Faz 9, 17)
 
-"İki bölüm bir demo, altı bölüm bir oyun." Faz 9'un işi içerik ölçeği — ama
+"İki bölüm bir demo, altı bölüm bir oyun." Faz 9'un işi içerik ölçeğiydi; Faz
+17 aynı hattan iki bölüm daha geçirdi ve oyun **sekiz bölüm** oldu. Ama
 dört bölümü elle yazmak, her birinin 350 satırlık `.tscn`'ini kopyalamak
 demekti. O 350 satırın ~250'si her bölümde AYNI: HUD, duraklatma, bitiş ekranı,
 hayalet kaydedici, birleştirici, ortam, zemin. HUD'a bir etiket eklemek altı
 dosyayı elle düzeltmek olurdu.
+
+> **Hattın asıl sınavı Faz 17'ydi.** Bir üretim hattının işe yarayıp
+> yaramadığı, ilk ürününden değil İKİNCİ partiden belli oluyor: bölüm 7 ve 8
+> yazılırken `bolum_uret.gd`'ye tek satır eklenmedi. Düşman türleri, canavar,
+> çevre sesi, aydınlatma — hepsi zaten veriden okunuyordu.
 
 Bu yüzden tekrar eden kısım **kod**, bölüme özgü kısım **veri** oldu:
 
@@ -355,6 +363,46 @@ Doğrulayıcı üç kez de KENDİ hatasını gösterdi, bunlar modelin sınırla
 - **Ölçüm anı.** `baslangic_fazi` sıfırdan farklı platformlar daha ilk fizik
   karesinde turun ortasına kayıyor; oradan süpürmek yanlış alan veriyordu.
   Turun başlangıç konumuna geri çekiliyor.
+
+### İki yeni bölüm (Faz 17)
+
+Faz 9 hattı kurdu, Faz 17 onu **ikinci kez** kullandı — bir üretim hattının
+işe yarayıp yaramadığı ilk ürününden değil, ikinci partiden belli oluyor.
+Bölüm 7 ve 8 yazılırken `araclar/bolum_uret.gd`'ye tek satır eklenmedi.
+
+**Bölüm 7 — Kum Kanyonu.** Oyun mağaza metninde "siper gerçekten siperdir:
+diken duvardan geçmez" diyordu ama hiçbir bölüm bunu ÖĞRETMİYORDU; atıcı
+(Faz 14) bölüm 5'te açık bir bahçede duruyor, siper almak orada bir seçenek.
+Burada gereklilik: iki atıcı çapraz hatta, yerlerinden kıpırdamıyorlar (yani
+hatları sabit ve öğrenilebilir), platoların üstündeki sütunlar hattı kesiyor.
+
+**Bölüm 8 — Diken Ana'nın İni.** Rövanş. Canavar tek satır kod yazılmadan
+zorlaştı; tamamı veri:
+
+```gdscript
+"boss": {"konum": Vector3(0, 1.6, -39.0), "aci": 180.0,
+    "ayarlar": {"can_max": 4, "bekleme": 0.9, "kalip_uzunlugu": 3,
+        "sersem_suresi": 2.0, "yagmur_adedi": 5, "yurume_hizi": 3.0}}
+```
+
+> **Ölçülen ders: "şunu tekrarladık" demeden önce ölç.** Bölüm 7'nin ilk
+> ölçümü **24 ölüm** verdi ve tanı hazırdı: Faz 14, menzilli düşmanı ölümcül
+> zemine koymanın hata olduğunu öğrenmişti (bölüm 3: süre 45 → 105 sn) —
+> demek aynı hatayı yaptık, atıcıları kaldıralım.
+>
+> Yanlış tanı. Suçlu, yalnızca çeşitlilik olsun diye koyduğum bir
+> **salıncaktı**: botun rotası ona kayıyor ve arka arkaya düşüyordu.
+> Salıncak kaldırıldı, atıcılara dokunulmadı: **24 ölüm → 1 ölüm**, süre
+> 74 sn (takıldı) → 44,7 sn (bitişte), çiçek 7/10 → 9/10.
+>
+> Doğru genelleme "menzilli düşman + ölümcül zemin" değil, **"aynı anda iki
+> baskı ekseni"**. Bölüm 7'nin kuralı artık veri dosyasının başında yazılı
+> ve salıncağın neden orada olmadığı da öyle.
+
+Aynı ölçüm botun iki sınırını da gösterdi: üst üste binen duraklardan
+(kayanın üstünden altındaki platforma) inemiyor — yatay yer değişimi
+olmadığı için "zıpla" hamlesi yerinde zıplamaya dönüşüyor; bölüm 5'te
+`Kaya1` yıllardır aynı sebeple ulaşılamaz. Bölüm 8'de kaya zemine indirildi.
 
 ### Bölüm tasarımı: ölçüler
 
@@ -668,7 +716,7 @@ hiçbir test görmüyordu.
 
 ### Aydınlatma tek yerden
 
-Altı bölüm aynı `sahneler/ortam.tscn` örneğini kullanıyor. Bölüme özel olan
+Bütün bölümler aynı `sahneler/ortam.tscn` örneğini kullanıyor. Bölüme özel olan
 yalnızca **sanat yönü** — gök renkleri, sis, güneş açısı, bulut miktarı;
 teknik kurulum ortak. Önceden ikisi elle yazılmış sahnede, dördü üreticideydi:
 gölge ayarını değiştirmek altı yerde aynı değişikliği yapmaktı ve biri
@@ -1535,19 +1583,19 @@ Godot **4.7.2** ile bu depoda gerçekten çalıştırıldı:
 | Düşman testleri (10 grup) | ✅ hepsi geçti (rig, hoplayan, atıcı, diken/duvar dahil) |
 | Ses testleri (8 grup) | ✅ kayıt, havuz, 3B, dinleyici, kısma, katmanlı müzik, çevre, gerilim |
 | Boss testi (5 grup) | ✅ SERSEM dışında 42 denemede hasar yok, betikli dövüş 652 karede bitti, ritim 1,10 → 0,83 → 0,62 sn, bitiş kilidi açıldı |
-| Çeviri testleri | ✅ 82 anahtar × 2 dil, eksik yok |
+| Çeviri testleri | ✅ 84 anahtar × 2 dil, eksik yok |
 | Performans bütçesi | ✅ altı bölüm bütçe içinde (67–85 draw call, 8,6–12,9 bin üçgen, en yüksek grafik ön ayarında) |
 | Dokunmatik testleri (5 grup) | ✅ hepsi geçti (Xvfb ile) |
 | Hayalet testleri (6 grup) | ✅ hepsi geçti |
 | Ayak IK testi (4 durum) | ✅ rampada bilek hatası 8,8 → 0,2 cm, basamakta 6,1 → 0,1 cm |
-| Görsel test (6 bölüm) | ✅ aydınlatma bütçe içinde, manzara çarpışmasız (Xvfb ile) |
+| Görsel test (8 bölüm) | ✅ aydınlatma bütçe içinde, manzara çarpışmasız (Xvfb ile) |
 | Ağ testi (iki süreç) | ✅ 360 ölçüm, yarıçap hatası 0.003 m, 1 hile paketi reddedildi |
-| Denge ölçümü (bot altı bölümü oynuyor) | ✅ altı art arda koşu, hepsi 23–25 sn, bütçe içinde |
+| Denge ölçümü (bot sekiz bölümü oynuyor) | ✅ iki art arda koşu, sekizi de bütçe içinde |
 | Telemetri testi (7 grup) | ✅ gizlilik kuralları geçti |
-| Bölüm hattı testi (6 bölüm) | ✅ hepsi bitirilebilir; 100 durağın hepsi erişilebilir |
+| Bölüm hattı testi (8 bölüm) | ✅ hepsi bitirilebilir; 129 durağın 125'i erişilebilir (4'ü kanyonun sütunları — bilerek duvar) |
 | Tuş atama testi (5 grup) | ✅ InputMap, çakışma, kilitlenme, kayıt, ekran |
 | İstemci–sunucu sözleşmesi | ✅ 3 satır, 4 olay adı, 7 ret kuralı (Node ile) |
-| Basın kiti sayfası | ✅ Chromium'da açıldı, 12 görsel yüklendi, konsol hatası yok |
+| Basın kiti sayfası | ✅ Chromium'da açıldı, 14 görsel yüklendi, konsol hatası yok |
 | Demo dışa aktarımı | ✅ Windows + Web; tarayıcıda menü "Demo sürümü — ilk bölüm" ve tek bölüm gösterdi |
 | Gerçek telefonda APK | ⚠️ denenmedi — Android SDK bu ortamda yok |
 | Tanıtım videosu | ✅ 746 kare / 31 sn, Xvfb + yazılımsal GPU ile çekildi |
@@ -1600,6 +1648,12 @@ açık kalan uçlar:
 - **Tek boss** — Faz 16 bölüm 6'ya bir canavar koydu, ama oyunun tek dövüş
   doruğu o. Ara bölümlerin kendi küçük "sınav" anları (mini boss, kovalamaca,
   zamanlı kaçış) yok.
+- **Bot üst üste binen duraklardan inemiyor** — kayanın üstünden altındaki
+  platforma geçiş yatay yer değişimi içermiyor, bot "zıpla" hamlesini yerinde
+  zıplayarak deniyor ve takılıyor. Bölüm 5'te `Kaya1`, bölüm 8'in ilk
+  yerleşiminde `Kaya3` bu yüzden ulaşılamazdı (bölüm 8'de kaya zemine
+  indirilerek çözüldü, bölüm 5 hâlâ öyle). Doğru çözüm botta: aynı düşey
+  eksende üst üste duran duraklar için "kenardan in" hamlesi.
 - **Bot dövüşmeyi bilmiyor** — canavarın telgrafını okumuyor, menzilinden
   çıkmıyor, sersem penceresini beklemiyor. Bölüm 6'nın ölüm sayısı bu yüzden
   bir zorluk ölçüsü değil ("daha kötüye gitmedi" nöbetçisi); dövüşün dengesini
@@ -1613,7 +1667,7 @@ açık kalan uçlar:
 - **Trailer'da ses yok** — Movie Maker ses de yazabiliyor (`.wav` yan dosyası);
   kurgu aşamasında eklenecek.
 - **Hiçbir bölüm İNSAN tarafından oynanarak dengelenmedi** — Faz 10'un botu
-  altısını da baştan sona oynuyor ve süre/ölüm/çiçek bütçesini tutuyor, ama
+  sekizini de baştan sona oynuyor ve süre/ölüm/çiçek bütçesini tutuyor, ama
   bot eğlenceyi, kafa karışıklığını ve "buradan sonra bıraktım"ı ölçemiyor:
   20 kişiye oynat, izle.
 - **Çevre sanatı prosedürel** — Faz 13 dünyayı doldurdu (aydınlatma, malzeme,

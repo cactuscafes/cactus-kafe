@@ -43,6 +43,12 @@ func _ready() -> void:
 		print("%-7s  %4d draw call (tepe %4d)  %7d üçgen  %5.1f MB doku" % [
 			kimlik, olcum["draw_call"], olcum["draw_call_tepe"],
 			olcum["ucgen"], olcum["doku_mb"]])
+		# Bütçesi olmayan bölüm SESSİZCE geçiyordu: Faz 17'de iki bölüm
+		# eklendi, ölçüldüler, yazdırıldılar ve "BUTCE ICINDE" denildi —
+		# oysa kıyaslanacak bir sayı yoktu. Bütçesizlik de bir aşım.
+		if sinir.is_empty():
+			asilan.append("%s: performans bütçesi yok — ölçülen değerleri %s içine yazın"
+				% [kimlik, BUTCE_YOLU])
 		for alan: String in sinir:
 			if float(olcum.get(alan, 0.0)) > float(sinir[alan]):
 				asilan.append("%s: %s = %s, bütçe %s" % [

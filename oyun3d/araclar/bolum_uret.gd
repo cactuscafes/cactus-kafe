@@ -3,10 +3,11 @@ extends Node
 ##
 ##   godot --headless --path oyun3d res://araclar/bolum_uret.tscn
 ##
-## NEDEN VAR: Faz 9'un hedefi "iki bölüm bir demo, altı bölüm bir oyun". Elle
+## NEDEN VAR: Faz 9'un hedefi "iki bölüm bir demo, altı bölüm bir oyun" (Faz
+## 17'de sekiz oldu). Elle
 ## yazılmış her .tscn 350 satır ve bunların ~250 satırı her bölümde AYNI: HUD,
-## duraklatma, bitiş ekranı, hayalet kaydedici, birleştirici, ortam. Altı bölüm
-## demek, aynı 250 satırın altı kopyası demek — HUD'a bir etiket eklemek altı
+## duraklatma, bitiş ekranı, hayalet kaydedici, birleştirici, ortam. Sekiz bölüm
+## demek, aynı 250 satırın sekiz kopyası demek — HUD'a bir etiket eklemek altı
 ## dosyayı elle düzeltmek olurdu. Burada tekrar eden kısım KOD, bölüme özgü
 ## kısım VERİ (`bolum_tasarimi/bolumN.gd`).
 ##
@@ -162,7 +163,7 @@ func _ekle(ebeveyn: Node, dugum: Node, kok: Node) -> Node:
 
 func _ortam_ekle(kok: Node3D, veri: Dictionary) -> void:
 	# Aydınlatmanın TEKNİK kurulumu `sahneler/ortam.tscn` içinde (Faz 13);
-	# burada yalnızca bölümün sanat yönü veriliyor. Altı bölüm aynı sahneyi
+	# burada yalnızca bölümün sanat yönü veriliyor. Bütün bölümler aynı sahneyi
 	# örnekliyor: gölge kademesini değiştirmek tek dosyada bir satır.
 	var ortam := ORTAM_SAHNE.instantiate()
 	ortam.name = "Ortam"

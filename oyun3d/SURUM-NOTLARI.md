@@ -6,11 +6,40 @@ telemetri olayları, basın kiti ve mağaza metni hep oradan okuyor.
 
 > **Sürüm numarasını değiştirirken:** `betikler/urun.gd` → `SURUM`,
 > `project.godot` → `config/version`, `sunucu/package.json` → `version`,
-> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.16\.0" oyun3d`
+> `basin/index.html` altbilgisi. Dördü ayrı yerde; `grep -rn "0\.17\.0" oyun3d`
 > hepsini gösteriyor. Yanlış sürümü yayınlamanın bedeli, geri bildirimin hangi
 > yapıdan geldiğini bilememektir.
 
 ---
+
+## 0.17.0 — İçerik ölçeği 2: iki yeni bölüm (Faz 17)
+
+- **Altı bölüm sekiz oldu.** Faz 9 "iki bölüm bir demo, altı bölüm bir oyun"
+  diyerek dört bölüm eklemişti. O zamandan beri oyuna üç düşman türü (Faz 14),
+  konumlu ses (Faz 15) ve bir canavar (Faz 16) girdi — ama hiçbiri YENİ bir
+  bölümde kullanılmamıştı; hepsi mevcut bölümlere sonradan serpiştirildi.
+- **Bölüm 7 — "Kum Kanyonu": siper bölümü.** Oyunun mağaza metninde iddia
+  ettiği ("siper gerçekten siperdir: diken duvardan geçmez") ama hiçbir
+  bölümün öğretmediği şey. İki atıcı çapraz ateş hattında, platoların
+  üstündeki sütunlar o hatları kesiyor; ilerlemek "sütundan sütuna, atış
+  arasında" demek. Zemin ölümcül ama platolar geniş ve boşluklar 2,5 m:
+  baskı tek eksende, nerede durduğunda.
+- **Bölüm 8 — "Diken Ana'nın İni": rövanş.** Üç düşman türü sırayla
+  (hatırlatma), sonra canavarla ikinci karşılaşma. Canavar **tek satır kod
+  yazılmadan** zorlaştı: dört can, %18 kısa nefes, üç yerine beş diken,
+  dört saldırılık kalıp — hepsi bölüm verisindeki `boss.ayarlar` sözlüğünde.
+  Faz 16'nın "veriden ayarlanabilir boss"u ilk kez gerçekten sınandı.
+- **Bölüm 6 yeniden adlandırıldı**: "Son Tırmanış" → "Zirve Dövüşü". Artık
+  son değil, ilk karşılaşma.
+- **Ölçülen ders: ölümlerin sebebi sandığın şey değil.** Bölüm 7'nin ilk
+  ölçümü 24 ölümdü ve suçlu atıcılar sanılmıştı — "Faz 14'ün hatasını
+  tekrarladık" diye. Değilmiş: ölümcül zeminin üstüne koyduğum bir
+  SALINCAK, botun rotasını kendine çekiyor ve onu arka arkaya düşürüyordu.
+  Salıncak kaldırıldı: **24 ölüm → 1 ölüm**, bölüm bitişe ulaşıldı. İki
+  baskıyı üst üste bindiren şey menzilli düşman değil, bekleme baskısıydı.
+- **Bölümler sekizde de doğrulanıyor**: bitirilebilirlik (`bolum_hatti_testi`),
+  denge (bot sekizini de oynuyor), aydınlatma (`gorsel_testi`) ve performans
+  bütçeleri yeni iki bölümü de kapsıyor.
 
 ## 0.16.0 — Boss: dövüşün doruğu (Faz 16)
 

@@ -58,15 +58,41 @@ func _dogrula(kosul: bool, mesaj: String) -> void:
 		_hatalar.append(mesaj)
 
 ## Platform turun ortasına gelene kadar bekler: iki ucundan da uzak olmalı ki
-## 20 karelik ölçüm penceresi uca taşmasın.
+## bindirme + ölçüm penceresi uca taşmasın. İLERİ giderken yakalanıyor;
+## dönüşte yakalanırsa ölçüm penceresi yön değişimine denk gelir ve platform
+## "hareket etmiyor" görünür.
 func _platform_penceresini_bekle(platform: Node3D) -> void:
 	var baslangic: Vector3 = platform.get("_baslangic")
 	var uc: Vector3 = platform.uc
-	for i in 400:
-		var oran: float = (platform.global_position - baslangic).dot(uc) / uc.length_squared()
-		if oran >= 0.15 and oran <= 0.55:
-			return
+	var onceki: Vector3 = platform.global_position
+	for i in 600:
 		await get_tree().physics_frame
+		var simdi: Vector3 = platform.global_position
+		var oran: float = (simdi - baslangic).dot(uc) / uc.length_squared()
+		var ileri: bool = (simdi - onceki).dot(uc) > 0.0
+		onceki = simdi
+		if ileri and oran >= 0.10 and oran <= 0.40:
+			return
+
+## Karakteri kayan platformun üstüne oturtur.
+##
+## TUZAK (ikinci kez): tek bir ışınlamadan sonra oturmayı beklemek yetmiyor.
+## Karakter 1,06 m yukarıdan düşerken platform altından kayıyor; düşüş
+## bittiğinde platform orada olmuyor ve karakter zemine iniyor. Ölçüm de
+## "oyuncu Δz=0,00, platform Δz=1,38" diyor — yani platform çalışıyor, taşıma
+## çalışmıyor gibi görünüyor. Oysa karakter hiç binmemiş oluyor.
+##
+## Çözüm: temas kurulana kadar HER KARE platformun üstüne yeniden konumlan.
+func _platforma_bindir(platform: Node3D) -> bool:
+	for i in 40:
+		var carpisma := _oyuncu.get_last_slide_collision()
+		if _oyuncu.is_on_floor() and carpisma != null \
+				and carpisma.get_collider() == platform:
+			return true
+		_oyuncu.velocity = Vector3.ZERO
+		_oyuncu.global_position = platform.global_position + Vector3(0, 1.02, 0)
+		await get_tree().physics_frame
+	return false
 
 # --- testler ---------------------------------------------------------------
 
@@ -192,7 +218,6 @@ func _toplanabilir_testi() -> void:
 
 func _hareketli_platform_testi() -> void:
 	var platform: Node3D = _sahne.get_node("HareketliPlatform")
-	await _isinla(platform.global_position + Vector3(0, 1.06, 0))
 	# Ölçüm penceresi platformun UCUNA denk gelmemeli: platform kuleye varınca
 	# karakter kuleye geçiyor ve taşıma ölçülemiyor.
 	#
@@ -201,7 +226,13 @@ func _hareketli_platform_testi() -> void:
 	# altıncı bölüm eklenince platform tur içinde 32 kare ileride oluyor ve
 	# ölçüm tam uca denk geliyordu. Bölüm eklemek, alakasız bir testi
 	# düşürüyordu. Artık platformun turdaki YERİ bekleniyor, kare değil.
+	#
+	# SIRA ÖNEMLİ: önce pencere beklenir, SONRA binilir. Tersi, ışınlanma ile
+	# ölçüm arasındaki bekleyişte platformun karakterin altından kaçması
+	# demekti — Faz 17'de iki bölüm eklenince tam bu oldu.
 	await _platform_penceresini_bekle(platform)
+	var bindi: bool = await _platforma_bindir(platform)
+	_dogrula(bindi, "Karakter platforma bindirilemedi")
 	var oyuncu_once := _oyuncu.global_position.z
 	var platform_once := platform.global_position.z
 	await _bekle(20)

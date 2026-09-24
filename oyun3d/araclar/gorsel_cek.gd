@@ -21,7 +21,7 @@ const KADRAJLAR := [
 	["04_dusman", "res://sahneler/bolum1.tscn", Vector3(2, 4.6, -24), 0.0, 60],
 	["05_kule", "res://sahneler/bolum2.tscn", Vector3(0, 2.2, 9), 0.0, 40],
 	["06_tirmanis", "res://sahneler/bolum2.tscn", Vector3(4.6, 6.5, -9.5), 120.0, 60],
-	# Faz 9'un dört yeni bölümü: mağaza sayfasında altı bölümün altısı da
+	# Faz 9'un dört yeni bölümü: mağaza sayfasında bölümlerin hepsi
 	# görünmeli, yoksa "iki bölümlük oyun" izlenimi kalıyor.
 	["08_kopru", "res://sahneler/bolum3.tscn", Vector3(0, 2.4, 6.0), 0.0, 40],
 	["09_teras", "res://sahneler/bolum4.tscn", Vector3(0, 2.6, 4.4), 8.0, 40],
@@ -31,6 +31,10 @@ const KADRAJLAR := [
 	# karşısına düşüyor — mağaza sayfasında "sonunda ne var" sorusunun
 	# cevabı tek karede görünmeli.
 	["12_canavar", "res://sahneler/bolum6.tscn", Vector3(3.8, 14.2, -35.6), 22.0, 50],
+	# Faz 17'nin iki bölümü. Kanyonda kadraj sütunları ve karşı çıkıntıdaki
+	# atıcıyı birlikte görmeli: "siper" bir cümle değil, bir resim.
+	["13_kanyon", "res://sahneler/bolum7.tscn", Vector3(2.0, 2.2, -11.2), 8.0, 50],
+	["14_in", "res://sahneler/bolum8.tscn", Vector3(2.5, 2.2, -28.0), 16.0, 60],
 	# Son kare mobil kontrolleri gösteriyor: mağaza sayfasında "telefonda da
 	# oynanır" iddiasının kanıtı ekran görüntüsüdür, cümle değil.
 	["07_mobil", "res://sahneler/bolum1.tscn", Vector3(0, 1.2, 4), 0.0, 40, true],

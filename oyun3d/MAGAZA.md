@@ -11,13 +11,13 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 **TR**
 > Kaktüs Parkuru'nda çölün dikenleri arasında zıpla, çiçekleri topla, dikenli
 > düşmanların üstüne bin. Kısa, hızlı, rekor kırmaya dayalı bir 3B platform
-> oyunu. Altı bölüm ve sonunda seni sınayan bir canavar; tek oturuşta
+> oyunu. Sekiz bölüm ve seni iki kez sınayan bir canavar; tek oturuşta
 > bitiyor — ama en iyi sürene kolay kolay ulaşamayacaksın.
 
 **EN**
 > Hop across a thorny desert, collect the blooms, and bounce off spiny foes.
-> Cactus 3D is a short, fast, record-chasing 3D platformer. Six levels and a
-> boss to finish them off, all in one sitting — beating your own best time is
+> Cactus 3D is a short, fast, record-chasing 3D platformer. Eight levels and a
+> beast that tests you twice, all in one sitting — beating your own best time is
 > the hard part.
 
 ## Uzun açıklama
@@ -51,11 +51,12 @@ Aşağıdakiler kopyalanıp yapıştırılacak hâlde; rakamları çıkıştan �
 
 ## Özellikler (madde madde)
 
-- Altı bölüm: parkur, kule tırmanışı, diken köprüsü, hareketli platform terası,
-  düşman bahçesi ve hepsini birden isteyen final
+- Sekiz bölüm: parkur, kule tırmanışı, diken köprüsü, hareketli platform terası,
+  düşman bahçesi, zirve dövüşü, siper kanyonu ve canavarın ini
 - Tuş atama ekranı ve erişilebilirlik ayarları
 - Üç düşman türü: kovalayan, üstüne zıplayan ve uzaktan diken atan
-- Dört evreli bir bölüm sonu canavarı: kalıbı öğren, açığını bekle
+- Dört evreli bir canavar, iki karşılaşma: ikincisinde daha hızlı ve daha sert
+- Siper gerçekten siper: diken duvardan geçmiyor, kanyon bunu öğretiyor
 - Coyote süresi, zıplama tamponu, değişken zıplama yüksekliği
 - Bölüm başına süre ve ölüm rekoru
 - Tarayıcıda oynanır — indirme yok

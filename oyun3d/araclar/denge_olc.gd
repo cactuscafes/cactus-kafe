@@ -19,7 +19,7 @@ const RAPOR_YOLU := "user://denge.json"
 const BUTCE_YOLU := "res://denge_butce.json"
 
 ## Bir bölüm için AZAMİ GERÇEK ZAMAN. Oyun içi süre değil duvar saati:
-## `--fixed-fps` ile altı bölüm ~20 saniyede oynanıyor, en yavaş bölüm 6 sn.
+## `--fixed-fps` ile sekiz bölüm ~30 saniyede oynanıyor, en yavaş bölüm 8 sn.
 ## 60 saniye "yavaşladı" değil "durdu" demek.
 const _AZAMI_GERCEK_MS := 60000
 

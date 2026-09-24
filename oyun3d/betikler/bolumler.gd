@@ -12,6 +12,8 @@ const LISTE: Array[Dictionary] = [
 	{"kimlik": "bolum4", "ad": "BOLUM4_AD", "sahne": "res://sahneler/bolum4.tscn"},
 	{"kimlik": "bolum5", "ad": "BOLUM5_AD", "sahne": "res://sahneler/bolum5.tscn"},
 	{"kimlik": "bolum6", "ad": "BOLUM6_AD", "sahne": "res://sahneler/bolum6.tscn"},
+	{"kimlik": "bolum7", "ad": "BOLUM7_AD", "sahne": "res://sahneler/bolum7.tscn"},
+	{"kimlik": "bolum8", "ad": "BOLUM8_AD", "sahne": "res://sahneler/bolum8.tscn"},
 ]
 
 ## Demoda yalnızca ilk bölüm açık. Bölüm listesini süzmek, menüden bitiş

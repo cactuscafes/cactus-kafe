@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0b1a07">
+<!-- Gecici test cagrisi; aramalarda cikmasin. -->
+<meta name="robots" content="noindex,nofollow">
+<title>Android Test Grubu — Cactus Coffee</title>
+<meta property="og:title" content="Cactus oyunları — Android test grubu">
+<meta property="og:description" content="Üç oyunu Play Store'a çıkarıyoruz. 14 gün test et, rekoru kır.">
+<meta property="og:image" content="https://cactuscafes.com/og-image.jpg">
+<meta property="og:url" content="https://cactuscafes.com/android-test.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--amber:#c8a86a;--amber2:#b8965a;--espresso:#0b1a07;--latte:#f0ece4;}
+body{font-family:'Inter',sans-serif;background:radial-gradient(120% 70% at 50% -10%,#2c4a1e 0%,#0b1a07 62%);color:var(--latte);min-height:100vh;padding:38px 18px calc(env(safe-area-inset-bottom) + 50px);}
+.kap{max-width:520px;margin:0 auto;}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--amber);text-align:center;margin-bottom:12px;}
+h1{font-family:'Fraunces',serif;font-size:clamp(28px,7vw,40px);font-weight:300;line-height:1.08;text-align:center;margin-bottom:14px;}
+h1 em{font-style:italic;color:var(--amber);}
+.alt{text-align:center;font-size:14px;color:rgba(245,234,216,.75);line-height:1.8;font-weight:300;margin-bottom:30px;}
+.alt b{color:#e8c47a;font-weight:600;}
+.uyari{display:flex;gap:14px;background:rgba(232,184,58,.1);border:1px solid rgba(232,184,58,.4);border-radius:15px;padding:18px 20px;margin-bottom:26px;}
+.uyari span{font-size:22px;line-height:1.1;}
+.uyari div{font-size:13.5px;line-height:1.75;color:rgba(245,234,216,.88);font-weight:300;}
+.uyari b{color:#e8c47a;font-weight:700;}
+.oyun{display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.055);border:1px solid rgba(232,160,48,.2);border-radius:17px;padding:16px;margin-bottom:13px;}
+.ikon{width:52px;height:52px;flex:none;border-radius:13px;background:linear-gradient(150deg,#3d6b2a,#1a3310);display:flex;align-items:center;justify-content:center;font-size:27px;}
+.govde{flex:1;min-width:0;}
+.ad{font-family:'Fraunces',serif;font-size:19px;font-weight:400;margin-bottom:3px;}
+.aciklama{font-size:12px;color:rgba(245,234,216,.6);line-height:1.6;font-weight:300;}
+.btn{flex:none;padding:11px 17px;border-radius:11px;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;text-decoration:none;white-space:nowrap;}
+.btn.pasif{background:rgba(255,255,255,.08);color:rgba(245,234,216,.4);border:1px dashed rgba(232,160,48,.3);}
+.adimlar{counter-reset:a;list-style:none;margin:28px 0 8px;}
+.adimlar li{counter-increment:a;position:relative;padding-left:46px;margin-bottom:17px;font-size:13.5px;line-height:1.75;color:rgba(245,234,216,.85);font-weight:300;}
+.adimlar li::before{content:counter(a);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber2));color:var(--espresso);font-family:'Fraunces',serif;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+.adimlar b{color:#e8c47a;font-weight:600;}
+h2{font-family:'Fraunces',serif;font-size:21px;font-weight:400;margin:30px 0 14px;}
+.qr{text-align:center;margin-top:30px;}
+.qr svg{width:160px;height:160px;border-radius:12px;display:block;margin:0 auto 10px;}
+.qr p,.dip{font-size:11.5px;color:rgba(245,234,216,.5);line-height:1.7;font-weight:300;text-align:center;}
+.dip{margin-top:26px;}
+.dip a{color:#e8c47a;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="kap">
+
+  <div class="eyebrow">Android Test Grubu</div>
+  <h1>Üç oyunumuzu <em>Play Store'a</em> çıkarıyoruz</h1>
+  <p class="alt">Google, oyunları herkese açmadan önce <b>12 kişinin 14 gün test etmesini</b> şart koşuyor. Android kullanıyorsan yardımın lazım.</p>
+
+  <div class="uyari">
+    <span>⏳</span>
+    <div><b>14 gün boyunca silme.</b> Google testçilerin oyunu gerçekten kullandığını kontrol ediyor. Kurup unutulursa ya da erken silinirse başvurumuz reddediliyor ve sayaç sıfırdan başlıyor. Ara sıra birkaç tur atman yeterli.</div>
+  </div>
+
+  <h2>Oyunlar</h2>
+
+  <div class="oyun">
+    <div class="ikon">🌵</div>
+    <div class="govde">
+      <div class="ad">Cactus Jump</div>
+      <div class="aciklama">Kaktüsten kaktüse zıpla. Rekoru kıran kafede limonata kazanır.</div>
+    </div>
+    <a class="btn pasif" data-paket="com.cactuscafes.cactusjump" href="#">Yakında</a>
+  </div>
+
+  <div class="oyun">
+    <div class="ikon">🏀</div>
+    <div class="govde">
+      <div class="ad">Hoop Legend</div>
+      <div class="aciklama">Mahalle sahasından dünya yıldızlığına uzanan basketbol kariyeri.</div>
+    </div>
+    <a class="btn pasif" data-paket="com.batuhanbulut.basketefsanesi" href="#">Yakında</a>
+  </div>
+
+  <div class="oyun">
+    <div class="ikon">🔤</div>
+    <div class="govde">
+      <div class="ad">Beş Harf</div>
+      <div class="aciklama">Türkçe kelime bulmaca — her gün yeni kelime, altı hakkın var.</div>
+    </div>
+    <a class="btn pasif" data-paket="com.cactuscafes.besharf" href="#">Yakında</a>
+  </div>
+
+  <h2>Nasıl katılırım?</h2>
+  <ol class="adimlar">
+    <li>Bize <b>Gmail adresini</b> yaz — Google test grubunu e-posta üzerinden yürütüyor, adresi listede olmayan kimse test sürümünü göremiyor.</li>
+    <li>Adresin eklenince bu sayfadaki düğmeler açılır. Her oyunda <b>"Testçi ol"</b> deyip <b>Play Store'dan kur</b>.</li>
+    <li><b>14 gün telefonunda kalsınlar</b> ve ara sıra aç, oyna. Hepsi bu.</li>
+  </ol>
+
+  <div class="qr">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR kod"><rect width="33" height="33" fill="#f0ece4"/><path d="M2 2h7v1h-7zM10 2h5v1h-5zM16 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM24 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM21 3h1v1h-1zM24 3h1v1h-1zM30 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h2v1h-2zM15 4h1v1h-1zM17 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM26 4h3v1h-3zM30 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM11 5h2v1h-2zM15 5h1v1h-1zM19 5h4v1h-4zM24 5h1v1h-1zM26 5h3v1h-3zM30 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM15 6h2v1h-2zM18 6h1v1h-1zM20 6h2v1h-2zM24 6h1v1h-1zM26 6h3v1h-3zM30 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM11 7h3v1h-3zM22 7h1v1h-1zM24 7h1v1h-1zM30 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h7v1h-7zM11 9h1v1h-1zM15 9h3v1h-3zM22 9h1v1h-1zM2 10h1v1h-1zM5 10h8v1h-8zM14 10h1v1h-1zM16 10h2v1h-2zM19 10h1v1h-1zM21 10h1v1h-1zM23 10h1v1h-1zM26 10h1v1h-1zM28 10h3v1h-3zM3 11h2v1h-2zM6 11h2v1h-2zM10 11h2v1h-2zM13 11h1v1h-1zM17 11h1v1h-1zM20 11h2v1h-2zM23 11h1v1h-1zM25 11h2v1h-2zM28 11h2v1h-2zM2 12h2v1h-2zM5 12h2v1h-2zM8 12h4v1h-4zM13 12h2v1h-2zM17 12h4v1h-4zM22 12h1v1h-1zM25 12h2v1h-2zM28 12h1v1h-1zM2 13h4v1h-4zM7 13h1v1h-1zM10 13h1v1h-1zM13 13h2v1h-2zM19 13h1v1h-1zM21 13h4v1h-4zM26 13h2v1h-2zM30 13h1v1h-1zM2 14h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM10 14h2v1h-2zM13 14h1v1h-1zM17 14h2v1h-2zM22 14h1v1h-1zM24 14h1v1h-1zM30 14h1v1h-1zM4 15h1v1h-1zM7 15h1v1h-1zM16 15h5v1h-5zM22 15h9v1h-9zM2 16h3v1h-3zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM15 16h5v1h-5zM21 16h5v1h-5zM28 16h1v1h-1zM30 16h1v1h-1zM3 17h4v1h-4zM9 17h1v1h-1zM11 17h1v1h-1zM13 17h1v1h-1zM20 17h4v1h-4zM26 17h1v1h-1zM28 17h1v1h-1zM30 17h1v1h-1zM3 18h2v1h-2zM6 18h3v1h-3zM11 18h3v1h-3zM15 18h1v1h-1zM17 18h2v1h-2zM25 18h1v1h-1zM27 18h1v1h-1zM2 19h1v1h-1zM4 19h4v1h-4zM12 19h1v1h-1zM14 19h2v1h-2zM17 19h1v1h-1zM19 19h4v1h-4zM26 19h1v1h-1zM28 19h2v1h-2zM2 20h3v1h-3zM7 20h5v1h-5zM13 20h3v1h-3zM17 20h1v1h-1zM19 20h1v1h-1zM21 20h1v1h-1zM23 20h2v1h-2zM26 20h2v1h-2zM30 20h1v1h-1zM2 21h3v1h-3zM6 21h2v1h-2zM9 21h2v1h-2zM12 21h1v1h-1zM14 21h3v1h-3zM18 21h1v1h-1zM20 21h2v1h-2zM23 21h2v1h-2zM26 21h3v1h-3zM2 22h2v1h-2zM5 22h1v1h-1zM7 22h2v1h-2zM10 22h1v1h-1zM12 22h1v1h-1zM14 22h2v1h-2zM18 22h2v1h-2zM21 22h9v1h-9zM10 23h1v1h-1zM14 23h5v1h-5zM22 23h1v1h-1zM26 23h2v1h-2zM2 24h7v1h-7zM10 24h1v1h-1zM14 24h2v1h-2zM17 24h1v1h-1zM20 24h3v1h-3zM24 24h1v1h-1zM26 24h2v1h-2zM2 25h1v1h-1zM8 25h1v1h-1zM10 25h3v1h-3zM15 25h1v1h-1zM19 25h4v1h-4zM26 25h1v1h-1zM29 25h2v1h-2zM2 26h1v1h-1zM4 26h3v1h-3zM8 26h1v1h-1zM10 26h2v1h-2zM14 26h2v1h-2zM17 26h2v1h-2zM21 26h7v1h-7zM29 26h1v1h-1zM2 27h1v1h-1zM4 27h3v1h-3zM8 27h1v1h-1zM10 27h1v1h-1zM12 27h10v1h-10zM23 27h1v1h-1zM30 27h1v1h-1zM2 28h1v1h-1zM4 28h3v1h-3zM8 28h1v1h-1zM11 28h1v1h-1zM13 28h2v1h-2zM16 28h2v1h-2zM19 28h1v1h-1zM23 28h1v1h-1zM25 28h2v1h-2zM28 28h3v1h-3zM2 29h1v1h-1zM8 29h1v1h-1zM12 29h1v1h-1zM14 29h1v1h-1zM18 29h1v1h-1zM24 29h2v1h-2zM27 29h2v1h-2zM30 29h1v1h-1zM2 30h7v1h-7zM10 30h2v1h-2zM15 30h1v1h-1zM21 30h2v1h-2zM25 30h2v1h-2z" fill="#0b1a07"/></svg>
+    <p>Bu sayfayı paylaşmak için kodu okut<br><b>cactuscafes.com/android-test.html</b></p>
+  </div>
+
+  <p class="dip">
+    Takıldığın yerde yaz:
+    <a href="https://wa.me/905380146600">WhatsApp</a> ·
+    <a href="mailto:batuhanbulut@cactuscafes.com">batuhanbulut@cactuscafes.com</a>
+  </p>
+
+</div>
+
+<script>
+/* Testçiler Play'e eklenmeden opt-in bağlantısı çalışmıyor; o yüzden sayfa
+   düğmeler kapalıyken de doğru görünecek şekilde yazıldı. Adresler girilince
+   AÇIK = true yapmak yeterli — bağlantılar paket adından türetiliyor. */
+const ACIK = false;
+
+if (ACIK) {
+  document.querySelectorAll('.btn[data-paket]').forEach(function (b) {
+    b.classList.remove('pasif');
+    b.textContent = 'Testçi ol →';
+    b.href = 'https://play.google.com/apps/testing/' + b.dataset.paket;
+  });
+}
+</script>
+
+</body>
+</html>

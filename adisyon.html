@@ -4665,7 +4665,9 @@ function patronGoster(){
     // 12 saniye timeout — yavaş ağda sonsuza takılmasın
     var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
     var toId=ctrl?setTimeout(function(){ctrl.abort();},12000):null;
-    fetch(API+'/sync/durum?sube='+SUBE+'&since='+since,{signal:ctrl?ctrl.signal:undefined})
+    // since başlıkta: adres sabit kalınca tarayıcı CORS ön-isteğini önbelleğe alıyor
+    // (adreste değişen since her ~5 sn'de bir OPTIONS doğuruyordu — Workers kotası)
+    fetch(API+'/sync/durum?sube='+SUBE,{headers:{'X-Since':String(since)},signal:ctrl?ctrl.signal:undefined})
       .then(function(r){if(toId)clearTimeout(toId);return r.json();})
       .then(function(data){
         _lastSync=data.zaman||Date.now();

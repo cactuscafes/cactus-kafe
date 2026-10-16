@@ -2090,11 +2090,13 @@ function _pushEvent(type, masa, payload){
   try{localStorage.setItem(LK.mas, JSON.stringify(masalar));}catch(e){}
   if(typeof renderAdisyon==='function') renderAdisyon();
   if(typeof renderMasalar==='function') renderMasalar();
+  _evSonHareket=Date.now();
   setTimeout(_evSync, 30);
 }
 function _evSync(){
   if(_evSyncInFlight) return;
   _evSyncInFlight=true;
+  _evSonCekim=Date.now();
   var pending=_pendingEvents.slice(0, 100);
   var pushP = pending.length
     ? fetch(EV_API+'/api/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:pending})}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
@@ -2112,6 +2114,7 @@ function _evSync(){
       _eventLog.forEach(function(e){existingIds[e.id]=true;});
       var yeni=pullRes.events.filter(function(e){return !existingIds[e.id];});
       if(yeni.length){
+        _evSonHareket=Date.now();
         _eventLog=_eventLog.concat(yeni);
         _lastSeq=Number(pullRes.last_seq)||_lastSeq;
         _rebuildMasalar();
@@ -2126,8 +2129,21 @@ function _evSync(){
     _evSyncInFlight=false;
   });
 }
+// Sayfa açılır açılmaz tam senkron, sonra uyarlanır yoklama (17 Eki 2026).
+// Her yoklama bir Worker isteği; hesabın günlük 100.000 sınırı var ve tek kasa
+// 2 sn'de bir sorunca günde ~27.000 istek ediyordu.
+//  • son 5 dk'da masa hareketi varsa (ya da gönderilmemiş olay bekliyorsa) 3 sn, sakin saatte 10 sn
+//  • sekme/uygulama arka plandaysa hiç sormaz; öne gelince hemen senkronlar
+//  • kendi eklediğin sipariş beklemeden gider (_pushEvent → setTimeout(_evSync, 30))
+var _evSonHareket=Date.now(), _evSonCekim=0;
+function _evYoklama(){
+  if(document.hidden) return;
+  var aralik=(_pendingEvents.length || Date.now()-_evSonHareket < 5*60000) ? 3000 : 10000;
+  if(Date.now()-_evSonCekim >= aralik) _evSync();
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) _evSync(); });
 setTimeout(_evSync, 100);
-setInterval(_evSync, 2000);
+setInterval(_evYoklama, 1000);
 
 function saveMasalar(){
   // EVENT-SOURCED v11: saveMasalar artık SADECE localStorage backup.
@@ -3802,8 +3818,11 @@ if(!window.PERSONEL_MODU) setInterval(function(){gunCiroYukle();},60000);
   }
 
   function init(){
-    setInterval(syncFromD1,4000); // 1.5s→4s: Cloudflare worker/D1 günlük limitini doldurmamak için (çok cihaz × sık polling limiti aşıyordu)
-    syncFromD1();
+    // /sync/durum yoklaması kaldırıldı (17 Eki 2026): cevabı hiçbir yerde kullanılmıyordu
+    // (masalar v11'den beri _evSync ile geliyor) ama tek cihaz saatte ~900 Worker isteği
+    // harcıyordu. Geriye yalnızca ağa çıkmayan gece sıfırlama kontrolü kaldı.
+    setInterval(geceKontrolu,60000);
+    geceKontrolu();
   }
 
   // Gece 04:00 sıfırlaması — masalar (TR saati UTC+3)
@@ -3831,25 +3850,6 @@ if(!window.PERSONEL_MODU) setInterval(function(){gunCiroYukle();},60000);
     if(typeof toast==='function') toast('🌙 Gece sıfırlaması yapıldı — Masalar temizlendi');
   }
 
-  var _syncInFlight=false;
-  function syncFromD1(){
-    // Yavaş ağda interval üst üste fire etmesin
-    if(_syncInFlight) return;
-    geceKontrolu();
-    // ── MASALAR — per-masa LWW (yeni motor) ──
-    if(typeof _masalarSyncCek==='function') _masalarSyncCek();
-    var since=_lastSync?Math.max(0,_lastSync-2000):Date.now()-30000;
-    _syncInFlight=true;
-    var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-    var toId=ctrl?setTimeout(function(){ctrl.abort();},12000):null;
-    // since başlıkta: adres sabit kalınca tarayıcı CORS ön-isteğini önbelleğe alıyor
-    // (adreste değişen since her ~5 sn'de bir OPTIONS doğuruyordu — Workers kotası)
-    fetch(API+'/sync/durum?sube='+SUBE,{headers:{'X-Since':String(since)},signal:ctrl?ctrl.signal:undefined})
-      .then(function(r){if(toId)clearTimeout(toId);return r.json();})
-      .then(function(data){
-        _lastSync=data.zaman||Date.now();
-      }).catch(function(){if(toId)clearTimeout(toId);}).finally(function(){_syncInFlight=false;});
-  }
 })();
 </script>
 <script id="cactus-patch">

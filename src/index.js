@@ -515,13 +515,25 @@ export default {
           const since = Number(url.searchParams.get('since') || 0);
           const limit = Math.min(Number(url.searchParams.get('limit') || 1000), 5000);
           if (!sube) return json({ ok: false, error: 'sube required' }, 400);
-          const result = await env.ADISYON_DB.prepare(
+          // Uzun yoklama (17 Eki 2026): ?bekle=N verilirse ve yeni olay yoksa N sn'ye kadar
+          // bekler, olay gelir gelmez döner. Her yoklama bir Workers isteği ve hesabın günlük
+          // 100.000 sınırı var: boştaki kasa saatte ~1.200 yerine ~150 istek eder.
+          // D1'e 2 sn'de bir bakar — ücretsiz planda istek başına 50 D1 sorgusu sınırı var,
+          // 24 sn en fazla 13 sorgu. Bekleme CPU süresi saymaz.
+          const bekle = Math.min(Math.max(Number(url.searchParams.get('bekle')) || 0, 0), 24);
+          const cek = () => env.ADISYON_DB.prepare(
             `SELECT seq, id, type, masa, payload, ts, server_ts, cihaz_id
                FROM adisyon_events
               WHERE sube = ? AND seq > ?
               ORDER BY seq ASC
               LIMIT ?`
           ).bind(sube, since, limit).all();
+          let result = await cek();
+          const bitis = Date.now() + bekle * 1000;
+          while (!(result.results || []).length && Date.now() + 2000 <= bitis) {
+            await new Promise((r) => setTimeout(r, 2000));
+            result = await cek();
+          }
           const events = (result.results || []).map(r => ({
             seq: r.seq,
             id: r.id,
@@ -532,7 +544,8 @@ export default {
             server_ts: r.server_ts,
             cihaz_id: r.cihaz_id,
           }));
-          return json({ ok: true, events, count: events.length, last_seq: events.length ? events[events.length - 1].seq : since });
+          // bekledi: istemci, sunucunun uzun yoklamayı desteklediğini buradan anlar
+          return json({ ok: true, events, count: events.length, last_seq: events.length ? events[events.length - 1].seq : since, bekledi: bekle > 0 });
         } catch (e) {
           return json({ ok: false, error: String(e.message || e) }, 500);
         }

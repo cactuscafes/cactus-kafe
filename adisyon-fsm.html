@@ -1991,7 +1991,7 @@ var _pendingEvents=[];
 try{_pendingEvents=JSON.parse(localStorage.getItem('cactus_evpending_'+SUBE)||'[]')||[];}catch(e){_pendingEvents=[];}
 var _lastSeq=0;
 try{_lastSeq=Number(localStorage.getItem('cactus_evseq_'+SUBE)||0)||0;}catch(e){_lastSeq=0;}
-var _evSyncInFlight=false;
+var _evPushInFlight=false, _evCekimAcik=false, _evSonHareket=Date.now(), _evZamanlayici=null;
 function _evSave(){
   try{
     localStorage.setItem('cactus_evlog_'+SUBE, JSON.stringify(_eventLog.slice(-2000)));
@@ -2093,57 +2093,69 @@ function _pushEvent(type, masa, payload){
   _evSonHareket=Date.now();
   setTimeout(_evSync, 30);
 }
-function _evSync(){
-  if(_evSyncInFlight) return;
-  _evSyncInFlight=true;
-  _evSonCekim=Date.now();
+// Gönderim ve çekim ayrı (17 Eki 2026). Çekim uzun yoklama: sunucu yeni olay yoksa
+// cevabı 24 sn'ye kadar bekletir, olay gelince ~2 sn içinde döner. Boştaki kasa saatte
+// ~150 Workers isteği eder (2 sn sabit yoklamada 1.800'dü; hesabın günlük sınırı 100.000).
+// Gönderim çekimi beklemez: kendi eklediğin sipariş hemen gider.
+function _evSync(){ _evPush(); _evCek(); }
+function _evPush(){
+  if(_evPushInFlight || !_pendingEvents.length) return;
+  _evPushInFlight=true;
   var pending=_pendingEvents.slice(0, 100);
-  var pushP = pending.length
-    ? fetch(EV_API+'/api/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:pending})}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
-    : Promise.resolve({ok:true,accepted:0});
-  var pullP = fetch(EV_API+'/api/events?sube='+SUBE+'&since='+_lastSeq).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
-  Promise.all([pushP, pullP]).then(function(res){
-    var pushRes=res[0], pullRes=res[1];
-    if(pushRes && pushRes.ok){
-      var pushedIds={};
-      pending.forEach(function(e){pushedIds[e.id]=true;});
-      _pendingEvents=_pendingEvents.filter(function(e){return !pushedIds[e.id];});
-    }
-    if(pullRes && pullRes.ok && Array.isArray(pullRes.events) && pullRes.events.length){
-      var existingIds={};
-      _eventLog.forEach(function(e){existingIds[e.id]=true;});
-      var yeni=pullRes.events.filter(function(e){return !existingIds[e.id];});
-      if(yeni.length){
-        _evSonHareket=Date.now();
-        _eventLog=_eventLog.concat(yeni);
-        _lastSeq=Number(pullRes.last_seq)||_lastSeq;
-        _rebuildMasalar();
-        if(typeof renderMasalar==='function') renderMasalar();
-        if(typeof renderAdisyon==='function' && !document.querySelector('.drawer.on')) renderAdisyon();
-      } else {
-        _lastSeq=Number(pullRes.last_seq)||_lastSeq;
+  fetch(EV_API+'/api/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:pending})})
+    .then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    .then(function(pushRes){
+      var tamam=!!(pushRes && pushRes.ok);
+      if(tamam){
+        var pushedIds={};
+        pending.forEach(function(e){pushedIds[e.id]=true;});
+        _pendingEvents=_pendingEvents.filter(function(e){return !pushedIds[e.id];});
+        _evSave();
       }
-    }
-    _evSave();
-  }).catch(function(){}).finally(function(){
-    _evSyncInFlight=false;
-  });
+      _evPushInFlight=false;
+      // kalan ya da başarısız olan varsa: başarıda hemen, hatada 5 sn sonra yeniden
+      if(_pendingEvents.length) setTimeout(_evPush, tamam?30:5000);
+    });
 }
-// Sayfa açılır açılmaz tam senkron, sonra uyarlanır yoklama (17 Eki 2026).
-// Her yoklama bir Worker isteği; hesabın günlük 100.000 sınırı var ve tek kasa
-// 2 sn'de bir sorunca günde ~27.000 istek ediyordu.
-//  • son 5 dk'da masa hareketi varsa (ya da gönderilmemiş olay bekliyorsa) 3 sn, sakin saatte 10 sn
-//  • sekme/uygulama arka plandaysa hiç sormaz; öne gelince hemen senkronlar
-//  • kendi eklediğin sipariş beklemeden gider (_pushEvent → setTimeout(_evSync, 30))
-var _evSonHareket=Date.now(), _evSonCekim=0;
-function _evYoklama(){
-  if(document.hidden) return;
-  var aralik=(_pendingEvents.length || Date.now()-_evSonHareket < 5*60000) ? 3000 : 10000;
-  if(Date.now()-_evSonCekim >= aralik) _evSync();
+function _evCek(){
+  if(_evCekimAcik || document.hidden) return;
+  _evCekimAcik=true;
+  clearTimeout(_evZamanlayici);
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var toId=ctrl?setTimeout(function(){ctrl.abort();},35000):null;
+  fetch(EV_API+'/api/events?sube='+SUBE+'&since='+_lastSeq+'&bekle=24',{signal:ctrl?ctrl.signal:undefined})
+    .then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    .then(function(pullRes){
+      if(toId) clearTimeout(toId);
+      var yeniVar=false;
+      try{
+        if(pullRes && pullRes.ok && Array.isArray(pullRes.events) && pullRes.events.length){
+          var existingIds={};
+          _eventLog.forEach(function(e){existingIds[e.id]=true;});
+          var yeni=pullRes.events.filter(function(e){return !existingIds[e.id];});
+          _lastSeq=Number(pullRes.last_seq)||_lastSeq;
+          if(yeni.length){
+            yeniVar=true;
+            _evSonHareket=Date.now();
+            _eventLog=_eventLog.concat(yeni);
+            _rebuildMasalar();
+            if(typeof renderMasalar==='function') renderMasalar();
+            if(typeof renderAdisyon==='function' && !document.querySelector('.drawer.on')) renderAdisyon();
+          }
+          _evSave();
+        }
+      }catch(e){}
+      _evCekimAcik=false;
+      var gecikme;
+      if(!pullRes) gecikme=5000;                            // ağ hatası: biraz bekle
+      else if(yeniVar || pullRes.bekledi) gecikme=300;      // olay geldi ya da sunucu bekletti: hemen yeniden
+      else gecikme=(_pendingEvents.length || Date.now()-_evSonHareket < 5*60000) ? 3000 : 10000; // uzun yoklamayı bilmeyen eski sunucu
+      _evZamanlayici=setTimeout(_evCek, gecikme);
+    });
 }
+// Arka planda (sekme gizli, uygulama alta alınmış) hiç sormaz; öne gelince hemen senkronlar.
 document.addEventListener('visibilitychange', function(){ if(!document.hidden) _evSync(); });
 setTimeout(_evSync, 100);
-setInterval(_evYoklama, 1000);
 
 function saveMasalar(){
   // EVENT-SOURCED v11: saveMasalar artık SADECE localStorage backup.

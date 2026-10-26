@@ -672,6 +672,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
             <div><span class="lbl">Podyum yorum sayısı</span><input class="yi" type="number" id="ay-yorum-podyum"></div>
           </div>
           <span class="lbl">Telefon (tüm sayfalardaki ara linkleri)</span><input class="yi" id="ay-telefon" placeholder="0538 014 66 00" style="max-width:270px;">
+          <span class="lbl" style="margin-top:14px;display:block;">❄️ Sezon teması (ana sayfa + menü)</span>
+          <select class="yi" id="ay-tema" style="max-width:270px;">
+            <option value="normal">Normal</option>
+            <option value="kis">Kış — kar yağışı, kar yığını, kış sloganı, atkılı kaktüs</option>
+          </select>
+          <div style="font-size:12px;color:var(--mist);margin-top:4px;">Kaydetmeden görmek için: <a href="https://cactuscafes.com/?tema=kis" target="_blank" rel="noopener">cactuscafes.com/?tema=kis</a></div>
         </div>
 
         <div style="display:flex;align-items:center;gap:14px;">
@@ -3337,6 +3343,7 @@ async function ayarYukle(){
     _av('ay-pp-fiyat').value=pp.fiyat||''; _av('ay-pp-metin').value=pp.metin||'';
     _av('ay-pp-not').value=pp.not||''; _av('ay-pp-bitis').value=pp.bitis||'';
     _av('ay-telefon').value=a.telefon||'';
+    if(_av('ay-tema')) _av('ay-tema').value=(a.tema==='kis'?'kis':'normal');
     if(st)st.textContent='';
   }catch(e){ if(st)st.textContent='❌ Yüklenemedi: '+e.message; }
 }
@@ -3355,6 +3362,7 @@ async function ayarKaydet(){
                   baslik:_av('ay-pp-baslik').value.trim(),fiyat:parseInt(_av('ay-pp-fiyat').value,10)||0,
                   metin:_av('ay-pp-metin').value.trim(),not:_av('ay-pp-not').value.trim(),bitis:_av('ay-pp-bitis').value};
   a.telefon=_av('ay-telefon').value.trim();
+  if(_av('ay-tema')) a.tema=_av('ay-tema').value;
   if(st)st.textContent='⏳ Kaydediliyor…';
   try{
     var r=await fetch(RAPOR_API+'/ayar/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ayar:a})});

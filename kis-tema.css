@@ -1,0 +1,48 @@
+/* ═══ CACTUS KIŞ TEMASI ═══
+ * Yalnız <html class="tema-kis"> varken etkilidir. Sınıfı site-ayarlar.js koyar:
+ * admin → Site Ayarları → Sezon teması = Kış, ya da önizleme için sayfaya ?tema=kis.
+ * Marka kimliği (Fraunces + Inter, yeşil-altın) aynen kalır; bu dosya yalnız
+ * mevsim katmanı ekler — kar, kar yığını, soğuk akşam ışığı, buhar.
+ */
+:root{--kis-kar:#f4f8f8;--kis-buz:#cfe1e3;--kis-golge:#9fb9bd;}
+
+/* ── Ana sayfa hero ── */
+/* Soğuk akşam ışığı: üstte çam-gecesi mavisi, altta koyulaşan zemin.
+   Fotoğrafın sıcak ışıkları (dönme dolap) bu soğuk zeminde daha da öne çıkar. */
+.tema-kis .hero-overlay{background:
+  linear-gradient(180deg,rgba(14,32,40,.50) 0%,rgba(16,34,30,.22) 42%,rgba(8,20,16,.62) 100%);}
+/* Sıcak yaz fotoğrafını kışa çeker: biraz soluk, biraz serin. Dönme dolabın ışıkları
+   sıcak kalır ve soğuk zeminde daha da parlar. */
+.tema-kis .hero-bg{filter:saturate(.68) brightness(.9) contrast(1.06);}
+/* Buzlu cam: kenarlardan içe doğru ince kırağı */
+.tema-kis .hero-overlay{box-shadow:inset 0 0 140px 40px rgba(214,232,236,.22),inset 0 0 40px 6px rgba(244,248,248,.18);}
+.tema-kis .hero-content{z-index:3;}
+.tema-kis .hero-scroll{z-index:3;bottom:84px;}
+@media(max-width:768px){.tema-kis .hero-scroll{bottom:64px;}}
+
+/* Kar tuvali — hero ve menüdeki sadakat bandının içine yerleşir */
+.kis-kar{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;}
+
+/* Kar yığını: hero'nun dibinde iki katmanlı (arka buz mavisi, ön kar beyazı) */
+.kis-yigin{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;z-index:2;pointer-events:none;display:block;}
+@media(max-width:768px){.kis-yigin{height:40px;}}
+
+/* Soğukta buhar daha belirgin görünür */
+.tema-kis .steam-wrap{opacity:.75;z-index:2;}
+.tema-kis .steam-blob{background:radial-gradient(circle,rgba(255,255,255,.62) 0%,transparent 70%);}
+
+/* Kış sloganı: Fraunces italik, kar beyazı */
+.tema-kis .hero-tagline.kis-slogan{font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+  font-size:clamp(15px,1.6vw,20px);letter-spacing:2.5px;text-transform:none;opacity:.95;color:var(--kis-kar);}
+
+/* Kış alt yazısı telefonda iki satıra dengeli bölünsün */
+.tema-kis .hero-subtitle{text-wrap:balance;max-width:min(92vw,760px);margin-left:auto;margin-right:auto;}
+
+/* ── Menü: sadakat bandı karın altında ── */
+.tema-kis .sk-banner > *:not(.kis-kar){position:relative;z-index:3;}
+
+/* Duyuru şeridinin alt kenarında ince buz çizgisi */
+.tema-kis #promoMarquee{border-bottom:1px solid rgba(207,225,227,.55)!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.10),inset 0 -1px 0 rgba(244,248,248,.18)!important;}
+
+@media print{.kis-kar,.kis-yigin{display:none!important;}}

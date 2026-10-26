@@ -20,6 +20,34 @@
   try { if (window.frameElement && window.frameElement.id === 'as-iframe') return; } catch (e) {}
   var API = 'https://cactus-rapor-api.batuhanbulut.workers.dev';
 
+  // ── Sezon teması ("normal" | "kis") ──
+  // Sunucunun cevabını beklemeden, son bilinen temayla hemen başlar (yoksa her açılışta
+  // normal görünüp sonradan kışa dönerdi); cevap gelince farklıysa düzeltir.
+  // Önizleme: ?tema=kis / ?tema=normal — oturum boyunca hatırlanır, admin ayarını ezmez.
+  var TEMA_V = 1;
+  var temaOnizleme = null;
+  try {
+    var _tm = location.search.match(/[?&]tema=(kis|normal)(?:&|$)/);
+    if (_tm) sessionStorage.setItem('cactus_tema_onizleme', _tm[1]);
+    temaOnizleme = sessionStorage.getItem('cactus_tema_onizleme');
+  } catch (e) {}
+  function temaUygula(t) {
+    var kis = t === 'kis', html = document.documentElement;
+    html.classList.toggle('tema-kis', kis);
+    if (kis && !document.getElementById('kisTemaCss')) {
+      var l = document.createElement('link');
+      l.id = 'kisTemaCss'; l.rel = 'stylesheet'; l.href = 'kis-tema.css?v=' + TEMA_V;
+      document.head.appendChild(l);
+      var s = document.createElement('script');
+      s.src = 'kis-tema.js?v=' + TEMA_V; s.defer = true;
+      document.head.appendChild(s);   // yüklenince sınıfı görüp kendini açar
+    }
+    if (window.KisTema) { if (kis) window.KisTema.ac(); else window.KisTema.kapat(); }
+  }
+  var temaSon = null;
+  try { temaSon = localStorage.getItem('cactus_tema'); } catch (e) {}
+  temaUygula(temaOnizleme || temaSon || 'normal');
+
   // Basit vurgu: *italik* → <em>, **kalın** → <strong>, satır sonu → <br> (önce HTML kaçışı)
   function md(s) {
     s = String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -64,6 +92,10 @@
   function uygula(a) {
     if (!a) return;
     try {
+      // ── Sezon teması ──
+      var tema = a.tema === 'kis' ? 'kis' : 'normal';
+      try { localStorage.setItem('cactus_tema', tema); } catch (e) {}
+      if (!temaOnizleme) temaUygula(tema);
       // ── Telefon ──
       if (a.telefon) {
         document.querySelectorAll('[data-ayar="tel"]').forEach(function (el) {

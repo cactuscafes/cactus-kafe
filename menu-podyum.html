@@ -634,13 +634,6 @@ footer{padding:40px 20px 24px;}
 .kmp-dus{position:absolute;top:-10px;width:26px;height:26px;color:#a8873f;pointer-events:none;z-index:1;animation:kpDus var(--t,2.6s) linear forwards;}
 .kampanya-foto-band{overflow:hidden;}
 
-/* --- popup yanma efekti --- */
-@keyframes yanMask{from{-webkit-mask-position:0 0;mask-position:0 0;}to{-webkit-mask-position:0 -200%;mask-position:0 -200%;}}
-@keyframes yanCizgi{from{top:104%;}to{top:-6%;}}
-@keyframes yanKivilcim{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx,0),-70px) scale(.3);}}
-.kampanya-modal.yaniyor{-webkit-mask-image:linear-gradient(to top,transparent 0%,transparent 38%,#000 62%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,transparent 38%,#000 62%,#000 100%);-webkit-mask-size:100% 300%;mask-size:100% 300%;-webkit-mask-position:0 0;mask-position:0 0;animation:yanMask .9s cubic-bezier(.4,.1,.6,.9) forwards;pointer-events:none;}
-.yan-cizgi{position:absolute;left:-4%;right:-4%;height:26px;top:104%;z-index:5;pointer-events:none;filter:blur(1px);background:radial-gradient(60% 100% at 20% 50%,rgba(255,150,40,.95),transparent 70%),radial-gradient(50% 100% at 45% 50%,rgba(255,200,90,.9),transparent 70%),radial-gradient(55% 100% at 72% 50%,rgba(255,120,20,.95),transparent 70%),radial-gradient(45% 100% at 92% 50%,rgba(255,190,80,.85),transparent 70%);box-shadow:0 0 24px 6px rgba(255,140,30,.5);animation:yanCizgi .9s cubic-bezier(.4,.1,.6,.9) forwards;}
-.yan-kivilcim{position:fixed;width:5px;height:5px;border-radius:50%;z-index:520;pointer-events:none;background:radial-gradient(circle,#ffd27a,#ff8c1e 70%,transparent);animation:yanKivilcim var(--t,.8s) ease-out forwards;}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 <script src="site-ayarlar.js?v=2" defer></script>
@@ -2233,50 +2226,6 @@ document.documentElement.classList.add('js');
     if(bg.classList.contains('on')&&!bg.dataset.oynadi){bg.dataset.oynadi='1';tatliYagmur();}
     if(!bg.classList.contains('on'))delete bg.dataset.oynadi;
   }).observe(bg,{attributes:true,attributeFilter:['class']});
-})();
-</script>
-
-<script>
-(function(){
-  var az=false; // hareket-azaltma muafiyeti: efekt herkeste oynasin
-  function sarmala(){
-    var orijinal=window.kampanyaKapat;
-    if(typeof orijinal!=='function')return false;
-    var yaniyor=false;
-    window.kampanyaKapat=function(){
-      var bg=document.getElementById('kampanyaBg');
-      var modal=bg&&bg.querySelector('.kampanya-modal');
-      if(az||!modal||yaniyor||!bg.classList.contains('on')){return orijinal.apply(this,arguments);}
-      yaniyor=true;
-      var ciz=document.createElement('div');ciz.className='yan-cizgi';modal.appendChild(ciz);
-      modal.classList.add('yaniyor');
-      var r=modal.getBoundingClientRect(),bas=Date.now();
-      var kiv=setInterval(function(){
-        var ilerleme=(Date.now()-bas)/900;
-        if(ilerleme>=1){clearInterval(kiv);return;}
-        for(var i=0;i<3;i++){
-          var d=document.createElement('div');d.className='yan-kivilcim';
-          d.style.left=(r.left+Math.random()*r.width)+'px';
-          d.style.top=(r.top+r.height*(1.04-ilerleme*1.1))+'px';
-          d.style.setProperty('--dx',((Math.random()-.5)*40)+'px');
-          d.style.setProperty('--t',(.5+Math.random()*.6)+'s');
-          document.body.appendChild(d);
-          setTimeout(function(x){return function(){x.remove();};}(d),1200);
-        }
-      },70);
-      setTimeout(function(){
-        orijinal();
-        modal.classList.remove('yaniyor');
-        ciz.remove();
-        yaniyor=false;
-      },880);
-    };
-    return true;
-  }
-  if(!sarmala()){
-    var dene=setInterval(function(){if(sarmala())clearInterval(dene);},200);
-    setTimeout(function(){clearInterval(dene);},5000);
-  }
 })();
 </script>
 </body>

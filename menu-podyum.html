@@ -2024,12 +2024,18 @@ function toggleMainNav(){
 </script>
 
 <!-- ── SAYFA GEÇİŞİ ── -->
-<div id="pt-veil"><span id="pt-word">CACTUS</span></div>
+<div id="pt-veil"><svg id="pt-wheel" viewBox="0 0 100 108" aria-hidden="true"><g class="pt-legs"><line x1="50" y1="44" x2="30" y2="100"/><line x1="50" y1="44" x2="70" y2="100"/><line x1="22" y1="100" x2="78" y2="100"/></g><g class="pt-spin"><circle cx="50" cy="44" r="34"/><circle cx="50" cy="44" r="29" opacity=".45"/><line x1="50" y1="44" x2="84.0" y2="44.0"/><line x1="50" y1="44" x2="79.4" y2="61.0"/><line x1="50" y1="44" x2="67.0" y2="73.4"/><line x1="50" y1="44" x2="50.0" y2="78.0"/><line x1="50" y1="44" x2="33.0" y2="73.4"/><line x1="50" y1="44" x2="20.6" y2="61.0"/><line x1="50" y1="44" x2="16.0" y2="44.0"/><line x1="50" y1="44" x2="20.6" y2="27.0"/><line x1="50" y1="44" x2="33.0" y2="14.6"/><line x1="50" y1="44" x2="50.0" y2="10.0"/><line x1="50" y1="44" x2="67.0" y2="14.6"/><line x1="50" y1="44" x2="79.4" y2="27.0"/><g class="pt-cab"><circle cx="82.8" cy="52.8" r="4"/><circle cx="67.0" cy="73.4" r="4"/><circle cx="41.2" cy="76.8" r="4"/><circle cx="20.6" cy="61.0" r="4"/><circle cx="17.2" cy="35.2" r="4"/><circle cx="33.0" cy="14.6" r="4"/><circle cx="58.8" cy="11.2" r="4"/><circle cx="79.4" cy="27.0" r="4"/></g></g><circle cx="50" cy="44" r="3.2" class="pt-hub"/></svg><span id="pt-word">CACTUS</span></div>
 <style>
 #pt-veil{position:fixed;inset:0;z-index:99999;background:#0b1a07;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .55s cubic-bezier(.4,0,.2,1);}
 #pt-veil.pt-out{opacity:0;pointer-events:none;}
 #pt-word{font-family:'Fraunces',serif;font-size:30px;letter-spacing:14px;color:#c8a86a;text-transform:uppercase;transition:opacity .25s ease,transform .25s ease;transform:scale(1);}
 #pt-veil.pt-out #pt-word{opacity:0;transform:scale(.94);}
+#pt-veil{flex-direction:column;gap:18px;}
+#pt-wheel{width:76px;height:82px;fill:none;stroke:#c8a86a;stroke-width:1.6;stroke-linecap:round;transition:opacity .25s ease,transform .25s ease;}
+#pt-wheel .pt-cab,#pt-wheel .pt-hub{fill:#c8a86a;stroke:none;}
+#pt-wheel .pt-spin{transform-origin:50px 44px;animation:ptSpin 5s linear infinite;}
+#pt-veil.pt-out #pt-wheel{opacity:0;transform:scale(.94);}
+@keyframes ptSpin{to{transform:rotate(360deg);}}
 </style>
 <script>
 (function(){

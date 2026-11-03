@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="foto-hero-podyum2.jpg" fetchpriority="high" media="(min-width:769px)">
-<link rel="preload" as="image" href="foto-hero-podyum-mobil2.jpg" fetchpriority="high" media="(max-width:768px)">
+<link rel="preload" as="image" href="video-hero-dolap-poster.jpg" fetchpriority="high" media="(max-width:768px)">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#c8a86a;--amber:#c8a86a;--dark:#1a1a1a;--light:#f8f6f2;}
@@ -60,8 +60,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.4);}
 /* Mobil: hero tam dolsun (bant yok) — kadraj dolabı koruyacak şekilde sola yaslı */
 @media(max-width:768px){
-  .hero-bg{object-fit:cover;object-position:32% center;}
+  .hero-bg{object-fit:cover;object-position:center;}
 }
+/* Mobil: dönen dönme dolap videosu (Gemini Veo, sessiz döngü) — poster ilk kareyle aynı, oynayınca üstüne biner */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+@media(max-width:768px){.hero-video{display:block;}}
 
 
 
@@ -407,9 +410,10 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 
 <section class="hero">
   <picture class="hero-pic">
-    <source media="(max-width:768px)" srcset="foto-hero-podyum-mobil2.jpg">
+    <source media="(max-width:768px)" srcset="video-hero-dolap-poster.jpg">
     <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">
   </picture>
+  <video class="hero-video" muted loop playsinline preload="none" poster="video-hero-dolap-poster.jpg" aria-hidden="true"></video>
   <div class="hero-overlay"></div>
   <div class="steam-wrap" aria-hidden="true">
     <div class="steam-blob"></div>
@@ -1365,6 +1369,16 @@ function toggleMainNav(){
       });
   }
   yukle();
+})();
+</script>
+<script>
+// Hero videosu yalnızca mobilde ve veri tasarrufu kapalıyken yüklenir
+(function(){
+  var v=document.querySelector('.hero-video');
+  if(!v || !matchMedia('(max-width:768px)').matches) return;
+  if(navigator.connection && navigator.connection.saveData) return;
+  v.src='video-hero-dolap.mp4';
+  var p=v.play(); if(p && p.catch) p.catch(function(){});
 })();
 </script>
 </body></html>

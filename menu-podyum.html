@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-05-soguk-video-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-05-onecikan-video-r1'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -549,7 +549,7 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 /* ═══ Ürün Rozetleri ═══ */
 .product-img-wrap{position:relative;}
 .spotlight-img-wrap{position:relative;overflow:hidden;}
-.spotlight-img-wrap img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .5s ease;}
+.spotlight-img-wrap img,.spotlight-img-wrap video{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .5s ease;background:#f8f6f2;}
 .product-badge{position:absolute;top:8px;left:8px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.2);}
 .badge-populer{background:linear-gradient(135deg,#ff7e3f,#e84393);color:#fff;}
 .badge-yeni{background:linear-gradient(135deg,#00c896,#2d8f6e);color:#fff;}
@@ -1235,6 +1235,7 @@ function renderMenu(sube) {
       servis: (live.servis!=null?live.servis:o.servis),
       emoji: (live.emoji!=null?live.emoji:o.emoji),
       foto: (live.foto||o.foto),
+      video: (live.video||o.video||''),
       kalori: (live.kalori!=null?live.kalori:o.kalori),
       alerjen: (live.alerjen!=null?live.alerjen:o.alerjen)
     });
@@ -1247,7 +1248,8 @@ function renderMenu(sube) {
       POPUP_DATA.push({ad:T(u.ad),fiyat:u.fiyat||'',aciklama:T(u.aciklama||''),foto:u.foto||'',emoji:u.emoji||'',servis:T(u.servis||''),kalori:u.kalori||'',alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])});
       var servisBadge = u.servis?'<span class="product-servis">'+u.servis+'</span>':'';
       var c='<div class="spotlight-card" onclick="upopAc('+pidx+')">';
-      c+='<div class="spotlight-img-wrap">'+servisBadge+'<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'"></div>';
+      var medya=u.video?'<video class="product-video" muted loop playsinline preload="none" poster="'+u.video+'.jpg" data-src="'+u.video+'.mp4" aria-label="'+u.ad+'"></video>':'<img src="'+u.foto+'" alt="'+u.ad+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
+      c+='<div class="spotlight-img-wrap">'+servisBadge+medya+'</div>';
       c+='<div class="spotlight-card-info"><div class="spotlight-card-name">'+T(u.ad)+'</div>';
       c+='<div class="spotlight-card-price">'+TFiyat(u.fiyat)+'</div></div></div>';
       return c;

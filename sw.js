@@ -7,7 +7,7 @@
  * KRİTİK: FSM ve Podyum HTML'leri ASLA birbirine fallback olamaz —
  * Her request kendi URL'ine ait cache döner; yoksa hata döner.
  */
-const VERSION = 'cactus-v77'; // v77: kis temasi (kis-tema.css/js) + site-ayarlar v3
+const VERSION = 'cactus-v78'; // v78: video/Range istekleri SW'ye uğramaz (iOS Safari videoyu oynatmıyordu)
 const CACHE = 'cactus-cache-' + VERSION;
 const STATIC_ASSETS = [
   '/favicon.svg',
@@ -36,6 +36,8 @@ self.addEventListener('fetch', (e) => {
   // Bordro D1 senkronu same-origin /api/bordro'ya gider; SW cache'i buna karışmamalı.
   if (_u.pathname.startsWith('/api/') || _u.hostname.includes('workers.dev')) return;
   if (req.method !== 'GET') return;
+  // Video/ses: Safari byte-range (206) ister; SW'nin tam 200 yanıtı iPhone'da videoyu oynatmıyordu → tarayıcıya bırak
+  if (req.headers.has('range') || req.destination === 'video' || req.destination === 'audio' || /\.(mp4|webm|mov|m4a|mp3)$/i.test(_u.pathname)) return;
   const url = new URL(req.url);
   // Same origin değilse atla
   if (url.origin !== location.origin) return;

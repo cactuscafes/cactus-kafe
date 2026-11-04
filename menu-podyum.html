@@ -445,39 +445,45 @@ footer{padding:40px 20px 24px;}
 /* ═══ Podyumpark Kampanya Pop-up (modal) — kart tasarımı ═══ */
 .kampanya-bg{position:fixed;inset:0;background:radial-gradient(120% 80% at 50% 0%,rgba(42,66,50,.78) 0%,rgba(22,37,28,.84) 60%,rgba(15,26,20,.88) 100%);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .4s,-webkit-backdrop-filter .45s,backdrop-filter .45s;}
 .kampanya-bg.on{display:flex;opacity:1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
-.kampanya-modal{background:#fdfaf2;border:none;border-radius:24px;max-width:400px;width:100%;text-align:center;position:relative;box-shadow:0 40px 90px -30px rgba(9,20,13,.75),0 2px 0 rgba(255,255,255,.5) inset;transform:translateY(28px) scale(.965);opacity:0;transition:transform .58s cubic-bezier(.16,1,.3,1),opacity .5s;max-height:calc(100dvh - 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.kampanya-modal{background:radial-gradient(130% 70% at 50% 100%,#1f3a2b 0%,#16251c 55%,#111d16 100%);border:none;border-radius:24px;max-width:400px;width:100%;text-align:center;position:relative;box-shadow:0 40px 90px -30px rgba(0,0,0,.8);transform:translateY(28px) scale(.965);opacity:0;transition:transform .58s cubic-bezier(.16,1,.3,1),opacity .5s;max-height:calc(100dvh - 28px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;color:#f3ecdc;}
 .kampanya-bg.on .kampanya-modal{transform:translateY(0);opacity:1;}
-.kampanya-ring{position:absolute;inset:0;border-radius:24px;pointer-events:none;box-shadow:0 0 0 1px rgba(168,135,63,.28) inset;z-index:2;}
-.kampanya-close{position:absolute;top:14px;right:14px;z-index:3;width:32px;height:32px;border:1px solid rgba(31,58,43,.14);background:rgba(253,250,242,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#1f3a2b;font-size:15px;cursor:pointer;line-height:1;border-radius:50%;display:grid;place-items:center;transition:background .2s,color .2s,transform .2s;}
-.kampanya-close:hover{background:#1f3a2b;color:#fdfaf2;transform:rotate(90deg);}
-.kampanya-ust{padding:22px 26px 14px;display:flex;flex-direction:column;align-items:center;gap:11px;}
-.pop-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;padding:5px 13px 4px;border-radius:999px;background:rgba(168,135,63,.07);color:#8a6d2c;border:1px solid rgba(168,135,63,.45);}
-.pop-badge::before{content:"";width:4px;height:4px;border-radius:50%;background:#a8873f;}
-.kampanya-brand .kmp-logo{display:block;height:48px;width:auto;margin:0 auto;}
-.kampanya-title{font-family:'Fraunces',serif;font-size:36px;font-weight:500;color:#16251c;line-height:1;letter-spacing:-.01em;margin:2px 0 0;}
-.kampanya-foto-band{position:relative;background:#f6f1e4;box-shadow:0 1px 0 rgba(168,135,63,.35) inset,0 -1px 0 rgba(168,135,63,.35) inset;}
-.kampanya-foto{display:block;width:100%;height:min(252px,32dvh);object-fit:contain;margin:0;}
-.kampanya-alt{padding:15px 24px 20px;display:flex;flex-direction:column;gap:12px;}
-.kampanya-sub{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:300;line-height:1.55;color:rgba(22,37,28,.75);margin:0;}
-.kampanya-icecek{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid rgba(168,135,63,.5);border-radius:12px;background:linear-gradient(180deg,rgba(168,135,63,.1),rgba(168,135,63,.04));text-align:left;margin:0;}
-.kampanya-icecek-txt{flex:1;font-family:'Inter',sans-serif;font-size:12px;font-weight:400;line-height:1.35;color:rgba(22,37,28,.82);}
+.kampanya-ring{position:absolute;inset:0;border-radius:24px;pointer-events:none;box-shadow:0 0 0 1px rgba(200,168,106,.32) inset;z-index:4;}
+.kampanya-close{position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border:1px solid rgba(243,236,220,.28);background:rgba(17,29,22,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#f3ecdc;font-size:14px;cursor:pointer;line-height:1;border-radius:50%;display:grid;place-items:center;transition:background .2s,color .2s,transform .2s;}
+.kampanya-close:hover{background:#c8a86a;color:#16251c;transform:rotate(90deg);}
+.kampanya-foto-band{position:relative;border-radius:24px 24px 0 0;overflow:hidden;}
+.kampanya-foto-band::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,29,22,.35) 0%,transparent 26%,transparent 62%,#16251c 100%);pointer-events:none;}
+.kampanya-foto{display:block;width:100%;aspect-ratio:4/3;max-height:36dvh;object-fit:cover;margin:0;}
+.kampanya-foto-ust{position:absolute;top:14px;left:14px;z-index:2;}
+.pop-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;padding:6px 12px 5px;border-radius:999px;background:rgba(17,29,22,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#f3ecdc;border:1px solid rgba(200,168,106,.6);}
+.pop-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:#c8a86a;box-shadow:0 0 0 3px rgba(200,168,106,.25);}
+.kampanya-ust{padding:0 24px 4px;margin-top:-14px;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.kampanya-brand .kmp-logo{display:block;height:30px;width:auto;margin:0 auto;opacity:.95;}
+.kampanya-title{font-family:'Fraunces',serif;font-size:36px;font-weight:400;color:#f3ecdc;line-height:1;letter-spacing:-.01em;margin:0;}
+.kampanya-title em{font-style:italic;color:#c8a86a;}
+.kampanya-cesit{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:2px;}
+.kampanya-cesit span{font-family:'Inter',sans-serif;font-size:10.5px;font-weight:500;letter-spacing:.08em;padding:5px 11px;border-radius:999px;border:1px solid rgba(243,236,220,.2);color:rgba(243,236,220,.88);background:rgba(243,236,220,.05);}
+.kampanya-alt{padding:14px 22px 20px;display:flex;flex-direction:column;gap:12px;}
+.kampanya-sub{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:300;line-height:1.55;color:rgba(243,236,220,.75);margin:0;}
+.kampanya-icecek{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid rgba(200,168,106,.45);border-radius:14px;background:linear-gradient(180deg,rgba(200,168,106,.14),rgba(200,168,106,.05));text-align:left;margin:0;}
+.kampanya-icecek-txt{flex:1;font-family:'Inter',sans-serif;font-size:12px;font-weight:400;line-height:1.35;color:rgba(243,236,220,.85);}
 .kampanya-icecek-fiyat{display:flex;align-items:baseline;gap:5px;white-space:nowrap;}
-.kampanya-yalnizca{font-style:normal;font-family:'Inter',sans-serif;font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#8a6d2c;}
-.kampanya-icecek b{font-family:'Fraunces',serif;font-size:25px;font-weight:600;line-height:1;color:#1f3a2b;}
-.kampanya-cta{font-family:'Inter',sans-serif;width:100%;background:#1f3a2b;color:#fdfaf2;border:none;padding:14px 20px;border-radius:999px;font-size:11.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 12px 24px -14px rgba(31,58,43,.9);}
-.kampanya-cta:hover{background:#16251c;transform:translateY(-1px);box-shadow:0 18px 30px -14px rgba(31,58,43,.95);}
+.kampanya-yalnizca{font-style:normal;font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#c8a86a;}
+.kampanya-icecek b{font-family:'Fraunces',serif;font-size:26px;font-weight:600;line-height:1;color:#f3ecdc;}
+.kampanya-cta{font-family:'Inter',sans-serif;width:100%;background:#c8a86a;color:#16251c;border:none;padding:15px 20px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 14px 28px -14px rgba(200,168,106,.8);}
+.kampanya-cta:hover{background:#d9bb7f;transform:translateY(-1px);box-shadow:0 18px 32px -14px rgba(200,168,106,.9);}
 .menu-dipnot{text-align:center;font-size:11.5px;color:#9a958a;font-family:'Inter',sans-serif;letter-spacing:.3px;margin:16px 20px 0;line-height:1.6;}
 /* Mobil: popup kayan şeridin ALTINDA başlar (nav 60 + şerit 34 + pay) */
 @media(max-width:768px){
   .kampanya-bg{padding:104px 16px 16px;align-items:flex-start;}
   .kampanya-modal{max-height:calc(100dvh - 120px);}
-  .kampanya-ust{padding:18px 20px 11px;gap:9px;}
-  .kmp-logo{height:38px!important;}
+  .kampanya-foto{max-height:30dvh;}
+  .kampanya-ust{padding:0 18px 2px;gap:8px;margin-top:-10px;}
+  .kmp-logo{height:26px!important;}
   .kampanya-title{font-size:30px;}
-  .kampanya-foto{height:min(220px,27dvh);}
-  .kampanya-alt{padding:13px 18px 16px;gap:10px;}
+  .kampanya-alt{padding:12px 18px 16px;gap:10px;}
   .kampanya-sub{font-size:12px;}
-  .kampanya-cta{padding:12px 18px;}
+  .kampanya-cta{padding:13px 18px;}
+}
 }
 
 /* ═══ Hoşgeldin Toast ═══ */
@@ -622,6 +628,7 @@ footer{padding:40px 20px 24px;}
 @keyframes kpDus{0%{transform:translateY(-30px) rotate(0);opacity:0;}12%{opacity:.9;}100%{transform:translateY(340px) rotate(var(--r,300deg));opacity:0;}}
 .kampanya-bg.on .pop-badge{animation:kpKademe .5s cubic-bezier(.2,.8,.2,1) .15s both;}
 .kampanya-bg.on .kampanya-brand{animation:kpKademe .5s cubic-bezier(.2,.8,.2,1) .25s both;}
+.kampanya-bg.on .kampanya-cesit{animation:kpKademe .55s cubic-bezier(.2,.8,.2,1) .42s both;}
 .kampanya-bg.on .kampanya-title{animation:kpKademe .55s cubic-bezier(.2,.8,.2,1) .35s both;}
 .kampanya-bg.on .kampanya-foto{animation:kpFoto 1.4s cubic-bezier(.2,.8,.2,1) .3s both;}
 .kampanya-bg.on .kampanya-sub{animation:kpKademe .55s cubic-bezier(.2,.8,.2,1) .5s both;}
@@ -637,7 +644,7 @@ footer{padding:40px 20px 24px;}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 <script src="site-ayarlar.js?v=3" defer></script>
-<script src="menu-i18n.js?v=1"></script>
+<script src="menu-i18n.js?v=2"></script>
 </head>
 <body>
 
@@ -954,16 +961,20 @@ footer{padding:40px 20px 24px;}
   <div class="kampanya-modal" role="dialog" aria-modal="true" aria-labelledby="kampanyaTitle">
     <span class="kampanya-ring" aria-hidden="true"></span>
     <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">✕</button>
-    <div class="kampanya-ust">
-      <span class="pop-badge">Günlük Taze</span>
-      <div class="kampanya-brand"><img class="kmp-logo" src="logo-trans.png" alt="Cactus"></div>
-      <h2 class="kampanya-title" id="kampanyaTitle">Waffle</h2>
-    </div>
     <div class="kampanya-foto-band">
-      <img class="kampanya-foto" src="foto-waffle-kase.jpg" alt="Dört çeşit soslu bubble waffle kasesi — çilek, muz, çikolata, Antep fıstığı ve lotus">
+      <picture>
+        <source type="image/webp" srcset="foto-waffle-gemini.webp">
+        <img class="kampanya-foto" src="foto-waffle-gemini.jpg" alt="Cactus kraft kaselerinde dört bubble waffle: Classic, Bitter, Caramel ve Dubai, çilek ve muzla">
+      </picture>
+      <div class="kampanya-foto-ust"><span class="pop-badge">Günlük Taze</span></div>
+    </div>
+    <div class="kampanya-ust">
+      <div class="kampanya-brand"><img class="kmp-logo" src="logo-light.png" alt="Cactus"></div>
+      <h2 class="kampanya-title" id="kampanyaTitle">Bubble <em>Waffle</em></h2>
+      <div class="kampanya-cesit" aria-label="Çeşitler"><span>Classic</span><span>Bitter</span><span>Caramel</span><span>Dubai</span></div>
     </div>
     <div class="kampanya-alt">
-      <p class="kampanya-sub">Sıcacık bubble waffle'ın üzerine taptaze çilek, muz ve dilediğin sos — bitter çikolatadan Antep fıstığına, lotustan beyaz çikolataya. Her kase siparişinle hazırlanır.</p>
+      <p class="kampanya-sub">Sıcacık bubble waffle, taptaze çilek ve muz, üstüne dilediğin sos. Her kase siparişinle hazırlanır.</p>
       <div class="kampanya-icecek">
         <span class="kampanya-icecek-txt">Waffle'ının yanında dilediğin içecek</span>
         <span class="kampanya-icecek-fiyat"><i class="kampanya-yalnizca">yalnızca</i><b>150₺</b></span>
@@ -2221,7 +2232,7 @@ document.documentElement.classList.add('js');
         d.style.left=(6+Math.random()*88)+'%';
         d.style.setProperty('--t',(2+Math.random()*1.6)+'s');
         d.style.setProperty('--r',(Math.random()>.5?'':'-')+(200+Math.random()*280)+'deg');
-        d.style.color=Math.random()>.5?'#a8873f':'#2d5a27';
+        d.style.color=Math.random()>.5?'#c8a86a':'#f3ecdc';
         d.appendChild(ico(setler[Math.floor(Math.random()*setler.length)]));
         band.appendChild(d);
         setTimeout(function(){d.remove();},4000);

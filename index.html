@@ -22,7 +22,7 @@
 <link rel="manifest" href="manifest-site.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="foto-hero-podyum2.webp" type="image/webp" fetchpriority="high" media="(min-width:769px)">
+<link rel="preload" as="image" href="video-hero-yol-poster.webp" type="image/webp" fetchpriority="high" media="(min-width:769px)">
 <link rel="preload" as="image" href="video-hero-dolap-poster.jpg" fetchpriority="high" media="(max-width:768px)">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -43,7 +43,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 /* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;}
 .hero-pic{position:absolute;inset:0;}
-.hero-bg{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;}
+.hero-bg{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.4) 100%);}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;}
 .hero-tagline{font-size:11px;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;opacity:0.85;font-weight:300;}
@@ -62,9 +62,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 @media(max-width:768px){
   .hero-bg{object-fit:cover;object-position:center;}
 }
-/* Mobil: dönen dönme dolap videosu (Gemini Veo, sessiz döngü) — poster ilk kareyle aynı, oynayınca üstüne biner */
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
-@media(max-width:768px){.hero-video{display:block;}.hero-overlay{background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.3) 100%);}.hero-tagline,.hero-title,.hero-subtitle{text-shadow:0 1px 3px rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.35);}}
+/* Hero videoları (Gemini Veo, sessiz döngü): mobilde dönme dolap, masaüstünde yürüyüş yolu — altındaki görsel videonun ilk karesi */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+@media(max-width:768px){.hero-overlay{background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.3) 100%);}}
+.hero-tagline,.hero-title,.hero-subtitle{text-shadow:0 1px 3px rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.35);}
 
 
 
@@ -417,10 +418,10 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 <section class="hero">
   <picture class="hero-pic">
     <source media="(max-width:768px)" srcset="video-hero-dolap-poster.jpg">
-    <source type="image/webp" srcset="foto-hero-podyum2.webp">
+    <source type="image/webp" srcset="video-hero-yol-poster.webp">
     <img class="hero-bg" src="foto-hero-podyum2.jpg" alt="Cactus Coffee — Podyumpark bahçesi ve dönme dolap" fetchpriority="high">
   </picture>
-  <video class="hero-video" muted loop playsinline preload="none" poster="video-hero-dolap-poster.jpg" aria-hidden="true"></video>
+  <video class="hero-video" muted loop playsinline preload="none" aria-hidden="true"></video>
   <div class="hero-overlay"></div>
   <div class="steam-wrap" aria-hidden="true">
     <div class="steam-blob"></div>
@@ -1378,12 +1379,15 @@ function toggleMainNav(){
 })();
 </script>
 <script>
-// Hero videosu yalnızca mobilde ve veri tasarrufu kapalıyken yüklenir
+// Hero videosu veri tasarrufu kapalıyken yüklenir: mobilde dikey dolap, masaüstünde yatay yol videosu
 (function(){
   var v=document.querySelector('.hero-video');
-  if(!v || !matchMedia('(max-width:768px)').matches) return;
+  if(!v) return;
   if(navigator.connection && navigator.connection.saveData) return;
-  v.src='video-hero-dolap.mp4';
+  var mobil=matchMedia('(max-width:768px)').matches;
+  v.src=mobil?'video-hero-dolap.mp4':'video-hero-yol.mp4';
+  // Yol videosu başta karardan açılıyor; ilk oynatma posterle aynı kareden başlasın
+  if(!mobil) v.addEventListener('loadedmetadata',function(){v.currentTime=0.6;},{once:true});
   var p=v.play(); if(p && p.catch) p.catch(function(){});
 })();
 </script>

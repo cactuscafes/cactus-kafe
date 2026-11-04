@@ -76,7 +76,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 .section-title span{font-style:italic;}
 .section-divider{width:60px;height:1px;background:var(--gold);margin:20px auto 0;}
 
-.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;max-width:960px;margin:0 auto;}
 .menu-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:pointer;}
 .menu-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease;}
 .menu-card:hover img{transform:scale(1.05);}
@@ -98,19 +98,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:fl
 
 /* INSTAGRAM */
 .ig-section{padding:100px 60px;background:#fff;}
-.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;}
+.ig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:620px;margin:0 auto;}
 .ig-card{text-decoration:none;display:flex;flex-direction:column;align-items:center;padding:48px 24px;border:1px solid #eee;transition:border-color .3s;}
 .ig-card:hover{border-color:var(--gold);}
 .ig-card.ig-center{background:#fafafa;}
 @media(max-width:768px){
   .ig-section{padding:60px 16px;}
-  .ig-grid{grid-template-columns:repeat(3,1fr);gap:10px;max-width:100%;}
+  .ig-grid{grid-template-columns:repeat(2,1fr);gap:10px;max-width:100%;}
   .ig-card{padding:28px 10px;}
 }
 
 /* BRANCHES */
 .section-branches{padding:100px 60px;}
-.branches-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:60px;}
+.branches-grid{display:grid;grid-template-columns:1fr;gap:2px;margin:60px auto 0;max-width:760px;}
 .branch-card{position:relative;aspect-ratio:16/9;overflow:hidden;}
 .branch-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
 .branch-card:hover img{transform:scale(1.04);}
@@ -163,7 +163,7 @@ nav{padding:18px 24px;}
 .nav-burger{display:flex;}
 .hero-title{font-size:48px;}
 .section-menu,.section-about,.section-branches{padding:70px 24px;}
-.menu-grid{grid-template-columns:repeat(3,1fr);gap:1px;}
+.menu-grid{grid-template-columns:repeat(2,1fr);gap:1px;}
 .menu-card{aspect-ratio:2/3;}
 .menu-card-title{font-size:14px;}
 .menu-card-label{font-size:7px;}

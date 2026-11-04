@@ -451,12 +451,12 @@ footer{padding:40px 20px 24px;}
 .kampanya-close{position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border:1px solid rgba(243,236,220,.28);background:rgba(17,29,22,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#f3ecdc;font-size:14px;cursor:pointer;line-height:1;border-radius:50%;display:grid;place-items:center;transition:background .2s,color .2s,transform .2s;}
 .kampanya-close:hover{background:#c8a86a;color:#16251c;transform:rotate(90deg);}
 .kampanya-foto-band{position:relative;border-radius:24px 24px 0 0;overflow:hidden;}
-.kampanya-foto-band::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,29,22,.35) 0%,transparent 26%,transparent 62%,#16251c 100%);pointer-events:none;}
-.kampanya-foto{display:block;width:100%;aspect-ratio:4/3;max-height:36dvh;object-fit:cover;margin:0;}
+.kampanya-foto-band::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,29,22,.3) 0%,transparent 20%,transparent 84%,#16251c 100%);pointer-events:none;}
+.kampanya-foto{display:block;width:100%;aspect-ratio:5/4;max-height:38dvh;object-fit:cover;margin:0;}
 .kampanya-foto-ust{position:absolute;top:14px;left:14px;z-index:2;}
 .pop-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;padding:6px 12px 5px;border-radius:999px;background:rgba(17,29,22,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#f3ecdc;border:1px solid rgba(200,168,106,.6);}
 .pop-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:#c8a86a;box-shadow:0 0 0 3px rgba(200,168,106,.25);}
-.kampanya-ust{padding:0 24px 4px;margin-top:-14px;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.kampanya-ust{padding:6px 24px 4px;margin-top:0;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .kampanya-brand .kmp-logo{display:block;height:30px;width:auto;margin:0 auto;opacity:.95;}
 .kampanya-title{font-family:'Fraunces',serif;font-size:36px;font-weight:400;color:#f3ecdc;line-height:1;letter-spacing:-.01em;margin:0;}
 .kampanya-title em{font-style:italic;color:#c8a86a;}
@@ -476,8 +476,8 @@ footer{padding:40px 20px 24px;}
 @media(max-width:768px){
   .kampanya-bg{padding:104px 16px 16px;align-items:flex-start;}
   .kampanya-modal{max-height:calc(100dvh - 120px);}
-  .kampanya-foto{max-height:30dvh;}
-  .kampanya-ust{padding:0 18px 2px;gap:8px;margin-top:-10px;}
+  .kampanya-foto{max-height:36dvh;}
+  .kampanya-ust{padding:4px 18px 2px;gap:8px;margin-top:0;}
   .kmp-logo{height:26px!important;}
   .kampanya-title{font-size:30px;}
   .kampanya-alt{padding:12px 18px 16px;gap:10px;}
@@ -963,8 +963,8 @@ footer{padding:40px 20px 24px;}
     <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">✕</button>
     <div class="kampanya-foto-band">
       <picture>
-        <source type="image/webp" srcset="foto-waffle-gemini.webp">
-        <img class="kampanya-foto" src="foto-waffle-gemini.jpg" alt="Cactus kraft kaselerinde dört bubble waffle: Classic, Bitter, Caramel ve Dubai, çilek ve muzla">
+        <source type="image/webp" srcset="foto-waffle-4lu.webp">
+        <img class="kampanya-foto" src="foto-waffle-4lu.jpg" alt="Cactus kraft kaselerinde dört bubble waffle: Bitter, Classic, Dubai ve Caramel">
       </picture>
       <div class="kampanya-foto-ust"><span class="pop-badge">Günlük Taze</span></div>
     </div>

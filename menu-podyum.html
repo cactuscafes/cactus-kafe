@@ -1156,6 +1156,8 @@ async function init() {
       // Adisyon formatı: {sicak:{label,tip,urunler:[...]},...} (id, label, urunler)
       // Web formatı:    aynı yapı + her urune emoji/foto eklenmiş hali. Direkt atayabiliriz.
       var podPer={};
+      // Adisyonda fotoğrafı olmayan ürünlere sitede duran görsel (adisyondan foto yüklenirse o geçerli olur)
+      var YEREL_FOTO={'waffle_1786556723044':'foto-tatli-kampanya.jpg'}; // Tatlı Kampanyası: Classic waffle + Iced Flat White
       Object.keys(dp).forEach(function(katKey){
         var kat=dp[katKey];
         if(!kat||!kat.urunler) return;
@@ -1163,7 +1165,7 @@ async function init() {
           id: katKey,
           label: kat.label||katKey,
           urunler: (kat.urunler||[]).map(function(u){
-            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||'', gizli:!!u.gizli, tukendi:!!u.tukendi, servis:u.servis||'', kalori:(u.kalori||''), alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])};
+            return {id:u.id, ad:u.ad, fiyat:String(u.fiyat||''), emoji:u.emoji||'', aciklama:u.aciklama||'', foto:u.foto||YEREL_FOTO[u.id]||'', gizli:!!u.gizli, tukendi:!!u.tukendi, servis:u.servis||'', kalori:(u.kalori||''), alerjen:(Array.isArray(u.alerjen)?u.alerjen:[])};
           })
         };
       });

@@ -460,6 +460,8 @@ footer{padding:40px 20px 24px;}
 /* ═══ Podyumpark Kampanya Pop-up (modal) — kart tasarımı ═══ */
 .kampanya-bg{position:fixed;inset:0;background:radial-gradient(120% 80% at 50% 0%,rgba(42,66,50,.78) 0%,rgba(22,37,28,.84) 60%,rgba(15,26,20,.88) 100%);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .4s,-webkit-backdrop-filter .45s,backdrop-filter .45s;}
 .kampanya-bg.on{display:flex;opacity:1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+/* Popup açıkken sağ alttaki Instagram/WhatsApp ve yürüyen kaktüs butonun üstüne binmesin */
+body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[aria-label="WhatsApp"],body:has(.kampanya-bg.on) #absKaktus{opacity:0;pointer-events:none;}
 .kampanya-modal{background:radial-gradient(130% 70% at 50% 100%,#1f3a2b 0%,#16251c 55%,#111d16 100%);border:none;border-radius:24px;max-width:400px;width:100%;text-align:center;position:relative;box-shadow:0 40px 90px -30px rgba(0,0,0,.8);transform:translateY(28px) scale(.965);opacity:0;transition:transform .58s cubic-bezier(.16,1,.3,1),opacity .5s;max-height:calc(100dvh - 28px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;color:#f3ecdc;}
 .kampanya-bg.on .kampanya-modal{transform:translateY(0);opacity:1;}
 .kampanya-ring{position:absolute;inset:0;border-radius:24px;pointer-events:none;box-shadow:0 0 0 1px rgba(200,168,106,.32) inset;z-index:4;}
@@ -467,7 +469,7 @@ footer{padding:40px 20px 24px;}
 .kampanya-close:hover{background:#c8a86a;color:#16251c;transform:rotate(90deg);}
 .kampanya-foto-band{position:relative;border-radius:24px 24px 0 0;overflow:hidden;}
 .kampanya-foto-band::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,29,22,.3) 0%,transparent 20%,transparent 84%,#16251c 100%);pointer-events:none;}
-.kampanya-foto{display:block;width:100%;aspect-ratio:5/4;max-height:38dvh;object-fit:cover;margin:0;}
+.kampanya-foto{display:block;width:100%;aspect-ratio:1/1;max-height:42dvh;object-fit:cover;object-position:center 30%;margin:0;}
 .kampanya-foto-ust{position:absolute;top:14px;left:14px;z-index:2;}
 .pop-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;padding:6px 12px 5px;border-radius:999px;background:rgba(17,29,22,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#f3ecdc;border:1px solid rgba(200,168,106,.6);}
 .pop-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:#c8a86a;box-shadow:0 0 0 3px rgba(200,168,106,.25);}
@@ -491,7 +493,7 @@ footer{padding:40px 20px 24px;}
 @media(max-width:768px){
   .kampanya-bg{padding:104px 16px 16px;align-items:flex-start;}
   .kampanya-modal{max-height:calc(100dvh - 120px);}
-  .kampanya-foto{max-height:36dvh;}
+  .kampanya-foto{max-height:42dvh;}
   .kampanya-ust{padding:4px 18px 2px;gap:8px;margin-top:0;}
   .kmp-logo{height:26px!important;}
   .kampanya-title{font-size:30px;}
@@ -978,8 +980,8 @@ footer{padding:40px 20px 24px;}
     <button class="kampanya-close" onclick="kampanyaKapat()" aria-label="Kapat">✕</button>
     <div class="kampanya-foto-band">
       <picture>
-        <source type="image/webp" srcset="foto-waffle-4lu.webp">
-        <img class="kampanya-foto" src="foto-waffle-4lu.jpg" alt="Cactus kraft kaselerinde dört bubble waffle: Bitter, Classic, Dubai ve Caramel">
+        <source type="image/webp" srcset="foto-waffle-4lu-aci.webp">
+        <img class="kampanya-foto" src="foto-waffle-4lu-aci.jpg" alt="Cactus kraft kaselerinde dört bubble waffle: Bitter, Classic, Dubai ve Caramel">
       </picture>
       <div class="kampanya-foto-ust"><span class="pop-badge">Günlük Taze</span></div>
     </div>

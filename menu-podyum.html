@@ -1159,10 +1159,10 @@ async function init() {
       // Adisyonda fotoğrafı olmayan ürünlere sitede duran görsel (adisyondan foto yüklenirse o geçerli olur)
       var YEREL_FOTO={'waffle_1786556723044':'foto-tatli-kampanya.jpg', // Tatlı Kampanyası: Classic waffle + Iced Flat White
         'so10':'https://soft-block-e14ccactus-foto-uploader.batuhanbulut.workers.dev/menu/1777376456782-dvmez1zqggb.jpg'}; // Ice Filtre = Ice Americano görseli
-      // Soğuk kahvelerin kartında karışan kahve videosu (Gemini Veo); sütlülerin hepsi aynı fotoğrafı kullandığı için tek video
-      var YEREL_VIDEO={so1:'video-soguk-americano',so10:'video-soguk-americano',
-        so2:'video-soguk-sutlu',so3:'video-soguk-sutlu',so4:'video-soguk-sutlu',so5:'video-soguk-sutlu',
-        so6:'video-soguk-sutlu',so7:'video-soguk-sutlu',so8:'video-soguk-sutlu',so9:'video-soguk-sutlu'};
+      // Kartlarda oynayan menü videoları (Gemini Veo): menu-video.json → {ürünId: 'dosya-yolu-uzantısız'}
+      // Arka plandaki 'menu-hareketli' görevi yeni video ekledikçe bu dosyayı günceller
+      var YEREL_VIDEO={};
+      try{ var rv=await fetch('menu-video.json?t='+Date.now(),{cache:'no-store'}); if(rv.ok) YEREL_VIDEO=(await rv.json())||{}; }catch(e){}
       Object.keys(dp).forEach(function(katKey){
         var kat=dp[katKey];
         if(!kat||!kat.urunler) return;

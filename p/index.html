@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Bizi puanla — Cactus Waffle</title>
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="/favicon.svg">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#0a0a0a;color:#fff;font-family:Impact,'Arial Black',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.k{max-width:360px;width:100%}
+h1{font-size:44px;line-height:1;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+h1 span{color:#ccff00}
+p{font-family:system-ui,-apple-system,sans-serif;font-size:15px;color:rgba(255,255,255,.7);margin-bottom:26px;line-height:1.5}
+a{display:block;padding:16px;border:3px solid #fff;font-size:22px;text-transform:uppercase;text-decoration:none;margin-bottom:12px;letter-spacing:.5px}
+a.app{background:#ccff00;color:#0a0a0a;border-color:#ccff00}
+a.web{color:#fff}
+.n{display:inline-block;width:10px;height:10px;background:#ccff00;margin:0 3px;animation:z .9s steps(2,jump-none) infinite}
+.n:nth-child(2){animation-delay:.3s}.n:nth-child(3){animation-delay:.6s}
+@keyframes z{to{opacity:.15}}
+</style>
+</head>
+<body>
+<div class="k">
+  <h1>Bizi <span>puanla</span></h1>
+  <p>Trendyol uygulaması açılıyor <span class="n"></span><span class="n"></span><span class="n"></span><br>Açılmazsa aşağıdan devam et.</p>
+  <a class="app" id="app" href="ty://?Channel=Meal&Page=RestaurantComments&RestaurantId=318539">Uygulamada aç</a>
+  <a class="web" id="web" href="https://tgoyemek.com/hesabim/siparislerim">Tarayıcıda devam et</a>
+</div>
+<script>
+/* Trendyol paketlerindeki kartvizit QR'ı buraya gelir (puanla QR'ı).
+   tgoyemek.com uygulamaya bağlı değil (universal link yok), o yüzden önce
+   Trendyol uygulamasının kendi şemasını (ty://) deniyoruz; uygulama yoksa
+   ya da açılmazsa web sayfasına geçiyoruz. Hedefi değiştirmek için kart
+   yeniden basılmaz — yalnızca bu dosya değişir. */
+(function(){
+  var APP='ty://?Channel=Meal&Page=RestaurantComments&RestaurantId=318539', WEB='https://tgoyemek.com/hesabim/siparislerim';
+  try{fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sayfa:'/p',yeni:true}),keepalive:true}).catch(function(){});}catch(e){}
+  var gitti=false;
+  document.addEventListener('visibilitychange',function(){ if(document.hidden) gitti=true; });
+  window.addEventListener('pagehide',function(){ gitti=true; });
+  setTimeout(function(){ location.href=APP; },150);
+  setTimeout(function(){ if(!gitti && !document.hidden) location.replace(WEB); },2200);
+})();
+</script>
+</body>
+</html>

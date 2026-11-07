@@ -39,11 +39,9 @@ a.web{color:#fff}
 (function(){
   var APP='ty://?Channel=Meal&Page=RestaurantComments&RestaurantId=318539', WEB='https://tgoyemek.com/hesabim/siparislerim';
   try{fetch('https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sayfa:'/p',yeni:true}),keepalive:true}).catch(function(){});}catch(e){}
-  var gitti=false;
-  document.addEventListener('visibilitychange',function(){ if(document.hidden) gitti=true; });
-  window.addEventListener('pagehide',function(){ gitti=true; });
+  // Uygulama açıldıysa sayfa arka plana düşer (document.hidden); düşmediyse webe geç.
   setTimeout(function(){ location.href=APP; },150);
-  setTimeout(function(){ if(!gitti && !document.hidden) location.replace(WEB); },2200);
+  setTimeout(function(){ if(!document.hidden) location.replace(WEB); },2400);
 })();
 </script>
 </body>

@@ -535,7 +535,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
   // kareler: bölüm ekrana yaklaşınca yüklenir (ana sayfa açılışını yavaşlatmaz)
   var kareler=new Array(ADET), sira=[], basladi=false, aktif=0, istenen=0, son=-1, yuklu=0, yukEl=document.getElementById('whYuk');
   (function(){var g={};[16,8,4,2,1].forEach(function(a){for(var i=0;i<ADET;i+=a){if(!g[i]){g[i]=1;sira.push(i);}}});})();
-  function yol(i){return 'waffle-hazirlik/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp';}
+  function yol(i){return 'waffle-hazirlik-v2/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp';}
   function sonraki(){ while(aktif<6&&sira.length){ (function(i){ aktif++; var im=new Image(); im.decoding='async';
     im.onload=function(){kareler[i]=im; aktif--; yuklu++; if(yuklu>=ADET*.98) yukEl.style.opacity=0; ciz(istenen,true); sonraki();};
     im.onerror=function(){aktif--; sonraki();}; im.src=yol(i); })(sira.shift()); } }

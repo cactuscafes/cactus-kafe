@@ -315,10 +315,10 @@ const VID_SON = .85;   // video kaydırmanın ilk %85'inde akar, kalan kısım s
 // px,py: malzemenin karedeki yeri (0-1); ky: masaüstü etiket yüksekliği (kare oranı); mob: mobil etiket yeri
 const KATMAN = [
   { ad:'Hamur', no:'01', t:.03, taraf:'sol', px:.30, py:.66, ky:.76, mob:{x:.18,ust:0}, yazi:'Bubble waffle. Her baloncuk ayrı bir lokma, saymayı bıraktık.' },
-  { ad:'Çilek & Muz', no:'02', t:.14, taraf:'sag', px:.78, py:.40, ky:.34, mob:{x:.76,ust:1}, yazi:'Hamurun üstüne taze meyve. Sıralama önemli.' },
-  { ad:'Sütlü Çikolata', no:'03', t:.34, taraf:'sol', px:.40, py:.34, ky:.28, mob:{x:.24,ust:1}, yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.' },
-  { ad:'Antep Çikolata', no:'04', t:.56, taraf:'sag', px:.68, py:.68, ky:.70, mob:{x:.82,ust:0}, yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
-  { ad:'Tel Kadayıf', no:'05', t:.80, taraf:'sol', px:.52, py:.52, ky:.52, mob:{x:.5,ust:0}, yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
+  { ad:'Çilek & Muz', no:'02', t:.23, taraf:'sag', px:.78, py:.40, ky:.34, mob:{x:.76,ust:1}, yazi:'Hamurun üstüne taze meyve. Sıralama önemli.' },
+  { ad:'Sütlü Çikolata', no:'03', t:.43, taraf:'sol', px:.40, py:.34, ky:.28, mob:{x:.24,ust:1}, yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.' },
+  { ad:'Antep Çikolata', no:'04', t:.63, taraf:'sag', px:.68, py:.68, ky:.70, mob:{x:.82,ust:0}, yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
+  { ad:'Tel Kadayıf', no:'05', t:.83, taraf:'sol', px:.52, py:.52, ky:.52, mob:{x:.5,ust:0}, yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
 ];
 KATMAN.forEach(k=>k.esik=k.t*VID_SON);
 const kapsayici = document.getElementById('katmanlar');
@@ -360,7 +360,7 @@ function tabakYerlestir(){
   });
 }
 tabakYerlestir(); addEventListener('resize', tabakYerlestir);
-const waffle = Dizi(waffleCanvas, 127, i=>'w/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp',
+const waffle = Dizi(waffleCanvas, 160, i=>'w/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp',
   { kip:()=>'cover', zemin:'#9aa0a6', arka:waffleArka, ilerle:yukGoster(document.getElementById('waffleYuk')) });
 const sayacNo = document.getElementById('sayacNo'), mA = document.getElementById('mAciklama');
 let sonAcik = -1;

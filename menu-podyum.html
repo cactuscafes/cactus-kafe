@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-donme-dolap-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-donme-dolap-r2'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -949,13 +949,12 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
   @keyframes dmRenk{0%,100%{stroke:#fff6dc}25%{stroke:#ff5fd2}50%{stroke:#62e6ff}75%{stroke:#ffd34d}}
   .dm-neon{fill:none;animation:dmNeon 2.6s ease-in-out infinite}
   @keyframes dmNeon{0%,100%{stroke:#3fa9ff;opacity:.95}50%{stroke:#b45cff;opacity:.6}}
-  .dm-kabin{position:absolute;left:0;top:0;width:21%;aspect-ratio:360/528;will-change:transform;z-index:2;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;-webkit-appearance:none;appearance:none;border-radius:0;min-width:0;min-height:0;font:inherit;color:inherit}
+  .dm-kabin{position:absolute;left:0;top:0;width:22%;aspect-ratio:360/465;will-change:transform;z-index:2;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;-webkit-appearance:none;appearance:none;border-radius:0;min-width:0;min-height:0;font:inherit;color:inherit}
   .dm-sal{position:absolute;inset:0;transform-origin:50% 0;transition:scale .4s cubic-bezier(.2,.8,.2,1)}
-  .dm-cam{position:absolute;left:21.5%;top:44.8%;width:57%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
+  .dm-cam{position:absolute;left:32.4%;top:63.9%;width:35.2%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
   .dm-cam img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04)}
   .dm-govde{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;filter:drop-shadow(0 8px 12px rgba(0,0,0,.55))}
-  .dm-boya{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;-webkit-mask:url(dolap-menu/kabin.webp) center/100% 100% no-repeat;mask:url(dolap-menu/kabin.webp) center/100% 100% no-repeat;background:linear-gradient(160deg,color-mix(in srgb,var(--kc) 70%,#fff) 0%,var(--kc) 55%,color-mix(in srgb,var(--kc) 75%,#000) 100%)}
-  .dm-ad{position:absolute;left:50%;top:94%;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+  .dm-ad{position:absolute;left:50%;top:101%;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.95)}
   .dm-kabin:hover .dm-sal,.dm-kabin:focus-visible .dm-sal{scale:1.1}
   .dm-kabin.alt .dm-sal{scale:1.14}
   .dm-ipucu{position:relative;z-index:2;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.55);margin-top:4px}
@@ -1003,9 +1002,9 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
     g+='<circle r="13" class="dm-led" stroke-width="2.4"/>';
     svg.innerHTML=g;
     var kabinler=KAT.map(function(k,i){
-      var d=document.createElement('button'); d.type='button'; d.className='dm-kabin'; d.style.setProperty('--kc',k.r);
+      var d=document.createElement('button'); d.type='button'; d.className='dm-kabin';
       d.setAttribute('aria-label',k.ad+' kategorisine git');
-      d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="dolap-menu/'+k.id+'.jpg" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"><div class="dm-boya"></div></div><span class="dm-ad">'+k.ad+'</span>';
+      d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="dolap-menu/'+k.id+'.jpg" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"></div><span class="dm-ad">'+k.ad+'</span>';
       d.addEventListener('click',function(){ if(surukledi) return; kategoriyeGit(k); });
       sahne.appendChild(d); return d;
     });

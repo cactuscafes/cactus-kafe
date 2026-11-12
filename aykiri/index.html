@@ -49,30 +49,31 @@ canvas{display:block}
 .kaydir i{display:block;width:1px;height:34px;background:linear-gradient(var(--krem),transparent);animation:damla 1.6s infinite}
 @keyframes damla{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-/* 2 — Parçalanan waffle */
-#waffle{height:560vh;background:var(--bg)}
-#waffle .yapiskan{background:radial-gradient(ellipse at 50% 70%,#12261c 0%,var(--bg) 60%)}
-#waffleCanvas{position:absolute;left:0;top:0;width:100%;height:100%}
+/* 2 — Waffle hazırlanışı */
+#waffle{height:600vh;background:var(--bg)}
+#waffle .yapiskan{background:radial-gradient(ellipse at 50% 55%,#132a1f 0%,var(--bg) 62%)}
+#waffleCanvas{position:absolute;border-radius:50%;box-shadow:0 0 0 1px rgba(243,234,216,.12),0 0 0 14px rgba(243,234,216,.03),0 40px 90px rgba(0,0,0,.6)}
+.halka{position:absolute;border-radius:50%;border:1px dashed rgba(216,180,106,.28);pointer-events:none}
 .w-baslik{position:absolute;left:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;max-width:60vw}
 .w-baslik .no{font-size:10px;letter-spacing:.3em;color:var(--altin)}
 .w-baslik h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(28px,6.4vw,64px);line-height:.95;text-transform:uppercase;margin-top:8px}
 .w-baslik h2 em{font-family:'Fraunces',serif;font-weight:400;text-transform:none;color:var(--fistik)}
 .sayac{position:absolute;right:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;text-align:right;font-size:10px;letter-spacing:.25em;color:var(--sis)}
 .sayac b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(40px,8vw,92px);letter-spacing:0;color:var(--krem);line-height:1}
-.katman{position:absolute;z-index:4;opacity:0;transition:opacity .45s,transform .45s;pointer-events:none}
+.katman{position:absolute;inset:0;z-index:4;opacity:0;transition:opacity .45s;pointer-events:none}
 .katman.acik{opacity:1}
-.katman .nokta{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--krem);box-shadow:0 0 0 4px rgba(243,234,216,.18)}
-.katman .hat{position:absolute;height:1px;background:var(--cizgi);transform-origin:left center;transform:scaleX(0);transition:transform .6s .1s}
-.katman.acik .hat{transform:scaleX(1)}
-.katman .kart{position:absolute;width:min(250px,24vw)}
+.katman .nokta{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--krem);box-shadow:0 0 0 4px rgba(10,22,17,.55),0 0 0 6px rgba(243,234,216,.35)}
+.katman .hat{position:absolute;height:1px;background:rgba(243,234,216,.45);transform-origin:left center;transform:rotate(var(--a,0deg)) scaleX(0);transition:transform .6s .1s}
+.katman.acik .hat{transform:rotate(var(--a,0deg)) scaleX(1)}
+.katman .kart{position:absolute;width:230px;transform:translateY(var(--ky,-50%))}
 .katman .kart small{display:block;font-size:10px;letter-spacing:.28em;color:var(--altin)}
 .katman .kart strong{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(20px,2.2vw,30px);text-transform:uppercase;margin:4px 0 6px;line-height:1}
 .katman .kart p{font-size:11.5px;line-height:1.6;color:var(--sis)}
-/* mobil açıklama kutusu */
 .m-aciklama{display:none}
 
 /* 3 — Menü çarkı */
-#cark{height:520vh;background:var(--bg2)}
+#cark{height:560vh;background:#070f0b}
+#cark .yapiskan{background:radial-gradient(ellipse 60% 55% at 70% 42%,#1a3a2c 0%,#0d1e17 48%,#070f0b 100%)}
 #cark .yapiskan{display:grid;grid-template-columns:minmax(300px,1fr) auto;align-items:center;gap:4vw;padding:0 6vw}
 .cark-sol .etiket{color:var(--fistik);border-color:var(--fistik)}
 .cark-sol h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(40px,7vw,104px);line-height:.92;text-transform:uppercase}
@@ -83,20 +84,29 @@ canvas{display:block}
 .aktif-kat p{font-size:12px;line-height:1.7;color:var(--sis);max-width:40ch}
 .bin{display:inline-flex;gap:10px;align-items:center;margin-top:16px;padding:12px 18px;background:var(--krem);color:var(--bg);text-decoration:none;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
 .bin:active{transform:translateY(1px)}
-.cark-sag{position:relative;width:min(44vw,72vh);aspect-ratio:1}
-.teker{position:absolute;inset:0;will-change:transform}
-.teker svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.kabin{position:absolute;width:21%;aspect-ratio:1;left:39.5%;top:39.5%;will-change:transform}
-.kabin .ic{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#1c3326;border:2px solid rgba(243,234,216,.35);transition:border-color .3s,box-shadow .3s,transform .4s}
-.kabin video,.kabin img{width:100%;height:100%;object-fit:cover;display:block}
-.kabin .ad{position:absolute;left:50%;top:104%;transform:translateX(-50%);white-space:nowrap;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--sis)}
-.kabin.aktif .ic{border-color:var(--altin);box-shadow:0 0 0 6px rgba(216,180,106,.18),0 0 40px rgba(216,180,106,.35);transform:scale(1.18)}
-.kabin.aktif .ad{color:var(--altin)}
-.kabin .ask{position:absolute;left:50%;bottom:100%;width:2px;height:14%;background:rgba(243,234,216,.4);transform:translateX(-50%)}
-.gobek{position:absolute;left:50%;top:50%;width:9%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:var(--altin);box-shadow:0 0 30px rgba(216,180,106,.6)}
-.ayak{position:absolute;left:50%;top:50%;width:62%;height:62%;transform:translateX(-50%);pointer-events:none}
-.ayak svg{width:100%;height:100%}
-.binis{position:absolute;left:50%;bottom:-7%;transform:translateX(-50%);font-size:9px;letter-spacing:.3em;color:var(--altin);white-space:nowrap}
+.cark-sag{position:relative;width:min(46vw,calc(84vh / 1.16));aspect-ratio:1/1.16}
+.cark-sag .iskelet{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.teker{position:absolute;left:0;top:0;width:100%;aspect-ratio:1;will-change:transform}
+.teker svg{display:block;width:100%;height:100%;overflow:visible}
+.amp{animation:yan 2.8s ease-in-out infinite}
+@keyframes yan{0%,100%{opacity:.3}50%{opacity:1}}
+.kabin{position:absolute;left:0;top:0;width:15.5%;aspect-ratio:1/1.5;will-change:transform;z-index:2}
+.kabin .sal{position:absolute;inset:0;transform-origin:50% 0;transition:scale .5s cubic-bezier(.2,.8,.2,1)}
+.kabin .kanca{position:absolute;left:50%;top:-3%;width:9%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:radial-gradient(circle at 35% 35%,#fff4d8,#b89a62 60%,#6d5630);box-shadow:0 1px 2px rgba(0,0,0,.6)}
+.kabin .aski{position:absolute;left:50%;top:0;width:3%;min-width:2px;height:15%;transform:translateX(-50%);background:linear-gradient(90deg,#7a6239,#f1dfb4,#7a6239)}
+.kabin .cati{position:absolute;left:8%;top:13%;width:84%;height:13%;border-radius:50% 50% 10% 10%/100% 100% 18% 18%;background:linear-gradient(180deg,#f6e7c3 0%,#c9ab6f 45%,#7b6238 100%);box-shadow:0 3px 6px rgba(0,0,0,.45)}
+.kabin .cati::before{content:"";position:absolute;left:50%;top:-22%;width:9%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:#f3dfae;box-shadow:0 0 8px rgba(255,220,150,.9)}
+.kabin .govde{position:absolute;left:5%;top:24%;width:90%;height:62%;border-radius:22%/16%;background:linear-gradient(160deg,#21473a 0%,#12291f 55%,#0b1b14 100%);border:1.5px solid #c9ab6f;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 8px 18px rgba(0,0,0,.5);transition:box-shadow .5s,border-color .5s}
+.kabin .cam{position:absolute;left:10%;top:9%;width:80%;height:72%;border-radius:18%/14%;overflow:hidden;background:#0a1611;box-shadow:inset 0 0 0 1px rgba(255,240,210,.25)}
+.kabin .cam img,.kabin .cam video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.85) brightness(.82);transition:filter .5s}
+.kabin .cam::after{content:"";position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.08) 100%);pointer-events:none}
+.kabin .serit{position:absolute;left:10%;right:10%;bottom:7%;height:5%;border-radius:4px;background:linear-gradient(90deg,#7b6238,#e9d3a0,#7b6238)}
+.kabin .taban{position:absolute;left:16%;top:85%;width:68%;height:5%;border-radius:0 0 40% 40%;background:linear-gradient(180deg,#c9ab6f,#5e4a2a)}
+.kabin .ad{position:absolute;left:50%;top:96%;transform:translateX(-50%);white-space:nowrap;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(243,234,216,.5);transition:color .4s,opacity .4s}
+.kabin.aktif .sal{scale:1.28}
+.kabin.aktif .govde{border-color:#f3d998;box-shadow:inset 0 0 0 3px rgba(0,0,0,.2),0 0 0 3px rgba(243,217,152,.15),0 0 34px rgba(255,214,140,.55)}
+.kabin.aktif .cam img,.kabin.aktif .cam video{filter:none}
+.kabin.aktif .ad{opacity:0}
 
 /* 4 — Kapanış */
 #son{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:80px 22px calc(60px + env(safe-area-inset-bottom));background:var(--krem);color:var(--bg)}
@@ -119,9 +129,10 @@ canvas{display:block}
 }
 /* Mobil */
 @media (max-width:899px){
-  .katman .kart{display:none}
-  .katman .hat{display:none}
-  .m-aciklama{display:block;position:absolute;left:18px;right:18px;bottom:calc(26px + env(safe-area-inset-bottom));z-index:5;border-top:1px solid var(--cizgi);padding-top:14px;min-height:96px}
+  .katman .kart small{font-size:8.5px;letter-spacing:.2em}
+  .katman .kart strong{font-size:15px;margin:2px 0 0;line-height:1.05}
+  .katman .kart p{display:none}
+  .m-aciklama{display:block;position:absolute;left:18px;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:5;border-top:1px solid var(--cizgi);padding-top:12px;min-height:90px}
   .m-aciklama small{font-size:10px;letter-spacing:.28em;color:var(--altin)}
   .m-aciklama strong{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:30px;text-transform:uppercase;margin:4px 0 4px;line-height:1}
   .m-aciklama p{font-size:12px;line-height:1.55;color:var(--sis)}
@@ -132,8 +143,8 @@ canvas{display:block}
   .aktif-kat h3{font-size:34px}
   .aktif-kat p{font-size:11.5px}
   .bin{margin-top:10px;padding:10px 14px}
-  .cark-sag{width:min(86vw,52svh);justify-self:center;align-self:center;margin-top:8px}
-  .binis{display:none}
+  .cark-sag{width:min(84vw,calc((100svh - 330px) / 1.16));justify-self:center;align-self:center;margin-top:6px}
+  #cark .yapiskan{background:radial-gradient(ellipse 90% 50% at 50% 70%,#1a3a2c 0%,#0d1e17 50%,#070f0b 100%)}
 }
 @media (prefers-reduced-motion:reduce){.kaydir i{animation:none}}
 </style>
@@ -162,24 +173,25 @@ canvas{display:block}
     </div>
     <div class="dy" data-bas=".68" data-son="1.01">
       <span class="etiket">Ama</span>
-      <h2 class="dev">Bir tek waffle dönmez. <em>Parçalanır.</em></h2>
+      <h2 class="dev">Bir tek waffle dönmez. <em>Katman katman kurulur.</em></h2>
       <div class="kaydir"><i></i>İÇİNE BAK</div>
     </div>
     <div class="yukleniyor" id="dolapYuk">YÜKLENİYOR 0%</div>
   </div>
 </section>
 
-<!-- 2. PARÇALANAN WAFFLE -->
+<!-- 2. WAFFLE HAZIRLANIŞI -->
 <section class="sahne" id="waffle">
   <div class="yapiskan">
-    <canvas id="waffleCanvas" aria-label="Dubai Bubble Waffle katmanları"></canvas>
+    <div class="halka" id="halka"></div>
+    <canvas id="waffleCanvas" aria-label="Dubai Bubble Waffle hazırlanışı"></canvas>
     <div class="w-baslik">
-      <div class="no">ŞEMA NO. 02 — PARÇALANMIŞ GÖRÜNÜM</div>
+      <div class="no">ŞEMA NO. 02 — KATMAN KATMAN</div>
       <h2>Dubai Bubble <em>Waffle</em></h2>
     </div>
-    <div class="sayac"><b id="sayacNo">00</b>/ 06 KATMAN</div>
+    <div class="sayac"><b id="sayacNo">00</b>/ 05 KATMAN</div>
     <div id="katmanlar"></div>
-    <div class="m-aciklama" id="mAciklama"><small>KAYDIRDIKÇA</small><strong>Katman katman</strong><p>Parmağını kaydır, waffle'ı sök.</p></div>
+    <div class="m-aciklama" id="mAciklama"><small>KAYDIRDIKÇA</small><strong>Sırayla hazırlanır</strong><p>Kaydır, kâseye ne girdiğini gör.</p></div>
     <div class="yukleniyor" id="waffleYuk">YÜKLENİYOR 0%</div>
   </div>
 </section>
@@ -198,12 +210,28 @@ canvas{display:block}
       </div>
     </div>
     <div class="cark-sag" id="carkSag">
-      <div class="ayak"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M50 0 L6 100 M50 0 L94 100" stroke="rgba(243,234,216,.22)" stroke-width="1.4" fill="none" vector-effect="non-scaling-stroke"/></svg></div>
-      <div class="teker" id="teker">
-        <svg viewBox="-100 -100 200 200" id="tekerSvg"></svg>
-      </div>
-      <div class="gobek"></div>
-      <div class="binis">▲ BİNİŞ NOKTASI</div>
+      <svg class="iskelet" viewBox="0 0 240 278" aria-hidden="true">
+        <defs>
+          <linearGradient id="metalD" x1="0" x2="1"><stop offset="0" stop-color="#5d4a2b"/><stop offset=".45" stop-color="#e8d3a2"/><stop offset=".6" stop-color="#b8975c"/><stop offset="1" stop-color="#4f3e23"/></linearGradient>
+          <radialGradient id="zemin" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(255,214,140,.28)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient>
+        </defs>
+        <ellipse cx="120" cy="272" rx="110" ry="10" fill="url(#zemin)"/>
+        <!-- arka ayaklar -->
+        <polygon points="117,120 123,120 70,266 62,266" fill="#3b301d" opacity=".55"/>
+        <polygon points="117,120 123,120 178,266 170,266" fill="#3b301d" opacity=".55"/>
+        <!-- ön ayaklar -->
+        <polygon points="116,118 124,118 58,268 46,268" fill="url(#metalD)"/>
+        <polygon points="116,118 124,118 194,268 182,268" fill="url(#metalD)"/>
+        <g stroke="#b8975c" stroke-width="1.3" opacity=".8">
+          <line x1="86" y1="190" x2="154" y2="190"/><line x1="70" y1="228" x2="170" y2="228"/>
+          <line x1="86" y1="190" x2="170" y2="228"/><line x1="154" y1="190" x2="70" y2="228"/>
+        </g>
+        <!-- biniş platformu -->
+        <rect x="60" y="266" width="120" height="7" rx="1.5" fill="#1d2f26" stroke="#c9ab6f" stroke-width=".8"/>
+        <g stroke="rgba(201,171,111,.5)" stroke-width=".6"><line x1="60" y1="269.5" x2="180" y2="269.5"/></g>
+        <g fill="#ffe9b8"><circle cx="66" cy="266" r="1.1"/><circle cx="90" cy="266" r="1.1"/><circle cx="150" cy="266" r="1.1"/><circle cx="174" cy="266" r="1.1"/></g>
+      </svg>
+      <div class="teker" id="teker"><svg viewBox="-120 -120 240 240" id="tekerSvg"></svg></div>
     </div>
   </div>
 </section>
@@ -273,60 +301,69 @@ const dolap = Dizi(document.getElementById('dolapCanvas'), 96, i=>'d/'+String(i)
   { kip:()=>'cover', dikey:.35, ilerle:yukGoster(document.getElementById('dolapYuk')) });
 const dyler = [...document.querySelectorAll('.dy')];
 
-/* ---- 2. Waffle ---- */
+/* ---- 2. Waffle: menüdeki gerçek hazırlanış videosu ---- */
+const VID_SON = .85;   // video kaydırmanın ilk %85'inde akar, kalan kısım son hali tutar
 const KATMAN = [
-  { ad:'Kadayıf', no:'01', esik:.62, y:.11, taraf:'sag', yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
-  { ad:'Çikolata', no:'02', esik:.68, y:.23, taraf:'sol', yazi:'Akar, bulaşır, pişman ettirmez.' },
-  { ad:'Fıstık kreması', no:'03', esik:.74, y:.36, taraf:'sag', yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
-  { ad:'Bubble waffle', no:'04', esik:.80, y:.47, taraf:'sol', yazi:'Her baloncuk ayrı bir lokma. Saymayı bıraktık.' },
-  { ad:'Çilek & muz', no:'05', esik:.86, y:.60, taraf:'sag', yazi:'Altta saklananlar. En iyisi sona kalır.' },
-  { ad:'Kâse', no:'06', esik:.92, y:.80, taraf:'sol', yazi:'Parkta, ofiste, dolapta. Nereye gidersen.' },
+  { ad:'Hamur', no:'01', t:.03, taraf:'sol', dy:-.55, mob:{x:.25,ust:1,nx:-.42,ny:-.38}, yazi:'Bubble waffle. Her baloncuk ayrı bir lokma, saymayı bıraktık.' },
+  { ad:'Çilek & Muz', no:'02', t:.14, taraf:'sag', dy:-.35, mob:{x:.75,ust:1,nx:.48,ny:-.3}, yazi:'Hamurun üstüne taze meyve. Sıralama önemli.' },
+  { ad:'Sütlü Çikolata', no:'03', t:.34, taraf:'sol', dy:0, mob:{x:.17,ust:0,nx:-.5,ny:.3}, yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.' },
+  { ad:'Antep Çikolata', no:'04', t:.60, taraf:'sag', dy:.35, mob:{x:.5,ust:0,nx:.04,ny:.48}, yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
+  { ad:'Tel Kadayıf', no:'05', t:.80, taraf:'sol', dy:.55, mob:{x:.83,ust:0,nx:.46,ny:.28}, yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
 ];
+KATMAN.forEach(k=>k.esik=k.t*VID_SON);
 const kapsayici = document.getElementById('katmanlar');
 KATMAN.forEach(k=>{
   const d = document.createElement('div'); d.className='katman'; d.innerHTML =
-    '<span class="nokta"></span><span class="hat"></span><div class="kart"><small>'+k.no+'</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p></div>';
+    '<span class="hat"></span><span class="nokta"></span><div class="kart"><small>'+k.no+'</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p></div>';
   kapsayici.appendChild(d); k.el = d;
 });
-let wKutu = {ox:0,oy:0,w:1,h:1};
-const waffleCanvas = document.getElementById('waffleCanvas');
-const waffle = Dizi(waffleCanvas, 120, i=>'w/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp',
-  { kip:()=>'contain', olcek:()=> mobil() ? 1 : Math.min(1, (innerHeight-120)/innerHeight), dikey: mobil() ? .5 : 1, zemin:'#0a1611',
-    ilerle:yukGoster(document.getElementById('waffleYuk')),
-    cizildi:(b)=>{ wKutu=b; yerlestir(); } });
-// mobilde kareler kare (720x720 kırpım), masaüstünde 16:9
-function yerlestir(){
-  const W = waffleCanvas.clientWidth, H = waffleCanvas.clientHeight;
-  const m = mobil();
-  // katmanın genişlik sınırı (karede): masaüstü 0.335–0.665, mobil 0.21–0.79
-  const solX = m ? .21 : .335, sagX = m ? .79 : .665;
+const waffleCanvas = document.getElementById('waffleCanvas'), halka = document.getElementById('halka');
+let wGeo = {cx:0,cy:0,r:0};
+function tabakYerlestir(){
+  const W = innerWidth, H = innerHeight, m = mobil();
+  const r = m ? Math.min(W*.4, H*.185) : Math.min(H*.36, W*.22);
+  const cx = W/2, cy = m ? H*.46 : H*.56;
+  wGeo = {cx,cy,r};
+  Object.assign(waffleCanvas.style,{left:(cx-r)+'px',top:(cy-r)+'px',width:(2*r)+'px',height:(2*r)+'px'});
+  const hr = r*1.14; Object.assign(halka.style,{left:(cx-hr)+'px',top:(cy-hr)+'px',width:(2*hr)+'px',height:(2*hr)+'px'});
   KATMAN.forEach(k=>{
-    const y = (wKutu.oy + k.y*wKutu.h)*H;
-    const xKenar = (wKutu.ox + (k.taraf==='sag'?sagX:solX)*wKutu.w)*W;
-    const el = k.el; el.style.left='0'; el.style.top='0';
-    const nokta = el.querySelector('.nokta'), hat = el.querySelector('.hat'), kart = el.querySelector('.kart');
-    nokta.style.left=(xKenar-4)+'px'; nokta.style.top=(y-4)+'px';
+    const el=k.el, nokta=el.querySelector('.nokta'), hat=el.querySelector('.hat'), kart=el.querySelector('.kart');
+    let nx, ny, lx, ly;   // nokta ve çizginin etiket ucu
     if(!m){
-      const uz = Math.max(40, (k.taraf==='sag' ? W*.86 - xKenar - 250 : xKenar - W*.14 - 250));
-      const hx = k.taraf==='sag' ? xKenar+8 : xKenar-8-uz;
-      hat.style.left=hx+'px'; hat.style.top=y+'px'; hat.style.width=uz+'px';
-      hat.style.transformOrigin = k.taraf==='sag'?'left center':'right center';
-      kart.style.top=(y-14)+'px';
-      kart.style.left = (k.taraf==='sag' ? hx+uz+14 : hx-14-kart.offsetWidth)+'px';
-      kart.style.textAlign = k.taraf==='sag'?'left':'right';
+      const y = cy + k.dy*r, ic = Math.sqrt(1-k.dy*k.dy)*r*.62, sag = k.taraf==='sag';
+      nx = sag ? cx+ic : cx-ic; ny = y;
+      const kx = sag ? cx+r+70 : cx-r-70-230;
+      kart.style.width='230px'; kart.style.left=kx+'px'; kart.style.top=y+'px'; kart.style.textAlign=sag?'left':'right';
+      kart.style.setProperty('--ky','-50%');
+      lx = sag ? kx-8 : kx+230+8; ly = y;
+    } else {
+      // mobil: etiketler tabağın üstünde ve altında, çizgi malzemeye iner
+      const mp = k.mob, kw = Math.min(118, W*.31);
+      const kx = kis(mp.x*W - kw/2, 8, W-8-kw);
+      const ust = mp.ust, ky = ust ? cy - r - 22 : cy + r + 22;
+      kart.style.width=kw+'px'; kart.style.left=kx+'px'; kart.style.top=ky+'px'; kart.style.textAlign='center';
+      kart.style.setProperty('--ky', ust ? '-100%' : '0%');
+      nx = cx + mp.nx*r; ny = cy + mp.ny*r; lx = kx + kw/2; ly = ky + (ust ? 4 : -4);
     }
+    const dx = nx-lx, dy = ny-ly, uz = Math.hypot(dx,dy);
+    hat.style.left=lx+'px'; hat.style.top=ly+'px'; hat.style.width=uz+'px';
+    hat.style.setProperty('--a', Math.atan2(dy,dx)+'rad');
+    nokta.style.left=(nx-5)+'px'; nokta.style.top=(ny-5)+'px';
   });
 }
+tabakYerlestir(); addEventListener('resize', tabakYerlestir);
+const waffle = Dizi(waffleCanvas, 127, i=>'w/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp',
+  { kip:()=>'cover', zemin:'#cfcac2', ilerle:yukGoster(document.getElementById('waffleYuk')) });
 const sayacNo = document.getElementById('sayacNo'), mA = document.getElementById('mAciklama');
 let sonAcik = -1;
 function waffleGuncelle(p){
-  waffle.ciz(Math.min(1, p/.72));   // video ilk %72'de biter, kalan kaydırma etiketlere
+  waffle.ciz(Math.min(1, p/VID_SON));
   let acik = -1;
   KATMAN.forEach((k,i)=>{ const a = p>=k.esik; k.el.classList.toggle('acik', a); if(a) acik=i; });
   sayacNo.textContent = String(acik+1).padStart(2,'0');
   if(acik!==sonAcik){ sonAcik=acik;
-    if(acik<0) mA.innerHTML='<small>KAYDIRDIKÇA</small><strong>Katman katman</strong><p>Parmağını kaydır, waffle\'ı sök.</p>';
-    else { const k=KATMAN[acik]; mA.innerHTML='<small>'+k.no+' / 06</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p>'; }
+    if(acik<0) mA.innerHTML='<small>KAYDIRDIKÇA</small><strong>Sırayla hazırlanır</strong><p>Kaydır, kâseye ne girdiğini gör.</p>';
+    else { const k=KATMAN[acik]; mA.innerHTML='<small>'+k.no+' / 05</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p>'; }
   }
 }
 
@@ -341,33 +378,81 @@ const KABIN = [
   { ad:'Çaylar', med:'../video-menu/mavi-kelebek-cayi', yazi:'Ihlamurdan mavi kelebeğe 8 bitki çayı. Herbal tea bizim soyadımız.', kat:'cay' },
   { ad:'Oyunlar', med:'../video-jump-oynanis', yazi:'Cactus Jump oyna, rekoru kır, kahveni kazan.', link:'../oyunlar.html' },
 ];
-const N = KABIN.length, teker = document.getElementById('teker'), svg = document.getElementById('tekerSvg');
-let svgIc = '<circle r="94" fill="none" stroke="rgba(243,234,216,.3)" stroke-width="1.2"/><circle r="80" fill="none" stroke="rgba(216,180,106,.35)" stroke-width=".8" stroke-dasharray="2 3"/>';
-for(let i=0;i<N*2;i++){ const a=i/(N*2)*Math.PI*2; svgIc += '<line x1="0" y1="0" x2="'+(Math.sin(a)*94).toFixed(2)+'" y2="'+(-Math.cos(a)*94).toFixed(2)+'" stroke="rgba(243,234,216,'+(i%2?'.12':'.28')+')" stroke-width=".8"/>'; }
-svg.innerHTML = svgIc;
+const N = KABIN.length, teker = document.getElementById('teker'), svg = document.getElementById('tekerSvg'), carkSag = document.getElementById('carkSag');
+(function tekerCiz(){
+  const P = (r,a)=>[(Math.sin(a)*r).toFixed(2), (-Math.cos(a)*r).toFixed(2)];
+  const rad = d=>d*Math.PI/180;
+  let g = '<defs>'+
+    '<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4e3bb"/><stop offset=".5" stop-color="#b8975c"/><stop offset="1" stop-color="#6b5532"/></linearGradient>'+
+    '<radialGradient id="hale"><stop offset="0" stop-color="rgba(255,236,190,.95)"/><stop offset=".35" stop-color="rgba(255,214,140,.45)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient>'+
+    '<radialGradient id="gobekG" cx=".35" cy=".35"><stop offset="0" stop-color="#fff2d0"/><stop offset=".55" stop-color="#c9ab6f"/><stop offset="1" stop-color="#5a4626"/></radialGradient>'+
+    '</defs>';
+  // dış kafes çember
+  g += '<circle r="100" fill="none" stroke="url(#metal)" stroke-width="2.4"/><circle r="92.5" fill="none" stroke="url(#metal)" stroke-width="1.5"/>';
+  let kafes=''; const K=96; for(let k=0;k<K;k++){ const a1=rad(k/K*360), a2=rad((k+.5)/K*360); const [x1,y1]=P(100,a1),[x2,y2]=P(92.5,a2),[x3,y3]=P(100,rad((k+1)/K*360)); kafes+='M'+x1+' '+y1+'L'+x2+' '+y2+'L'+x3+' '+y3; }
+  g += '<path d="'+kafes+'" fill="none" stroke="#b8975c" stroke-width=".55" opacity=".85"/>';
+  // iç halkalar
+  g += '<circle r="44" fill="none" stroke="url(#metal)" stroke-width="1.3"/><circle r="40" fill="none" stroke="#b8975c" stroke-width=".5" opacity=".7"/>';
+  // kollar (çift, üçgen kafes) ve gergi halatları
+  let kol='', halat='';
+  const S=16;
+  for(let i=0;i<S;i++){ const a=rad(i/S*360);
+    const [ax,ay]=P(13,a-rad(7)), [bx,by]=P(13,a+rad(7)), [cx,cy]=P(92.5,a);
+    kol+='M'+ax+' '+ay+'L'+cx+' '+cy+'M'+bx+' '+by+'L'+cx+' '+cy;
+    for(const r of [30,52,72]){ const [p1,q1]=P(r,a-rad(7*(92.5-r)/80)), [p2,q2]=P(r,a+rad(7*(92.5-r)/80)); kol+='M'+p1+' '+q1+'L'+p2+' '+q2; }
+    const [hx,hy]=P(44,a+rad(11.25)), [kx,ky]=P(92.5,a); halat+='M'+hx+' '+hy+'L'+kx+' '+ky;
+    const [h2x,h2y]=P(44,a-rad(11.25)); halat+='M'+h2x+' '+h2y+'L'+kx+' '+ky;
+  }
+  g += '<path d="'+halat+'" fill="none" stroke="rgba(243,234,216,.22)" stroke-width=".35"/>';
+  g += '<path d="'+kol+'" fill="none" stroke="url(#metal)" stroke-width="1.05" stroke-linecap="round"/>';
+  // ampuller: çember + kollar
+  let amp='', ampC='', n=0;
+  const ekle=(x,y,gec)=>{ amp+='<circle class="amp" cx="'+x+'" cy="'+y+'" r="3.4" fill="url(#hale)" style="animation-delay:'+gec+'s"/>'; ampC+='<circle class="amp" cx="'+x+'" cy="'+y+'" r=".9" fill="#fff7e2" style="animation-delay:'+gec+'s"/>'; n++; };
+  for(let k=0;k<64;k++){ const [x,y]=P(96.2,rad(k/64*360)); ekle(x,y, -(k%8)*.35); }
+  for(let i=0;i<S;i++){ const a=rad(i/S*360); [24,40,58,76].forEach((r,j)=>{ const [x,y]=P(r,a); ekle(x,y, -(j*.5 + (i%2)*1.2)); }); }
+  g += '<g>'+amp+'</g><g>'+ampC+'</g>';
+  // kabin pimleri
+  for(let i=0;i<N;i++){ const [x,y]=P(100,rad(i/N*360+180)); g+='<circle cx="'+x+'" cy="'+y+'" r="2.8" fill="url(#gobekG)" stroke="#5a4626" stroke-width=".5"/>'; }
+  // göbek
+  g += '<circle r="15" fill="url(#gobekG)" stroke="#5a4626" stroke-width=".8"/><circle r="10" fill="#14281f" stroke="#c9ab6f" stroke-width=".8"/><circle r="5" fill="url(#gobekG)"/>';
+  for(let i=0;i<8;i++){ const [x,y]=P(12.5,rad(i*45)); g+='<circle cx="'+x+'" cy="'+y+'" r=".9" fill="#3a2d18"/>'; }
+  g += '<circle r="22" fill="url(#hale)" opacity=".35"/>';
+  svg.innerHTML = g;
+})();
 const kabinler = KABIN.map((k,i)=>{
   const d = document.createElement('div'); d.className='kabin';
-  d.innerHTML = '<span class="ask"></span><div class="ic"><img loading="lazy" alt="" src="'+k.med+'.jpg"></div><span class="ad">'+k.ad+'</span>';
-  document.getElementById('carkSag').appendChild(d); k.el=d; return d;
+  d.innerHTML = '<div class="sal"><span class="aski"></span><span class="kanca"></span><div class="cati"></div><div class="govde"><div class="cam"><img loading="lazy" alt="" src="'+k.med+'.jpg"></div><span class="serit"></span></div><div class="taban"></div></div><span class="ad">'+k.ad+'</span>';
+  carkSag.appendChild(d); k.el=d; return d;
 });
 const kNo=document.getElementById('kNo'), kAd=document.getElementById('kAd'), kAcik=document.getElementById('kAcik'), kLink=document.getElementById('kLink');
-let aktifKabin=-1;
+let aktifKabin=-1, sonAci=0, salinim=0, hiz=0, salDongu=false;
+function kabinYerlestir(aci){
+  const W = carkSag.clientWidth, R = W*100/240, c = W/2, kw = kabinler[0].offsetWidth;
+  kabinler.forEach((el,i)=>{
+    const a = (i/N*360 + aci + 180) * Math.PI/180;
+    const x = c + Math.sin(a)*R - kw/2, y = c - Math.cos(a)*R;
+    el.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';
+    el.firstChild.style.rotate = salinim.toFixed(2)+'deg';
+  });
+}
+function salinimAdim(){
+  // sarkaç: dönüş hızına göre kabinler hafifçe sallanır, sonra durulur
+  const hedef = kis(-hiz*2.2, -13, 13);
+  salinim += (hedef - salinim)*.12; hiz *= .86;
+  kabinYerlestir(sonAci);
+  if(Math.abs(salinim)>.05 || Math.abs(hiz)>.01) requestAnimationFrame(salinimAdim); else { salinim=0; kabinYerlestir(sonAci); salDongu=false; }
+}
 function carkGuncelle(p){
   // her kabin biniş noktasında bir süre bekler (basamaklı, yumuşak geçişli dönüş)
   const s = p*(N-1), taban = Math.min(N-1, Math.floor(s)), kes = s - taban;
   const t = kis((kes-.3)/.4, 0, 1), yum = t*t*(3-2*t);
-  const tur = (taban + yum)/N;
-  const aci = -tur*360;             // derece
+  const aci = -((taban + yum)/N)*360;
+  hiz += (aci - sonAci); sonAci = aci;
   teker.style.transform = 'rotate('+aci+'deg)';
-  const R = 47; // yüzde, merkezden
+  kabinYerlestir(aci);
+  if(!salDongu && Math.abs(hiz)>.01){ salDongu=true; requestAnimationFrame(salinimAdim); }
   let enYakin=0, enAz=1e9;
-  kabinler.forEach((el,i)=>{
-    const a = (i/N*360 + aci + 180) * Math.PI/180; // 0. kabin başta en altta
-    const x = Math.sin(a)*R, y = -Math.cos(a)*R;
-    el.style.transform = 'translate('+(x/21*100).toFixed(1)+'%,'+(y/21*100).toFixed(1)+'%)';
-    const uzak = Math.abs(((i/N*360 + aci) % 360 + 360) % 360); const u = Math.min(uzak, 360-uzak);
-    if(u<enAz){enAz=u;enYakin=i;}
-  });
+  kabinler.forEach((el,i)=>{ const uzak = ((i/N*360 + aci) % 360 + 360) % 360; const u = Math.min(uzak, 360-uzak); if(u<enAz){enAz=u;enYakin=i;} });
   if(enYakin!==aktifKabin){
     if(aktifKabin>=0){ const e=kabinler[aktifKabin]; e.classList.remove('aktif'); const v=e.querySelector('video'); if(v){v.pause();} }
     aktifKabin=enYakin; const k=KABIN[enYakin], e=kabinler[enYakin]; e.classList.add('aktif');
@@ -376,10 +461,11 @@ function carkGuncelle(p){
     kLink.href = k.link || ('../menu-podyum.html#'+k.kat);
     kLink.textContent = k.link ? 'Oyuna gir →' : 'Kabine bin →';
     let v=e.querySelector('video');
-    if(!v){ v=document.createElement('video'); v.muted=true; v.loop=true; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto'; v.poster=k.med+'.jpg'; v.src=k.med+'.mp4'; e.querySelector('.ic').replaceChildren(v); }
+    if(!v){ v=document.createElement('video'); v.muted=true; v.loop=true; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto'; v.poster=k.med+'.jpg'; v.src=k.med+'.mp4'; e.querySelector('.cam').replaceChildren(v); }
     v.play().catch(()=>{});
   }
 }
+addEventListener('resize', ()=>kabinYerlestir(sonAci));
 
 /* ---- Kaydırma döngüsü ---- */
 const bolum = id => document.getElementById(id);
@@ -396,8 +482,8 @@ function guncelle(){
   document.getElementById('ilerleme').style.width = (scrollY/top*100)+'%';
 }
 addEventListener('scroll', ()=>{ if(!bekliyor){bekliyor=true; requestAnimationFrame(guncelle);} }, {passive:true});
-addEventListener('resize', ()=>{ yerlestir(); guncelle(); });
-guncelle(); setTimeout(()=>{yerlestir();guncelle();}, 300);
+addEventListener('resize', ()=>{ guncelle(); });
+guncelle(); setTimeout(()=>{tabakYerlestir();guncelle();}, 300);
 })();
 </script>
 </body>

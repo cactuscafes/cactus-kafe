@@ -83,18 +83,22 @@ canvas{display:block}
 .cark-sol h2 em{font-family:'Fraunces',serif;font-weight:400;text-transform:none;color:var(--altin)}
 .aktif-kat{margin-top:24px;min-height:150px}
 .aktif-kat .kno{font-size:10px;letter-spacing:.3em;color:var(--sis)}
-.aktif-kat h3{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(34px,4.6vw,64px);text-transform:uppercase;line-height:1;margin:6px 0 8px;color:var(--kat-renk,var(--krem));transition:color .4s}
+.aktif-kat h3{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(34px,4.6vw,64px);text-transform:uppercase;line-height:1;margin:6px 0 8px;color:var(--krem)}
 .aktif-kat p{font-size:12px;line-height:1.7;color:var(--sis);max-width:40ch}
 .bin{display:inline-flex;gap:10px;align-items:center;margin-top:16px;padding:12px 18px;background:var(--krem);color:var(--bg);text-decoration:none;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
 .kontrol{display:flex;align-items:center;gap:12px;margin-top:22px}
 .kontrol button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(243,234,216,.4);background:rgba(255,255,255,.04);color:var(--krem);font-size:20px;cursor:pointer}
 .kontrol button:active{transform:scale(.94)}
 .kontrol span{font-size:10px;letter-spacing:.22em;color:var(--sis)}
-.cark-sag{position:relative;z-index:1;width:min(46vw,calc(76vh / 1.12));aspect-ratio:1/1.12;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.cark-sag{position:relative;z-index:1;width:min(44vw,calc(82vh / 1.34));aspect-ratio:1/1.34;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .cark-sag.tutuyor{cursor:grabbing}
 .cark-sag .iskelet{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .teker{position:absolute;left:0;top:0;width:100%;aspect-ratio:1;will-change:transform}
-.teker svg{display:block;width:100%;height:100%;overflow:visible}
+.teker img{position:absolute;inset:0;width:100%;height:100%;animation:ledNabiz 2.4s ease-in-out infinite;pointer-events:none}
+.teker svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}
+@keyframes ledNabiz{0%,100%{filter:brightness(1) saturate(1.1)}50%{filter:brightness(1.55) saturate(1.6) drop-shadow(0 0 6px rgba(150,190,255,.7))}}
+.teker-hale{position:absolute;inset:-4%;border-radius:50%;background:radial-gradient(circle,rgba(120,170,255,0) 58%,rgba(120,170,255,.16) 66%,rgba(120,170,255,0) 72%);animation:haleNabiz 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes haleNabiz{0%,100%{opacity:.4}50%{opacity:1}}
 /* LED: noktalar kayar ve renk değiştirir */
 .led{fill:none;stroke-linecap:round;stroke-dasharray:.01 3.2;animation:ledKay 1.4s linear infinite,ledRenk 9s linear infinite}
 .led-hale{fill:none;stroke-linecap:round;opacity:.28;animation:ledRenk 9s linear infinite}
@@ -103,19 +107,14 @@ canvas{display:block}
 @keyframes ledRenk{0%,100%{stroke:#fff6dc}25%{stroke:#ff5fd2}50%{stroke:#62e6ff}75%{stroke:#ffd34d}}
 .neon{fill:none;animation:neon 2.6s ease-in-out infinite}
 @keyframes neon{0%,100%{stroke:#3fa9ff;opacity:.95}50%{stroke:#b45cff;opacity:.6}}
-.kabin{position:absolute;left:0;top:0;width:19%;aspect-ratio:1/1.32;will-change:transform;z-index:2;cursor:pointer}
+.kabin{position:absolute;left:0;top:0;width:25%;aspect-ratio:360/528;will-change:transform;z-index:2;cursor:pointer}
 .kabin .sal{position:absolute;inset:0;transform-origin:50% 0;transition:scale .45s cubic-bezier(.2,.8,.2,1)}
-.kabin .kol{position:absolute;left:50%;top:0;width:3.5%;min-width:2px;height:15%;transform:translateX(-50%);background:#f2f2ee;box-shadow:0 0 4px rgba(0,0,0,.4)}
-.kabin .kanca{position:absolute;left:50%;top:-4%;width:10%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:#fff;border:2px solid #9aa3a8}
-.kabin .tente{position:absolute;left:4%;top:12%;width:92%;height:15%;border-radius:50% 50% 14% 14%/100% 100% 22% 22%;background:var(--k);box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 3px 8px rgba(0,0,0,.4)}
-.kabin .tente::after{content:"";position:absolute;left:8%;right:8%;bottom:-14%;height:22%;background:repeating-linear-gradient(90deg,#fff 0 12%,transparent 12% 24%);border-radius:0 0 50% 50%;opacity:.9}
-.kabin .kup{position:absolute;left:2%;top:25%;width:96%;height:68%;border-radius:20% 20% 46% 46%/16% 16% 40% 40%;background:linear-gradient(160deg,color-mix(in srgb,var(--k) 85%,#fff) 0%,var(--k) 45%,color-mix(in srgb,var(--k) 70%,#000) 100%);box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.35)}
-.kabin .cam{position:absolute;left:9%;top:7%;width:82%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611;box-shadow:0 0 0 3px #fff,inset 0 0 0 1px rgba(0,0,0,.2)}
-.kabin .cam img,.kabin .cam video{width:100%;height:100%;object-fit:cover;display:block}
-.kabin .cam::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(130deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 40%);pointer-events:none}
-.kabin .ad{position:absolute;left:50%;top:97%;transform:translateX(-50%);white-space:nowrap;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.9);transition:opacity .3s}
-.kabin.aktif .sal{scale:1.22}
-.kabin.aktif .kup{box-shadow:0 0 0 3px #fff,0 0 34px var(--k),0 10px 22px rgba(0,0,0,.5)}
+.kabin .cam{position:absolute;left:21.5%;top:44.8%;width:57%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
+.kabin .cam img,.kabin .cam video{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04)}
+.kabin .govde{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.55))}
+.kabin .ad{position:absolute;left:50%;top:96%;transform:translateX(-50%);white-space:nowrap;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.9);transition:opacity .3s}
+.kabin.aktif .sal{scale:1.16}
+.kabin.aktif .govde{filter:drop-shadow(0 0 14px rgba(255,236,190,.85)) drop-shadow(0 8px 14px rgba(0,0,0,.5))}
 .kabin.aktif .ad{opacity:0}
 .ipucu{position:absolute;left:50%;bottom:-2%;transform:translateX(-50%);font-size:9px;letter-spacing:.28em;color:rgba(255,255,255,.55);white-space:nowrap;pointer-events:none}
 
@@ -157,7 +156,8 @@ canvas{display:block}
   .aktif-kat p{font-size:11.5px;min-height:3.4em}
   .bin{margin-top:8px;padding:10px 14px}
   .kontrol{display:none}
-  .cark-sag{width:min(94vw,calc((100svh - 300px) / 1.12));justify-self:center;margin-top:4px}
+  .ipucu{display:none}
+  .cark-sag{width:min(80vw,calc((100svh - 290px) / 1.34));justify-self:center;margin-top:4px}
 }
 @media (prefers-reduced-motion:reduce){.kaydir i{animation:none}.led,.led-hale,.neon{animation:none}}
 </style>
@@ -225,21 +225,21 @@ canvas{display:block}
     <div class="kontrol"><button type="button" id="carkGeri" aria-label="Önceki kategori">‹</button><button type="button" id="carkIleri" aria-label="Sonraki kategori">›</button><span>YA DA DOLABI ÇEVİR</span></div>
   </div>
   <div class="cark-sag" id="carkSag" aria-label="Kategorileri seçmek için dönme dolabı çevirin">
-    <svg class="iskelet" viewBox="0 0 240 269" aria-hidden="true">
+    <svg class="iskelet" viewBox="0 0 240 322" aria-hidden="true">
       <defs>
         <linearGradient id="beyazMetal" x1="0" x2="1"><stop offset="0" stop-color="#9da6ab"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#8d969b"/></linearGradient>
-        <radialGradient id="zeminIsik" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(98,230,255,.35)"/><stop offset="1" stop-color="rgba(98,230,255,0)"/></radialGradient>
+        <radialGradient id="zeminIsik" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(98,180,255,.35)"/><stop offset="1" stop-color="rgba(98,180,255,0)"/></radialGradient>
       </defs>
-      <ellipse cx="120" cy="262" rx="118" ry="9" fill="url(#zeminIsik)"/>
-      <polygon points="117,120 123,120 168,262 160,262" fill="#7d878c" opacity=".6"/>
-      <polygon points="117,120 123,120 80,262 72,262" fill="#7d878c" opacity=".6"/>
-      <polygon points="116,118 124,118 60,264 48,264" fill="url(#beyazMetal)"/>
-      <polygon points="116,118 124,118 192,264 180,264" fill="url(#beyazMetal)"/>
-      <g stroke="#dfe4e6" stroke-width="1.2" opacity=".85"><line x1="88" y1="186" x2="152" y2="186"/><line x1="72" y1="226" x2="168" y2="226"/><line x1="88" y1="186" x2="168" y2="226"/><line x1="152" y1="186" x2="72" y2="226"/></g>
-      <g class="led" stroke-width="1.6"><line x1="62" y1="258" x2="118" y2="124"/><line x1="178" y1="258" x2="122" y2="124"/></g>
-      <rect x="58" y="258" width="124" height="8" rx="2" fill="#1b2a30" stroke="#dfe4e6" stroke-width=".8"/>
+      <ellipse cx="120" cy="314" rx="120" ry="9" fill="url(#zeminIsik)"/>
+      <polygon points="117,120 123,120 176,312 168,312" fill="#7d878c" opacity=".55"/>
+      <polygon points="117,120 123,120 72,312 64,312" fill="#7d878c" opacity=".55"/>
+      <polygon points="116,118 124,118 50,314 38,314" fill="url(#beyazMetal)"/>
+      <polygon points="116,118 124,118 202,314 190,314" fill="url(#beyazMetal)"/>
+      <g stroke="#dfe4e6" stroke-width="1.2" opacity=".85"><line x1="84" y1="214" x2="156" y2="214"/><line x1="64" y1="268" x2="176" y2="268"/><line x1="84" y1="214" x2="176" y2="268"/><line x1="156" y1="214" x2="64" y2="268"/></g>
+      <g class="led" stroke-width="1.6"><line x1="52" y1="306" x2="118" y2="124"/><line x1="188" y1="306" x2="122" y2="124"/></g>
+      <rect x="44" y="308" width="152" height="9" rx="2" fill="#1b2a30" stroke="#dfe4e6" stroke-width=".8"/>
     </svg>
-    <div class="teker" id="teker"><svg viewBox="-120 -120 240 240" id="tekerSvg"></svg></div>
+    <div class="teker" id="teker"><div class="teker-hale"></div><img src="dolap/teker.webp" alt="" draggable="false"><svg viewBox="-120 -120 240 240" id="tekerSvg"></svg></div>
     <div class="ipucu">◀ ÇEVİR ▶</div>
   </div>
 </section>
@@ -389,32 +389,15 @@ const N = KABIN.length, ADIM = 360/N, teker = document.getElementById('teker'), 
 (function tekerCiz(){
   const P = (r,a)=>[(Math.sin(a)*r).toFixed(2), (-Math.cos(a)*r).toFixed(2)];
   const rad = d=>d*Math.PI/180;
-  let g = '<defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#d9dfe2"/><stop offset="1" stop-color="#9aa3a8"/></linearGradient>'+
-    '<radialGradient id="gobekIsik"><stop offset="0" stop-color="rgba(255,246,220,.9)"/><stop offset="1" stop-color="rgba(255,246,220,0)"/></radialGradient></defs>';
-  // dış çember: beyaz kafes + mavi neon
-  g += '<circle r="104" class="neon" stroke-width="6" opacity=".25"/><circle r="104" class="neon" stroke-width="1.6"/>';
-  g += '<circle r="100" fill="none" stroke="url(#bm)" stroke-width="2.6"/><circle r="93" fill="none" stroke="url(#bm)" stroke-width="1.6"/>';
-  let kafes=''; const K=84; for(let k=0;k<K;k++){ const [x1,y1]=P(100,rad(k/K*360)),[x2,y2]=P(93,rad((k+.5)/K*360)),[x3,y3]=P(100,rad((k+1)/K*360)); kafes+='M'+x1+' '+y1+'L'+x2+' '+y2+'L'+x3+' '+y3; }
-  g += '<path d="'+kafes+'" fill="none" stroke="#e8ecee" stroke-width=".6"/>';
-  g += '<circle r="96.5" class="led" stroke-width="2.2"/>';
-  g += '<circle r="40" fill="none" stroke="url(#bm)" stroke-width="1.4"/><circle r="40" class="led b" stroke-width="1.8"/>';
-  // kollar: beyaz kiriş + üstünde LED şerit
-  let kol='', led='';
-  const S=18;
-  for(let i=0;i<S;i++){ const a=rad(i/S*360);
-    const [ax,ay]=P(14,a-rad(6)), [bx,by]=P(14,a+rad(6)), [cx,cy]=P(93,a);
-    kol+='M'+ax+' '+ay+'L'+cx+' '+cy+'M'+bx+' '+by+'L'+cx+' '+cy;
-    const [lx,ly]=P(16,a); led+='M'+lx+' '+ly+'L'+cx+' '+cy;
-  }
-  g += '<path d="'+kol+'" fill="none" stroke="url(#bm)" stroke-width="1.1" stroke-linecap="round"/>';
-  g += '<path d="'+led+'" class="led-hale" stroke-width="4.5"/><path d="'+led+'" class="led" stroke-width="1.9"/>';
-  for(let i=0;i<N;i++){ const [x,y]=P(100,rad(i*ADIM+180)); g+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="#fff" stroke="#9aa3a8" stroke-width=".8"/>'; }
-  g += '<circle r="26" fill="url(#gobekIsik)" opacity=".5"/><circle r="15" fill="#f4f6f7" stroke="#9aa3a8" stroke-width="1"/><circle r="11" class="led" stroke-width="2"/><circle r="6" fill="#1b2a30"/><circle r="3" fill="#fff"/>';
+  let g = '<circle r="109.5" class="neon" stroke-width="5" opacity=".22"/><circle r="111.5" class="neon" stroke-width="1.4"/>';
+  g += '<circle r="106" class="led" stroke-width="2.6"/><circle r="100" class="led b" stroke-width="2.2"/>';
+  for(let i=0;i<N;i++){ const [x,y]=P(109.5,rad(i*ADIM+180)); g+='<circle cx="'+x+'" cy="'+y+'" r="3.2" fill="#fff" stroke="#9aa3a8" stroke-width=".8"/>'; }
+  g += '<circle r="13" class="led" stroke-width="2.4"/>';
   svg.innerHTML = g;
 })();
 const kabinler = KABIN.map((k,i)=>{
-  const d = document.createElement('div'); d.className='kabin'; d.style.setProperty('--k', k.renk);
-  d.innerHTML = '<div class="sal"><span class="kol"></span><span class="kanca"></span><div class="tente"></div><div class="kup"><div class="cam"><img loading="lazy" alt="'+k.ad+'" src="'+(k.foto||k.med+'.jpg')+'" draggable="false"></div></div></div><span class="ad">'+k.ad+'</span>';
+  const d = document.createElement('div'); d.className='kabin';
+  d.innerHTML = '<div class="sal"><div class="cam"><img loading="lazy" alt="'+k.ad+'" src="'+(k.foto||k.med+'.jpg')+'" draggable="false"></div><img class="govde" src="dolap/kabin.webp" alt="" draggable="false"></div><span class="ad">'+k.ad+'</span>';
   d.addEventListener('click', e=>{ if(surukledi) return; hedefeGit(i); });
   carkSag.appendChild(d); k.el=d; return d;
 });
@@ -422,7 +405,7 @@ const kNo=document.getElementById('kNo'), kAd=document.getElementById('kAd'), kA
 let aci = 0, hiz = 0, salinim = 0, aktifKabin = -1, surukledi = false, tutuyor = false, hedef = null, dongu = false;
 function ciz(){
   teker.style.transform = 'rotate('+aci.toFixed(2)+'deg)';
-  const W = carkSag.clientWidth, R = W*100/240, c = W/2, kw = kabinler[0].offsetWidth;
+  const W = carkSag.clientWidth, R = W*109.5/240, c = W/2, kw = kabinler[0].offsetWidth;
   kabinler.forEach((el,i)=>{
     const a = (i*ADIM + aci + 180) * Math.PI/180;
     el.style.transform = 'translate('+(c + Math.sin(a)*R - kw/2).toFixed(1)+'px,'+(c - Math.cos(a)*R).toFixed(1)+'px)';
@@ -437,7 +420,7 @@ function aktifYap(i){
   if(aktifKabin>=0){ const e=kabinler[aktifKabin]; e.classList.remove('aktif'); const v=e.querySelector('video'); if(v) v.pause(); }
   aktifKabin=i; const k=KABIN[i], e=kabinler[i]; e.classList.add('aktif');
   kNo.textContent='KABİN '+String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0');
-  kAd.textContent=k.ad; kAcik.textContent=k.yazi; aktifKat.style.setProperty('--kat-renk', k.renk);
+  kAd.textContent=k.ad; kAcik.textContent=k.yazi; 
   kLink.href='../menu-podyum.html#'+k.kat;
   let v=e.querySelector('video');
   if(!v){ v=document.createElement('video'); v.muted=true; v.loop=true; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto'; v.poster=k.foto||k.med+'.jpg'; v.src=k.med+'.mp4'; e.querySelector('.cam').replaceChildren(v); }

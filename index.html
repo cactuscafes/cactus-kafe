@@ -738,21 +738,29 @@ function biletCiz(dolu, hak, onceki, svgId){
 #uygulama .app-title{font-size:clamp(28px,3.1vw,42px)}
 #uygulama .app-sub{margin-bottom:16px}
 @media(max-width:900px){
-  #uygulama.app-sec{padding:30px 18px 32px}
-  #uygulama .app-inner{gap:12px}
-  #uygulama .app-sahne{padding:0 60px 4px}
-  #uygulama .app-tel{width:min(112px,32vw);border-radius:22px;padding:5px}
+  /* sadakat bölümü gibi kompakt: yazı solda, telefon sağda küçük */
+  #uygulama.app-sec{padding:30px 16px 30px}
+  #uygulama .app-inner{grid-template-columns:1fr 104px;gap:12px;align-items:center}
+  #uygulama .app-gorsel{order:2}
+  #uygulama .app-sahne{padding:0}
+  #uygulama .app-tel{width:104px;border-radius:22px;padding:5px;transform:rotate(3deg)}
   #uygulama .app-ekran{border-radius:17px}
-  #uygulama .app-ekran::before{width:36px;height:10px;top:5px}
-  #uygulama .app-rozet.rekor{padding:8px 11px;min-width:0}
-  #uygulama .app-rozet.rekor .rk{font-size:8px;letter-spacing:1.5px}
-  #uygulama .app-rozet.rekor .rk-no{font-size:26px}
-  #uygulama .app-rozet.rekor .rk-alt{font-size:9px;max-width:110px}
-  #uygulama .app-title{font-size:27px;margin-bottom:8px}
-  #uygulama .app-sub{font-size:12.5px;line-height:1.6;margin-bottom:12px}
-  #uygulama .app-odul{margin-bottom:12px;padding:10px 12px}
-  #uygulama .app-adim{margin-bottom:14px}
-  #uygulama .app-not{display:none}
+  #uygulama .app-ekran::before{width:34px;height:10px;top:5px}
+  #uygulama .app-rozet{display:none}
+  #uygulama .app-eyebrow{font-size:8.5px;letter-spacing:2px;margin-bottom:8px}
+  #uygulama .app-eyebrow::before{width:14px}
+  #uygulama .app-title{font-size:23px;margin-bottom:10px}
+  #uygulama .app-sub,#uygulama .app-adim,#uygulama .app-not{display:none}
+  #uygulama .app-odul{padding:7px 10px;gap:8px;margin-bottom:12px;border-radius:12px}
+  #uygulama .app-odul .ai{font-size:20px}
+  #uygulama .app-odul b{font-size:12px;margin:0}
+  #uygulama .app-odul div span{display:none}
+  #uygulama .app-cta-sat{gap:8px 12px}
+  #uygulama .app-cta{padding:9px 12px 9px 10px;border-radius:11px;gap:8px}
+  #uygulama .app-cta svg{width:20px;height:20px}
+  #uygulama .app-cta b{font-size:13px}
+  #uygulama .app-cta small{font-size:8.5px}
+  #uygulama .app-dene{font-size:11.5px}
 }
 </style>
 <section class="app-sec" id="uygulama">

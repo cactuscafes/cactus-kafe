@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-05-onecikan-video-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-donme-dolap-r1'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -927,10 +927,135 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 
 <div id="menu-podyum">
   <p class="menu-dipnot">💧 Su ve soda yalnızca gel-al veya sipariş yanında servis edilir.</p>
-  <div class="spotlight" id="spotlight-podyum">
-    <p class="spotlight-title">Öne Çıkanlar</p>
-    <div class="spotlight-grid" id="spotlight-grid-podyum"></div>
-  </div>
+  <!-- DÖNME DOLAP: kategoriler (öne çıkanların yerine) -->
+  <style>
+  .dm{position:relative;margin:28px 16px 8px;border-radius:26px;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 42%,#173a4a 0%,#0c1e24 48%,#060d10 100%);padding:30px 16px 22px;text-align:center;color:#f3ead8}
+  .dm::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 12% 18%,#fff8,transparent),radial-gradient(1px 1px at 32% 8%,#fff6,transparent),radial-gradient(1.5px 1.5px at 70% 12%,#fff7,transparent),radial-gradient(1px 1px at 88% 24%,#fff5,transparent),radial-gradient(1px 1px at 8% 46%,#fff4,transparent)}
+  .dm-ust{position:relative;z-index:2}
+  .dm-ust small{display:block;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:#7fe3ff}
+  .dm-ust h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(26px,4.4vw,40px);margin-top:8px;line-height:1.1}
+  .dm-ust h2 em{font-style:italic;color:#c8a86a}
+  .dm-ust p{font-size:12px;color:rgba(243,234,216,.62);margin-top:6px}
+  .dm-sahne{position:relative;z-index:1;width:min(80vw,460px);aspect-ratio:1/1.34;margin:14px auto 0;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+  .dm-sahne.tut{cursor:grabbing}
+  .dm-iskelet{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .dm-teker{position:absolute;left:0;top:0;width:100%;aspect-ratio:1;will-change:transform}
+  .dm-teker img{position:absolute;inset:0;width:100%;height:100%;animation:dmNabiz 2.4s ease-in-out infinite;pointer-events:none}
+  .dm-teker svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  @keyframes dmNabiz{0%,100%{filter:brightness(1) saturate(1.1)}50%{filter:brightness(1.55) saturate(1.6) drop-shadow(0 0 6px rgba(150,190,255,.7))}}
+  .dm-led{fill:none;stroke-linecap:round;stroke-dasharray:.01 3.2;animation:dmKay 1.4s linear infinite,dmRenk 9s linear infinite}
+  .dm-led.b{animation-direction:reverse,normal;animation-delay:0s,-3s}
+  @keyframes dmKay{to{stroke-dashoffset:-6.4}}
+  @keyframes dmRenk{0%,100%{stroke:#fff6dc}25%{stroke:#ff5fd2}50%{stroke:#62e6ff}75%{stroke:#ffd34d}}
+  .dm-neon{fill:none;animation:dmNeon 2.6s ease-in-out infinite}
+  @keyframes dmNeon{0%,100%{stroke:#3fa9ff;opacity:.95}50%{stroke:#b45cff;opacity:.6}}
+  .dm-kabin{position:absolute;left:0;top:0;width:21%;aspect-ratio:360/528;will-change:transform;z-index:2;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;-webkit-appearance:none;appearance:none;border-radius:0;min-width:0;min-height:0;font:inherit;color:inherit}
+  .dm-sal{position:absolute;inset:0;transform-origin:50% 0;transition:scale .4s cubic-bezier(.2,.8,.2,1)}
+  .dm-cam{position:absolute;left:21.5%;top:44.8%;width:57%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
+  .dm-cam img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04)}
+  .dm-govde{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;filter:drop-shadow(0 8px 12px rgba(0,0,0,.55))}
+  .dm-boya{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;-webkit-mask:url(dolap-menu/kabin.webp) center/100% 100% no-repeat;mask:url(dolap-menu/kabin.webp) center/100% 100% no-repeat;background:linear-gradient(160deg,color-mix(in srgb,var(--kc) 70%,#fff) 0%,var(--kc) 55%,color-mix(in srgb,var(--kc) 75%,#000) 100%)}
+  .dm-ad{position:absolute;left:50%;top:94%;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+  .dm-kabin:hover .dm-sal,.dm-kabin:focus-visible .dm-sal{scale:1.1}
+  .dm-kabin.alt .dm-sal{scale:1.14}
+  .dm-ipucu{position:relative;z-index:2;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.55);margin-top:4px}
+  @media(min-width:900px){.dm{margin:40px auto 10px;max-width:1080px}}
+  @media(prefers-reduced-motion:reduce){.dm-teker img,.dm-led,.dm-neon{animation:none}}
+  </style>
+  <section class="dm" id="dolap-menu" aria-label="Kategoriler">
+    <div class="dm-ust">
+      <small>Kategoriler</small>
+      <h2>Dönme dolaba <em>bin.</em></h2>
+      <p>Dolabı çevir, bir kabine dokun, o kategoriye git.</p>
+    </div>
+    <div class="dm-sahne" id="dmSahne">
+      <svg class="dm-iskelet" viewBox="0 0 240 322" aria-hidden="true">
+        <defs>
+          <linearGradient id="dmMetal" x1="0" x2="1"><stop offset="0" stop-color="#9da6ab"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#8d969b"/></linearGradient>
+          <radialGradient id="dmZemin" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(98,180,255,.35)"/><stop offset="1" stop-color="rgba(98,180,255,0)"/></radialGradient>
+        </defs>
+        <ellipse cx="120" cy="314" rx="120" ry="9" fill="url(#dmZemin)"/>
+        <polygon points="117,120 123,120 176,312 168,312" fill="#7d878c" opacity=".55"/>
+        <polygon points="117,120 123,120 72,312 64,312" fill="#7d878c" opacity=".55"/>
+        <polygon points="116,118 124,118 50,314 38,314" fill="url(#dmMetal)"/>
+        <polygon points="116,118 124,118 202,314 190,314" fill="url(#dmMetal)"/>
+        <g stroke="#dfe4e6" stroke-width="1.2" opacity=".85"><line x1="84" y1="214" x2="156" y2="214"/><line x1="64" y1="268" x2="176" y2="268"/><line x1="84" y1="214" x2="176" y2="268"/><line x1="156" y1="214" x2="64" y2="268"/></g>
+        <g class="dm-led" stroke-width="1.6"><line x1="52" y1="306" x2="118" y2="124"/><line x1="188" y1="306" x2="122" y2="124"/></g>
+        <rect x="44" y="308" width="152" height="9" rx="2" fill="#1b2a30" stroke="#dfe4e6" stroke-width=".8"/>
+      </svg>
+      <div class="dm-teker" id="dmTeker"><img src="dolap-menu/teker.webp" alt="" draggable="false"><svg viewBox="-120 -120 240 240" id="dmSvg"></svg></div>
+    </div>
+    <div class="dm-ipucu">◀ ÇEVİR · DOKUN ▶</div>
+  </section>
+  <script>
+  (function(){
+    var KAT=[
+      {id:'waffle',ad:'Waffle',r:'#b8860b'},{id:'kokteyl',ad:'Kokteyl',r:'#c2447e'},{id:'sicak',ad:'Sıcak',r:'#a86b32'},
+      {id:'soguk',ad:'Soğuk',r:'#2e7fa8'},{id:'vitamin',ad:'Vitamin',r:'#d97a1f'},{id:'tatlilar',ad:'Tatlılar',r:'#c05a5a'},
+      {id:'cay',ad:'Çaylar',r:'#3e7d46'},{id:'tost',ad:'Tostlar',r:'#8a5a36'}
+    ];
+    var N=KAT.length, ADIM=360/N, sahne=document.getElementById('dmSahne'), teker=document.getElementById('dmTeker'), svg=document.getElementById('dmSvg');
+    if(!sahne) return;
+    function P(r,a){return [(Math.sin(a)*r).toFixed(2),(-Math.cos(a)*r).toFixed(2)];}
+    var rad=function(d){return d*Math.PI/180;};
+    var g='<circle r="109.5" class="dm-neon" stroke-width="5" opacity=".22"/><circle r="111.5" class="dm-neon" stroke-width="1.4"/><circle r="106" class="dm-led" stroke-width="2.6"/><circle r="100" class="dm-led b" stroke-width="2.2"/>';
+    for(var i=0;i<N;i++){var p=P(109.5,rad(i*ADIM+180)); g+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="#fff" stroke="#9aa3a8" stroke-width=".8"/>';}
+    g+='<circle r="13" class="dm-led" stroke-width="2.4"/>';
+    svg.innerHTML=g;
+    var kabinler=KAT.map(function(k,i){
+      var d=document.createElement('button'); d.type='button'; d.className='dm-kabin'; d.style.setProperty('--kc',k.r);
+      d.setAttribute('aria-label',k.ad+' kategorisine git');
+      d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="dolap-menu/'+k.id+'.jpg" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"><div class="dm-boya"></div></div><span class="dm-ad">'+k.ad+'</span>';
+      d.addEventListener('click',function(){ if(surukledi) return; kategoriyeGit(k); });
+      sahne.appendChild(d); return d;
+    });
+    function kategoriyeGit(k){
+      var sube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE)?AKTIF_SUBE:'podyum';
+      var el=document.getElementById('cat-'+k.id+'-'+sube)||document.querySelector('#cat-list-'+sube+' .cat-section[data-kat*="'+k.ad+'"]');
+      if(!el) return;
+      if(!el.classList.contains('open')&&typeof toggleCat==='function') toggleCat(el.id);
+      setTimeout(function(){ var y=el.getBoundingClientRect().top+scrollY-120; scrollTo({top:y,behavior:'smooth'}); },160);
+    }
+    var aci=0,hiz=0,sal=0,tutuyor=false,surukledi=false,hedef=null,dongu=false,sonA=0,sonT=0,altI=-1;
+    function ciz(){
+      teker.style.transform='rotate('+aci.toFixed(2)+'deg)';
+      var W=sahne.clientWidth,R=W*109.5/240,c=W/2,kw=kabinler[0].offsetWidth;
+      var en=0,az=1e9;
+      kabinler.forEach(function(el,i){
+        var a=(i*ADIM+aci+180)*Math.PI/180;
+        el.style.transform='translate('+(c+Math.sin(a)*R-kw/2).toFixed(1)+'px,'+(c-Math.cos(a)*R).toFixed(1)+'px)';
+        el.firstChild.style.rotate=sal.toFixed(2)+'deg';
+        var u=((i*ADIM+aci)%360+360)%360, dd=Math.min(u,360-u); if(dd<az){az=dd;en=i;}
+      });
+      if(en!==altI){ if(altI>=0) kabinler[altI].classList.remove('alt'); altI=en; kabinler[en].classList.add('alt'); }
+    }
+    function adim(){
+      if(!tutuyor){
+        if(hedef!==null){var f=hedef-aci; hiz=f*.12; if(Math.abs(f)<.05){aci=hedef;hiz=0;hedef=null;}}
+        else if(Math.abs(hiz)>.25){hiz*=.955;}
+        else{hedef=Math.round(aci/ADIM)*ADIM;}
+        aci+=hiz;
+      }
+      sal+=(Math.max(-16,Math.min(16,-hiz*2.4))-sal)*.14;
+      ciz();
+      if(tutuyor||hedef!==null||Math.abs(hiz)>.01||Math.abs(sal)>.05) requestAnimationFrame(adim); else {sal=0;ciz();dongu=false;}
+    }
+    function baslat(){ if(!dongu){dongu=true;requestAnimationFrame(adim);} }
+    function isaretAci(e){var r=teker.getBoundingClientRect(); return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))*180/Math.PI;}
+    sahne.addEventListener('pointerdown',function(e){ tutuyor=true; surukledi=false; hedef=null; hiz=0; sonA=isaretAci(e); sonT=performance.now(); sahne.classList.add('tut'); baslat(); });
+    sahne.addEventListener('pointermove',function(e){
+      if(!tutuyor) return;
+      var a=isaretAci(e), d=a-sonA; if(d>180) d-=360; if(d<-180) d+=360;
+      if(Math.abs(d)>.6 && !surukledi){ surukledi=true; try{sahne.setPointerCapture(e.pointerId);}catch(_){} }
+      var t=performance.now(), dt=Math.max(8,t-sonT);
+      aci+=d; hiz=hiz*.5+(d*16/dt)*.5; sonA=a; sonT=t;
+    });
+    function birak(){ if(!tutuyor) return; tutuyor=false; sahne.classList.remove('tut'); if(performance.now()-sonT>90) hiz=0; baslat(); setTimeout(function(){surukledi=false;},0); }
+    sahne.addEventListener('pointerup',birak); sahne.addEventListener('pointercancel',birak); sahne.addEventListener('pointerleave',function(){ if(tutuyor&&!surukledi) birak(); });
+    addEventListener('resize',ciz);
+    requestAnimationFrame(ciz); setTimeout(ciz,400);
+  })();
+  </script>
   <div class="cat-list" id="cat-list-podyum"></div>
 </div>
 

@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-donme-dolap-r2'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-donme-dolap-r4'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -949,12 +949,12 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
   @keyframes dmRenk{0%,100%{stroke:#fff6dc}25%{stroke:#ff5fd2}50%{stroke:#62e6ff}75%{stroke:#ffd34d}}
   .dm-neon{fill:none;animation:dmNeon 2.6s ease-in-out infinite}
   @keyframes dmNeon{0%,100%{stroke:#3fa9ff;opacity:.95}50%{stroke:#b45cff;opacity:.6}}
-  .dm-kabin{position:absolute;left:0;top:0;width:22%;aspect-ratio:360/465;will-change:transform;z-index:2;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;-webkit-appearance:none;appearance:none;border-radius:0;min-width:0;min-height:0;font:inherit;color:inherit}
+  .dm-kabin{position:absolute;left:0;top:0;width:22%;aspect-ratio:360/528;will-change:transform;z-index:2;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;-webkit-appearance:none;appearance:none;border-radius:0;min-width:0;min-height:0;font:inherit;color:inherit}
   .dm-sal{position:absolute;inset:0;transform-origin:50% 0;transition:scale .4s cubic-bezier(.2,.8,.2,1)}
-  .dm-cam{position:absolute;left:32.4%;top:63.9%;width:35.2%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
+  .dm-cam{position:absolute;left:21.5%;top:44.8%;width:57%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#0a1611}
   .dm-cam img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04)}
   .dm-govde{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;filter:drop-shadow(0 8px 12px rgba(0,0,0,.55))}
-  .dm-ad{position:absolute;left:50%;top:101%;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+  .dm-ad{position:absolute;left:50%;top:97%;transform:translateX(-50%);white-space:normal;width:118%;line-height:1.15;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.95)}
   .dm-kabin:hover .dm-sal,.dm-kabin:focus-visible .dm-sal{scale:1.1}
   .dm-kabin.alt .dm-sal{scale:1.14}
   .dm-ipucu{position:relative;z-index:2;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.55);margin-top:4px}
@@ -988,35 +988,53 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
   </section>
   <script>
   (function(){
-    var KAT=[
-      {id:'waffle',ad:'Waffle',r:'#b8860b'},{id:'kokteyl',ad:'Kokteyl',r:'#c2447e'},{id:'sicak',ad:'Sıcak',r:'#a86b32'},
-      {id:'soguk',ad:'Soğuk',r:'#2e7fa8'},{id:'vitamin',ad:'Vitamin',r:'#d97a1f'},{id:'tatlilar',ad:'Tatlılar',r:'#c05a5a'},
-      {id:'cay',ad:'Çaylar',r:'#3e7d46'},{id:'tost',ad:'Tostlar',r:'#8a5a36'}
-    ];
-    var N=KAT.length, ADIM=360/N, sahne=document.getElementById('dmSahne'), teker=document.getElementById('dmTeker'), svg=document.getElementById('dmSvg');
+    var sahne=document.getElementById('dmSahne'), teker=document.getElementById('dmTeker'), svg=document.getElementById('dmSvg');
     if(!sahne) return;
+    var FOTO={waffle:1,kokteyl:1,sicak:1,soguk:1,vitamin:1,tatlilar:1,cay:1,tost:1};
+    var KAT=[], N=0, ADIM=45, kabinler=[], imza='';
     function P(r,a){return [(Math.sin(a)*r).toFixed(2),(-Math.cos(a)*r).toFixed(2)];}
-    var rad=function(d){return d*Math.PI/180;};
-    var g='<circle r="109.5" class="dm-neon" stroke-width="5" opacity=".22"/><circle r="111.5" class="dm-neon" stroke-width="1.4"/><circle r="106" class="dm-led" stroke-width="2.6"/><circle r="100" class="dm-led b" stroke-width="2.2"/>';
-    for(var i=0;i<N;i++){var p=P(109.5,rad(i*ADIM+180)); g+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="#fff" stroke="#9aa3a8" stroke-width=".8"/>';}
-    g+='<circle r="13" class="dm-led" stroke-width="2.4"/>';
-    svg.innerHTML=g;
-    var kabinler=KAT.map(function(k,i){
-      var d=document.createElement('button'); d.type='button'; d.className='dm-kabin';
-      d.setAttribute('aria-label',k.ad+' kategorisine git');
-      d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="dolap-menu/'+k.id+'.jpg" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"></div><span class="dm-ad">'+k.ad+'</span>';
-      d.addEventListener('click',function(){ if(surukledi) return; kategoriyeGit(k); });
-      sahne.appendChild(d); return d;
-    });
+    function rad(d){return d*Math.PI/180;}
+    function sube(){return (typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE)?AKTIF_SUBE:'podyum';}
+    // Kabinleri menüde gerçekten görünen kategorilerden kur (ad, sıra ve sayı menüyle birebir)
+    function menudenOku(){
+      var liste=document.getElementById('cat-list-'+sube()); if(!liste) return [];
+      return [].slice.call(liste.querySelectorAll('.cat-section[id^="cat-"]')).filter(function(k){return k.offsetParent!==null||k.style.display!=='none';}).map(function(k){
+        var id=k.id.replace(/^cat-/,'').replace(new RegExp('-'+sube()+'$'),'');
+        var ad=(k.dataset.kat||'').replace(/^[^\p{L}\p{N}]+/u,'').trim();
+        var img=k.querySelector('.product-card img[src]');
+        var foto=FOTO[id]?'dolap-menu/'+id+'.jpg':(img?img.getAttribute('src'):'dolap-menu/waffle.jpg');
+        return {el:k.id,id:id,ad:ad,foto:foto};
+      }).filter(function(k){return k.ad;});
+    }
+    function kur(){
+      var yeniKat=menudenOku(); if(!yeniKat.length) return;
+      var im=yeniKat.map(function(k){return k.el+':'+k.ad;}).join('|'); if(im===imza) return; imza=im;
+      KAT=yeniKat; N=KAT.length; ADIM=360/N;
+      var g='<circle r="109.5" class="dm-neon" stroke-width="5" opacity=".22"/><circle r="111.5" class="dm-neon" stroke-width="1.4"/><circle r="106" class="dm-led" stroke-width="2.6"/><circle r="100" class="dm-led b" stroke-width="2.2"/>';
+      for(var i=0;i<N;i++){var p=P(109.5,rad(i*ADIM+180)); g+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="#fff" stroke="#9aa3a8" stroke-width=".8"/>';}
+      g+='<circle r="13" class="dm-led" stroke-width="2.4"/>';
+      svg.innerHTML=g;
+      kabinler.forEach(function(k){k.remove();});
+      kabinler=KAT.map(function(k){
+        var d=document.createElement('button'); d.type='button'; d.className='dm-kabin';
+        d.setAttribute('aria-label',k.ad+' kategorisine git');
+        d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="'+k.foto+'" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"></div><span class="dm-ad">'+k.ad+'</span>';
+        d.addEventListener('click',function(){ if(surukledi) return; kategoriyeGit(k); });
+        sahne.appendChild(d); return d;
+      });
+      // kabin genişliği kabin sayısına göre (çok kabinde küçülür)
+      var gen=Math.max(15,Math.min(23,170/N));
+      kabinler.forEach(function(d){d.style.width=gen+'%';});
+      altI=-1; aci=Math.round(aci/ADIM)*ADIM; ciz();
+    }
     function kategoriyeGit(k){
-      var sube=(typeof AKTIF_SUBE!=='undefined'&&AKTIF_SUBE)?AKTIF_SUBE:'podyum';
-      var el=document.getElementById('cat-'+k.id+'-'+sube)||document.querySelector('#cat-list-'+sube+' .cat-section[data-kat*="'+k.ad+'"]');
-      if(!el) return;
+      var el=document.getElementById(k.el); if(!el) return;
       if(!el.classList.contains('open')&&typeof toggleCat==='function') toggleCat(el.id);
       setTimeout(function(){ var y=el.getBoundingClientRect().top+scrollY-120; scrollTo({top:y,behavior:'smooth'}); },160);
     }
     var aci=0,hiz=0,sal=0,tutuyor=false,surukledi=false,hedef=null,dongu=false,sonA=0,sonT=0,altI=-1;
     function ciz(){
+      if(!N) return;
       teker.style.transform='rotate('+aci.toFixed(2)+'deg)';
       var W=sahne.clientWidth,R=W*109.5/240,c=W/2,kw=kabinler[0].offsetWidth;
       var en=0,az=1e9;
@@ -1026,7 +1044,7 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
         el.firstChild.style.rotate=sal.toFixed(2)+'deg';
         var u=((i*ADIM+aci)%360+360)%360, dd=Math.min(u,360-u); if(dd<az){az=dd;en=i;}
       });
-      if(en!==altI){ if(altI>=0) kabinler[altI].classList.remove('alt'); altI=en; kabinler[en].classList.add('alt'); }
+      if(en!==altI){ if(altI>=0&&kabinler[altI]) kabinler[altI].classList.remove('alt'); altI=en; kabinler[en].classList.add('alt'); }
     }
     function adim(){
       if(!tutuyor){
@@ -1041,7 +1059,7 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
     }
     function baslat(){ if(!dongu){dongu=true;requestAnimationFrame(adim);} }
     function isaretAci(e){var r=teker.getBoundingClientRect(); return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))*180/Math.PI;}
-    sahne.addEventListener('pointerdown',function(e){ tutuyor=true; surukledi=false; hedef=null; hiz=0; sonA=isaretAci(e); sonT=performance.now(); sahne.classList.add('tut'); baslat(); });
+    sahne.addEventListener('pointerdown',function(e){ if(!N) return; tutuyor=true; surukledi=false; hedef=null; hiz=0; sonA=isaretAci(e); sonT=performance.now(); sahne.classList.add('tut'); baslat(); });
     sahne.addEventListener('pointermove',function(e){
       if(!tutuyor) return;
       var a=isaretAci(e), d=a-sonA; if(d>180) d-=360; if(d<-180) d+=360;
@@ -1052,7 +1070,10 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
     function birak(){ if(!tutuyor) return; tutuyor=false; sahne.classList.remove('tut'); if(performance.now()-sonT>90) hiz=0; baslat(); setTimeout(function(){surukledi=false;},0); }
     sahne.addEventListener('pointerup',birak); sahne.addEventListener('pointercancel',birak); sahne.addEventListener('pointerleave',function(){ if(tutuyor&&!surukledi) birak(); });
     addEventListener('resize',ciz);
-    requestAnimationFrame(ciz); setTimeout(ciz,400);
+    // Menü yüklenince ve değişince (şube/panel güncellemesi) kabinleri yeniden kur
+    function izle(){ var l=document.getElementById('cat-list-'+sube()); if(l) new MutationObserver(function(){ clearTimeout(izle.t); izle.t=setTimeout(kur,120); }).observe(l,{childList:true}); kur(); }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',izle); else izle();
+    var deneme=0, aralik=setInterval(function(){ kur(); if(N||++deneme>40) clearInterval(aralik); },300);
   })();
   </script>
   <div class="cat-list" id="cat-list-podyum"></div>

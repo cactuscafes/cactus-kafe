@@ -726,6 +726,57 @@ function biletCiz(dolu, hak, onceki, svgId){
 @media(max-width:900px){.app-sec{padding:44px 20px 48px;}.app-inner{grid-template-columns:1fr;gap:18px;}.app-gorsel{order:-1;}.app-sahne{padding:4px 70px 8px;}.app-tel{width:min(145px,40vw);border-radius:28px;padding:6px;transform:rotate(-2deg);}.app-ekran{border-radius:23px;}.app-ekran::before{width:46px;height:13px;top:6px;border-radius:8px;}.app-rozet.rekor{top:38%;left:0;padding:9px 12px;min-width:0;border-radius:14px;}.app-rozet.rekor .rk{font-size:8.5px;letter-spacing:1.8px;}.app-rozet.rekor .rk-no{font-size:26px;}.app-rozet.rekor .rk-alt{max-width:96px;font-size:9px;}.app-rozet.limon{display:none;}.app-sub{font-size:13px;margin-bottom:16px;}.app-adim{gap:8px 16px;margin-bottom:18px;}}
 @media(max-width:420px){.app-sahne{padding:4px 56px 8px;}}
 </style>
+<style>
+/* Cactus Jump: oyunun çöl/kum renkleri (yeşil sadakat bölümünden ayrışsın) + kompakt */
+#uygulama.app-sec{background:linear-gradient(160deg,#f7e6c4 0%,#f0cf95 60%,#e9b977 100%);color:#2b1d0e;padding:44px 60px}
+#uygulama.app-sec::before{background:radial-gradient(ellipse at 85% 20%,rgba(255,255,255,.45) 0%,transparent 45%),radial-gradient(circle at 12% 90%,rgba(194,86,43,.12) 0%,transparent 40%)}
+#uygulama.app-sec::after{display:none}
+#uygulama .app-inner{grid-template-columns:1.3fr .7fr;gap:30px}
+#uygulama .app-eyebrow{color:#a8461f;margin-bottom:10px}
+#uygulama .app-eyebrow::before{background:#a8461f}
+#uygulama .app-title{color:#2b1d0e;font-size:clamp(28px,3vw,40px);margin-bottom:10px}
+#uygulama .app-title em{color:#c2562b}
+#uygulama .app-sub{color:rgba(43,29,14,.75);font-size:13px;margin-bottom:14px}
+#uygulama .app-odul{background:rgba(255,255,255,.5);border-color:rgba(168,70,31,.35);margin-bottom:14px;padding:10px 14px}
+#uygulama .app-odul b{color:#7a2f12}
+#uygulama .app-odul span{color:rgba(43,29,14,.72)}
+#uygulama .app-adim{display:none}
+#uygulama .app-cta{background:#2b1d0e;color:#f7e6c4}
+#uygulama .app-cta small{color:#d9b98a}
+#uygulama .app-dene{color:#a8461f;border-color:rgba(168,70,31,.45)}
+#uygulama .app-not{color:rgba(43,29,14,.6);margin-top:12px;font-size:10.5px}
+#uygulama .app-not b{color:rgba(43,29,14,.85)}
+#uygulama .app-not a{color:#a8461f!important}
+#uygulama .app-tel{width:min(180px,100%);box-shadow:0 30px 60px rgba(90,50,10,.35),0 0 0 1.5px rgba(0,0,0,.15)}
+#uygulama .app-sahne{padding:4px 40px 8px}
+#uygulama .app-rozet{background:rgba(43,29,14,.88);border-color:rgba(240,199,140,.5)}
+#uygulama .app-rozet.rekor{padding:10px 14px;min-width:120px}
+#uygulama .app-rozet.rekor .rk-no{font-size:30px}
+@media(max-width:900px){
+  #uygulama.app-sec{padding:26px 16px 24px}
+  #uygulama .app-inner{grid-template-columns:104px 1fr;gap:16px;align-items:center}
+  #uygulama .app-gorsel{order:-1}
+  #uygulama .app-sahne{padding:0}
+  #uygulama .app-tel{width:104px;border-radius:22px;padding:5px;transform:rotate(-3deg)}
+  #uygulama .app-ekran{border-radius:18px}
+  #uygulama .app-ekran::before{width:34px;height:10px;top:5px}
+  #uygulama .app-rozet{display:none}
+  #uygulama .app-eyebrow{font-size:8.5px;letter-spacing:2px;margin-bottom:6px}
+  #uygulama .app-eyebrow::before{width:14px}
+  #uygulama .app-title{font-size:23px;margin-bottom:8px}
+  #uygulama .app-sub,#uygulama .app-not{display:none}
+  #uygulama .app-odul{padding:7px 10px;gap:8px;margin-bottom:10px;border-radius:12px}
+  #uygulama .app-odul .ai{font-size:20px}
+  #uygulama .app-odul b{font-size:12px;margin:0}
+  #uygulama .app-odul div span{display:none}
+  #uygulama .app-cta-sat{gap:10px 14px}
+  #uygulama .app-cta{padding:9px 12px 9px 10px;border-radius:11px;gap:8px}
+  #uygulama .app-cta svg{width:20px;height:20px}
+  #uygulama .app-cta b{font-size:13px}
+  #uygulama .app-cta small{font-size:8.5px}
+  #uygulama .app-dene{font-size:11.5px}
+}
+</style>
 <section class="app-sec" id="uygulama">
   <div class="app-inner">
     <div>

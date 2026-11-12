@@ -244,6 +244,29 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 
 /* Gizle/Göster */
 .sayfa{display:none;}.sayfa.on{display:block;}
+
+/* ═══ LUNAPARK BİLETİ KARTI ═══ */
+.dijital-kart.bilet{background:none!important;border:0!important;box-shadow:none!important;border-radius:0;overflow:visible;position:relative;aspect-ratio:672/1020;max-width:400px;margin:0 auto 14px;container-type:inline-size;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45));transform:rotate(-1.2deg)}
+.bilet-zemin{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
+.bilet-dolap{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.bilet-sayac{position:absolute;left:50%;top:53.9%;transform:translate(-50%,-50%);font-family:'Anton','Impact',sans-serif;font-size:6.2cqw;color:#1f3d2b;line-height:1;letter-spacing:.5px}
+.bilet-sayac .dk-pul-say{all:unset;font:inherit;color:inherit}
+.bilet-uye{position:absolute;left:14%;top:80.2%;width:52%;font-family:'Space Mono',ui-monospace,monospace;color:#1f3d2b;text-transform:uppercase;line-height:1.15}
+.bilet-uye span{display:block;font-size:2.4cqw;letter-spacing:.3em;color:#9a7a3a}
+.bilet-uye .dk-ad{all:unset;display:block;font-family:'Space Mono',ui-monospace,monospace;font-weight:700;font-size:3.8cqw;color:#1f3d2b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bilet-alt{max-width:400px;margin:0 auto 22px;text-align:center}
+.bilet-alt .dk-nudge{all:unset;display:inline-block;font-family:'Anton','Impact',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;color:#0e1f08;background:#e8c47a;padding:5px 12px 3px;transform:rotate(-1.5deg);box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.bilet-hak{margin-top:12px;font-family:'Space Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,234,216,.75);display:flex;justify-content:center;gap:10px;align-items:baseline}
+.bilet-hak b{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;letter-spacing:0;color:#e8c47a}
+.bk-kabin{transition:transform .3s}
+.bk-kabin.sira .bk-govde{animation:bkSira 1.4s ease-in-out infinite}
+@keyframes bkSira{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.bk-kabin.zimba{transform-box:fill-box;transform-origin:50% 0;animation:bkZimbaKabin .7s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes bkZimbaKabin{0%{transform:scale(.3) rotate(-25deg);opacity:0}60%{transform:scale(1.25) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.bilet-cark{transform-box:view-box;transform-origin:336px 550px}
+.dijital-kart.bilet.bk-giris .bilet-cark{animation:bkCarkDon 1.6s cubic-bezier(.2,.8,.2,1) calc(var(--bk-g,0s) + .2s) both}
+@keyframes bkCarkDon{from{transform:rotate(-200deg)}to{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){.bk-kabin.sira .bk-govde,.bk-kabin.zimba,.dijital-kart.bilet.bk-giris .bilet-cark{animation:none}}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 </head>
@@ -324,31 +347,19 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
   <div class="kart-bg">
     <div class="kart-wrap">
 
-      <!-- Dijital kart — brutalist poster -->
-      <div class="dijital-kart">
-        <div class="bk-ust">
-          <h2 class="bk-logo" aria-label="Cactus"><span aria-hidden="true" style="--h:0">C</span><span aria-hidden="true" style="--h:1">a</span><span aria-hidden="true" style="--h:2">c</span><span aria-hidden="true" style="--h:3">t</span><span aria-hidden="true" style="--h:4">u</span><span aria-hidden="true" style="--h:5">s</span></h2>
-          <div class="bk-logo-alt"><span>COFFEE</span><span>BURSA</span></div>
-        </div>
-        <div class="bk-bant">Sadakat Kartı</div>
-        <div class="bk-orta">
-          <div class="bk-uye"><span class="bk-etiket">Üye</span><div class="dk-ad" id="dkAd">Üye</div></div>
-          <div class="bk-sayac"><span class="bk-etiket">Yıldız</span><div class="dk-pul-say" id="dkPulSay">0/7</div></div>
-        </div>
-        <div class="bk-kagit">
-          <div class="pul-grid" id="pulGrid"></div>
-          <div class="dk-nudge" id="dkNudge"></div>
-          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
-          <div class="dk-alt">
-            <div class="dk-pul-lbl">7 yıldız = 1 bedava içecek</div>
-            <div style="text-align:right">
-              <div class="dk-hediye-no" id="dkHediyeNo">0 hak</div>
-              <div class="dk-hediye-txt">Bedava içecek</div>
-            </div>
-          </div>
-        </div>
+      <!-- Dijital kart — lunapark bileti + dönme dolap (her yıldız bir kabin) -->
+      <div class="dijital-kart bilet">
+        <img class="bilet-zemin" src="bilet-kart.webp" alt="" draggable="false">
+        <svg class="bilet-dolap" id="biletDolap" viewBox="0 0 672 1020" aria-hidden="true"></svg>
+        <div class="bilet-sayac"><span class="dk-pul-say" id="dkPulSay">0/7</span></div>
+        <div class="bilet-uye"><span>Üye</span><b class="dk-ad" id="dkAd">Üye</b></div>
       </div>
-
+      <div class="bilet-alt">
+        <div class="dk-nudge" id="dkNudge"></div>
+        <div class="bilet-hak"><b id="dkHediyeNo">0 hak</b><span>Bedava içecek · 7 kabin = 1 tur</span></div>
+        <div class="progress-bar-wrap" hidden><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+        <div id="pulGrid" hidden></div>
+      </div>
 
       <!-- Oyun daveti -->
       <a class="oyun-davet" href="oyunlar.html">
@@ -627,23 +638,48 @@ function kartGoster(m, oncekiGoster){
   var pct = Math.round((gosterPul/ESIK)*100);
   setTimeout(function(){document.getElementById('progressBar').style.width=pct+'%';},100);
 
-  // Pul ızgarası (yeni eklenenlere pop animasyonu)
-  var grid=document.getElementById('pulGrid');
-  grid.innerHTML='';
-  for(var i=0;i<ESIK;i++){
-    var div=document.createElement('div');
-    if(i<gosterPul){ div.className='pul dolu'+(i===gosterPul-1?' son':''); if(oncekiGoster!=null && i>=oncekiGoster) div.className+=' pop'; }
-    else if(i===gosterPul&&gosterPul<ESIK) div.className='pul next';
-    else div.className='pul';
-    div.setAttribute('data-n', i+1); div.style.setProperty('--s', i);
-    div.innerHTML='<i>'+(i<gosterPul?'':(i+1))+'</i>';
-    grid.appendChild(div);
-  }
-  var hd=document.createElement('div');
-  hd.className='pul hediye'; hd.setAttribute('data-n', ESIK+1);
-  hd.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#0a0a0a" stroke-width="4" stroke-linejoin="miter" aria-hidden="true"><rect x="7" y="18" width="34" height="9"/><rect x="10" y="27" width="28" height="15"/><path d="M24 18v24M24 18c-3-8-12-9-12-3s9 3 12 3c3 0 12 3 12-3s-9-5-12 3"/></svg><b>Bedava<br>içecek</b>';
-  grid.appendChild(hd);
+  biletCiz(gosterPul, bedavaHak, oncekiGoster);
   kartPollBasla();
+}
+// Lunapark bileti: 7 kabinli dönme dolap — dolu kabin = yıldız, 7. kabin hediye
+function biletCiz(dolu, hak, onceki){
+  var svg=document.getElementById('biletDolap'); if(!svg) return;
+  var CX=336, CY=550, R=170, N=7, Y='#1f3d2b', A='#b8924a', K='#f6efdf';
+  var g='';
+  // ayaklar ve zemin
+  g+='<g stroke="'+Y+'" stroke-linecap="round" fill="none"><path d="M336 550 L238 765 M336 550 L434 765" stroke-width="8"/><path d="M262 712 L410 712 M284 664 L388 664" stroke-width="3.5"/><path d="M206 768 L466 768" stroke-width="6"/></g>';
+  // çember, kollar
+  g+='<g class="bilet-cark">';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="'+Y+'" stroke-width="6"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+(R-12)+'" fill="none" stroke="'+A+'" stroke-width="2.5"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="96" fill="none" stroke="'+A+'" stroke-width="2" stroke-dasharray="3 6"/>';
+  for(var s=0;s<14;s++){ var t=s/14*Math.PI*2; g+='<line x1="'+(CX+Math.sin(t)*44).toFixed(1)+'" y1="'+(CY-Math.cos(t)*44).toFixed(1)+'" x2="'+(CX+Math.sin(t)*(R-12)).toFixed(1)+'" y2="'+(CY-Math.cos(t)*(R-12)).toFixed(1)+'" stroke="'+Y+'" stroke-width="2.6"/>'; }
+  for(var s2=0;s2<28;s2++){ var t2=s2/28*Math.PI*2; g+='<circle cx="'+(CX+Math.sin(t2)*(R-6)).toFixed(1)+'" cy="'+(CY-Math.cos(t2)*(R-6)).toFixed(1)+'" r="2.2" fill="'+A+'"/>'; }
+  g+='</g>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="44" fill="'+K+'" stroke="'+Y+'" stroke-width="5"/><circle cx="'+CX+'" cy="'+CY+'" r="37" fill="none" stroke="'+A+'" stroke-width="2"/>';
+  // kabinler (saat 12'den saat yönünde)
+  for(var k=0;k<N;k++){
+    var th=k/N*Math.PI*2, px=CX+Math.sin(th)*R, py=CY-Math.cos(th)*R;
+    var hediye=(k===N-1), dolu_mu=hediye?hak>0:(k<dolu), sira=!hediye&&k===dolu, yeni=!hediye&&onceki!=null&&k>=onceki&&k<dolu;
+    var dolgu=dolu_mu?'#c9a24a':K;
+    var cls='bk-kabin'+(sira?' sira':'')+(yeni?' zimba':'');
+    var x=px, y=py;
+    g+='<g class="'+cls+'">';
+    g+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+Y+'"/>';
+    g+='<line x1="'+x.toFixed(1)+'" y1="'+y.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+(y+14).toFixed(1)+'" stroke="'+Y+'" stroke-width="3"/>';
+    g+='<path d="M'+(x-27).toFixed(1)+' '+(y+22).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+4).toFixed(1)+' '+(x+27).toFixed(1)+' '+(y+22).toFixed(1)+' Z" fill="'+(dolu_mu?'#1f3d2b':A)+'" stroke="'+Y+'" stroke-width="3" stroke-linejoin="round"/>';
+    g+='<path class="bk-govde" d="M'+(x-24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+21).toFixed(1)+' '+(y+52).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+66).toFixed(1)+' '+(x-21).toFixed(1)+' '+(y+52).toFixed(1)+' Z" fill="'+dolgu+'" stroke="'+Y+'" stroke-width="3.5" stroke-linejoin="round"'+(sira?' stroke-dasharray="6 5"':'')+'/>';
+    if(hediye){
+      var c=dolu_mu?Y:Y;
+      g+='<g fill="none" stroke="'+c+'" stroke-width="2.6" stroke-linejoin="round"><rect x="'+(x-11).toFixed(1)+'" y="'+(y+33).toFixed(1)+'" width="22" height="16"/><path d="M'+(x-13).toFixed(1)+' '+(y+33).toFixed(1)+' h26 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' v16 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' c-3-7-11-7-11-2 s8 2 11 2 c3 0 11 0 11-2 s-8-5-11 2"/></g>';
+    } else if(dolu_mu){
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+49).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="22" fill="'+Y+'">★</text>';
+    } else {
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+48).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="19" fill="'+Y+'" opacity=".55">'+(k+1)+'</text>';
+    }
+    g+='</g>';
+  }
+  svg.innerHTML=g;
 }
 function kartPollBasla(){
   if(_kartPollKuruldu) return;

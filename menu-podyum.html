@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-sadakat-aykiri-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-bilet-r1'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -878,55 +878,96 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 
 <!-- SADAKAT KARTI BANNER -->
 <style>
-.skp{--lm:#d6ff2e;--kg:#efede4;--sy:#0a0a0a;position:relative;background:var(--sy);color:#fff;padding:96px 48px 40px;overflow:hidden;font-family:'Space Mono',ui-monospace,monospace}
-.skp::before{content:"";position:absolute;left:0;right:0;top:68px;height:12px;background:repeating-linear-gradient(-45deg,var(--lm) 0 14px,var(--sy) 14px 28px)}
-.skp-ic{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;position:relative}
-.skp-ust{display:inline-block;background:var(--lm);color:var(--sy);font-size:10px;font-weight:700;letter-spacing:3px;padding:5px 10px;text-transform:uppercase;transform:rotate(-1.5deg)}
-.skp-baslik{font-family:'Anton','Impact',sans-serif;font-weight:400;text-transform:uppercase;line-height:.88;font-size:clamp(54px,8vw,112px);margin:14px 0 0;letter-spacing:-.5px}
-.skp-baslik span{display:inline-block;background:var(--lm);color:var(--sy);padding:0 .08em;transform:rotate(-2deg);box-shadow:6px 6px 0 #fff}
-.skp-alt{font-size:12px;line-height:1.7;color:rgba(255,255,255,.72);max-width:44ch;margin:18px 0 0}
-.skp-cta{display:inline-block;margin-top:20px;background:var(--lm);color:var(--sy);text-decoration:none;font-family:'Anton','Impact',sans-serif;font-size:20px;letter-spacing:1px;text-transform:uppercase;padding:12px 20px 10px;border:3px solid var(--sy);box-shadow:6px 6px 0 #fff;transition:transform .08s,box-shadow .08s}
-.skp-cta:active{transform:translate(4px,4px);box-shadow:2px 2px 0 #fff}
-.skp-fis{position:relative;background:var(--kg);color:var(--sy);padding:18px 18px 16px;transform:rotate(2deg);box-shadow:10px 10px 0 var(--lm);-webkit-mask:radial-gradient(circle 7px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 7px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
-.skp-fis-ust{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--sy);padding-bottom:8px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
-.skp-fis-ust b{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:0;font-weight:400}
-.skp-delik{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0 10px}
-.skp-delik i{aspect-ratio:1;border:2.5px solid var(--sy);border-radius:50%;display:grid;place-items:center;font-style:normal;font-family:'Anton',sans-serif;font-size:13px}
-.skp-delik i.d{background:var(--sy);color:var(--lm)}
-.skp-delik i.s{border-style:dashed;animation:skpNabiz 1.6s ease-in-out infinite}
-.skp-delik i.h{background:var(--lm);border-color:var(--sy)}
-@keyframes skpNabiz{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-.skp-fis-alt{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;display:flex;justify-content:space-between}
-.skp-bant{position:relative;display:block;width:fit-content;margin:14px 0 2px auto;background:#ff3d2e;color:#fff;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;text-transform:uppercase;padding:8px 14px 6px;transform:rotate(-4deg);box-shadow:4px 4px 0 var(--sy);max-width:300px;line-height:1.15;border:2px solid var(--sy)}
+.blt{position:relative;background:radial-gradient(ellipse 70% 80% at 75% 50%,#244a33 0%,#173322 55%,#0f2418 100%);color:#f3ead8;padding:92px 40px 34px;overflow:hidden}
+.blt::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(#c9a24a 1px,transparent 1.2px);background-size:22px 22px;opacity:.08}
+.blt-ic{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center;position:relative}
+.blt-ust{font-family:'Space Mono',ui-monospace,monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#c9a24a}
+.blt-baslik{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(30px,4.6vw,54px);line-height:1.05;margin:10px 0 0}
+.blt-baslik em{font-style:italic;color:#e8c47a}
+.blt-alt{font-size:12.5px;line-height:1.7;color:rgba(243,234,216,.72);max-width:44ch;margin:12px 0 0}
+.blt-cta{display:inline-block;margin-top:18px;padding:12px 24px;background:#e8c47a;color:#14281c;text-decoration:none;font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;border-radius:2px;box-shadow:0 0 0 1px #14281c inset,4px 4px 0 rgba(0,0,0,.35)}
+.blt-not{margin-top:14px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#e8c47a;display:flex;gap:8px;align-items:center}
+.blt-not::before{content:"✱";font-size:14px}
+.blt-bilet{position:relative;width:min(100%,250px);aspect-ratio:672/1020;justify-self:center;transform:rotate(3deg);filter:drop-shadow(0 16px 22px rgba(0,0,0,.5));container-type:inline-size}
+.blt-bilet img{position:absolute;inset:0;width:100%;height:100%}
+.blt-bilet svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.blt-sayac{position:absolute;left:50%;top:53.9%;transform:translate(-50%,-50%);font-family:'Anton',sans-serif;font-size:6.2cqw;color:#1f3d2b;line-height:1}
+.blt-uye{position:absolute;left:14%;top:80.2%;width:52%;font-family:'Space Mono',monospace;font-weight:700;font-size:3.8cqw;color:#1f3d2b;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blt-uye small{display:block;font-weight:400;font-size:2.4cqw;letter-spacing:.3em;color:#9a7a3a}
+.bk-kabin.sira .bk-govde{animation:bltSira 1.4s ease-in-out infinite}
+@keyframes bltSira{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
 @media(max-width:768px){
-  .skp{padding:74px 16px 30px}
-  .skp::before{top:58px;height:9px}
-  .skp-ic{grid-template-columns:1fr;gap:22px}
-  .skp-baslik{font-size:52px;margin-top:10px}
-  .skp-baslik span{box-shadow:4px 4px 0 #fff}
-  .skp-alt{font-size:11px;margin-top:12px}
-  .skp-cta{font-size:16px;padding:10px 14px 8px;margin-top:14px;box-shadow:4px 4px 0 #fff}
-  .skp-fis{transform:rotate(1.2deg);box-shadow:7px 7px 0 var(--lm);margin:0 6px 8px}
-  .skp-bant{font-size:12.5px;max-width:240px}
+  .blt{padding:72px 16px 24px}
+  .blt-ic{grid-template-columns:1fr 128px;gap:12px;align-items:start}
+  .blt-ust{font-size:9px;letter-spacing:2px}
+  .blt-baslik{font-size:26px}
+  .blt-alt{display:none}
+  .blt-cta{padding:9px 14px;font-size:9.5px;letter-spacing:1.8px;margin-top:12px}
+  .blt-not{font-size:9.5px;margin-top:10px}
+  .blt-bilet{width:128px;transform:rotate(4deg);margin-top:4px}
 }
-@media(prefers-reduced-motion:reduce){.skp-delik i.s{animation:none}}
+@media(prefers-reduced-motion:reduce){.bk-kabin.sira .bk-govde{animation:none}}
 </style>
-<section class="skp" aria-label="Dijital sadakat kartı">
-  <div class="skp-ic">
+<section class="blt" aria-label="Dijital sadakat kartı">
+  <div class="blt-ic">
     <div>
-      <span class="skp-ust">Sadakat kartı · kâğıt değil</span>
-      <h2 class="skp-baslik">7 iç.<br><span>1'i bizden.</span></h2>
-      <p class="skp-alt">Cüzdanda kart taşımak yok, uygulama indirmek yok. Telefon numaran yeter. Her içecekte bir yıldız; 7'yi doldur, bir içeceğin bizden.</p>
-      <a href="kart.html" class="skp-cta">Kartımı gör →</a>
+      <div class="blt-ust">Sadakat kartı · Tek tur</div>
+      <h2 class="blt-baslik">7 kabin dolunca<br><em>tur bizden.</em></h2>
+      <p class="blt-alt">Her içecekte dönme dolabın bir kabini dolar. Yedinci kabin dolunca bir içeceğin bizden. Kart yok, uygulama yok; telefon numaran yeter.</p>
+      <a href="kart.html" class="blt-cta">Biletimi gör →</a>
+      <div class="blt-not" id="bltNot">Kasada numaranı söylemeyi unutma.</div>
     </div>
-    <div class="skp-fis">
-      <div class="skp-fis-ust"><span>Cactus · Sadakat</span><b>3/7</b></div>
-      <div class="skp-delik"><i class="d">★</i><i class="d">★</i><i class="d">★</i><i class="s"></i><i></i><i></i><i class="h">🎁</i></div>
-      <div class="skp-fis-alt"><span>No: 05XX XXX XX XX</span><span>Devam →</span></div>
-      <div class="skp-bant">Numaranı kasiyere söyle. Söylemezsen yıldız yazılmaz.</div>
-    </div>
+    <a class="blt-bilet" href="kart.html" aria-label="Sadakat biletini aç">
+      <img src="bilet-kart.webp" alt="" loading="lazy">
+      <svg id="biletDolapMenu" viewBox="0 0 672 1020" aria-hidden="true"></svg>
+      <div class="blt-sayac" id="bltSayac">3/7</div>
+      <div class="blt-uye" id="bltUye"><small>Üye</small>Sen</div>
+    </a>
   </div>
 </section>
+<script>
+// Lunapark bileti: 7 kabinli dönme dolap — dolu kabin = yıldız, 7. kabin hediye
+function biletCiz(dolu, hak, onceki, svgId){
+  var svg=document.getElementById(svgId||'biletDolap'); if(!svg) return;
+  var CX=336, CY=550, R=170, N=7, Y='#1f3d2b', A='#b8924a', K='#f6efdf';
+  var g='';
+  // ayaklar ve zemin
+  g+='<g stroke="'+Y+'" stroke-linecap="round" fill="none"><path d="M336 550 L238 765 M336 550 L434 765" stroke-width="8"/><path d="M262 712 L410 712 M284 664 L388 664" stroke-width="3.5"/><path d="M206 768 L466 768" stroke-width="6"/></g>';
+  // çember, kollar
+  g+='<g class="bilet-cark">';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="'+Y+'" stroke-width="6"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+(R-12)+'" fill="none" stroke="'+A+'" stroke-width="2.5"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="96" fill="none" stroke="'+A+'" stroke-width="2" stroke-dasharray="3 6"/>';
+  for(var s=0;s<14;s++){ var t=s/14*Math.PI*2; g+='<line x1="'+(CX+Math.sin(t)*44).toFixed(1)+'" y1="'+(CY-Math.cos(t)*44).toFixed(1)+'" x2="'+(CX+Math.sin(t)*(R-12)).toFixed(1)+'" y2="'+(CY-Math.cos(t)*(R-12)).toFixed(1)+'" stroke="'+Y+'" stroke-width="2.6"/>'; }
+  for(var s2=0;s2<28;s2++){ var t2=s2/28*Math.PI*2; g+='<circle cx="'+(CX+Math.sin(t2)*(R-6)).toFixed(1)+'" cy="'+(CY-Math.cos(t2)*(R-6)).toFixed(1)+'" r="2.2" fill="'+A+'"/>'; }
+  g+='</g>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="44" fill="'+K+'" stroke="'+Y+'" stroke-width="5"/><circle cx="'+CX+'" cy="'+CY+'" r="37" fill="none" stroke="'+A+'" stroke-width="2"/>';
+  // kabinler (saat 12'den saat yönünde)
+  for(var k=0;k<N;k++){
+    var th=k/N*Math.PI*2, px=CX+Math.sin(th)*R, py=CY-Math.cos(th)*R;
+    var hediye=(k===N-1), dolu_mu=hediye?hak>0:(k<dolu), sira=!hediye&&k===dolu, yeni=!hediye&&onceki!=null&&k>=onceki&&k<dolu;
+    var dolgu=dolu_mu?'#c9a24a':K;
+    var cls='bk-kabin'+(sira?' sira':'')+(yeni?' zimba':'');
+    var x=px, y=py;
+    g+='<g class="'+cls+'">';
+    g+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+Y+'"/>';
+    g+='<line x1="'+x.toFixed(1)+'" y1="'+y.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+(y+14).toFixed(1)+'" stroke="'+Y+'" stroke-width="3"/>';
+    g+='<path d="M'+(x-27).toFixed(1)+' '+(y+22).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+4).toFixed(1)+' '+(x+27).toFixed(1)+' '+(y+22).toFixed(1)+' Z" fill="'+(dolu_mu?'#1f3d2b':A)+'" stroke="'+Y+'" stroke-width="3" stroke-linejoin="round"/>';
+    g+='<path class="bk-govde" d="M'+(x-24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+21).toFixed(1)+' '+(y+52).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+66).toFixed(1)+' '+(x-21).toFixed(1)+' '+(y+52).toFixed(1)+' Z" fill="'+dolgu+'" stroke="'+Y+'" stroke-width="3.5" stroke-linejoin="round"'+(sira?' stroke-dasharray="6 5"':'')+'/>';
+    if(hediye){
+      var c=dolu_mu?Y:Y;
+      g+='<g fill="none" stroke="'+c+'" stroke-width="2.6" stroke-linejoin="round"><rect x="'+(x-11).toFixed(1)+'" y="'+(y+33).toFixed(1)+'" width="22" height="16"/><path d="M'+(x-13).toFixed(1)+' '+(y+33).toFixed(1)+' h26 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' v16 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' c-3-7-11-7-11-2 s8 2 11 2 c3 0 11 0 11-2 s-8-5-11 2"/></g>';
+    } else if(dolu_mu){
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+49).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="22" fill="'+Y+'">★</text>';
+    } else {
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+48).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="19" fill="'+Y+'" opacity=".55">'+(k+1)+'</text>';
+    }
+    g+='</g>';
+  }
+  svg.innerHTML=g;
+}
+biletCiz(3,0,null,'biletDolapMenu');
+</script>
 
 <div class="menu-header">
   <div class="mh-titles">
@@ -1538,34 +1579,18 @@ function _sadakatBaslat(){
     }).catch(function(){});
 }
 function _sadakatCiz(m){
-  // Yeni (aykırı) sadakat bandını müşterinin gerçek yıldızlarıyla doldurur
-  var pul=Number(m.pul)||0;
-  var gosterPul=pul%ESIK_YILDIZ;
-  var bedavaHak=Math.floor(pul/ESIK_YILDIZ);
-  var ham=(m.ad||'').toString().trim();
-  var isim=ham?ham.split(/\s+/)[0]:''; if(isim.length<2) isim='';
-  var ttl=document.querySelector('.skp-baslik');
-  if(ttl){
-    var selam=isim?'Selam '+isim+'.':'Selam.';
-    ttl.innerHTML= bedavaHak>0 ? selam+'<br><span>'+bedavaHak+' içecek bizden.</span>' : selam+'<br><span>'+(ESIK_YILDIZ-gosterPul)+' yıldız kaldı.</span>';
-  }
-  var alt=document.querySelector('.skp-alt');
-  if(alt) alt.textContent = bedavaHak>0 ? 'Hediyen hazır. Kasada numaranı söyle, bedava içeceğini al.' : 'Her içecekte bir yıldız. Kasada numaranı söylemen yeterli.';
-  var grid=document.querySelector('.skp-delik');
-  if(grid){
-    var h='';
-    for(var i=0;i<ESIK_YILDIZ;i++){
-      if(i<gosterPul) h+='<i class="d">★</i>';
-      else if(i===gosterPul && i<ESIK_YILDIZ-1) h+='<i class="s"></i>';
-      else if(i===ESIK_YILDIZ-1) h+='<i class="h">🎁</i>';
-      else h+='<i></i>';
-    }
-    grid.innerHTML=h;
-  }
-  var say=document.querySelector('.skp-fis-ust b'); if(say) say.textContent=gosterPul+'/'+ESIK_YILDIZ;
+  // Lunapark bileti bandını müşterinin gerçek kabinleriyle doldurur
+  var pul=Number(m.pul)||0, gosterPul=pul%ESIK_YILDIZ, bedavaHak=Math.floor(pul/ESIK_YILDIZ);
+  var ham=(m.ad||'').toString().trim(); var isim=ham?ham.split(/\s+/)[0]:''; if(isim.length<2) isim='';
+  var ttl=document.querySelector('.blt-baslik');
+  if(ttl){ var selam=isim?'Selam '+isim+',':'Selam,';
+    ttl.innerHTML = bedavaHak>0 ? selam+'<br><em>'+bedavaHak+' turun bizden.</em>' : selam+'<br><em>'+(ESIK_YILDIZ-gosterPul)+' kabin kaldı.</em>'; }
+  var alt=document.querySelector('.blt-alt'); if(alt) alt.textContent = bedavaHak>0 ? 'Hediyen hazır. Kasada numaranı söyle, bedava içeceğini al.' : 'Her içecekte bir kabin dolar. Kasada numaranı söylemen yeterli.';
+  if(typeof biletCiz==='function') biletCiz(gosterPul, bedavaHak, null, 'biletDolapMenu');
+  var say=document.getElementById('bltSayac'); if(say) say.textContent=gosterPul+'/'+ESIK_YILDIZ;
+  var uye=document.getElementById('bltUye'); if(uye) uye.innerHTML='<small>Üye</small>'+(isim||'Sen');
   var tel=(localStorage.getItem('cactus_kart_tel')||'').replace(/\D/g,'');
-  var no=document.querySelector('.skp-fis-alt span'); if(no&&tel) no.textContent='No: •••• '+tel.slice(-4);
-  var bant=document.querySelector('.skp-bant'); if(bant&&tel) bant.textContent='Kasada '+tel.slice(-4)+' ile biten numaranı söyle.';
+  var not=document.getElementById('bltNot'); if(not&&tel) not.textContent='Kasada '+tel.slice(-4)+' ile biten numaranı söyle.';
 }
 
 // ═══════════════════════════════════════════════════════════════════════

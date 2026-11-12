@@ -518,7 +518,7 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     KATMAN.forEach(function(k){
       var n=k.el.querySelector('.wh-nokta'),h=k.el.querySelector('.wh-hat'),kt=k.el.querySelector('.wh-kart');
       var nx=sx+k.px*sz, ny=sy+k.py*sz, lx, ly;
-      if(!m){ var sag=k.taraf==='sag', kw=Math.min(230,sx-60), y=sy+k.ky*sz, kx=sag?sx+sz+30:sx-30-kw;
+      if(!m){ var sag=k.taraf==='sag', kw=Math.min(230,sx-60), y=sag?sy+k.ky*sz:Math.max(sy+k.ky*sz,250), kx=sag?sx+sz+30:sx-30-kw;
         kt.style.width=kw+'px'; kt.style.left=kx+'px'; kt.style.top=y+'px'; kt.style.textAlign=sag?'left':'right'; kt.style.setProperty('--ky','-50%');
         lx=sag?kx-10:kx+kw+10; ly=y;
       } else { var kw2=Math.min(118,W*.31), kx2=kis(k.mob.x*W-kw2/2,8,W-8-kw2), ust=k.mob.ust, ky=ust?sy-6:sy+sz+6;

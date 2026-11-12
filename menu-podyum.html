@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-bilet-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-bilet-r2'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -896,17 +896,33 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 .blt-uye small{display:block;font-weight:400;font-size:2.4cqw;letter-spacing:.3em;color:#9a7a3a}
 .bk-kabin.sira .bk-govde{animation:bltSira 1.4s ease-in-out infinite}
 @keyframes bltSira{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.blt-bilet{animation:bltSuz 4.5s ease-in-out infinite}
+@keyframes bltSuz{0%,100%{transform:rotate(3deg) translateY(0)}50%{transform:rotate(1deg) translateY(-6px)}}
+.blt-bilet::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,250,230,.75) 48%,transparent 60%) no-repeat;background-size:250% 100%;background-position:150% 0;mix-blend-mode:soft-light;-webkit-mask:url(bilet-kart.webp) center/100% 100% no-repeat;mask:url(bilet-kart.webp) center/100% 100% no-repeat;animation:bltParla 5s ease-in-out 1.6s infinite}
+@keyframes bltParla{0%{background-position:150% 0}35%,100%{background-position:-60% 0}}
+.blt-bilet .bilet-cark{transform-box:view-box;transform-origin:336px 550px;animation:bltCark 1.8s cubic-bezier(.2,.8,.2,1) .3s both}
+@keyframes bltCark{from{transform:rotate(-220deg)}to{transform:rotate(0)}}
+.blt-bilet g.bk-kabin{transform-box:fill-box;transform-origin:50% 0;animation:bltKabin .55s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes bltKabin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.blt-bilet g.bk-kabin:nth-of-type(3){animation-delay:1.60s}
+.blt-bilet g.bk-kabin:nth-of-type(4){animation-delay:1.72s}
+.blt-bilet g.bk-kabin:nth-of-type(5){animation-delay:1.84s}
+.blt-bilet g.bk-kabin:nth-of-type(6){animation-delay:1.96s}
+.blt-bilet g.bk-kabin:nth-of-type(7){animation-delay:2.08s}
+.blt-bilet g.bk-kabin:nth-of-type(8){animation-delay:2.20s}
+.blt-bilet g.bk-kabin:nth-of-type(9){animation-delay:2.32s}
+.blt-bilet:hover{animation-play-state:paused}
 @media(max-width:768px){
-  .blt{padding:72px 16px 24px}
+  .blt{padding:112px 16px 26px}
   .blt-ic{grid-template-columns:1fr 128px;gap:12px;align-items:start}
   .blt-ust{font-size:9px;letter-spacing:2px}
   .blt-baslik{font-size:26px}
   .blt-alt{display:none}
   .blt-cta{padding:9px 14px;font-size:9.5px;letter-spacing:1.8px;margin-top:12px}
   .blt-not{font-size:9.5px;margin-top:10px}
-  .blt-bilet{width:128px;transform:rotate(4deg);margin-top:4px}
+  .blt-bilet{width:128px;margin-top:4px}
 }
-@media(prefers-reduced-motion:reduce){.bk-kabin.sira .bk-govde{animation:none}}
+@media(prefers-reduced-motion:reduce){.bk-kabin.sira .bk-govde,.blt-bilet,.blt-bilet::after,.blt-bilet .bilet-cark,.blt-bilet g.bk-kabin{animation:none}}
 </style>
 <section class="blt" aria-label="Dijital sadakat kartı">
   <div class="blt-ic">

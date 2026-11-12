@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-donme-dolap-r4'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-donme-dolap-r5'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -1018,7 +1018,7 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
       kabinler=KAT.map(function(k){
         var d=document.createElement('button'); d.type='button'; d.className='dm-kabin';
         d.setAttribute('aria-label',k.ad+' kategorisine git');
-        d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="'+k.foto+'" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin.webp" alt="" draggable="false"></div><span class="dm-ad">'+k.ad+'</span>';
+        d.innerHTML='<div class="dm-sal"><div class="dm-cam"><img loading="lazy" alt="" src="'+k.foto+'" draggable="false"></div><img class="dm-govde" src="dolap-menu/kabin-beyaz.webp" alt="" draggable="false"></div><span class="dm-ad">'+k.ad+'</span>';
         d.addEventListener('click',function(){ if(surukledi) return; kategoriyeGit(k); });
         sahne.appendChild(d); return d;
       });

@@ -22,13 +22,13 @@
 <link rel="manifest" href="manifest-site.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script>
 /* ═══ OTOMATİK CACHE/SW RESET (versiyon bump'ta çalışır) ═══
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-oyunsuz-r1'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-sadakat-aykiri-r1'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -877,27 +877,53 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 </style>
 
 <!-- SADAKAT KARTI BANNER -->
-<section class="sk-banner">
-  <div class="sk-banner-left">
-    <div class="sk-banner-eyebrow">Dijital Sadakat Kartı</div>
-    <h2 class="sk-banner-title">7 içecek, 1 tanesi<br><em>bizden.</em></h2>
-    <p class="sk-banner-sub">Her siparişinde yıldız kazan. 7 yıldız doldurduğunda<br>bir içeceğin bizden. Kart yok, uygulama yok — sadece telefon numaran.</p>
-    <a href="kart.html" class="sk-banner-cta">Kartımı Gör →</a>
-  </div>
-  <div class="sk-banner-right">
-    <div class="sk-stamp-grid">
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp dolu">⭐</div>
-      <div class="sk-stamp next"></div>
-      <div class="sk-stamp bos"></div>
-      <div class="sk-stamp bos"></div>
-      <div class="sk-stamp bos"></div>
+<style>
+.skp{--lm:#d6ff2e;--kg:#efede4;--sy:#0a0a0a;position:relative;background:var(--sy);color:#fff;padding:96px 48px 40px;overflow:hidden;font-family:'Space Mono',ui-monospace,monospace}
+.skp::before{content:"";position:absolute;left:0;right:0;top:68px;height:12px;background:repeating-linear-gradient(-45deg,var(--lm) 0 14px,var(--sy) 14px 28px)}
+.skp-ic{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;position:relative}
+.skp-ust{display:inline-block;background:var(--lm);color:var(--sy);font-size:10px;font-weight:700;letter-spacing:3px;padding:5px 10px;text-transform:uppercase;transform:rotate(-1.5deg)}
+.skp-baslik{font-family:'Anton','Impact',sans-serif;font-weight:400;text-transform:uppercase;line-height:.88;font-size:clamp(54px,8vw,112px);margin:14px 0 0;letter-spacing:-.5px}
+.skp-baslik span{display:inline-block;background:var(--lm);color:var(--sy);padding:0 .08em;transform:rotate(-2deg);box-shadow:6px 6px 0 #fff}
+.skp-alt{font-size:12px;line-height:1.7;color:rgba(255,255,255,.72);max-width:44ch;margin:18px 0 0}
+.skp-cta{display:inline-block;margin-top:20px;background:var(--lm);color:var(--sy);text-decoration:none;font-family:'Anton','Impact',sans-serif;font-size:20px;letter-spacing:1px;text-transform:uppercase;padding:12px 20px 10px;border:3px solid var(--sy);box-shadow:6px 6px 0 #fff;transition:transform .08s,box-shadow .08s}
+.skp-cta:active{transform:translate(4px,4px);box-shadow:2px 2px 0 #fff}
+.skp-fis{position:relative;background:var(--kg);color:var(--sy);padding:18px 18px 16px;transform:rotate(2deg);box-shadow:10px 10px 0 var(--lm);-webkit-mask:radial-gradient(circle 7px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 7px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
+.skp-fis-ust{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--sy);padding-bottom:8px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.skp-fis-ust b{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:0;font-weight:400}
+.skp-delik{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0 10px}
+.skp-delik i{aspect-ratio:1;border:2.5px solid var(--sy);border-radius:50%;display:grid;place-items:center;font-style:normal;font-family:'Anton',sans-serif;font-size:13px}
+.skp-delik i.d{background:var(--sy);color:var(--lm)}
+.skp-delik i.s{border-style:dashed;animation:skpNabiz 1.6s ease-in-out infinite}
+.skp-delik i.h{background:var(--lm);border-color:var(--sy)}
+@keyframes skpNabiz{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.skp-fis-alt{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;display:flex;justify-content:space-between}
+.skp-bant{position:relative;display:block;width:fit-content;margin:14px 0 2px auto;background:#ff3d2e;color:#fff;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;text-transform:uppercase;padding:8px 14px 6px;transform:rotate(-4deg);box-shadow:4px 4px 0 var(--sy);max-width:300px;line-height:1.15;border:2px solid var(--sy)}
+@media(max-width:768px){
+  .skp{padding:74px 16px 30px}
+  .skp::before{top:58px;height:9px}
+  .skp-ic{grid-template-columns:1fr;gap:22px}
+  .skp-baslik{font-size:52px;margin-top:10px}
+  .skp-baslik span{box-shadow:4px 4px 0 #fff}
+  .skp-alt{font-size:11px;margin-top:12px}
+  .skp-cta{font-size:16px;padding:10px 14px 8px;margin-top:14px;box-shadow:4px 4px 0 #fff}
+  .skp-fis{transform:rotate(1.2deg);box-shadow:7px 7px 0 var(--lm);margin:0 6px 8px}
+  .skp-bant{font-size:12.5px;max-width:240px}
+}
+@media(prefers-reduced-motion:reduce){.skp-delik i.s{animation:none}}
+</style>
+<section class="skp" aria-label="Dijital sadakat kartı">
+  <div class="skp-ic">
+    <div>
+      <span class="skp-ust">Sadakat kartı · kâğıt değil</span>
+      <h2 class="skp-baslik">7 iç.<br><span>1'i bizden.</span></h2>
+      <p class="skp-alt">Cüzdanda kart taşımak yok, uygulama indirmek yok. Telefon numaran yeter. Her içecekte bir yıldız; 7'yi doldur, bir içeceğin bizden.</p>
+      <a href="kart.html" class="skp-cta">Kartımı gör →</a>
     </div>
-    <div class="sk-stamp-label">3 / 7 yıldız</div>
-    <div class="sk-kasiyer-not">
-      <span class="sk-kasiyer-ikon">📱</span>
-      <span>Yıldız kazanmak için sipariş verirken <strong>telefon numaranı kasiyere söylemeyi unutma!</strong></span>
+    <div class="skp-fis">
+      <div class="skp-fis-ust"><span>Cactus · Sadakat</span><b>3/7</b></div>
+      <div class="skp-delik"><i class="d">★</i><i class="d">★</i><i class="d">★</i><i class="s"></i><i></i><i></i><i class="h">🎁</i></div>
+      <div class="skp-fis-alt"><span>No: 05XX XXX XX XX</span><span>Devam →</span></div>
+      <div class="skp-bant">Numaranı kasiyere söyle. Söylemezsen yıldız yazılmaz.</div>
     </div>
   </div>
 </section>
@@ -1512,50 +1538,34 @@ function _sadakatBaslat(){
     }).catch(function(){});
 }
 function _sadakatCiz(m){
+  // Yeni (aykırı) sadakat bandını müşterinin gerçek yıldızlarıyla doldurur
   var pul=Number(m.pul)||0;
   var gosterPul=pul%ESIK_YILDIZ;
   var bedavaHak=Math.floor(pul/ESIK_YILDIZ);
-  // Başlık güncelle — ad varsa "Hoşgeldin Batuhan,", yoksa sade "Hoşgeldin,"
-  var ttl=document.querySelector('.sk-banner-title');
+  var ham=(m.ad||'').toString().trim();
+  var isim=ham?ham.split(/\s+/)[0]:''; if(isim.length<2) isim='';
+  var ttl=document.querySelector('.skp-baslik');
   if(ttl){
-    var ham=(m.ad||'').toString().trim();
-    var isim=ham?ham.split(/\s+/)[0]:'';
-    // Çok kısa/anlamsız ise yoksay (örn. tek karakter)
-    if(isim.length<2) isim='';
-    var selam=isim?'Hoşgeldin '+isim+',':'Hoşgeldin,';
-    if(bedavaHak>0){
-      ttl.innerHTML=selam+'<br><em>'+bedavaHak+' bedava içeceğin var 🎁</em>';
-    } else {
-      var kalan=ESIK_YILDIZ-gosterPul;
-      ttl.innerHTML=selam+'<br><em>'+kalan+' yıldız kaldı</em> hediyeye';
-    }
+    var selam=isim?'Selam '+isim+'.':'Selam.';
+    ttl.innerHTML= bedavaHak>0 ? selam+'<br><span>'+bedavaHak+' içecek bizden.</span>' : selam+'<br><span>'+(ESIK_YILDIZ-gosterPul)+' yıldız kaldı.</span>';
   }
-  // Alt yazı
-  var sub=document.querySelector('.sk-banner-sub');
-  if(sub){
-    sub.innerHTML='Her siparişinde bir yıldız kazan. Kasiyere telefon numaranı söylemen yeterli.';
-  }
-  // Yıldız grid güncelle
-  var grid=document.querySelector('.sk-stamp-grid');
+  var alt=document.querySelector('.skp-alt');
+  if(alt) alt.textContent = bedavaHak>0 ? 'Hediyen hazır. Kasada numaranı söyle, bedava içeceğini al.' : 'Her içecekte bir yıldız. Kasada numaranı söylemen yeterli.';
+  var grid=document.querySelector('.skp-delik');
   if(grid){
-    grid.innerHTML='';
+    var h='';
     for(var i=0;i<ESIK_YILDIZ;i++){
-      var div=document.createElement('div');
-      if(i<gosterPul){ div.className='sk-stamp dolu'; div.textContent='⭐'; }
-      else if(i===gosterPul){ div.className='sk-stamp next'; }
-      else { div.className='sk-stamp bos'; }
-      grid.appendChild(div);
+      if(i<gosterPul) h+='<i class="d">★</i>';
+      else if(i===gosterPul && i<ESIK_YILDIZ-1) h+='<i class="s"></i>';
+      else if(i===ESIK_YILDIZ-1) h+='<i class="h">🎁</i>';
+      else h+='<i></i>';
     }
+    grid.innerHTML=h;
   }
-  // Yıldız label
-  var lbl=document.querySelector('.sk-stamp-label');
-  if(lbl) lbl.textContent=gosterPul+' / '+ESIK_YILDIZ+' yıldız';
-  // Bilgi kutusu — telefon zaten kayıtlı olduğu için farklı mesaj
-  var bilgi=document.querySelector('.sk-kasiyer-not');
-  var tel=localStorage.getItem('cactus_kart_tel')||'';
-  if(bilgi){
-    bilgi.innerHTML='<span class="sk-kasiyer-ikon">📞</span><span>Sipariş verirken <strong>'+tel.slice(-4)+' ile biten numaran</strong> ile yıldızını kazan!</span>';
-  }
+  var say=document.querySelector('.skp-fis-ust b'); if(say) say.textContent=gosterPul+'/'+ESIK_YILDIZ;
+  var tel=(localStorage.getItem('cactus_kart_tel')||'').replace(/\D/g,'');
+  var no=document.querySelector('.skp-fis-alt span'); if(no&&tel) no.textContent='No: •••• '+tel.slice(-4);
+  var bant=document.querySelector('.skp-bant'); if(bant&&tel) bant.textContent='Kasada '+tel.slice(-4)+' ile biten numaranı söyle.';
 }
 
 // ═══════════════════════════════════════════════════════════════════════

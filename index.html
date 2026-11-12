@@ -21,7 +21,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest-site.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&amp;family=Inter:wght@300;400;500;600;700&amp;family=Anton&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="video-hero-yol-poster.webp" type="image/webp" fetchpriority="high" media="(min-width:769px)">
 <link rel="preload" as="image" href="video-hero-dolap-poster.jpg" fetchpriority="high" media="(max-width:768px)">
 <style>
@@ -442,6 +442,122 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
     <span>Keşfet</span>
   </div>
 </section>
+
+<!-- WAFFLE HAZIRLANIŞ — kaydırdıkça hazırlanır (menüdeki Dubai waffle çekimleri) -->
+<style>
+.wh{position:relative;height:300vh;background:#0a1611}
+.wh-yap{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#0a1611}
+#whArka{position:absolute;inset:-6%;width:112%;height:112%;filter:blur(26px) brightness(.42) saturate(1.15)}
+#whTuval{position:absolute;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}
+.wh-golge{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,22,17,.55) 0%,rgba(10,22,17,0) 22%,rgba(10,22,17,0) 78%,rgba(10,22,17,.55) 100%)}
+.wh-baslik{position:absolute;left:5vw;top:96px;z-index:3;max-width:60vw;color:#f3ead8;text-shadow:0 2px 18px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.5)}
+.wh-baslik .no{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:#d8b46a}
+.wh-baslik h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(28px,5vw,60px);line-height:.95;text-transform:uppercase;margin:8px 0 0}
+.wh-baslik h2 em{font-family:'Fraunces',serif;font-weight:400;text-transform:none;color:#b9cf7d}
+.wh-sayac{position:absolute;right:5vw;top:96px;z-index:3;text-align:right;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;color:rgba(243,234,216,.62);text-shadow:0 2px 18px rgba(0,0,0,.75)}
+.wh-sayac b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(40px,7vw,88px);letter-spacing:0;color:#f3ead8;line-height:1}
+.wh-katman{position:absolute;inset:0;z-index:4;opacity:0;transition:opacity .45s;pointer-events:none}
+.wh-katman.acik{opacity:1}
+.wh-nokta{position:absolute;width:10px;height:10px;border-radius:50%;background:#f3ead8;box-shadow:0 0 0 4px rgba(10,22,17,.55),0 0 0 6px rgba(243,234,216,.35)}
+.wh-hat{position:absolute;height:1.5px;background:rgba(255,250,235,.9);box-shadow:0 0 3px rgba(0,0,0,.45);transform-origin:left center;transform:rotate(var(--a,0deg)) scaleX(0);transition:transform .6s .1s}
+.wh-katman.acik .wh-hat{transform:rotate(var(--a,0deg)) scaleX(1)}
+.wh-kart{position:absolute;width:230px;transform:translateY(var(--ky,-50%));color:#f3ead8;font-family:'Space Mono',monospace}
+.wh-kart small{display:block;font-size:10px;letter-spacing:.28em;color:#d8b46a}
+.wh-kart strong{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(20px,2.2vw,30px);text-transform:uppercase;margin:4px 0 6px;line-height:1;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.wh-kart p{font-size:11.5px;line-height:1.6;color:rgba(243,234,216,.7);margin:0}
+.wh-alt{display:none}
+.wh-yuk{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;color:rgba(243,234,216,.6);transition:opacity .4s;z-index:5}
+@media(max-width:899px){
+  #whTuval{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
+  .wh-baslik{left:18px;top:calc(76px + env(safe-area-inset-top));max-width:66vw}
+  .wh-sayac{right:18px;top:calc(76px + env(safe-area-inset-top))}
+  .wh-kart small{font-size:8.5px;letter-spacing:.2em}
+  .wh-kart strong{font-size:15px;margin:2px 0 0;line-height:1.05}
+  .wh-kart p{display:none}
+  .wh-alt{display:block;position:absolute;left:18px;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:5;border-top:1px solid rgba(243,234,216,.28);padding-top:12px;min-height:90px;color:#f3ead8;font-family:'Space Mono',monospace}
+  .wh-alt small{font-size:10px;letter-spacing:.28em;color:#d8b46a}
+  .wh-alt strong{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:30px;text-transform:uppercase;margin:4px 0;line-height:1}
+  .wh-alt p{font-size:12px;line-height:1.55;color:rgba(243,234,216,.7);margin:0}
+}
+</style>
+<section class="wh" id="waffleHazirlik" aria-label="Dubai Bubble Waffle nasıl hazırlanır">
+  <div class="wh-yap">
+    <canvas id="whArka" width="160" height="160" aria-hidden="true"></canvas>
+    <canvas id="whTuval" aria-label="Dubai Bubble Waffle hazırlanışı"></canvas>
+    <div class="wh-golge"></div>
+    <div class="wh-baslik"><div class="no">KATMAN KATMAN</div><h2>Dubai Bubble <em>Waffle</em></h2></div>
+    <div class="wh-sayac"><b id="whSayac">00</b>/ 05 KATMAN</div>
+    <div id="whKatmanlar"></div>
+    <div class="wh-alt" id="whAlt"><small>KAYDIRDIKÇA</small><strong>Sırayla hazırlanır</strong><p>Kaydır, kâseye ne girdiğini gör.</p></div>
+    <div class="wh-yuk" id="whYuk">KAYDIR ↓</div>
+  </div>
+</section>
+<script>
+(function(){
+  var bolum=document.getElementById('waffleHazirlik'); if(!bolum) return;
+  var ADET=160, VID_SON=.85;
+  function mobil(){return innerWidth<900;}
+  function kis(v,a,b){return Math.min(b,Math.max(a,v));}
+  var KATMAN=[
+    {ad:'Hamur',no:'01',t:.03,taraf:'sol',px:.30,py:.66,ky:.76,mob:{x:.18,ust:0},yazi:'Bubble waffle. Her baloncuk ayrı bir lokma, saymayı bıraktık.'},
+    {ad:'Çilek & Muz',no:'02',t:.23,taraf:'sag',px:.78,py:.40,ky:.34,mob:{x:.76,ust:1},yazi:'Hamurun üstüne taze meyve. Sıralama önemli.'},
+    {ad:'Sütlü Çikolata',no:'03',t:.43,taraf:'sol',px:.40,py:.34,ky:.28,mob:{x:.24,ust:1},yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.'},
+    {ad:'Antep Çikolata',no:'04',t:.63,taraf:'sag',px:.68,py:.68,ky:.70,mob:{x:.82,ust:0},yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde."},
+    {ad:'Tel Kadayıf',no:'05',t:.83,taraf:'sol',px:.52,py:.52,ky:.52,mob:{x:.5,ust:0},yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.'}
+  ];
+  var kap=document.getElementById('whKatmanlar');
+  KATMAN.forEach(function(k){ k.esik=k.t*VID_SON; var d=document.createElement('div'); d.className='wh-katman';
+    d.innerHTML='<span class="wh-hat"></span><span class="wh-nokta"></span><div class="wh-kart"><small>'+k.no+'</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p></div>'; kap.appendChild(d); k.el=d; });
+  var tuval=document.getElementById('whTuval'), arka=document.getElementById('whArka'), ctx=tuval.getContext('2d');
+  function yerlestir(){
+    var W=innerWidth,H=innerHeight,m=mobil();
+    var sz=m?W:Math.min(H,W*.6), sx=(W-sz)/2, sy=m?Math.max(150,H*.47-sz/2):(H-sz)/2;
+    tuval.style.left=sx+'px'; tuval.style.top=sy+'px'; tuval.style.width=sz+'px'; tuval.style.height=sz+'px';
+    var dpr=Math.min(devicePixelRatio||1,2); tuval.width=Math.round(sz*dpr); tuval.height=Math.round(sz*dpr);
+    arka.width=160; arka.height=Math.round(160*H/W);
+    KATMAN.forEach(function(k){
+      var n=k.el.querySelector('.wh-nokta'),h=k.el.querySelector('.wh-hat'),kt=k.el.querySelector('.wh-kart');
+      var nx=sx+k.px*sz, ny=sy+k.py*sz, lx, ly;
+      if(!m){ var sag=k.taraf==='sag', kw=Math.min(230,sx-60), y=sy+k.ky*sz, kx=sag?sx+sz+30:sx-30-kw;
+        kt.style.width=kw+'px'; kt.style.left=kx+'px'; kt.style.top=y+'px'; kt.style.textAlign=sag?'left':'right'; kt.style.setProperty('--ky','-50%');
+        lx=sag?kx-10:kx+kw+10; ly=y;
+      } else { var kw2=Math.min(118,W*.31), kx2=kis(k.mob.x*W-kw2/2,8,W-8-kw2), ust=k.mob.ust, ky=ust?sy-6:sy+sz+6;
+        kt.style.width=kw2+'px'; kt.style.left=kx2+'px'; kt.style.top=ky+'px'; kt.style.textAlign='center'; kt.style.setProperty('--ky',ust?'-100%':'0%');
+        lx=kx2+kw2/2; ly=ky+(ust?2:-2);
+      }
+      var dx=nx-lx, dy=ny-ly; h.style.left=lx+'px'; h.style.top=ly+'px'; h.style.width=Math.hypot(dx,dy)+'px'; h.style.setProperty('--a',Math.atan2(dy,dx)+'rad');
+      n.style.left=(nx-5)+'px'; n.style.top=(ny-5)+'px';
+    });
+    son=-1; ciz(istenen);
+  }
+  // kareler: bölüm ekrana yaklaşınca yüklenir (ana sayfa açılışını yavaşlatmaz)
+  var kareler=new Array(ADET), sira=[], basladi=false, aktif=0, istenen=0, son=-1, yuklu=0, yukEl=document.getElementById('whYuk');
+  (function(){var g={};[16,8,4,2,1].forEach(function(a){for(var i=0;i<ADET;i+=a){if(!g[i]){g[i]=1;sira.push(i);}}});})();
+  function yol(i){return 'waffle-hazirlik/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp';}
+  function sonraki(){ while(aktif<6&&sira.length){ (function(i){ aktif++; var im=new Image(); im.decoding='async';
+    im.onload=function(){kareler[i]=im; aktif--; yuklu++; if(yuklu>=ADET*.98) yukEl.style.opacity=0; ciz(istenen,true); sonraki();};
+    im.onerror=function(){aktif--; sonraki();}; im.src=yol(i); })(sira.shift()); } }
+  function basla(){ if(basladi) return; basladi=true; sonraki(); }
+  if('IntersectionObserver' in window){ new IntersectionObserver(function(e){ if(e[0].isIntersecting) basla(); },{rootMargin:'800px 0px'}).observe(bolum); } else basla();
+  function yakin(i){ if(kareler[i]) return i; for(var d=1;d<ADET;d++){ if(kareler[i-d]) return i-d; if(kareler[i+d]) return i+d; } return -1; }
+  function ciz(i,zorla){ istenen=i; var k=yakin(i); if(k<0) return; if(k===son&&!zorla) return; son=k; var im=kareler[k];
+    ctx.drawImage(im,0,0,tuval.width,tuval.height);
+    var ac=arka.getContext('2d'), as=Math.max(arka.width/im.width,arka.height/im.height); ac.drawImage(im,(arka.width-im.width*as)/2,(arka.height-im.height*as)/2,im.width*as,im.height*as); }
+  var sayac=document.getElementById('whSayac'), alt=document.getElementById('whAlt'), sonAcik=-2;
+  function guncelle(){
+    var r=bolum.getBoundingClientRect(), p=kis(-r.top/(r.height-innerHeight),0,1);
+    if(r.bottom<0||r.top>innerHeight) return;
+    ciz(Math.round(Math.min(1,p/VID_SON)*(ADET-1)));
+    var acik=-1; KATMAN.forEach(function(k,i){ var a=p>=k.esik; k.el.classList.toggle('acik',a); if(a) acik=i; });
+    sayac.textContent=String(acik+1).padStart(2,'0');
+    if(acik!==sonAcik){ sonAcik=acik; if(acik<0) alt.innerHTML='<small>KAYDIRDIKÇA</small><strong>Sırayla hazırlanır</strong><p>Kaydır, kâseye ne girdiğini gör.</p>';
+      else { var k=KATMAN[acik]; alt.innerHTML='<small>'+k.no+' / 05</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p>'; } }
+  }
+  var bek=false; addEventListener('scroll',function(){ if(!bek){bek=true; requestAnimationFrame(function(){bek=false; guncelle();});} },{passive:true});
+  addEventListener('resize',function(){ yerlestir(); guncelle(); });
+  yerlestir(); guncelle();
+})();
+</script>
 
 <!-- SADAKAT KARTI TANITIM -->
 <section id="sadakat-section" style="background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 45%,#0e1f08 100%);padding:80px 60px;overflow:hidden;position:relative;">

@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-bilet-r2'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-bilet-r4'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -658,6 +658,22 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 .kmp-dus{position:absolute;top:-10px;width:26px;height:26px;color:#a8873f;pointer-events:none;z-index:1;animation:kpDus var(--t,2.6s) linear forwards;}
 .kampanya-foto-band{overflow:hidden;}
 
+
+/* Menü başlığı + Google yorumları yan yana (mobilde yer kaplamasın) */
+@media(max-width:700px){
+  .menu-header{flex-wrap:nowrap!important;justify-content:space-between!important;gap:10px!important;padding:12px 14px 12px!important;text-align:left}
+  .menu-header .mh-titles{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+  .menu-header-eyebrow{font-size:7.5px!important;letter-spacing:2px!important;margin-bottom:0!important;white-space:nowrap}
+  .menu-header-title{font-size:23px!important;letter-spacing:0;white-space:nowrap}
+  .menu-header #dilBtn{font-size:10px!important;padding:4px 10px!important;margin:2px 0 0!important}
+  .menu-google{gap:7px!important;padding:6px 8px 6px 10px!important;flex-shrink:0}
+  .menu-google svg{width:16px;height:16px}
+  .mg-score{font-size:19px!important}
+  .mg-stars{font-size:10px!important;letter-spacing:.5px!important}
+  .mg-count{font-size:7.5px!important}
+  .mg-cta{font-size:8px!important;padding:6px 9px!important;letter-spacing:1px!important}
+}
+@media(max-width:360px){.mg-count{display:none}}
 </style>
 <script>(function(){try{var k="cv_"+new Date().toISOString().split("T")[0],y=!localStorage.getItem(k);if(y)localStorage.setItem(k,"1");fetch("https://cactus-rapor-api.batuhanbulut.workers.dev/ziyaret/kaydet",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sayfa:location.pathname,yeni:y})}).catch(function(){});}catch(e){}})();</script>
 <script src="site-ayarlar.js?v=3" defer></script>
@@ -913,14 +929,14 @@ body:has(.kampanya-bg.on) a[aria-label="Instagram"],body:has(.kampanya-bg.on) a[
 .blt-bilet g.bk-kabin:nth-of-type(9){animation-delay:2.32s}
 .blt-bilet:hover{animation-play-state:paused}
 @media(max-width:768px){
-  .blt{padding:112px 16px 26px}
-  .blt-ic{grid-template-columns:1fr 128px;gap:12px;align-items:start}
+  .blt{padding:112px 16px 20px}
+  .blt-ic{grid-template-columns:1fr 112px;gap:12px;align-items:center}
   .blt-ust{font-size:9px;letter-spacing:2px}
-  .blt-baslik{font-size:26px}
+  .blt-baslik{font-size:23px}
   .blt-alt{display:none}
   .blt-cta{padding:9px 14px;font-size:9.5px;letter-spacing:1.8px;margin-top:12px}
   .blt-not{font-size:9.5px;margin-top:10px}
-  .blt-bilet{width:128px;margin-top:4px}
+  .blt-bilet{width:112px;margin-top:0}
 }
 @media(prefers-reduced-motion:reduce){.bk-kabin.sira .bk-govde,.blt-bilet,.blt-bilet::after,.blt-bilet .bilet-cark,.blt-bilet g.bk-kabin{animation:none}}
 </style>
@@ -983,6 +999,19 @@ function biletCiz(dolu, hak, onceki, svgId){
   svg.innerHTML=g;
 }
 biletCiz(3,0,null,'biletDolapMenu');
+(function(){
+  var b=document.querySelector('.blt'); if(!b) return;
+  function ayarla(){
+    var alt=0;
+    [].forEach.call(document.querySelectorAll('body *'),function(e){
+      if(e===b||b.contains(e)) return;
+      var c=getComputedStyle(e); if(c.position!=='fixed'&&c.position!=='sticky') return;
+      var r=e.getBoundingClientRect(); if(r.top<=2&&r.height>8&&r.height<160&&r.width>innerWidth*.6) alt=Math.max(alt,r.bottom);
+    });
+    if(alt) b.style.paddingTop=Math.round(alt+(innerWidth<769?26:34))+'px';
+  }
+  ayarla(); addEventListener('load',ayarla); addEventListener('resize',ayarla); setTimeout(ayarla,600); setTimeout(ayarla,1800);
+})();
 </script>
 
 <div class="menu-header">

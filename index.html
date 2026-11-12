@@ -559,142 +559,123 @@ background-size:600px 600px;opacity:.4;pointer-events:none;}
 })();
 </script>
 
-<!-- SADAKAT KARTI TANITIM -->
-<section id="sadakat-section" style="background:linear-gradient(135deg,#2c4a1e 0%,#1a3310 45%,#0e1f08 100%);padding:80px 60px;overflow:hidden;position:relative;">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(200,168,106,.1) 0%,transparent 60%);pointer-events:none;"></div>
-  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" id="sadakat-inner">
-
-    <!-- Sol: Metin -->
-    <div style="position:relative;z-index:1;">
-      <p style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#c8a86a;margin-bottom:14px;font-family:'Inter',sans-serif;">Üyelere Özel</p>
-      <h2 style="font-family:'Fraunces',serif;font-size:clamp(30px,3.5vw,52px);font-weight:300;color:#f7f2ea;line-height:1.1;margin-bottom:16px;">Her kahve seni<br><em style="font-style:italic;color:#e8c47a;">bedavaya</em> götürür</h2>
-      <p style="font-size:13px;color:rgba(240,225,195,.65);line-height:1.9;font-weight:300;margin-bottom:28px;max-width:380px;">Dijital sadakat kartınla her alışverişte 1 yıldız kazan. 7 yıldız tamamlandığında bir içecek bizden. Uygulama yok, kart yok — sadece telefon numaran yeterli.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">1</div>
-          <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">Kasiyere telefonunu söyle, yıldız otomatik eklenir</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">2</div>
-          <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">7 yıldız dolduğunda bedava içecek hakkı kazanırsın</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,168,106,.15);border:1px solid rgba(200,168,106,.45);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#c8a86a;font-family:'Inter',sans-serif;font-weight:500;">3</div>
-          <span style="font-size:12px;color:rgba(240,225,195,.7);font-weight:300;">Bakiyeni istediğin zaman kartımı görüntüle sayfasından kontrol et</span>
-        </div>
-      </div>
-      <a href="kart.html" style="display:inline-block;padding:13px 32px;background:#c8a86a;color:#0e1f08;text-decoration:none;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;transition:all .2s;" onmouseover="this.style.background='#e8c47a';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#c8a86a';this.style.transform='translateY(0)'">Kartımı Gör →</a>
-
+<!-- SADAKAT KARTI — LUNAPARK BİLETİ -->
+<style>
+.hb{position:relative;background:radial-gradient(ellipse 70% 80% at 72% 50%,#244a33 0%,#173322 55%,#0f2418 100%);color:#f3ead8;padding:90px 60px;overflow:hidden}
+.hb::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(#c9a24a 1px,transparent 1.2px);background-size:22px 22px;opacity:.08}
+.hb-ic{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;position:relative}
+.hb-ust{font-family:'Space Mono',ui-monospace,monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#c9a24a}
+.hb h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(32px,4vw,54px);line-height:1.05;margin:12px 0 0;color:#f7f2ea}
+.hb h2 em{font-style:italic;color:#e8c47a}
+.hb-alt{font-size:13px;line-height:1.85;color:rgba(243,234,216,.7);max-width:42ch;margin:16px 0 0}
+.hb-liste{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:10px;font-family:'Space Mono',ui-monospace,monospace;font-size:11.5px;color:rgba(243,234,216,.82)}
+.hb-liste li{display:flex;gap:12px;align-items:baseline}
+.hb-liste b{font-family:'Anton',sans-serif;font-weight:400;font-size:15px;color:#e8c47a;min-width:22px}
+.hb-cta{display:inline-block;margin-top:26px;padding:13px 26px;background:#e8c47a;color:#14281c;text-decoration:none;font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;border-radius:2px;box-shadow:0 0 0 1px #14281c inset,4px 4px 0 rgba(0,0,0,.35)}
+.hb-bilet{position:relative;width:min(100%,330px);aspect-ratio:672/1020;justify-self:center;filter:drop-shadow(0 22px 30px rgba(0,0,0,.5));container-type:inline-size;animation:hbSuz 4.5s ease-in-out infinite;cursor:pointer}
+@keyframes hbSuz{0%,100%{transform:rotate(3deg) translateY(0)}50%{transform:rotate(1deg) translateY(-8px)}}
+.hb-bilet img{position:absolute;inset:0;width:100%;height:100%}
+.hb-bilet svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hb-bilet::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,250,230,.75) 48%,transparent 60%) no-repeat;background-size:250% 100%;background-position:150% 0;mix-blend-mode:soft-light;-webkit-mask:url(bilet-kart.webp) center/100% 100% no-repeat;mask:url(bilet-kart.webp) center/100% 100% no-repeat;animation:hbParla 5s ease-in-out 1.6s infinite}
+@keyframes hbParla{0%{background-position:150% 0}35%,100%{background-position:-60% 0}}
+.hb-sayac{position:absolute;left:50%;top:53.9%;transform:translate(-50%,-50%);font-family:'Anton',sans-serif;font-size:6.2cqw;color:#1f3d2b;line-height:1}
+.hb-uye{position:absolute;left:14%;top:80.2%;width:52%;font-family:'Space Mono',monospace;font-weight:700;font-size:3.8cqw;color:#1f3d2b;text-transform:uppercase;white-space:nowrap}
+.hb-uye small{display:block;font-weight:400;font-size:2.4cqw;letter-spacing:.3em;color:#9a7a3a}
+.hb-tamam{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-8deg) scale(.4);opacity:0;font-family:'Anton',sans-serif;font-size:10cqw;letter-spacing:1px;color:#b23a2a;border:.8cqw solid #b23a2a;padding:.6cqw 2.4cqw .2cqw;text-transform:uppercase;white-space:nowrap;transition:transform .35s cubic-bezier(.2,.9,.3,1.5),opacity .2s;mix-blend-mode:multiply}
+.hb-bilet.tamam .hb-tamam{opacity:.9;transform:translate(-50%,-50%) rotate(-8deg) scale(1)}
+.hb .bk-kabin.sira .bk-govde{animation:hbSira 1.4s ease-in-out infinite}
+@keyframes hbSira{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.hb .bk-kabin.zimba{transform-box:fill-box;transform-origin:50% 0;animation:hbZimba .6s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes hbZimba{0%{transform:scale(.3) rotate(-25deg);opacity:0}60%{transform:scale(1.25) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@media(max-width:900px){.hb{padding:64px 28px}.hb-ic{gap:36px}}
+@media(max-width:640px){
+  .hb{padding:34px 16px 30px}
+  .hb-ic{grid-template-columns:1fr 118px;gap:12px;align-items:center}
+  .hb h2{font-size:23px;margin-top:8px}
+  .hb-ust{font-size:9px;letter-spacing:2px}
+  .hb-alt,.hb-liste{display:none}
+  .hb-cta{margin-top:14px;padding:9px 14px;font-size:9.5px;letter-spacing:1.8px}
+  .hb-bilet{width:118px}
+}
+@media(prefers-reduced-motion:reduce){.hb-bilet,.hb-bilet::after,.hb .bk-kabin.sira .bk-govde,.hb .bk-kabin.zimba{animation:none}}
+</style>
+<section class="hb" id="sadakat-section" aria-label="Sadakat kartı">
+  <div class="hb-ic">
+    <div>
+      <div class="hb-ust">Sadakat kartı · Tek tur</div>
+      <h2>Her içecek bir kabin.<br><em>7 kabin, tur bizden.</em></h2>
+      <p class="hb-alt">Podyum Park'ın dönme dolabından ilham alan dijital biletin. Kart taşımak yok, uygulama yok; telefon numaran yeter.</p>
+      <ul class="hb-liste">
+        <li><b>01</b><span>Kasada telefon numaranı söyle, kabinin dolar.</span></li>
+        <li><b>02</b><span>7 kabin dolunca bir içeceğin bizden.</span></li>
+        <li><b>03</b><span>Biletine istediğin zaman kart sayfasından bak.</span></li>
+      </ul>
+      <a href="kart.html" class="hb-cta">Biletimi gör →</a>
     </div>
-
-    <!-- Sağ: Kart görseli -->
-    <div id="sadakat-kart-gorsel" style="display:flex;justify-content:center;position:relative;z-index:1;">
-      <div style="background:linear-gradient(145deg,#1a2d12 0%,#111e0b 100%);border:1px solid rgba(200,168,106,.25);border-radius:20px;padding:28px 24px;width:100%;max-width:280px;box-shadow:0 24px 56px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.2),inset 0 1px 0 rgba(200,168,106,.1);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
-          <div>
-            <div style="font-family:'Fraunces',serif;font-size:17px;letter-spacing:5px;color:#f7f2ea;text-transform:uppercase;">CACTUS</div>
-            <div style="font-size:8px;letter-spacing:3px;color:#c8a86a;text-transform:uppercase;margin-top:2px;">Sadakat Kartı</div>
-          </div>
-          <div style="font-size:20px;">⭐</div>
-        </div>
-        <div style="font-size:11px;color:rgba(240,225,195,.4);margin-bottom:16px;letter-spacing:1px;">Ahmet Y. · 05** ***78</div>
-        <div id="kart-damga-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:20px;cursor:pointer;" onclick="kartDamgaReset()" title="Tıkla, baştan başla"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-          <div>
-            <div style="font-family:'Fraunces',serif;font-size:24px;color:#f7f2ea;font-weight:300;"><span id="kart-sayac">0</span>/7</div>
-            <div style="font-size:8px;color:rgba(200,168,106,.5);letter-spacing:2px;text-transform:uppercase;">yıldız</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:11px;color:#c8a86a;" id="kart-hak">0 hak</div>
-            <div style="font-size:8px;color:rgba(200,168,106,.4);letter-spacing:1px;text-transform:uppercase;">bedava içecek</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <a class="hb-bilet" id="hbBilet" href="kart.html" aria-label="Sadakat biletini aç">
+      <img src="bilet-kart.webp" alt="" loading="lazy">
+      <svg id="biletDolapAna" viewBox="0 0 672 1020" aria-hidden="true"></svg>
+      <div class="hb-sayac" id="hbSayac">0/7</div>
+      <div class="hb-uye"><small>Üye</small>Sen</div>
+      <div class="hb-tamam">Tur tamam!</div>
+    </a>
   </div>
 </section>
-<style>
-@keyframes kp{0%,100%{border-color:rgba(200,168,106,.3);}50%{border-color:rgba(200,168,106,.9);box-shadow:0 0 8px rgba(200,168,106,.3);}}
-/* Damga animasyonları */
-.kdm{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .25s cubic-bezier(.34,1.56,.64,1);position:relative;}
-.kdm.bos{border:1.5px solid rgba(200,168,106,.2);background:rgba(255,255,255,.03);}
-.kdm.aktif{border:1.5px dashed #c8a86a;animation:kp 1.5s ease-in-out infinite;}
-.kdm.dolu{background:linear-gradient(135deg,#c8a86a,#a8883a);box-shadow:0 2px 8px rgba(200,168,106,.3);animation:kdmPop .5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes kdmPop{0%{transform:scale(0.2) rotate(-90deg);opacity:0;}60%{transform:scale(1.25) rotate(15deg);opacity:1;}100%{transform:scale(1) rotate(0deg);opacity:1;}}
-@keyframes kdmSparkle{0%,100%{transform:scale(1);}50%{transform:scale(1.08);box-shadow:0 0 20px rgba(232,196,122,.7);}}
-.kdm.son{animation:kdmPop .5s cubic-bezier(.34,1.56,.64,1),kdmSparkle 1.2s ease-in-out infinite .5s;}
-#kart-sayac{display:inline-block;transition:transform .25s;}
-#kart-sayac.bumb{transform:scale(1.3);color:#e8c47a;}
-@media(max-width:900px){
-  #sadakat-section{padding:56px 32px!important;}
-  #sadakat-inner{gap:48px!important;}
-}
-@media(max-width:640px){
-  #sadakat-section{padding:48px 20px!important;}
-  #sadakat-inner{grid-template-columns:1fr!important;gap:36px!important;}
-  #sadakat-kart-gorsel{display:flex!important;}
-  #sadakat-kart-gorsel > div{max-width:240px!important;padding:22px 18px!important;}
-  #sadakat-section h2{font-size:28px!important;margin-bottom:12px!important;}
-}
-</style>
 <script>
+// Lunapark bileti: 7 kabinli dönme dolap — dolu kabin = yıldız, 7. kabin hediye
+function biletCiz(dolu, hak, onceki, svgId){
+  var svg=document.getElementById(svgId||'biletDolap'); if(!svg) return;
+  var CX=336, CY=550, R=170, N=7, Y='#1f3d2b', A='#b8924a', K='#f6efdf';
+  var g='';
+  // ayaklar ve zemin
+  g+='<g stroke="'+Y+'" stroke-linecap="round" fill="none"><path d="M336 550 L238 765 M336 550 L434 765" stroke-width="8"/><path d="M262 712 L410 712 M284 664 L388 664" stroke-width="3.5"/><path d="M206 768 L466 768" stroke-width="6"/></g>';
+  // çember, kollar
+  g+='<g class="bilet-cark">';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="'+Y+'" stroke-width="6"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="'+(R-12)+'" fill="none" stroke="'+A+'" stroke-width="2.5"/>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="96" fill="none" stroke="'+A+'" stroke-width="2" stroke-dasharray="3 6"/>';
+  for(var s=0;s<14;s++){ var t=s/14*Math.PI*2; g+='<line x1="'+(CX+Math.sin(t)*44).toFixed(1)+'" y1="'+(CY-Math.cos(t)*44).toFixed(1)+'" x2="'+(CX+Math.sin(t)*(R-12)).toFixed(1)+'" y2="'+(CY-Math.cos(t)*(R-12)).toFixed(1)+'" stroke="'+Y+'" stroke-width="2.6"/>'; }
+  for(var s2=0;s2<28;s2++){ var t2=s2/28*Math.PI*2; g+='<circle cx="'+(CX+Math.sin(t2)*(R-6)).toFixed(1)+'" cy="'+(CY-Math.cos(t2)*(R-6)).toFixed(1)+'" r="2.2" fill="'+A+'"/>'; }
+  g+='</g>';
+  g+='<circle cx="'+CX+'" cy="'+CY+'" r="44" fill="'+K+'" stroke="'+Y+'" stroke-width="5"/><circle cx="'+CX+'" cy="'+CY+'" r="37" fill="none" stroke="'+A+'" stroke-width="2"/>';
+  // kabinler (saat 12'den saat yönünde)
+  for(var k=0;k<N;k++){
+    var th=k/N*Math.PI*2, px=CX+Math.sin(th)*R, py=CY-Math.cos(th)*R;
+    var hediye=(k===N-1), dolu_mu=hediye?hak>0:(k<dolu), sira=!hediye&&k===dolu, yeni=!hediye&&onceki!=null&&k>=onceki&&k<dolu;
+    var dolgu=dolu_mu?'#c9a24a':K;
+    var cls='bk-kabin'+(sira?' sira':'')+(yeni?' zimba':'');
+    var x=px, y=py;
+    g+='<g class="'+cls+'">';
+    g+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+Y+'"/>';
+    g+='<line x1="'+x.toFixed(1)+'" y1="'+y.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+(y+14).toFixed(1)+'" stroke="'+Y+'" stroke-width="3"/>';
+    g+='<path d="M'+(x-27).toFixed(1)+' '+(y+22).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+4).toFixed(1)+' '+(x+27).toFixed(1)+' '+(y+22).toFixed(1)+' Z" fill="'+(dolu_mu?'#1f3d2b':A)+'" stroke="'+Y+'" stroke-width="3" stroke-linejoin="round"/>';
+    g+='<path class="bk-govde" d="M'+(x-24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+24).toFixed(1)+' '+(y+24).toFixed(1)+' L'+(x+21).toFixed(1)+' '+(y+52).toFixed(1)+' Q'+x.toFixed(1)+' '+(y+66).toFixed(1)+' '+(x-21).toFixed(1)+' '+(y+52).toFixed(1)+' Z" fill="'+dolgu+'" stroke="'+Y+'" stroke-width="3.5" stroke-linejoin="round"'+(sira?' stroke-dasharray="6 5"':'')+'/>';
+    if(hediye){
+      var c=dolu_mu?Y:Y;
+      g+='<g fill="none" stroke="'+c+'" stroke-width="2.6" stroke-linejoin="round"><rect x="'+(x-11).toFixed(1)+'" y="'+(y+33).toFixed(1)+'" width="22" height="16"/><path d="M'+(x-13).toFixed(1)+' '+(y+33).toFixed(1)+' h26 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' v16 M'+x.toFixed(1)+' '+(y+33).toFixed(1)+' c-3-7-11-7-11-2 s8 2 11 2 c3 0 11 0 11-2 s-8-5-11 2"/></g>';
+    } else if(dolu_mu){
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+49).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="22" fill="'+Y+'">★</text>';
+    } else {
+      g+='<text x="'+x.toFixed(1)+'" y="'+(y+48).toFixed(1)+'" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="19" fill="'+Y+'" opacity=".55">'+(k+1)+'</text>';
+    }
+    g+='</g>';
+  }
+  svg.innerHTML=g;
+}
 (function(){
-  var grid,sayacEl,hakEl,timer,playing=false,started=false;
-  function cizGrid(doluSayisi){
-    if(!grid) return;
-    grid.innerHTML='';
-    for(var i=0;i<7;i++){
-      var d=document.createElement('div');
-      if(i<doluSayisi){
-        d.className='kdm dolu'+(i===doluSayisi-1&&doluSayisi===7?' son':'');
-        d.textContent='⭐';
-      } else if(i===doluSayisi){
-        d.className='kdm aktif';
-      } else {
-        d.className='kdm bos';
-      }
-      grid.appendChild(d);
-    }
-    sayacEl.textContent=doluSayisi;
-    sayacEl.classList.add('bumb');
-    setTimeout(function(){sayacEl.classList.remove('bumb');},250);
-    hakEl.textContent=(doluSayisi>=7?'1':'0')+' hak';
+  var bilet=document.getElementById('hbBilet'), say=document.getElementById('hbSayac'); if(!bilet) return;
+  var n=0, t=null, oynuyor=false, hareket=!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function ciz(d,hak,onceki){ biletCiz(d,hak,onceki,'biletDolapAna'); say.textContent=(hak?7:d)+'/7'; bilet.classList.toggle('tamam',!!hak); }
+  function adim(){
+    if(n<6){ n++; ciz(n,0,n-1); t=setTimeout(adim,700); }
+    else if(n===6){ n=7; ciz(6,1,null); t=setTimeout(adim,2600); }
+    else { n=0; ciz(0,0,null); t=setTimeout(adim,900); }
   }
-  function adim(n){
-    cizGrid(n);
-    if(n<7){
-      timer=setTimeout(function(){adim(n+1);},520);
-    } else {
-      // 7 doldu — biraz bekle, baştan başla
-      timer=setTimeout(function(){if(playing){cizGrid(0);timer=setTimeout(function(){adim(1);},400);}},2500);
-    }
-  }
-  window.kartDamgaReset=function(){
-    clearTimeout(timer);
-    cizGrid(0);
-    setTimeout(function(){if(playing)adim(1);},300);
-  };
-  function basla(){
-    if(started) return; started=true; playing=true;
-    cizGrid(0);
-    timer=setTimeout(function(){adim(1);},500);
-  }
-  document.addEventListener('DOMContentLoaded',function(){
-    grid=document.getElementById('kart-damga-grid');
-    sayacEl=document.getElementById('kart-sayac');
-    hakEl=document.getElementById('kart-hak');
-    if(!grid) return;
-    cizGrid(0);
-    // Görünür olduğunda başlat (performans için)
-    if('IntersectionObserver' in window){
-      var obs=new IntersectionObserver(function(ents){
-        ents.forEach(function(e){if(e.isIntersecting)basla();});
-      },{threshold:0.3});
-      obs.observe(grid);
-    } else {
-      basla();
-    }
-  });
+  ciz(0,0,null);
+  if(!hareket){ ciz(3,0,null); return; }
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(e){ var g=e[0].isIntersecting; if(g&&!oynuyor){oynuyor=true; t=setTimeout(adim,500);} else if(!g&&oynuyor){oynuyor=false; clearTimeout(t);} },{threshold:.3}).observe(bilet);
+  } else { t=setTimeout(adim,500); }
 })();
 </script>
 

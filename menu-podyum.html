@@ -28,7 +28,7 @@
  * Eski Service Worker / browser cache kalıntısı varsa
  * sayfa açılır açılmaz tek seferlik temizler + reload yapar. */
 (function(){
-  var APP_VER='cactus-2026-11-12-bilet-r4'; // bump → cihazlarda zorla reset
+  var APP_VER='cactus-2026-11-12-bilet-r5'; // bump → cihazlarda zorla reset
   try{
     var stored=localStorage.getItem('cactus_app_ver_menu');
     if(stored===APP_VER) return; // Güncel — sessiz geç
@@ -1100,7 +1100,7 @@ biletCiz(3,0,null,'biletDolapMenu');
   (function(){
     var sahne=document.getElementById('dmSahne'), teker=document.getElementById('dmTeker'), svg=document.getElementById('dmSvg');
     if(!sahne) return;
-    var FOTO={waffle:1,kokteyl:1,sicak:1,soguk:1,vitamin:1,tatlilar:1,cay:1,tost:1};
+    var FOTO={waffle:'waffle-classic',kokteyl:'kokteyl-zeus',sicak:'sicak',soguk:'soguk',vitamin:'serinletici-limonata',tatlilar:'tatlilar',cay:'cay',tost:'tost'};
     var KAT=[], N=0, ADIM=45, kabinler=[], imza='';
     function P(r,a){return [(Math.sin(a)*r).toFixed(2),(-Math.cos(a)*r).toFixed(2)];}
     function rad(d){return d*Math.PI/180;}
@@ -1112,7 +1112,7 @@ biletCiz(3,0,null,'biletDolapMenu');
         var id=k.id.replace(/^cat-/,'').replace(new RegExp('-'+sube()+'$'),'');
         var ad=(k.dataset.kat||'').replace(/^[^\p{L}\p{N}]+/u,'').trim();
         var img=k.querySelector('.product-card img[src]');
-        var foto=FOTO[id]?'dolap-menu/'+id+'.jpg':(img?img.getAttribute('src'):'dolap-menu/waffle.jpg');
+        var foto=FOTO[id]?'dolap-menu/'+FOTO[id]+'.jpg':(img?img.getAttribute('src'):'dolap-menu/waffle-classic.jpg');
         return {el:k.id,id:id,ad:ad,foto:foto};
       }).filter(function(k){return k.ad;});
     }

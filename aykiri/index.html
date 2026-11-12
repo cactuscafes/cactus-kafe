@@ -52,18 +52,21 @@ canvas{display:block}
 /* 2 — Waffle hazırlanışı */
 #waffle{height:600vh;background:var(--bg)}
 #waffle .yapiskan{background:radial-gradient(ellipse at 50% 55%,#132a1f 0%,var(--bg) 62%)}
-#waffleCanvas{position:absolute;border-radius:50%;box-shadow:0 0 0 1px rgba(243,234,216,.12),0 0 0 14px rgba(243,234,216,.03),0 40px 90px rgba(0,0,0,.6)}
-.halka{position:absolute;border-radius:50%;border:1px dashed rgba(216,180,106,.28);pointer-events:none}
-.w-baslik{position:absolute;left:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;max-width:60vw}
+#waffleArka{position:absolute;inset:-6%;width:112%;height:112%;filter:blur(26px) brightness(.42) saturate(1.15)}
+#waffleCanvas{position:absolute;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}
+.w-golge{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,22,17,.55) 0%,rgba(10,22,17,0) 22%,rgba(10,22,17,0) 78%,rgba(10,22,17,.55) 100%)}
+@media (max-width:899px){#waffleCanvas{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%)}}
+.katman .kart strong{text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.w-baslik{position:absolute;left:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;max-width:60vw;text-shadow:0 2px 18px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.5)}
 .w-baslik .no{font-size:10px;letter-spacing:.3em;color:var(--altin)}
 .w-baslik h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(28px,6.4vw,64px);line-height:.95;text-transform:uppercase;margin-top:8px}
 .w-baslik h2 em{font-family:'Fraunces',serif;font-weight:400;text-transform:none;color:var(--fistik)}
-.sayac{position:absolute;right:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;text-align:right;font-size:10px;letter-spacing:.25em;color:var(--sis)}
+.sayac{text-shadow:0 2px 18px rgba(0,0,0,.75);position:absolute;right:22px;top:calc(64px + env(safe-area-inset-top));z-index:3;text-align:right;font-size:10px;letter-spacing:.25em;color:var(--sis)}
 .sayac b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(40px,8vw,92px);letter-spacing:0;color:var(--krem);line-height:1}
 .katman{position:absolute;inset:0;z-index:4;opacity:0;transition:opacity .45s;pointer-events:none}
 .katman.acik{opacity:1}
 .katman .nokta{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--krem);box-shadow:0 0 0 4px rgba(10,22,17,.55),0 0 0 6px rgba(243,234,216,.35)}
-.katman .hat{position:absolute;height:1px;background:rgba(243,234,216,.45);transform-origin:left center;transform:rotate(var(--a,0deg)) scaleX(0);transition:transform .6s .1s}
+.katman .hat{position:absolute;height:1.5px;background:rgba(255,250,235,.9);box-shadow:0 0 3px rgba(0,0,0,.45);transform-origin:left center;transform:rotate(var(--a,0deg)) scaleX(0);transition:transform .6s .1s}
 .katman.acik .hat{transform:rotate(var(--a,0deg)) scaleX(1)}
 .katman .kart{position:absolute;width:230px;transform:translateY(var(--ky,-50%))}
 .katman .kart small{display:block;font-size:10px;letter-spacing:.28em;color:var(--altin)}
@@ -183,8 +186,9 @@ canvas{display:block}
 <!-- 2. WAFFLE HAZIRLANIŞI -->
 <section class="sahne" id="waffle">
   <div class="yapiskan">
-    <div class="halka" id="halka"></div>
+    <canvas id="waffleArka" width="160" height="160" aria-hidden="true"></canvas>
     <canvas id="waffleCanvas" aria-label="Dubai Bubble Waffle hazırlanışı"></canvas>
+    <div class="w-golge"></div>
     <div class="w-baslik">
       <div class="no">ŞEMA NO. 02 — KATMAN KATMAN</div>
       <h2>Dubai Bubble <em>Waffle</em></h2>
@@ -288,6 +292,7 @@ function Dizi(canvas, adet, yol, ayar){
     const ox = (cw-w)/2, oy = (ch-h)*(ayar.dikey!=null?ayar.dikey:.5);
     ctx.fillStyle = ayar.zemin || '#0a1611'; ctx.fillRect(0,0,cw,ch);
     ctx.drawImage(im, ox, oy, w, h);
+    if(ayar.arka){ const a=ayar.arka, ac=a.getContext('2d'), as=Math.max(a.width/im.width, a.height/im.height); ac.drawImage(im,(a.width-im.width*as)/2,(a.height-im.height*as)/2,im.width*as,im.height*as); }
     ayar.cizildi && ayar.cizildi({ox:ox/cw, oy:oy/ch, w:w/cw, h:h/ch});
   }
   sonraki(); addEventListener('resize', boyutla); requestAnimationFrame(boyutla);
@@ -303,12 +308,13 @@ const dyler = [...document.querySelectorAll('.dy')];
 
 /* ---- 2. Waffle: menüdeki gerçek hazırlanış videosu ---- */
 const VID_SON = .85;   // video kaydırmanın ilk %85'inde akar, kalan kısım son hali tutar
+// px,py: malzemenin karedeki yeri (0-1); ky: masaüstü etiket yüksekliği (kare oranı); mob: mobil etiket yeri
 const KATMAN = [
-  { ad:'Hamur', no:'01', t:.03, taraf:'sol', dy:-.55, mob:{x:.25,ust:1,nx:-.42,ny:-.38}, yazi:'Bubble waffle. Her baloncuk ayrı bir lokma, saymayı bıraktık.' },
-  { ad:'Çilek & Muz', no:'02', t:.14, taraf:'sag', dy:-.35, mob:{x:.75,ust:1,nx:.48,ny:-.3}, yazi:'Hamurun üstüne taze meyve. Sıralama önemli.' },
-  { ad:'Sütlü Çikolata', no:'03', t:.34, taraf:'sol', dy:0, mob:{x:.17,ust:0,nx:-.5,ny:.3}, yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.' },
-  { ad:'Antep Çikolata', no:'04', t:.60, taraf:'sag', dy:.35, mob:{x:.5,ust:0,nx:.04,ny:.48}, yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
-  { ad:'Tel Kadayıf', no:'05', t:.80, taraf:'sol', dy:.55, mob:{x:.83,ust:0,nx:.46,ny:.28}, yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
+  { ad:'Hamur', no:'01', t:.03, taraf:'sol', px:.30, py:.66, ky:.76, mob:{x:.18,ust:0}, yazi:'Bubble waffle. Her baloncuk ayrı bir lokma, saymayı bıraktık.' },
+  { ad:'Çilek & Muz', no:'02', t:.14, taraf:'sag', px:.78, py:.40, ky:.34, mob:{x:.76,ust:1}, yazi:'Hamurun üstüne taze meyve. Sıralama önemli.' },
+  { ad:'Sütlü Çikolata', no:'03', t:.34, taraf:'sol', px:.40, py:.34, ky:.28, mob:{x:.24,ust:1}, yazi:'Şişeden sıkılır, akar, bulaşır, pişman ettirmez.' },
+  { ad:'Antep Çikolata', no:'04', t:.56, taraf:'sag', px:.68, py:.68, ky:.70, mob:{x:.82,ust:0}, yazi:"Dubai'nin olayı. Bursa'da, dönme dolabın dibinde." },
+  { ad:'Tel Kadayıf', no:'05', t:.80, taraf:'sol', px:.52, py:.52, ky:.52, mob:{x:.5,ust:0}, yazi:'Çıtırlığı duyulur. Sessiz tatlı arayan yanlış kapıda.' },
 ];
 KATMAN.forEach(k=>k.esik=k.t*VID_SON);
 const kapsayici = document.getElementById('katmanlar');
@@ -317,33 +323,31 @@ KATMAN.forEach(k=>{
     '<span class="hat"></span><span class="nokta"></span><div class="kart"><small>'+k.no+'</small><strong>'+k.ad+'</strong><p>'+k.yazi+'</p></div>';
   kapsayici.appendChild(d); k.el = d;
 });
-const waffleCanvas = document.getElementById('waffleCanvas'), halka = document.getElementById('halka');
-let wGeo = {cx:0,cy:0,r:0};
+const waffleCanvas = document.getElementById('waffleCanvas'), waffleArka = document.getElementById('waffleArka');
 function tabakYerlestir(){
   const W = innerWidth, H = innerHeight, m = mobil();
-  const r = m ? Math.min(W*.4, H*.185) : Math.min(H*.36, W*.22);
-  const cx = W/2, cy = m ? H*.46 : H*.56;
-  wGeo = {cx,cy,r};
-  Object.assign(waffleCanvas.style,{left:(cx-r)+'px',top:(cy-r)+'px',width:(2*r)+'px',height:(2*r)+'px'});
-  const hr = r*1.14; Object.assign(halka.style,{left:(cx-hr)+'px',top:(cy-hr)+'px',width:(2*hr)+'px',height:(2*hr)+'px'});
+  // video karesi: masaüstünde ekran yüksekliği kadar, mobilde ekran genişliği kadar; kalan alan videonun bulanık hali
+  const sz = m ? W : Math.min(H, W*.6);
+  const sx = (W-sz)/2, sy = m ? Math.max(150, H*.47 - sz/2) : (H-sz)/2;
+  Object.assign(waffleCanvas.style,{left:sx+'px',top:sy+'px',width:sz+'px',height:sz+'px'});
+  waffleArka.width = 160; waffleArka.height = Math.round(160*H/W);
   KATMAN.forEach(k=>{
     const el=k.el, nokta=el.querySelector('.nokta'), hat=el.querySelector('.hat'), kart=el.querySelector('.kart');
-    let nx, ny, lx, ly;   // nokta ve çizginin etiket ucu
+    const nx = sx + k.px*sz, ny = sy + k.py*sz;
+    let lx, ly;
     if(!m){
-      const y = cy + k.dy*r, ic = Math.sqrt(1-k.dy*k.dy)*r*.62, sag = k.taraf==='sag';
-      nx = sag ? cx+ic : cx-ic; ny = y;
-      const kx = sag ? cx+r+70 : cx-r-70-230;
-      kart.style.width='230px'; kart.style.left=kx+'px'; kart.style.top=y+'px'; kart.style.textAlign=sag?'left':'right';
+      const sag = k.taraf==='sag', kw = Math.min(230, sx - 60), y = sy + k.ky*sz;
+      const kx = sag ? sx+sz+30 : sx-30-kw;
+      kart.style.width=kw+'px'; kart.style.left=kx+'px'; kart.style.top=y+'px'; kart.style.textAlign=sag?'left':'right';
       kart.style.setProperty('--ky','-50%');
-      lx = sag ? kx-8 : kx+230+8; ly = y;
+      lx = sag ? kx-10 : kx+kw+10; ly = y;
     } else {
-      // mobil: etiketler tabağın üstünde ve altında, çizgi malzemeye iner
       const mp = k.mob, kw = Math.min(118, W*.31);
       const kx = kis(mp.x*W - kw/2, 8, W-8-kw);
-      const ust = mp.ust, ky = ust ? cy - r - 22 : cy + r + 22;
+      const ust = mp.ust, ky = ust ? sy - 6 : sy + sz + 6;
       kart.style.width=kw+'px'; kart.style.left=kx+'px'; kart.style.top=ky+'px'; kart.style.textAlign='center';
       kart.style.setProperty('--ky', ust ? '-100%' : '0%');
-      nx = cx + mp.nx*r; ny = cy + mp.ny*r; lx = kx + kw/2; ly = ky + (ust ? 4 : -4);
+      lx = kx + kw/2; ly = ky + (ust ? 2 : -2);
     }
     const dx = nx-lx, dy = ny-ly, uz = Math.hypot(dx,dy);
     hat.style.left=lx+'px'; hat.style.top=ly+'px'; hat.style.width=uz+'px';
@@ -353,7 +357,7 @@ function tabakYerlestir(){
 }
 tabakYerlestir(); addEventListener('resize', tabakYerlestir);
 const waffle = Dizi(waffleCanvas, 127, i=>'w/'+(mobil()?'m':'d')+'/'+String(i).padStart(3,'0')+'.webp',
-  { kip:()=>'cover', zemin:'#cfcac2', ilerle:yukGoster(document.getElementById('waffleYuk')) });
+  { kip:()=>'cover', zemin:'#9aa0a6', arka:waffleArka, ilerle:yukGoster(document.getElementById('waffleYuk')) });
 const sayacNo = document.getElementById('sayacNo'), mA = document.getElementById('mAciklama');
 let sonAcik = -1;
 function waffleGuncelle(p){

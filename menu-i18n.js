@@ -186,8 +186,8 @@
       'Warm bubble waffle with fresh strawberries and banana, topped with your favourite sauce. Every bowl is made to order.'],
     ['.kampanya-cta', "Waffle'lara Bak", 'See Waffles'],
     ['.menu-dipnot', '💧 Su ve soda yalnızca gel-al veya sipariş yanında servis edilir.', '💧 Water and soda are served to-go or alongside an order only.'],
-    ['.kampanya-icecek-txt', "Waffle'ının yanında dilediğin içecek", 'Any drink with your waffle'],
-    ['.kampanya-yalnizca', 'yalnızca', 'just'],
+    ['.kampanya-icecek-txt', 'Waffle + dilediğin içecek', 'Waffle + any drink'],
+    ['.kampanya-yalnizca', 'birlikte', 'together'],
     ['.pop-badge', 'Günlük Taze', 'Fresh Daily']
   ];
 

@@ -3957,6 +3957,9 @@ function skOnce(t){
   if(g<365) return Math.floor(g/30)+' ay önce';
   return Math.floor(g/365)+' yıl önce';
 }
+/* Instagram kullanıcı adı yalnızca [a-z0-9._] ise bağlantıya çevrilir (aksi halde boş) */
+function skIg(m){ var g=String((m&&m.instagram)||'').toLowerCase(); return /^[a-z0-9._]{1,30}$/.test(g)?g:''; }
+function skIgLink(m){ var g=skIg(m); return g ? '<a href="https://www.instagram.com/'+g+'/" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:#8a5a9e;text-decoration:none;font-weight:500;">@'+g+'</a>' : ''; }
 function skBasHarf(ad){ ad=String(ad||'').trim(); return ad ? ad.charAt(0).toLocaleUpperCase('tr') : '?'; }
 /* Bir üyenin ham kaydından türetilen bilgiler */
 function skBilgi(m){
@@ -3985,7 +3988,8 @@ var SK_FILTRE = {
   aktif:   {ad:'Aktif',         f:function(m,b){ return b.sonG<=30; }},
   uykuda:  {ad:'Uykuda',        f:function(m,b){ return b.sonG>60; }},
   bedava:  {ad:'Hediye hazır',  f:function(m,b){ return b.hak>0; }},
-  yaklasan:{ad:'Hediyeye yakın',f:function(m,b){ return b.hak===0 && b.kart>=5; }}
+  yaklasan:{ad:'Hediyeye yakın',f:function(m,b){ return b.hak===0 && b.kart>=5; }},
+  instagram:{ad:"Instagram'ı var",f:function(m){ return !!skIg(m); }}
 };
 
 async function kartListeYukle(){
@@ -4029,7 +4033,8 @@ function kartOzet(){
     + kutu(hediye, 'Bekleyen hediye', hediye ? 'verilmeyi bekliyor' : '', hediye>0)
     + kutu(verilen, 'Verilen hediye', 'bugüne kadar')
     + kutu(yildiz, 'Toplam yıldız', n ? 'üye başı '+(yildiz/n).toFixed(1) : '')
-    + kutu('%'+yuzde(kvkk), 'KVKK onaylı', kvkk+' üye');
+    + kutu('%'+yuzde(kvkk), 'KVKK onaylı', kvkk+' üye')
+    + kutu(d.filter(function(m){ return !!skIg(m); }).length, "Instagram'ı var", 'takip edilebilir');
   uy.innerHTML = (_kartGercekToplam && _kartGercekToplam>n)
     ? '<div class="sk-uyari">Toplam '+_kartGercekToplam+' üye var, ancak liste sunucu tarafında '+n+' kayıtla sınırlı. Aşağıdaki liste ve sayılar en çok yıldızı olan '+n+' üyeyi gösteriyor.</div>' : '';
 }
@@ -4085,6 +4090,7 @@ function kartSecili(){
     if(!f.f(m, m._b)) return false;
     if(!q) return true;
     if(String(m.ad||'').toLocaleLowerCase('tr').indexOf(qAd)>=0) return true;
+    if(skIg(m) && skIg(m).indexOf(qAd.replace(/^@/,''))>=0) return true;
     return !!qTel && skRakam(m.telefon).indexOf(qTel)>=0;
   });
   var sira = document.getElementById('kartSirala') ? document.getElementById('kartSirala').value : 'kayit_yeni';
@@ -4108,7 +4114,7 @@ function kartListeRender(){
   if(sayac) sayac.textContent = data.length===_kartVerisi.length ? data.length+' üye' : data.length+' / '+_kartVerisi.length+' üye';
   if(!data.length){ listEl.innerHTML = '<div class="sk-tablo"><div class="sk-bos">Bu ölçütlere uyan üye yok.</div></div>'; return; }
   var uye = function(m){
-    return '<div class="sk-uye"><div class="sk-avatar">'+skEsc(skBasHarf(m.ad))+'</div><div style="min-width:0"><b>'+skEsc(m.ad||'İsimsiz üye')+'</b><span>'+skEsc(skTel(m.telefon))+'</span></div></div>';
+    return '<div class="sk-uye"><div class="sk-avatar">'+skEsc(skBasHarf(m.ad))+'</div><div style="min-width:0"><b>'+skEsc(m.ad||'İsimsiz üye')+'</b><span>'+skEsc(skTel(m.telefon))+(skIg(m)?' · '+skIgLink(m):'')+'</span></div></div>';
   };
   // Mobil: kart listesi
   if(window.innerWidth < 900){
@@ -4161,6 +4167,7 @@ function kartDetayAc(tel){
     + '<div class="sk-eylem">'
     +   '<a class="sk-btn" href="tel:'+tel+'">📞 Ara</a>'
     +   '<a class="sk-btn" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">💬 WhatsApp</a>'
+    +   (skIg(m) ? '<a class="sk-btn" href="https://www.instagram.com/'+skIg(m)+'/" target="_blank" rel="noopener">📸 Instagram</a>' : '')
     +   '<button class="sk-btn" onclick="kartDuzenleTel(\''+tel+'\')">✎ Düzenle</button>'
     +   (b.hak>0 ? '<button class="sk-btn altin" onclick="kartSifirla(\''+tel+'\')">✓ Hediye verildi</button>' : '')
     + '</div>'
@@ -4174,6 +4181,7 @@ function kartDetayAc(tel){
     +   satir('Toplam yıldız', b.toplam, b.kvkk ? 'hoş geldin yıldızı dahil' : '')
     +   satir('Verilen hediye', b.kullanilan, b.hak>0 ? b.hak+' tane de bekliyor' : '')
     +   satir('Ziyaret sıklığı', b.aralik ? (b.aralik<1 ? 'günde birden fazla' : 'ortalama '+Math.round(b.aralik)+' günde bir') : 'henüz veri az', '')
+    +   satir('Instagram', skIg(m) ? skIgLink(m) : 'Eklenmemiş', skIg(m) ? '' : 'üye isterse kart sayfasından ekler')
     +   satir('Üye no', '#'+skEsc(m.id!=null?m.id:'—'), '')
     + '</div></div>'
     + '<div class="sk-blok"><h4>Hareketler</h4><div id="skHareket" class="sk-bos" style="padding:14px 0;">Yükleniyor…</div></div>'
@@ -4199,16 +4207,16 @@ async function kartHareketYukle(tel){
     var el2 = document.getElementById('skHareket'); if(el2) el2.textContent = 'Hareketler yüklenemedi.';
   }
 }
-function kartDuzenleTel(tel){ var m=_kartMap[skRakam(tel)]; if(m) kartDuzenle(JSON.stringify({telefon:m.telefon, ad:m.ad})); }
+function kartDuzenleTel(tel){ var m=_kartMap[skRakam(tel)]; if(m) kartDuzenle(JSON.stringify({telefon:m.telefon, ad:m.ad, instagram:m.instagram||''})); }
 
 /* Görünen listeyi (filtre + arama uygulanmış) Excel'in açtığı CSV olarak indirir */
 function kartCsvIndir(){
   var data = kartSecili();
   if(!data.length){ toast('Aktarılacak üye yok.'); return; }
   var h = function(v){ v=String(v==null?'':v); if(/^[=+\-@]/.test(v)) v="'"+v; return '"'+v.replace(/"/g,'""')+'"'; };
-  var satirlar = [['Ad','Telefon','Kayıt tarihi','Kayıt kaynağı','KVKK onayı','Karttaki yıldız','Toplam yıldız','Verilen hediye','Bekleyen hediye','Son işlem','Durum']];
+  var satirlar = [['Ad','Telefon','Instagram','Kayıt tarihi','Kayıt kaynağı','KVKK onayı','Karttaki yıldız','Toplam yıldız','Verilen hediye','Bekleyen hediye','Son işlem','Durum']];
   data.forEach(function(m){ var b=m._b;
-    satirlar.push([m.ad||'', skTel(m.telefon), skTarih(m.kayit_tarih,true), b.kaynak, b.kvkk?skTarih(m.kvkk_onay,true):'', b.pul, b.toplam, b.kullanilan, b.hak, skTarih(m.son_islem,true), SK_DURUM[b.durum]]);
+    satirlar.push([m.ad||'', skTel(m.telefon), skIg(m), skTarih(m.kayit_tarih,true), b.kaynak, b.kvkk?skTarih(m.kvkk_onay,true):'', b.pul, b.toplam, b.kullanilan, b.hak, skTarih(m.son_islem,true), SK_DURUM[b.durum]]);
   });
   var csv = '﻿' + satirlar.map(function(s){ return s.map(h).join(';'); }).join('\r\n');
   var a = document.createElement('a');
@@ -4267,6 +4275,7 @@ function kartDuzenle(mJson){
   document.getElementById('kdOrijTel').value = m.telefon || '';
   document.getElementById('kdAd').value = m.ad || '';
   document.getElementById('kdTel').value = m.telefon || '';
+  document.getElementById('kdIg').value = m.instagram || '';
   document.getElementById('kdModal').style.display = 'flex';
 }
 
@@ -4281,6 +4290,7 @@ async function kartDuzenleKaydet(){
   if(!yeniTel){ toast('Telefon numarası gerekli.'); return; }
   var payload = {telefon: orijTel};
   payload.yeni_ad = yeniAd;
+  payload.yeni_instagram = document.getElementById('kdIg').value.trim();
   if(yeniTel !== orijTel.replace(/\D/g,'')) payload.yeni_telefon = yeniTel;
   var btn = document.getElementById('kdKaydetBtn');
   btn.disabled = true; btn.textContent = 'Kaydediliyor…';
@@ -4349,9 +4359,13 @@ async function ziyaretYukle(){
       <label style="display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px;">Ad Soyad</label>
       <input id="kdAd" type="text" placeholder="Ad Soyad" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;">
     </div>
-    <div style="margin-bottom:28px;">
+    <div style="margin-bottom:18px;">
       <label style="display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px;">Telefon</label>
       <input id="kdTel" type="tel" placeholder="05XXXXXXXXX" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;">
+    </div>
+    <div style="margin-bottom:28px;">
+      <label style="display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px;">Instagram (isteğe bağlı)</label>
+      <input id="kdIg" type="text" placeholder="kullaniciadi" autocapitalize="none" autocomplete="off" spellcheck="false" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;">
     </div>
     <div style="display:flex;gap:12px;">
       <button onclick="kartDuzenleKapat()" style="flex:1;padding:11px;background:#f5f5f5;color:#666;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;">İptal</button>

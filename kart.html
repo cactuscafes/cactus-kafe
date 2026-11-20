@@ -90,6 +90,20 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
 .giris-btn:hover{background:linear-gradient(135deg,#d8b87a,var(--amber));transform:translateY(-1px);box-shadow:0 6px 24px rgba(200,168,106,.3);}
 .giris-btn:disabled{background:rgba(232,160,48,.3);color:rgba(26,12,4,.5);cursor:default;transform:none;box-shadow:none;}
 .giris-hata{font-size:12px;color:#ff8c6e;text-align:center;padding:8px;min-height:32px;}
+.giris-ig-not{font-size:10.5px;color:rgba(245,234,216,.55);margin:-6px 2px 12px;line-height:1.5;text-align:left;}
+/* Instagram hatırlatması (kart sayfası) */
+.ig-kutu{background:rgba(255,255,255,.04);border:1px solid rgba(200,168,106,.18);border-radius:14px;padding:14px 16px;margin-bottom:14px;position:relative;}
+.ig-baslik{font-size:13px;font-weight:600;color:var(--latte);}
+.ig-alt{font-size:11px;color:rgba(245,234,216,.62);margin-top:3px;line-height:1.5;}
+.ig-satir{display:flex;gap:8px;margin-top:10px;}
+.ig-satir input{flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:1.5px solid rgba(232,160,48,.2);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;color:var(--latte);outline:none;}
+.ig-satir input:focus{border-color:rgba(232,196,122,.6);}
+.ig-satir button{flex:none;padding:10px 16px;border:none;border-radius:9px;background:#c8a86a;color:#1a3010;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;}
+.ig-satir button:disabled{opacity:.6;cursor:default;}
+.ig-hata{font-size:11px;color:#ffb4a2;margin-top:6px;min-height:0;}
+.ig-sonra{display:inline-block;margin-top:8px;font-size:11px;color:rgba(245,234,216,.5);text-decoration:underline;}
+.ig-takip{display:inline-block;margin-top:10px;padding:9px 16px;border-radius:100px;background:#c8a86a;color:#1a3010;font-size:12.5px;font-weight:700;text-decoration:none;}
+.ig-kapat{position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(245,234,216,.5);font-size:15px;cursor:pointer;padding:4px;}
 .giris-tesvik{font-size:12px;color:var(--amber);text-align:center;margin:2px 0 12px;letter-spacing:.3px;}
 .giris-tesvik b{color:var(--latte);font-weight:600;}
 .giris-kvkk{font-size:10.5px;color:rgba(245,234,216,.62);text-align:center;margin-top:12px;line-height:1.55;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:6px;}
@@ -327,13 +341,16 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
           inputmode="numeric" maxlength="11" oninput="telFormat(this)" onkeydown="if(event.key==='Enter')girisYap()">
         <input class="giris-input" id="adInput" type="text" placeholder="Adın Soyadın" autocomplete="name" aria-label="Ad soyad"
           oninput="kartFormCheck()" onkeydown="if(event.key==='Enter')girisYap()">
+        <input class="giris-input" id="igInput" type="text" placeholder="Instagram adın (isteğe bağlı)" aria-label="Instagram kullanıcı adı (isteğe bağlı)"
+          autocapitalize="none" autocomplete="off" spellcheck="false" maxlength="60" onkeydown="if(event.key==='Enter')girisYap()">
+        <div class="giris-ig-not" id="igNot">Yazarsan seni takip eder, Cactus paylaşımlarında etiketleyebiliriz. Boş bırakabilirsin.</div>
         <div class="giris-tesvik">🎁 İlk kez mi? <b>İlk yıldızın bizden.</b></div>
         <label class="kvkk-onay" id="kvkkRow">
           <input type="checkbox" id="kvkkChk" onchange="kartFormCheck()" aria-label="KVKK onayı">
-          <span><a href="javascript:void(0)" onclick="kvkkAc(event)">KVKK Aydınlatma Metni</a>'ni okudum; ad-soyad ve telefon numaramın sadakat programı için işlenmesine açık rıza veriyorum.</span>
+          <span><a href="javascript:void(0)" onclick="kvkkAc(event)">KVKK Aydınlatma Metni</a>'ni okudum; ad-soyad ve telefon numaramın, yazdıysam Instagram kullanıcı adımın sadakat programı için işlenmesine açık rıza veriyorum.</span>
         </label>
         <div class="kvkk-metin" id="kvkkMetin" style="display:none;">
-          <b>Veri Sorumlusu:</b> Cactus Coffee (Nilüfer/Bursa) · <b>İşlenen veriler:</b> ad-soyad, telefon numarası ve yıldız/işlem geçmişi · <b>Amaç:</b> dijital sadakat programının yürütülmesi (yıldız kazanımı ve hediye takibi) · <b>Hukuki sebep:</b> açık rızanız · <b>Aktarım:</b> verileriniz üçüncü kişilerle paylaşılmaz, reklam amaçlı kullanılmaz; yalnızca hizmet altyapı sağlayıcımızın sunucularında saklanır · <b>Saklama:</b> üyeliğiniz süresince; talebinizle silinir · <b>Haklarınız (KVKK m.11):</b> verilerinize erişme, düzeltme, silme ve rızayı geri çekme için kafede personele başvurabilir veya <a href="tel:+905380146600">0538 014 66 00</a>'ı arayabilirsiniz.
+          <b>Veri Sorumlusu:</b> Cactus Coffee (Nilüfer/Bursa) · <b>İşlenen veriler:</b> ad-soyad, telefon numarası, yıldız/işlem geçmişi ve (yalnızca siz yazarsanız) Instagram kullanıcı adı · <b>Amaç:</b> dijital sadakat programının yürütülmesi (yıldız kazanımı ve hediye takibi); Instagram kullanıcı adınız yalnızca sizi Instagram'da takip etmek ve paylaşımlarımızda etiketleyebilmek için kullanılır · <b>Hukuki sebep:</b> açık rızanız · <b>Aktarım:</b> verileriniz üçüncü kişilerle paylaşılmaz, reklam amaçlı kullanılmaz; yalnızca hizmet altyapı sağlayıcımızın sunucularında saklanır · <b>Saklama:</b> üyeliğiniz süresince; talebinizle silinir · <b>Haklarınız (KVKK m.11):</b> verilerinize erişme, düzeltme, silme ve rızayı geri çekme için kafede personele başvurabilir veya <a href="tel:+905380146600">0538 014 66 00</a>'ı arayabilirsiniz.
         </div>
         <button class="giris-btn" id="girisBtn" onclick="girisYap()" disabled>Kartımı Oluştur →</button>
         <div class="giris-hata" id="girisHata"></div>
@@ -394,6 +411,26 @@ body{font-family:'Inter',sans-serif;background:var(--espresso);color:var(--latte
       </div>
 
 
+      <!-- Instagram: adresi olmayana küçük hatırlatma, olana takip daveti -->
+      <div class="ig-kutu" id="igKutu" style="display:none">
+        <div id="igSor">
+          <div class="ig-baslik">📸 Instagram'ını ekler misin?</div>
+          <div class="ig-alt">Seni takip edelim, Cactus paylaşımlarında etiketleyelim. İsteğe bağlı.</div>
+          <div class="ig-satir">
+            <input id="igEkInput" type="text" placeholder="@kullaniciadin" aria-label="Instagram kullanıcı adı" autocapitalize="none" autocomplete="off" spellcheck="false" maxlength="60" onkeydown="if(event.key==='Enter')igKaydet()">
+            <button id="igEkBtn" onclick="igKaydet()">Ekle</button>
+          </div>
+          <div class="ig-hata" id="igHata"></div>
+          <a href="javascript:void(0)" class="ig-sonra" onclick="igSonra()">Şimdi değil</a>
+        </div>
+        <div id="igTamam" style="display:none">
+          <button class="ig-kapat" onclick="igTakipKapat()" aria-label="Kapat">✕</button>
+          <div class="ig-baslik" id="igTamamBaslik">Biz de Instagram'dayız 🌵</div>
+          <div class="ig-alt">Yeni lezzetleri ve kampanyaları ilk oradan duyuruyoruz.</div>
+          <a class="ig-takip" href="https://www.instagram.com/cactuscafe.tr/" target="_blank" rel="noopener">@cactuscafe.tr'yi takip et</a>
+        </div>
+      </div>
+
       <!-- Geçmiş -->
       <div class="gecmis-baslik">Son İşlemler</div>
       <div id="gecmisListe"></div>
@@ -423,6 +460,49 @@ function kartToast(msg){
   el.textContent=msg;
   requestAnimationFrame(function(){ el.classList.add('on'); });
   clearTimeout(_ktt); _ktt=setTimeout(function(){ el.classList.remove('on'); },4200);
+}
+
+/* ── Instagram (isteğe bağlı) ──
+   Sunucu adresi herkese açık yanıtta döndürmez; yalnızca instagram_var (var/yok) gelir. */
+function igTemizle(v){
+  var s=String(v||'').trim().toLowerCase();
+  s=s.replace(/^https?:\/\/(www\.)?instagram\.com\//,'').replace(/^@+/,'').replace(/[\/?#].*$/,'');
+  return /^[a-z0-9._]{1,30}$/.test(s)?s:'';
+}
+var _igEklendi=false;
+function igGuncelle(m){
+  var kutu=document.getElementById('igKutu'); if(!kutu) return;
+  var sor=document.getElementById('igSor'), tamam=document.getElementById('igTamam');
+  var varMi=_igEklendi||!!(m&&(m.instagram||m.instagram_var));
+  var oku=function(k){ try{return Number(localStorage.getItem(k))||0;}catch(e){return 0;} };
+  if(varMi){
+    // Adresi olan üyeye bir kez "bizi takip et" daveti (kapatınca bir daha gelmez)
+    sor.style.display='none'; tamam.style.display='';
+    kutu.style.display=(_igEklendi||!oku('cactus_ig_takip_kapali'))?'':'none';
+  } else {
+    // Adresi olmayana hatırlatma; "Şimdi değil" denirse 14 gün sonra yeniden sorulur
+    tamam.style.display='none'; sor.style.display='';
+    kutu.style.display=(Date.now()-oku('cactus_ig_sonra')>14*86400000)?'':'none';
+  }
+}
+function igSonra(){ try{localStorage.setItem('cactus_ig_sonra',String(Date.now()));}catch(e){} document.getElementById('igKutu').style.display='none'; }
+function igTakipKapat(){ try{localStorage.setItem('cactus_ig_takip_kapali','1');}catch(e){} _igEklendi=false; document.getElementById('igKutu').style.display='none'; }
+function igKaydet(){
+  var inp=document.getElementById('igEkInput'), btn=document.getElementById('igEkBtn'), hata=document.getElementById('igHata');
+  var ig=igTemizle(inp.value);
+  if(!ig){ hata.textContent='Kullanıcı adında yalnızca harf, rakam, nokta ve alt çizgi olabilir.'; return; }
+  hata.textContent=''; btn.disabled=true; btn.textContent='…';
+  fetch(API+'/kart/instagram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:_kartTel,instagram:ig})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled=false; btn.textContent='Ekle';
+      if(d.ok||d.zaten){
+        _igEklendi=true;
+        document.getElementById('igTamamBaslik').textContent=d.ok?'Teşekkürler, ekledik 🌵':'Instagram adresin zaten kayıtlı 🌵';
+        igGuncelle({instagram_var:true});
+      } else { hata.textContent=d.error||'Kaydedilemedi, tekrar dene.'; }
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent='Ekle'; hata.textContent='Bağlantı hatası. Tekrar dene.'; });
 }
 
 function telFormat(input){
@@ -472,6 +552,7 @@ function girisModuDegis(){
   var kvkkRow=document.getElementById('kvkkRow'), kvkkMetin=document.getElementById('kvkkMetin');
   if(_viewMode){
     ad.style.display='none'; ad.value='';
+    ['igInput','igNot'].forEach(function(i){ var e=document.getElementById(i); if(e) e.style.display='none'; });
     if(baslik) baslik.textContent='Kartını Gör';
     if(alt) alt.textContent='Telefonunu gir, yıldızlarını gör';
     if(tesvik) tesvik.style.display='none';
@@ -481,6 +562,7 @@ function girisModuDegis(){
     if(link) link.innerHTML='Yeni misin? <b>Kart oluştur</b>';
   } else {
     ad.style.display='';
+    ['igInput','igNot'].forEach(function(i){ var e=document.getElementById(i); if(e) e.style.display=''; });
     if(baslik) baslik.textContent='Kartını Oluştur';
     if(alt) alt.textContent='Ad soyad ve telefonun yeterli — uygulama yok, üyelik yok';
     if(tesvik) tesvik.style.display='';
@@ -507,10 +589,12 @@ function girisYap(){
   }
   if(!ad||ad.length<2){hata.textContent='Lütfen ad soyad girin.';return;}
   if(!((document.getElementById('kvkkChk')||{}).checked)){hata.textContent='Devam etmek için KVKK aydınlatma metnini onaylamalısın.';return;}
+  var igHam=((document.getElementById('igInput')||{}).value||'').trim(), ig=igTemizle(igHam);
+  if(igHam && !ig){hata.textContent='Instagram kullanıcı adını kontrol et ya da boş bırak (harf, rakam, nokta, alt çizgi).';return;}
   hata.textContent='';
   document.getElementById('girisBtn').disabled=true;
   sayfa('sayfaYukl');
-  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad,kvkk:true})})
+  fetch(API+'/kart/kayit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel,ad:ad,kvkk:true,instagram:ig})})
     .then(function(r){return r.json();})
     .then(function(d){
       if(!d.ok){throw new Error(d.error||'Hata');}
@@ -607,6 +691,7 @@ function kartGoster(m, oncekiGoster){
   document.getElementById('dkHediyeNo').textContent=bedavaHak+' hak';
   document.getElementById('statPul').textContent=pul;
   document.getElementById('statToplam').textContent=topKaz;
+  igGuncelle(m);
   var banner=document.getElementById('bedavaBanner');
   banner.style.display=bedavaHak>0?'flex':'none';
   // Kutlama: hediye hakkı varsa (oturumda hak sayısı başına bir kez) konfeti patlat

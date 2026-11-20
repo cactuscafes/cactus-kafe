@@ -937,38 +937,123 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       </div>
 
       <!-- SADAKAT KARTI -->
+      <style>
+      /* ── Sadakat üyeleri paneli (sk-) ── */
+      .sk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+      .sk-head .psub{margin-bottom:0}
+      .sk-btn{padding:9px 16px;border-radius:100px;border:1px solid var(--stone);background:var(--surface);color:var(--ink);font:500 12px/1 'Inter',sans-serif;cursor:pointer;transition:border-color .18s,background .18s;white-space:nowrap}
+      .sk-btn:hover{border-color:var(--ink)}
+      .sk-btn.koyu{background:var(--ink);border-color:var(--ink);color:#fff}
+      .sk-btn.altin{background:var(--gold);border-color:var(--gold);color:#fff}
+      .sk-btn.kirmizi{color:#b23a2c;border-color:#efc9c3;background:#fff7f5}
+      .sk-ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+      .sk-kutu{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px;box-shadow:var(--shadow)}
+      .sk-kutu > b{display:block;font:500 28px/1.1 'Fraunces',serif;color:var(--ink)}
+      .sk-kutu > span{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--mist);margin-top:6px}
+      .sk-kutu > i{display:block;font-style:normal;font-size:11.5px;color:#5c7a4f;margin-top:4px}
+      .sk-kutu.vurgu{border-color:var(--gold)} .sk-kutu.vurgu > b{color:var(--gold)}
+      .sk-grafik{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-bottom:22px}
+      .sk-grafik h4{font:600 12px/1 'Inter',sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--mist);margin-bottom:14px}
+      .sk-hafta{display:flex;align-items:flex-end;gap:8px;height:120px}
+      .sk-hafta div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;min-width:0}
+      .sk-hafta u{display:block;width:100%;max-width:38px;background:linear-gradient(180deg,#3f6b34,#2d5a27);border-radius:6px 6px 2px 2px;min-height:2px;text-decoration:none}
+      .sk-hafta b{font:600 11.5px/1 'Inter',sans-serif;color:var(--ink)}
+      .sk-hafta span{font-size:10px;color:var(--mist);white-space:nowrap}
+      .sk-cubuk{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:8px}
+      .sk-cubuk em{width:112px;font-style:normal;color:#5a564e;flex:none}
+      .sk-cubuk s{flex:1;height:8px;border-radius:8px;background:var(--paper);overflow:hidden;text-decoration:none}
+      .sk-cubuk s u{display:block;height:100%;border-radius:8px;text-decoration:none}
+      .sk-cubuk b{width:64px;text-align:right;font-weight:600;flex:none} .sk-cubuk b small{color:var(--mist);font-weight:400}
+      .sk-arac{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+      .sk-ara{flex:1 1 220px;max-width:320px;padding:10px 14px 10px 36px;border:1px solid var(--stone);border-radius:100px;font:400 13px 'Inter',sans-serif;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239a958a' stroke-width='1.6'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M10.5 10.5L14 14'/%3E%3C/svg%3E") 13px 50% no-repeat;outline:none}
+      .sk-ara:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,150,90,.13)}
+      .sk-chip{padding:7px 13px;border-radius:100px;border:1px solid var(--stone);background:var(--surface);font:500 12px/1 'Inter',sans-serif;color:#4a4843;cursor:pointer;white-space:nowrap}
+      .sk-chip small{color:var(--mist);margin-left:4px}
+      .sk-chip.on{background:var(--ink);border-color:var(--ink);color:#fff} .sk-chip.on small{color:rgba(255,255,255,.65)}
+      .sk-sec{padding:8px 12px;border-radius:100px;border:1px solid var(--stone);background:var(--surface);font:500 12px 'Inter',sans-serif;color:var(--ink);cursor:pointer}
+      .sk-tablo{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);overflow-x:auto;box-shadow:var(--shadow)}
+      .sk-tablo table{font-size:12.5px}
+      .sk-tablo th{padding:12px 14px;background:#faf6ee}
+      .sk-tablo td{padding:12px 14px;vertical-align:middle;white-space:nowrap}
+      .sk-tablo tbody tr{cursor:pointer;transition:background .15s}
+      .sk-tablo tbody tr:hover{background:#faf6ee}
+      .sk-tablo tbody tr:last-child td{border-bottom:none}
+      .sk-uye{display:flex;align-items:center;gap:11px;min-width:0}
+      .sk-avatar{flex:none;width:34px;height:34px;border-radius:50%;background:#e9efe2;color:#2d5a27;font:600 13px/34px 'Inter',sans-serif;text-align:center}
+      .sk-avatar.buyuk{width:52px;height:52px;line-height:52px;font-size:19px}
+      .sk-uye b{display:block;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+      .sk-uye span{display:block;font-size:11.5px;color:var(--mist);margin-top:2px;font-variant-numeric:tabular-nums}
+      .sk-alt{display:block;font-size:11px;color:var(--mist);margin-top:2px}
+      .sk-nokta{display:inline-flex;gap:3px;vertical-align:middle}
+      .sk-nokta i{width:9px;height:9px;border-radius:50%;background:#e4ddd0}
+      .sk-nokta i.d{background:var(--gold)}
+      .sk-etk{display:inline-block;padding:3px 9px;border-radius:100px;font:600 10.5px/1.3 'Inter',sans-serif;letter-spacing:.3px;white-space:nowrap}
+      .sk-etk.yeni{background:#e6f0e0;color:#2d5a27} .sk-etk.aktif{background:#e8f1f6;color:#2c5f7a}
+      .sk-etk.seyrek{background:#f6efdc;color:#8a6a1f} .sk-etk.uykuda{background:#efece6;color:#7d786e}
+      .sk-etk.hediye{background:var(--gold);color:#fff}
+      .sk-bos{padding:36px 16px;text-align:center;color:var(--mist);font-size:13px}
+      .sk-uyari{background:#fff8e6;border:1px solid #ecd9a4;border-radius:var(--rad-sm);padding:10px 14px;font-size:12px;color:#7a5c12;margin-bottom:14px}
+      .sk-mob{display:flex;flex-direction:column;gap:10px}
+      .sk-mob > div{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:14px;cursor:pointer}
+      .sk-mob .sk-satir{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:11.5px;color:var(--mist)}
+      /* çekmece (üye detayı) */
+      .sk-cek{position:fixed;inset:0;z-index:9990;display:none}
+      .sk-cek.on{display:block}
+      .sk-cek-bg{position:absolute;inset:0;background:rgba(20,18,14,.42)}
+      .sk-cek-ic{position:absolute;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--paper);overflow-y:auto;box-shadow:-18px 0 40px -20px rgba(0,0,0,.35);padding:22px 22px 40px;font-family:'Inter',sans-serif}
+      .sk-cek-ust{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+      .sk-cek-ust h3{font:500 22px/1.15 'Fraunces',serif;color:var(--ink);word-break:break-word}
+      .sk-cek-ust p{font-size:13px;color:var(--mist);margin-top:3px;font-variant-numeric:tabular-nums}
+      .sk-kapat{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--stone);background:var(--surface);font-size:16px;cursor:pointer;color:var(--ink)}
+      .sk-eylem{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+      .sk-eylem a{text-decoration:none}
+      .sk-blok{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px;margin-bottom:12px}
+      .sk-blok h4{font:600 11px/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--mist);margin-bottom:12px}
+      .sk-kart-buyuk{display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .sk-kart-buyuk .sk-nokta i{width:22px;height:22px}
+      .sk-kart-buyuk b{font:500 24px/1 'Fraunces',serif;color:var(--ink)}
+      .sk-ozl{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+      .sk-ozl div span{display:block;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mist)}
+      .sk-ozl div b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-top:3px}
+      .sk-ozl div small{display:block;font-size:11px;color:var(--mist);margin-top:1px}
+      .sk-zaman{list-style:none}
+      .sk-zaman li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+      .sk-zaman li:last-child{border-bottom:none}
+      .sk-zaman i{flex:none;width:26px;height:26px;border-radius:50%;font:700 12px/26px 'Inter',sans-serif;text-align:center;font-style:normal;background:#e6f0e0;color:#2d5a27}
+      .sk-zaman i.k{background:var(--gold);color:#fff}
+      .sk-zaman b{display:block;font-weight:600;color:var(--ink)}
+      .sk-zaman span{display:block;font-size:11px;color:var(--mist);margin-top:2px}
+      @media(max-width:900px){.sk-grafik{grid-template-columns:1fr}}
+      @media(max-width:700px){.sk-ara{max-width:none;flex-basis:100%}.sk-ozet{grid-template-columns:1fr 1fr}.sk-kutu > b{font-size:23px}}
+      </style>
       <div class="panel" id="panel-sadakat">
-        <div class="pttl">🎖 Sadakat Kartı</div>
-        <div class="psub">Kayıtlı müşteriler · 7 pul = 1 bedava içecek</div>
-        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
-          <button onclick="kartListeYukle()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">↻ Yenile</button>
-          <select id="kartFilter" style="display:none;">
-            <option value="hepsi">Tüm Müşteriler</option>
-            <option value="yeni">Yeni Kayıt</option>
-            <option value="bedava">Bedava Hakkı</option>
-          </select>
-          <div id="kartFilterChips" style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button onclick="kartFilterSec('hepsi',this)" class="kf-chip on" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">Tümü</button>
-            <button onclick="kartFilterSec('yeni',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🆕 Bugün Kayıt</button>
-            <button onclick="kartFilterSec('bedava',this)" class="kf-chip" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;">🎁 Bedava Hakkı</button>
+        <div class="sk-head">
+          <div>
+            <div class="pttl">Sadakat Üyeleri</div>
+            <div class="psub">Kayıtlı üyeler ve hareketleri · 7 yıldız = 1 hediye içecek</div>
           </div>
-          <select id="kartSirala" onchange="kartListeRender()" title="Sıralama" style="padding:7px 12px;border-radius:100px;border:1.5px solid var(--stone);background:#fff;font-size:11.5px;font-weight:600;font-family:inherit;color:#1a1a1a;cursor:pointer;">
-            <option value="kayit_yeni">↓ En son kayıt olan</option>
-            <option value="kayit_eski">↑ İlk kayıt olanlar</option>
-            <option value="yildiz_cok">⭐ En çok yıldız</option>
-            <option value="yildiz_az">⭐ En az yıldız</option>
-            <option value="aktif_pul">🎁 Kartta en çok pul (bedavaya en yakın)</option>
-            <option value="son_islem">🕒 Son işlem (en yakın)</option>
-            <option value="ad">🔤 Ada göre (A→Z)</option>
-          </select>
-          <span id="kartSayac" style="font-size:12px;color:var(--mist);"></span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="sk-btn" onclick="kartCsvIndir()">⬇ Excel'e aktar</button>
+            <button class="sk-btn koyu" onclick="kartListeYukle()">↻ Yenile</button>
+          </div>
         </div>
-        <!-- Özet kartlar -->
-        <div id="kartOzet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;"></div>
-        <!-- Analitik blok -->
-        <div id="kartAnalitik" style="margin-bottom:24px;"></div>
-        <!-- Müşteri listesi -->
-        <div style="font-size:13px;font-weight:600;color:#555;margin:0 0 10px;border-top:1.5px solid var(--stone);padding-top:18px;">👥 Tüm Müşteriler</div>
+        <div id="kartUyari"></div>
+        <div id="kartOzet" class="sk-ozet"></div>
+        <div id="kartAnalitik"></div>
+        <div class="sk-arac">
+          <input id="kartAra" class="sk-ara" type="search" placeholder="Ad ya da telefon ara" oninput="kartListeRender()" autocomplete="off">
+          <div id="kartFilterChips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+          <select id="kartSirala" class="sk-sec" onchange="kartListeRender()" title="Sıralama">
+            <option value="kayit_yeni">En son kayıt olan</option>
+            <option value="kayit_eski">İlk kayıt olanlar</option>
+            <option value="son_islem">Son işlem (en yakın)</option>
+            <option value="yildiz_cok">En çok yıldız</option>
+            <option value="yildiz_az">En az yıldız</option>
+            <option value="aktif_pul">Hediyeye en yakın</option>
+            <option value="ad">Ada göre (A→Z)</option>
+          </select>
+          <span id="kartSayac" style="font-size:12px;color:var(--mist);margin-left:auto;"></span>
+        </div>
         <div id="kartListesi"></div>
       </div>
 
@@ -3805,7 +3890,7 @@ function limonataRender(){
     var verildi = !!k.kullanildi;
     return '<div style="border:1.5px solid '+(verildi?'var(--stone)':'var(--gold)')+';border-radius:10px;padding:13px 15px;margin-bottom:9px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;'+(verildi?'opacity:.7;':'')+'">'
       + '<div style="flex:1;min-width:190px;">'
-      +   '<div style="font-weight:700;font-size:14px;color:var(--ink);">'+(k.musteri_ad || 'İsimsiz')+'</div>'
+      +   '<div style="font-weight:700;font-size:14px;color:var(--ink);">'+skEsc(k.musteri_ad || 'İsimsiz')+'</div>'
       +   '<div style="font-size:12px;color:var(--mist);margin-top:2px;">'+k.telefon+' · '+oyun+' · '+k.skor+' '+birim+'</div>'
       +   '<div style="font-size:11px;color:var(--mist);margin-top:3px;">Kazandı: '+limonataTarih(k.kazanma)
       +     (verildi ? ' · Verildi: '+limonataTarih(k.kullanma) : '')+'</div>'
@@ -3845,240 +3930,293 @@ async function limonataSil(id, tel){
   } catch(e){ alert('Hata: ' + e.message); }
 }
 
-/* ══════════ SADAKAT KARTI ══════════ */
+/* ══════════ SADAKAT ÜYELERİ ══════════
+   Liste /kart/listele'den, üye hareketleri /kart/bak'tan (yönetim anahtarıyla maskesiz) gelir.
+   Üye adı müşterinin kendi yazdığı metindir → HTML'e basılmadan önce her yerde skEsc() ile kaçırılır. */
 var KART_API = RAPOR_API;
-var _kartVerisi = [];
+var _kartVerisi = [], _kartMap = {}, _kartFiltre = 'hepsi', _kartAcik = null, _kartGercekToplam = null;
+var SK_GUN = 86400000;
+var SK_DURUM = {yeni:'Yeni', aktif:'Aktif', seyrek:'Seyrek', uykuda:'Uykuda'};
+
+function skEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function skRakam(t){ return String(t||'').replace(/\D/g,''); }
+function skTel(t){ t=skRakam(t); return t.length===11 ? t.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/,'$1 $2 $3 $4') : t; }
+function skTs(t){ var d=t?new Date(t).getTime():0; return isNaN(d)?0:d; }
+function skGun(t){ var d=skTs(t); return d ? (Date.now()-d)/SK_GUN : Infinity; }
+function skTarih(t,saat){
+  var d=skTs(t); if(!d) return '—';
+  var o={day:'2-digit',month:'short',year:'numeric',timeZone:'Europe/Istanbul'};
+  if(saat){ o.hour='2-digit'; o.minute='2-digit'; }
+  return new Date(d).toLocaleString('tr-TR',o);
+}
+function skOnce(t){
+  var g=skGun(t); if(g===Infinity) return '—';
+  if(g<1){ var s=Math.floor(g*24); return s<1?'az önce':s+' saat önce'; }
+  if(g<2) return 'dün';
+  if(g<31) return Math.floor(g)+' gün önce';
+  if(g<365) return Math.floor(g/30)+' ay önce';
+  return Math.floor(g/365)+' yıl önce';
+}
+function skBasHarf(ad){ ad=String(ad||'').trim(); return ad ? ad.charAt(0).toLocaleUpperCase('tr') : '?'; }
+/* Bir üyenin ham kaydından türetilen bilgiler */
+function skBilgi(m){
+  var pul=m.pul||0, top=m.toplam_kazanilan||0;
+  var kayitG=skGun(m.kayit_tarih), sonG=skGun(m.son_islem);
+  var durum = kayitG<=7 ? 'yeni' : (sonG<=30 ? 'aktif' : (sonG<=60 ? 'seyrek' : 'uykuda'));
+  var aralik=null;
+  if(top>1){ var f=skTs(m.son_islem)-skTs(m.kayit_tarih); if(f>SK_GUN/2) aralik=f/SK_GUN/(top-1); }
+  return { pul:pul, toplam:top, hak:Math.floor(pul/7), kart:pul%7,
+           kullanilan:Math.max(0,Math.round((top-pul)/7)),
+           kayitG:kayitG, sonG:sonG, durum:durum, kvkk:!!m.kvkk_onay,
+           kaynak:m.kvkk_onay?'Kart sayfası':'Kasa', aralik:aralik };
+}
+function skNokta(b){
+  var dolu = (b.hak>0 && b.kart===0) ? 7 : b.kart, h='<span class="sk-nokta">';
+  for(var i=0;i<7;i++) h+='<i'+(i<dolu?' class="d"':'')+'></i>';
+  return h+'</span>';
+}
+function skEtiket(b){
+  return (b.hak>0?'<span class="sk-etk hediye">Hediye hazır</span> ':'')
+       + '<span class="sk-etk '+b.durum+'">'+SK_DURUM[b.durum]+'</span>';
+}
+var SK_FILTRE = {
+  hepsi:   {ad:'Tümü',          f:function(){ return true; }},
+  yeni:    {ad:'Yeni (7 gün)',  f:function(m,b){ return b.kayitG<=7; }},
+  aktif:   {ad:'Aktif',         f:function(m,b){ return b.sonG<=30; }},
+  uykuda:  {ad:'Uykuda',        f:function(m,b){ return b.sonG>60; }},
+  bedava:  {ad:'Hediye hazır',  f:function(m,b){ return b.hak>0; }},
+  yaklasan:{ad:'Hediyeye yakın',f:function(m,b){ return b.hak===0 && b.kart>=5; }}
+};
 
 async function kartListeYukle(){
   var listEl = document.getElementById('kartListesi');
-  var ozetEl = document.getElementById('kartOzet');
-  var sayacEl = document.getElementById('kartSayac');
   if(!listEl) return;
-  listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Yükleniyor...</div>';
+  listEl.innerHTML = '<div class="sk-bos">Yükleniyor…</div>';
   try {
     var r = await fetch(KART_API + '/kart/listele');
-    _kartVerisi = await r.json();
-    var bedavaCount = _kartVerisi.filter(function(m){ return m.pul >= 5; }).length;
-    // Panel açıldı = yeni kayıt bildirimi görüldü → rozeti temizle + "görülme" zamanını işaretle
+    var veri = await r.json();
+    if(!Array.isArray(veri)) throw new Error((veri && veri.error) || 'Beklenmeyen yanıt');
+    _kartVerisi = veri; _kartMap = {};
+    _kartVerisi.forEach(function(m){ m._b = skBilgi(m); _kartMap[skRakam(m.telefon)] = m; });
+    // Gerçek üye sayısı (liste sunucuda 200 kayıtla sınırlı — eksik varsa uyar)
+    try { var s = await (await fetch(KART_API + '/kart/sayac')).json(); _kartGercekToplam = (s && s.ok) ? s.uye : null; } catch(e){ _kartGercekToplam = null; }
+    // Panel açıldı = yeni kayıt bildirimi görüldü
     try{ localStorage.setItem(KEYS.sadakatGorulen, String(Date.now())); }catch(e){}
     var badge = document.getElementById('sadakatBadge');
     if(badge){ badge.style.display = 'none'; }
-    // Özet
-    var toplam = _kartVerisi.length;
-    var toplamPul = _kartVerisi.reduce(function(s,m){ return s + (m.toplam_kazanilan||0); }, 0);
-    ozetEl.innerHTML = [
-      {label:'Kayıtlı Müşteri', val: toplam},
-      {label:'Bedava Hakkı Olan', val: bedavaCount, hl: bedavaCount > 0},
-      {label:'Toplam Kazanılan Pul', val: toplamPul}
-    ].map(function(k){
-      return '<div class="kart" style="text-align:center;'+(k.hl?'border-color:var(--gold);':'')+'">'
-        +'<div style="font-size:24px;font-weight:700;font-family:\'Fraunces\',serif;color:'+(k.hl?'var(--gold)':'var(--ink)')+'">' + k.val + '</div>'
-        +'<div style="font-size:11px;color:var(--mist);letter-spacing:1px;margin-top:2px;">' + k.label + '</div>'
-        +'</div>';
-    }).join('');
-    sayacEl.textContent = toplam + ' müşteri';
-    kartAnalitik();
-    kartListeRender();
+    kartOzet(); kartAnalitik(); kartChipler(); kartListeRender();
+    if(_kartAcik){ if(_kartMap[_kartAcik]) kartDetayAc(_kartAcik); else kartDetayKapat(); }
   } catch(e){
-    listEl.innerHTML = '<div style="color:var(--rd);font-size:13px;padding:20px 0;">Yüklenemedi: ' + e.message + '</div>';
+    listEl.innerHTML = '<div class="sk-bos" style="color:var(--rd);">Yüklenemedi: ' + skEsc(e.message) + '</div>';
   }
+}
+
+function kartOzet(){
+  var el = document.getElementById('kartOzet'), uy = document.getElementById('kartUyari');
+  var d = _kartVerisi, n = d.length;
+  var hafta=0, aktif=0, hediye=0, verilen=0, yildiz=0, kvkk=0;
+  d.forEach(function(m){ var b=m._b;
+    if(b.kayitG<=7) hafta++; if(b.sonG<=30) aktif++;
+    hediye+=b.hak; verilen+=b.kullanilan; yildiz+=b.toplam; if(b.kvkk) kvkk++;
+  });
+  var yuzde = function(x){ return n ? Math.round(x/n*100) : 0; };
+  var kutu = function(deger, etiket, alt, vurgu){
+    return '<div class="sk-kutu'+(vurgu?' vurgu':'')+'"><b>'+deger+'</b><span>'+etiket+'</span>'+(alt?'<i>'+alt+'</i>':'')+'</div>';
+  };
+  var toplam = (_kartGercekToplam && _kartGercekToplam>n) ? _kartGercekToplam : n;
+  el.innerHTML = kutu(toplam, 'Toplam üye', hafta ? '+'+hafta+' bu hafta' : 'bu hafta yeni kayıt yok')
+    + kutu(aktif, 'Aktif (son 30 gün)', '%'+yuzde(aktif)+' oranında')
+    + kutu(hediye, 'Bekleyen hediye', hediye ? 'verilmeyi bekliyor' : '', hediye>0)
+    + kutu(verilen, 'Verilen hediye', 'bugüne kadar')
+    + kutu(yildiz, 'Toplam yıldız', n ? 'üye başı '+(yildiz/n).toFixed(1) : '')
+    + kutu('%'+yuzde(kvkk), 'KVKK onaylı', kvkk+' üye');
+  uy.innerHTML = (_kartGercekToplam && _kartGercekToplam>n)
+    ? '<div class="sk-uyari">Toplam '+_kartGercekToplam+' üye var, ancak liste sunucu tarafında '+n+' kayıtla sınırlı. Aşağıdaki liste ve sayılar en çok yıldızı olan '+n+' üyeyi gösteriyor.</div>' : '';
 }
 
 function kartAnalitik(){
   var el = document.getElementById('kartAnalitik');
   if(!el) return;
-  var data = _kartVerisi || [];
-  if(!data.length){ el.innerHTML=''; return; }
-  var now = Date.now(), GUN = 86400000;
-  var yas = function(t){ if(!t) return Infinity; var d=new Date(t).getTime(); return isNaN(d)?Infinity:(now-d)/GUN; };
-
-  var aktif=0, uykuda=0, yeni=0;
-  var bedavaBekleyen=0, toplamPul=0, yaklasan=0, hicAlmamis=0;
-  data.forEach(function(m){
-    var sonG = yas(m.son_islem);
-    if(sonG<=30) aktif++;
-    if(sonG>60) uykuda++;
-    if(yas(m.kayit_tarih)<=30) yeni++;
-    var p = m.pul||0;
-    toplamPul += p;
-    bedavaBekleyen += Math.floor(p/7);
-    if(p>=5 && p<7) yaklasan++;
-    if(p===0) hicAlmamis++;
-  });
-  var ortPul = (toplamPul/data.length).toFixed(1);
-
-  // İstatistik kartları
-  var stat = function(val, lbl, hl){
-    return '<div class="kart" style="text-align:center;'+(hl?'border-color:var(--gold);':'')+'">'
-      +'<div style="font-size:24px;font-weight:700;font-family:\'Fraunces\',serif;color:'+(hl?'var(--gold)':'var(--ink)')+'">'+val+'</div>'
-      +'<div style="font-size:11px;color:var(--mist);letter-spacing:.5px;margin-top:2px;">'+lbl+'</div></div>';
+  var d = _kartVerisi || [], n = d.length;
+  if(!n){ el.innerHTML=''; return; }
+  // Son 8 hafta: haftalık yeni kayıt
+  var simdi = Date.now(), haftalar=[], enCok=1;
+  for(var i=7;i>=0;i--){
+    var bas = simdi-(i+1)*7*SK_GUN, son = simdi-i*7*SK_GUN, say=0;
+    d.forEach(function(m){ var t=skTs(m.kayit_tarih); if(t>bas && t<=son) say++; });
+    haftalar.push({say:say, ad:new Date(bas+SK_GUN).toLocaleDateString('tr-TR',{day:'numeric',month:'short',timeZone:'Europe/Istanbul'})});
+    if(say>enCok) enCok=say;
+  }
+  var hafta = '<div class="sk-kutu"><h4>Haftalık yeni üye · son 8 hafta</h4><div class="sk-hafta">'
+    + haftalar.map(function(h){ return '<div><b>'+h.say+'</b><u style="height:'+Math.max(2,Math.round(h.say/enCok*78))+'%"></u><span>'+h.ad+'</span></div>'; }).join('')
+    + '</div></div>';
+  var cubuk = function(ad, x, renk){
+    var p = Math.round(x/n*100);
+    return '<div class="sk-cubuk"><em>'+ad+'</em><s><u style="width:'+p+'%;background:'+renk+'"></u></s><b>'+x+' <small>%'+p+'</small></b></div>';
   };
-  var kartlar = '<div style="font-size:13px;font-weight:600;color:#555;margin:0 0 10px;">📊 Analitik</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:18px;">'
-    + stat(aktif, 'Aktif (son 30 gün)')
-    + stat(uykuda, 'Uykuda (60+ gün)')
-    + stat('+'+yeni, 'Yeni (son 30 gün)')
-    + stat(bedavaBekleyen, 'Bedava Bekleyen ☕', bedavaBekleyen>0)
-    + stat(ortPul, 'Ort. Pul / Müşteri')
+  var say = function(f){ return d.filter(function(m){ return f(m._b); }).length; };
+  var durum = '<div class="sk-kutu"><h4>Üye durumu</h4>'
+    + cubuk('Yeni (7 gün)', say(function(b){return b.durum==='yeni';}), '#3f6b34')
+    + cubuk('Aktif (30 gün)', say(function(b){return b.durum==='aktif';}), '#4d86a6')
+    + cubuk('Seyrek (31–60)', say(function(b){return b.durum==='seyrek';}), '#d6b25e')
+    + cubuk('Uykuda (60+)', say(function(b){return b.durum==='uykuda';}), '#bdb6a8')
+    + '<h4 style="margin-top:16px;">Kayıt kaynağı</h4>'
+    + cubuk('Kart sayfası', say(function(b){return b.kvkk;}), 'var(--gold)')
+    + cubuk('Kasa', say(function(b){return !b.kvkk;}), '#bdb6a8')
     + '</div>';
-
-  // Pul dağılımı (basit bar)
-  var bar = function(lbl, n, renk){
-    var pct = data.length ? Math.round(n/data.length*100) : 0;
-    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px;">'
-      +'<div style="width:120px;color:var(--mist);">'+lbl+'</div>'
-      +'<div style="flex:1;background:#f0ede8;border-radius:6px;height:16px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+renk+';"></div></div>'
-      +'<div style="width:54px;text-align:right;font-weight:600;">'+n+' <span style="color:var(--mist);font-weight:400;">%'+pct+'</span></div></div>';
-  };
-  var dagilim = '<div style="font-size:12px;font-weight:600;color:#555;margin:0 0 8px;">Pul Dağılımı</div>'
-    + bar('Hiç pulu yok', hicAlmamis, '#d8d2c8')
-    + bar('1–4 pul', data.filter(function(m){return (m.pul||0)>=1&&(m.pul||0)<5;}).length, '#9bbf8f')
-    + bar('5–6 pul (yaklaşan)', yaklasan, '#dcbd80')
-    + bar('7+ pul (bedava hakkı)', data.filter(function(m){return (m.pul||0)>=7;}).length, 'var(--gold)');
-
-  // En sadık 10
-  var top = data.slice().sort(function(a,b){return (b.toplam_kazanilan||0)-(a.toplam_kazanilan||0);}).slice(0,10);
-  var sadik = '<div style="font-size:12px;font-weight:600;color:#555;margin:18px 0 8px;">🏆 En Sadık 10 Müşteri</div>'
-    +'<table><thead><tr><th>#</th><th>Ad</th><th>Telefon</th><th style="text-align:center">Güncel Pul</th><th style="text-align:center">Toplam Kazanılan</th></tr></thead><tbody>'
-    + top.map(function(m,i){
-        return '<tr><td style="color:var(--mist);font-size:11px;">'+(i+1)+'</td>'
-          +'<td style="font-weight:600;">'+(m.ad||'—')+'</td>'
-          +'<td style="color:var(--mist);">'+m.telefon+'</td>'
-          +'<td style="text-align:center;">'+(m.pul||0)+'</td>'
-          +'<td style="text-align:center;font-weight:600;">'+(m.toplam_kazanilan||0)+'</td></tr>';
-      }).join('')
-    +'</tbody></table>';
-
-  el.innerHTML = kartlar
-    + '<div style="display:grid;grid-template-columns:1fr;gap:0;">'+dagilim+'</div>'
-    + sadik;
+  el.innerHTML = '<div class="sk-grafik">'+hafta+durum+'</div>';
 }
 
-function kartFilterSec(deger, btn){
-  document.getElementById('kartFilter').value = deger;
-  document.querySelectorAll('.kf-chip').forEach(function(b){
-    b.style.background = '#fff';
-    b.style.color = '#1a1a1a';
-    b.style.borderColor = '';
+function kartChipler(){
+  var el = document.getElementById('kartFilterChips'); if(!el) return;
+  el.innerHTML = Object.keys(SK_FILTRE).map(function(k){
+    var x = _kartVerisi.filter(function(m){ return SK_FILTRE[k].f(m, m._b); }).length;
+    return '<button class="sk-chip'+(k===_kartFiltre?' on':'')+'" onclick="kartFilterSec(\''+k+'\')">'+SK_FILTRE[k].ad+'<small>'+x+'</small></button>';
+  }).join('');
+}
+function kartFilterSec(deger){ _kartFiltre = SK_FILTRE[deger] ? deger : 'hepsi'; kartChipler(); kartListeRender(); }
+
+/* Filtre + arama + sıralama uygulanmış liste (tablo ve dışa aktarma ortak kullanır) */
+function kartSecili(){
+  var f = SK_FILTRE[_kartFiltre] || SK_FILTRE.hepsi;
+  var q = (document.getElementById('kartAra') ? document.getElementById('kartAra').value : '').trim();
+  var qAd = q.toLocaleLowerCase('tr'), qTel = skRakam(q);
+  var data = _kartVerisi.filter(function(m){
+    if(!f.f(m, m._b)) return false;
+    if(!q) return true;
+    if(String(m.ad||'').toLocaleLowerCase('tr').indexOf(qAd)>=0) return true;
+    return !!qTel && skRakam(m.telefon).indexOf(qTel)>=0;
   });
-  btn.style.background = 'var(--ink)';
-  btn.style.color = '#fff';
-  btn.style.borderColor = 'var(--ink)';
-  kartListeRender();
+  var sira = document.getElementById('kartSirala') ? document.getElementById('kartSirala').value : 'kayit_yeni';
+  var s = {
+    kayit_yeni: function(a,b){ return skTs(b.kayit_tarih)-skTs(a.kayit_tarih); },
+    kayit_eski: function(a,b){ return skTs(a.kayit_tarih)-skTs(b.kayit_tarih); },
+    yildiz_cok: function(a,b){ return b._b.toplam-a._b.toplam || skTs(b.kayit_tarih)-skTs(a.kayit_tarih); },
+    yildiz_az:  function(a,b){ return a._b.toplam-b._b.toplam || skTs(b.kayit_tarih)-skTs(a.kayit_tarih); },
+    aktif_pul:  function(a,b){ return b._b.pul-a._b.pul || skTs(b.son_islem)-skTs(a.son_islem); },
+    son_islem:  function(a,b){ return skTs(b.son_islem)-skTs(a.son_islem); },
+    ad:         function(a,b){ return String(a.ad||'').localeCompare(String(b.ad||''),'tr'); }
+  }[sira];
+  return s ? data.slice().sort(s) : data;
 }
 
-function _kartTarihSaat(t){ if(!t) return '-'; var d=new Date(t); if(isNaN(d.getTime())) return '-'; return d.toLocaleString('tr-TR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'}); }
 function kartListeRender(){
   var listEl = document.getElementById('kartListesi');
   if(!listEl) return;
-  var filtre = document.getElementById('kartFilter') ? document.getElementById('kartFilter').value : 'hepsi';
-  var data;
-  if(filtre === 'bedava'){
-    data = _kartVerisi.filter(function(m){ return m.pul >= 5; });
-  } else if(filtre === 'yeni'){
-    // Son 1 günde kayıt olanlar — en yeni en üstte
-    var _now = Date.now(), _gun = 86400000;
-    var _yas = function(t){ if(!t) return Infinity; var d=new Date(t).getTime(); return isNaN(d)?Infinity:(_now-d)/_gun; };
-    data = _kartVerisi.filter(function(m){ return _yas(m.kayit_tarih) <= 1; })
-                      .sort(function(a,b){ return (new Date(b.kayit_tarih).getTime()||0) - (new Date(a.kayit_tarih).getTime()||0); });
-  } else {
-    data = _kartVerisi;
-  }
-  // ── Sıralama (kullanıcı seçimi) ──
-  var _sira = document.getElementById('kartSirala') ? document.getElementById('kartSirala').value : 'kayit_yeni';
-  var _ts = function(t){ var d=t?new Date(t).getTime():0; return isNaN(d)?0:d; };
-  var _sirala = {
-    kayit_yeni: function(a,b){ return _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
-    kayit_eski: function(a,b){ return _ts(a.kayit_tarih)-_ts(b.kayit_tarih); },
-    yildiz_cok: function(a,b){ return (b.toplam_kazanilan||0)-(a.toplam_kazanilan||0) || _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
-    yildiz_az:  function(a,b){ return (a.toplam_kazanilan||0)-(b.toplam_kazanilan||0) || _ts(b.kayit_tarih)-_ts(a.kayit_tarih); },
-    aktif_pul:  function(a,b){ return (b.pul||0)-(a.pul||0) || _ts(b.son_islem)-_ts(a.son_islem); },
-    son_islem:  function(a,b){ return _ts(b.son_islem)-_ts(a.son_islem); },
-    ad:         function(a,b){ return String(a.ad||'').localeCompare(String(b.ad||''),'tr'); }
-  }[_sira] || null;
-  if(_sirala) data = data.slice().sort(_sirala);
-  if(!data.length){
-    listEl.innerHTML = '<div style="color:var(--mist);font-size:13px;padding:20px 0;">Kayıt bulunamadı.</div>';
-    return;
-  }
-  // Son 1 günde kayıt olanlara "🆕 YENİ" etiketi
-  var _yeniEsik = Date.now() - 1*86400000;
-  var _yeniTag = function(m){
-    var d = m.kayit_tarih ? new Date(m.kayit_tarih).getTime() : 0;
-    return (d && d>=_yeniEsik) ? ' <span style="background:#2d5a27;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.5px;white-space:nowrap;">🆕 YENİ</span>' : '';
+  var data = kartSecili();
+  var sayac = document.getElementById('kartSayac');
+  if(sayac) sayac.textContent = data.length===_kartVerisi.length ? data.length+' üye' : data.length+' / '+_kartVerisi.length+' üye';
+  if(!data.length){ listEl.innerHTML = '<div class="sk-tablo"><div class="sk-bos">Bu ölçütlere uyan üye yok.</div></div>'; return; }
+  var uye = function(m){
+    return '<div class="sk-uye"><div class="sk-avatar">'+skEsc(skBasHarf(m.ad))+'</div><div style="min-width:0"><b>'+skEsc(m.ad||'İsimsiz üye')+'</b><span>'+skEsc(skTel(m.telefon))+'</span></div></div>';
   };
-
-  // ── Mobil: kart görünümü ──
-  if(window.innerWidth < 700){
-    listEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'
-      + data.map(function(m){
-          var bedava = m.pul >= 7;
-          var sonIslem = m.son_islem ? _kartTarihSaat(m.son_islem) : '-';
-          var pulBar = '';
-          for(var i=0;i<7;i++){
-            pulBar += '<span style="display:inline-block;width:11px;height:11px;border-radius:50%;margin:2px;background:'+(i<(m.pul%7)?'var(--gold)':'#e8e4de')+';"></span>';
-          }
-          var mJson = encodeURIComponent(JSON.stringify(m));
-          return '<div class="mob-musteri-kart'+(bedava?' bedava':'')+'">'
-            + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">'
-              + '<div>'
-                + '<div style="font-size:15px;font-weight:600;">' + (m.ad||'—') + _yeniTag(m) + '</div>'
-                + '<div style="font-size:12px;color:var(--mist);margin-top:2px;">' + m.telefon + (m.sube?' · '+m.sube:'') + '</div>'
-              + '</div>'
-              + '<div style="text-align:right;">'
-                + '<div style="font-size:26px;font-weight:700;line-height:1;color:'+(bedava?'var(--gold)':'var(--ink)')+'">'+m.pul+'</div>'
-                + '<div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mist);margin-top:2px;">'+(bedava?'BEDAVA HAKKI VAR':'pul')+'</div>'
-              + '</div>'
-            + '</div>'
-            + '<div style="margin-bottom:8px;">'+ pulBar +'</div>'
-            + '<div style="font-size:11px;color:var(--mist);margin-bottom:12px;line-height:1.7;">Toplam '+(m.toplam_kazanilan||0)+' pul<br>Kayıt: '+_kartTarihSaat(m.kayit_tarih)+'<br>Son işlem: '+sonIslem+'</div>'
-            + '<div style="display:flex;gap:8px;">'
-              + (bedava
-                ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="flex:1;padding:10px 8px;background:var(--gold);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border-radius:4px;">✓ Bedavayı Kullandı</button>'
-                : '<div style="flex:1;padding:10px 8px;background:var(--paper);border:1.5px solid var(--stone);font-size:11px;color:var(--mist);text-align:center;border-radius:4px;">'+(7-m.pul)+' pul kaldı</div>')
-              + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:10px 14px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✎</button>'
-              + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:10px 14px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:13px;cursor:pointer;font-family:inherit;border-radius:4px;">✕</button>'
-            + '</div>'
-          + '</div>';
-        }).join('')
-      + '</div>';
+  // Mobil: kart listesi
+  if(window.innerWidth < 900){
+    listEl.innerHTML = '<div class="sk-mob">' + data.map(function(m){ var b=m._b;
+      return '<div onclick="kartDetayAc(\''+skRakam(m.telefon)+'\')">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">'+uye(m)+'<div style="text-align:right;flex:none;">'+skEtiket(b)+'</div></div>'
+        + '<div class="sk-satir"><span>'+skNokta(b)+' &nbsp;'+b.kart+'/7</span><span>'+b.toplam+' yıldız · son '+skOnce(m.son_islem)+'</span></div>'
+        + '</div>';
+    }).join('') + '</div>';
     return;
   }
-
-  // ── Masaüstü: tablo görünümü ──
-  listEl.innerHTML = '<table><thead><tr>'
-    + '<th>Telefon</th><th>Ad</th><th style="text-align:center">Pul</th>'
-    + '<th style="text-align:center">Toplam Kazanılan</th><th>Kayıt</th><th>Son İşlem</th><th>Şube</th><th style="text-align:center">İşlem</th>'
+  // Masaüstü: tablo
+  listEl.innerHTML = '<div class="sk-tablo"><table><thead><tr>'
+    + '<th>Üye</th><th>Kayıt</th><th>Kart</th><th style="text-align:center">Toplam yıldız</th><th style="text-align:center">Hediye</th><th>Son işlem</th><th>Durum</th>'
     + '</tr></thead><tbody>'
-    + data.map(function(m){
-        var bedava = m.pul >= 7;
-        var sonIslem = m.son_islem ? _kartTarihSaat(m.son_islem) : '-';
-        var pulBar = '';
-        for(var i=0;i<7;i++){
-          pulBar += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:1px;background:'+(i<(m.pul%7)?'var(--gold)':'#e0dbd3')+';"></span>';
-        }
-        var mJson = encodeURIComponent(JSON.stringify(m));
-        return '<tr style="'+(bedava?'background:rgba(184,150,90,.06);':'')+'">'
-          + '<td style="font-weight:600;">' + m.telefon + '</td>'
-          + '<td style="color:var(--mist);">' + (m.ad||'—') + _yeniTag(m) + '</td>'
-          + '<td style="text-align:center;">'
-            + '<div style="font-size:16px;font-weight:700;color:'+(bedava?'var(--gold)':'var(--ink)')+'">' + m.pul + '</div>'
-            + '<div>' + pulBar + '</div>'
-          + '</td>'
-          + '<td style="text-align:center;color:var(--mist);">' + (m.toplam_kazanilan||0) + '</td>'
-          + '<td style="color:var(--mist);font-size:11px;">' + _kartTarihSaat(m.kayit_tarih) + '</td>'
-          + '<td style="color:var(--mist);font-size:11px;">' + sonIslem + '</td>'
-          + '<td style="color:var(--mist);font-size:11px;">' + (m.sube||'—') + '</td>'
-          + '<td style="white-space:nowrap;text-align:center;">'
-            + (bedava
-              ? '<button onclick="kartSifirla(\''+m.telefon+'\')" style="padding:5px 10px;background:var(--gold);color:#fff;border:none;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;white-space:nowrap;">✓ Bedava</button> '
-              : '<span style="font-size:10px;color:#ccc;margin-right:6px;">' + (7 - m.pul) + ' pul kaldı</span>')
-            + '<button onclick="kartDuzenle(decodeURIComponent(\''+mJson+'\'))" style="padding:5px 10px;background:#f0ede8;color:var(--ink);border:1px solid #ddd;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✎ Düzenle</button> '
-            + '<button onclick="kartSil(\''+m.telefon+'\',\''+encodeURIComponent(m.ad||'')+'\')" style="padding:5px 10px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;font-size:10px;cursor:pointer;font-family:inherit;border-radius:4px;">✕ Sil</button>'
-          + '</td>'
+    + data.map(function(m){ var b=m._b;
+        return '<tr onclick="kartDetayAc(\''+skRakam(m.telefon)+'\')">'
+          + '<td>'+uye(m)+'</td>'
+          + '<td>'+skTarih(m.kayit_tarih)+'<span class="sk-alt">'+b.kaynak+(b.kvkk?' · KVKK ✓':'')+'</span></td>'
+          + '<td>'+skNokta(b)+'<span class="sk-alt">'+(b.hak>0?b.hak+' hediye hazır':b.kart+'/7 · '+(7-b.kart)+' kaldı')+'</span></td>'
+          + '<td style="text-align:center;font-weight:600;">'+b.toplam+'</td>'
+          + '<td style="text-align:center;">'+b.kullanilan+'<span class="sk-alt">verildi</span></td>'
+          + '<td>'+skOnce(m.son_islem)+'<span class="sk-alt">'+skTarih(m.son_islem,true)+'</span></td>'
+          + '<td>'+skEtiket(b)+'</td>'
           + '</tr>';
       }).join('')
-    + '</tbody></table>';
+    + '</tbody></table></div>';
+}
+
+/* ── Üye detayı (yan çekmece) ── */
+function kartDetayKapat(){ _kartAcik=null; var c=document.getElementById('skCekmece'); if(c) c.classList.remove('on'); }
+function kartDetayAc(tel){
+  tel = skRakam(tel); var m = _kartMap[tel]; if(!m) return;
+  _kartAcik = tel; var b = m._b;
+  var c = document.getElementById('skCekmece');
+  if(!c){
+    c = document.createElement('div'); c.id='skCekmece'; c.className='sk-cek';
+    c.innerHTML = '<div class="sk-cek-bg" onclick="kartDetayKapat()"></div><aside class="sk-cek-ic" id="skCekIc"></aside>';
+    document.body.appendChild(c);
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && _kartAcik && document.getElementById('kdModal').style.display!=='flex') kartDetayKapat(); });
+  }
+  var wa = tel.length===11 && tel.charAt(0)==='0' ? '9'+tel : tel;
+  var satir = function(etiket, deger, alt){ return '<div><span>'+etiket+'</span><b>'+deger+'</b>'+(alt?'<small>'+alt+'</small>':'')+'</div>'; };
+  var uyelik = b.kayitG===Infinity ? '—' : (b.kayitG<1 ? 'bugün katıldı' : Math.floor(b.kayitG)+' gündür üye');
+  document.getElementById('skCekIc').innerHTML =
+      '<div class="sk-cek-ust"><div class="sk-avatar buyuk">'+skEsc(skBasHarf(m.ad))+'</div>'
+    +   '<div style="min-width:0"><h3>'+skEsc(m.ad||'İsimsiz üye')+'</h3><p>'+skEsc(skTel(tel))+'</p></div>'
+    +   '<button class="sk-kapat" onclick="kartDetayKapat()" aria-label="Kapat">✕</button></div>'
+    + '<div style="margin:-6px 0 14px;">'+skEtiket(b)+'</div>'
+    + '<div class="sk-eylem">'
+    +   '<a class="sk-btn" href="tel:'+tel+'">📞 Ara</a>'
+    +   '<a class="sk-btn" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">💬 WhatsApp</a>'
+    +   '<button class="sk-btn" onclick="kartDuzenleTel(\''+tel+'\')">✎ Düzenle</button>'
+    +   (b.hak>0 ? '<button class="sk-btn altin" onclick="kartSifirla(\''+tel+'\')">✓ Hediye verildi</button>' : '')
+    + '</div>'
+    + '<div class="sk-blok"><h4>Kart</h4><div class="sk-kart-buyuk">'+skNokta(b)+'<b>'+(b.hak>0&&b.kart===0?7:b.kart)+'/7</b></div>'
+    +   '<div style="font-size:12px;color:var(--mist);margin-top:10px;">'+(b.hak>0 ? b.hak+' hediye içecek hakkı bekliyor.' : 'Hediyeye '+(7-b.kart)+' yıldız kaldı.')+'</div></div>'
+    + '<div class="sk-blok"><h4>Üyelik bilgileri</h4><div class="sk-ozl">'
+    +   satir('Kayıt tarihi', skTarih(m.kayit_tarih,true), uyelik)
+    +   satir('Kayıt kaynağı', b.kaynak, b.kvkk ? 'müşteri kendi kaydoldu' : 'kasadan eklendi ya da eski kayıt')
+    +   satir('KVKK açık rızası', b.kvkk ? 'Var' : 'Kayıtlı değil', b.kvkk ? skTarih(m.kvkk_onay,true) : '')
+    +   satir('Son işlem', skOnce(m.son_islem), skTarih(m.son_islem,true))
+    +   satir('Toplam yıldız', b.toplam, b.kvkk ? 'hoş geldin yıldızı dahil' : '')
+    +   satir('Verilen hediye', b.kullanilan, b.hak>0 ? b.hak+' tane de bekliyor' : '')
+    +   satir('Ziyaret sıklığı', b.aralik ? (b.aralik<1 ? 'günde birden fazla' : 'ortalama '+Math.round(b.aralik)+' günde bir') : 'henüz veri az', '')
+    +   satir('Üye no', '#'+skEsc(m.id!=null?m.id:'—'), '')
+    + '</div></div>'
+    + '<div class="sk-blok"><h4>Hareketler</h4><div id="skHareket" class="sk-bos" style="padding:14px 0;">Yükleniyor…</div></div>'
+    + '<div style="margin-top:18px;"><button class="sk-btn kirmizi" onclick="kartSil(\''+tel+'\',\''+encodeURIComponent(m.ad||'')+'\')">Üyeyi ve geçmişini sil</button></div>';
+  c.classList.add('on');
+  kartHareketYukle(tel);
+}
+async function kartHareketYukle(tel){
+  try {
+    var d = await (await fetch(KART_API + '/kart/bak?telefon=' + tel)).json();
+    if(_kartAcik!==tel) return;
+    var el = document.getElementById('skHareket'); if(!el) return;
+    var g = (d && d.gecmis) || [];
+    if(!g.length){ el.textContent = 'Kayıtlı hareket yok.'; return; }
+    el.className=''; el.style.padding='0';
+    el.innerHTML = '<ul class="sk-zaman">' + g.map(function(h){
+      var kul = h.tip==='kullandi';
+      return '<li><i'+(kul?' class="k"':'')+'>'+(kul?'🎁':'+'+skEsc(h.miktar||1))+'</i><div><b>'
+        + (kul ? 'Hediye içecek verildi (−'+skEsc(h.miktar||7)+' yıldız)' : skEsc(h.aciklama||'Yıldız kazandı'))+'</b>'
+        + '<span>'+skTarih(h.tarih,true)+(h.sube?' · '+skEsc(h.sube):'')+(kul&&h.aciklama?' · '+skEsc(h.aciklama):'')+'</span></div></li>';
+    }).join('') + '</ul>' + (g.length>=20 ? '<div style="font-size:11px;color:var(--mist);margin-top:8px;">Son 20 hareket gösteriliyor.</div>' : '');
+  } catch(e){
+    var el2 = document.getElementById('skHareket'); if(el2) el2.textContent = 'Hareketler yüklenemedi.';
+  }
+}
+function kartDuzenleTel(tel){ var m=_kartMap[skRakam(tel)]; if(m) kartDuzenle(JSON.stringify({telefon:m.telefon, ad:m.ad})); }
+
+/* Görünen listeyi (filtre + arama uygulanmış) Excel'in açtığı CSV olarak indirir */
+function kartCsvIndir(){
+  var data = kartSecili();
+  if(!data.length){ toast('Aktarılacak üye yok.'); return; }
+  var h = function(v){ v=String(v==null?'':v); if(/^[=+\-@]/.test(v)) v="'"+v; return '"'+v.replace(/"/g,'""')+'"'; };
+  var satirlar = [['Ad','Telefon','Kayıt tarihi','Kayıt kaynağı','KVKK onayı','Karttaki yıldız','Toplam yıldız','Verilen hediye','Bekleyen hediye','Son işlem','Durum']];
+  data.forEach(function(m){ var b=m._b;
+    satirlar.push([m.ad||'', skTel(m.telefon), skTarih(m.kayit_tarih,true), b.kaynak, b.kvkk?skTarih(m.kvkk_onay,true):'', b.pul, b.toplam, b.kullanilan, b.hak, skTarih(m.son_islem,true), SK_DURUM[b.durum]]);
+  });
+  var csv = '﻿' + satirlar.map(function(s){ return s.map(h).join(';'); }).join('\r\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'cactus-sadakat-uyeleri-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  toast('✓ '+data.length+' üye indirildi.');
 }
 
 async function kartSifirla(telefon){

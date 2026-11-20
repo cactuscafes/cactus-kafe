@@ -3998,7 +3998,7 @@ async function kartListeYukle(){
     if(!Array.isArray(veri)) throw new Error((veri && veri.error) || 'Beklenmeyen yanıt');
     _kartVerisi = veri; _kartMap = {};
     _kartVerisi.forEach(function(m){ m._b = skBilgi(m); _kartMap[skRakam(m.telefon)] = m; });
-    // Gerçek üye sayısı (liste sunucuda 200 kayıtla sınırlı — eksik varsa uyar)
+    // Gerçek üye sayısı (liste eksik gelirse uyarmak için; sunucudaki eski 200 sınırı 21 Kas 2026'da kaldırıldı)
     try { var s = await (await fetch(KART_API + '/kart/sayac')).json(); _kartGercekToplam = (s && s.ok) ? s.uye : null; } catch(e){ _kartGercekToplam = null; }
     // Panel açıldı = yeni kayıt bildirimi görüldü
     try{ localStorage.setItem(KEYS.sadakatGorulen, String(Date.now())); }catch(e){}
